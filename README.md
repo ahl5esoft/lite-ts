@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.3-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.4-green.svg)
 
 ## 结构
 * dist - 编译后的目录(js)
@@ -9,7 +9,11 @@
   * io - io相关
     * os - 系统io
   * main - 入口
-    * version - 修改版本(同步README.md\package-lock.json\package.json)
+    * version - 修改版本(README.md\package-lock.json\package.json)
+  * object - 对象相关
+    * id-generator-base - id生成器接口
   * plugin - 插件(第三方)
     * db - 数据库相关
-      * mongo - mongodb
+      * mongo - mongodb相关
+        * id-generator - 用mongo.ObjectID实现IDGeneratorBase
+        * ... - mongodb CRUD
