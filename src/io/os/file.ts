@@ -2,10 +2,10 @@ import { createReadStream, createWriteStream, existsSync } from 'fs';
 import { readFile, unlink, writeFile } from 'fs/promises';
 import { dirname } from 'path';
 
-import { Directory } from './directory';
+import { OSDirectory } from './directory';
 import { FileBase } from '../file-base';
 
-export class File extends FileBase {
+export class OSFile extends FileBase {
     public async isExist(): Promise<boolean> {
         return existsSync(this.path);
     }
@@ -15,11 +15,11 @@ export class File extends FileBase {
         if (!isExist)
             return;
 
-        isExist = await new File(dstFilePath).isExist();
+        isExist = await new OSFile(dstFilePath).isExist();
         if (isExist)
             throw new Error(`文件已经存在: ${dstFilePath}`);
 
-        await new Directory(
+        await new OSDirectory(
             dirname(dstFilePath)
         ).create();
 

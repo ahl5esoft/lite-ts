@@ -2,33 +2,33 @@ import { existsSync, Stats } from 'fs';
 import { mkdir, readdir, rmdir, stat } from 'fs/promises';
 import { dirname, join } from 'path';
 
-import { File } from './file';
+import { OSFile } from './file';
 import { DirectoryBase } from '../directory-base';
-import { NodeBase } from '../node-base';
+import { IONodeBase } from '../node-base';
 
-export class Directory extends DirectoryBase {
+export class OSDirectory extends DirectoryBase {
     public async create(): Promise<void> {
         const isExist = await this.isExist();
         if (isExist)
             return;
 
-        await new Directory(
+        await new OSDirectory(
             dirname(this.path)
         ).create();
 
         await mkdir(this.path);
     }
 
-    public async findDirectories(): Promise<Directory[]> {
+    public async findDirectories(): Promise<OSDirectory[]> {
         return this.find((stat): boolean => {
             return stat.isDirectory();
-        }, Directory);
+        }, OSDirectory);
     }
 
-    public async findFiles(): Promise<File[]> {
+    public async findFiles(): Promise<OSFile[]> {
         return this.find((stat): boolean => {
             return stat.isFile();
-        }, File);
+        }, OSFile);
     }
 
     public async isExist(): Promise<boolean> {
@@ -36,7 +36,7 @@ export class Directory extends DirectoryBase {
     }
 
     public async move(dstDirPath: string): Promise<void> {
-        const dstDir = new Directory(dstDirPath);
+        const dstDir = new OSDirectory(dstDirPath);
         let isExist = await dstDir.isExist();
         if (isExist)
             throw new Error(`目录已经存在: ${dstDirPath}`);
@@ -82,7 +82,7 @@ export class Directory extends DirectoryBase {
         await rmdir(this.path);
     }
 
-    private async find<T extends NodeBase>(
+    private async find<T extends IONodeBase>(
         checkFunc: (stat: Stats) => boolean,
         ctor: new (path: string) => T
     ): Promise<T[]> {

@@ -1,8 +1,8 @@
-import { RepositoryBase } from './repository-base';
+import { DbRepositoryBase } from './repository-base';
 import { IUnitOfWork } from './unit-of-work-base';
 
-export abstract class FactoryBase {
-    public abstract db<T>(model: Function, ...extra: DbExtraType[]): RepositoryBase<T>;
+export abstract class DbFactoryBase {
+    public abstract db<T>(model: Function, ...extra: DbExtraType[]): DbRepositoryBase<T>;
     public abstract uow(): IUnitOfWork;
 }
 

@@ -5,6 +5,7 @@
 		"class-validator": "^0.12.2",
 		"commander": "^6.2.1",
 		"express": "^4.17.1",
+		"ioredis": "^4.19.4",
 		"mongodb": "^3.6.3",
 		"multer": "^1.4.2",
 		"reflect-metadata": "^0.1.13",
@@ -16,6 +17,7 @@
 		"@types/body-parser": "^1.19.0",
 		"@types/commander": "^2.12.2",
 		"@types/express": "^4.17.9",
+		"@types/ioredis": "^4.17.10",
 		"@types/mocha": "^8.2.0",
 		"@types/mongodb": "^3.6.3",
 		"@types/multer": "^1.4.5",
@@ -25,12 +27,11 @@
 	},
 	"keywords": [],
 	"license": "GPL-3.0",
-	"main": "src/index.ts",
 	"name": "lite-ts",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ahl5esoft/lite-ts.git"
 	},
 	"scripts": {},
-	"version": "0.0.5"
+	"version": "0.0.6"
 }

@@ -1,7 +1,7 @@
-import { QueryBase } from './query-base';
+import { DbQueryBase } from './query-base';
 import { UnitOfWorkBase } from './unit-of-work-base';
 
-export abstract class RepositoryBase<T> {
+export abstract class DbRepositoryBase<T> {
     public constructor(protected table: string, private m_IsTx: boolean, private m_Uow: UnitOfWorkBase) { }
 
     public async add(entry: T): Promise<void> {
@@ -28,5 +28,5 @@ export abstract class RepositoryBase<T> {
         await this.m_Uow.commit();
     }
 
-    public abstract query(): QueryBase<T>;
+    public abstract query(): DbQueryBase<T>;
 }

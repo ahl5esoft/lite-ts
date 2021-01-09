@@ -1,5 +1,5 @@
-export abstract class HandlerBase<T> {
-    private m_Handlers: HandlerBase<T>[] = [this];
+export abstract class CORHandlerBase<T> {
+    private m_Handlers: CORHandlerBase<T>[] = [this];
 
     public async handle(ctx: T): Promise<void> {
         for (const r of this.m_Handlers) {
@@ -7,7 +7,7 @@ export abstract class HandlerBase<T> {
         }
     }
 
-    public setNext(handler: HandlerBase<T>): this {
+    public setNext(handler: CORHandlerBase<T>): this {
         this.m_Handlers.push(handler);
         return this;
     }

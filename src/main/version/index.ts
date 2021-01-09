@@ -4,7 +4,7 @@ import * as commander from 'commander';
 
 import { OtherHandler } from './other-handler';
 import { ReadmeHandler } from './readme-handler';
-import { Directory } from '../../io/os';
+import { OSDirectory } from '../../io/os';
 
 (async (): Promise<void> => {
     const cmd = new commander.Command().option(
@@ -23,7 +23,7 @@ import { Directory } from '../../io/os';
     ).setNext(
         new OtherHandler('package-lock.json')
     ).handle({
-        rootDir: new Directory(__dirname, '..', '..', '..'),
+        rootDir: new OSDirectory(__dirname, '..', '..', '..'),
         version: cmd.nv
     });
 })();

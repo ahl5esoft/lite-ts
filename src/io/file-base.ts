@@ -1,8 +1,8 @@
 import { extname } from 'path';
 
-import { NodeBase } from './node-base';
+import { IONodeBase } from './node-base';
 
-export abstract class FileBase extends NodeBase {
+export abstract class FileBase extends IONodeBase {
     public get ext(): string {
         return extname(this.path);
     }

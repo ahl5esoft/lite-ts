@@ -1,9 +1,11 @@
 import { Pool } from './pool';
 import { Repository } from './repository';
 import { UnitOfWork } from './unit-of-work';
-import { DbExtraType, FactoryBase } from '../factory-base';
+import { DbExtraType, DbFactoryBase } from '../factory-base';
+import { DbRepositoryBase } from '../repository-base';
+import { IUnitOfWork } from '../unit-of-work-base';
 
-export class Factory extends FactoryBase {
+export class MongoFactory extends DbFactoryBase {
     private m_Pool: Pool;
 
     public constructor(name: string, url: string) {
@@ -17,7 +19,7 @@ export class Factory extends FactoryBase {
         await client.close();
     }
 
-    public db<T>(model: Function, ...extra: DbExtraType[]): Repository<T> {
+    public db<T>(model: Function, ...extra: DbExtraType[]): DbRepositoryBase<T> {
         let isTx = true;
         let uow: UnitOfWork;
         extra.forEach((r): void => {
@@ -27,13 +29,13 @@ export class Factory extends FactoryBase {
 
         if (!uow) {
             isTx = false;
-            uow = this.uow();
+            uow = this.uow() as UnitOfWork;
         }
 
         return new Repository<T>(this.m_Pool, model.name, isTx, uow);
     }
 
-    public uow(): UnitOfWork {
+    public uow(): IUnitOfWork {
         return new UnitOfWork(this.m_Pool);
     }
 }

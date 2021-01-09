@@ -1,7 +1,7 @@
 import { FileBase } from './file-base';
-import { NodeBase } from './node-base';
+import { IONodeBase } from './node-base';
 
-export abstract class DirectoryBase extends NodeBase {
+export abstract class DirectoryBase extends IONodeBase {
     public abstract create(): Promise<void>;
     public abstract findDirectories(): Promise<DirectoryBase[]>;
     public abstract findFiles(): Promise<FileBase[]>;

@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { mkdir, readFile, rmdir, unlink, writeFile } from 'fs/promises';
 import { dirname, extname, join } from 'path';
 
-import { File as Self } from '../../../io/os';
+import { OSFile as Self } from '../../../io/os';
 
 describe('src/io/os/file.ts', (): void => {
     describe('.ext', (): void => {

@@ -4,7 +4,7 @@ import { mkdir, rmdir, unlink, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { promisify } from 'util';
 
-import { Directory as Self } from '../../../io/os';
+import { OSDirectory as Self } from '../../../io/os';
 
 describe('src/io/os/directory.ts', (): void => {
     describe('.create(): Promise<void>', (): void => {

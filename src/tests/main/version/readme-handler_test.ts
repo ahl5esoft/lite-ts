@@ -1,15 +1,15 @@
 import { strictEqual } from 'assert';
 
-import { Directory, File } from '../../../io/os';
+import { OSDirectory, OSFile } from '../../../io/os';
 import { ReadmeHandler } from '../../../main/version/readme-handler';
 
 describe('src/main/version/readme-handler.ts', (): void => {
     describe('.handling(ctx: Context): Promise<void>', (): void => {
         it('ok', async (): Promise<void> => {
-            const dir = new Directory(__dirname, 'readme-handler');
+            const dir = new OSDirectory(__dirname, 'readme-handler');
             await dir.create();
 
-            const readme = new File(dir.path, ReadmeHandler.filename);
+            const readme = new OSFile(dir.path, ReadmeHandler.filename);
             await readme.write('# ![Version](https://img.shields.io/badge/version-0.0.0-green.svg)');
 
             let err: Error;

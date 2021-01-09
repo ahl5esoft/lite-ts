@@ -1,6 +1,6 @@
 import { basename, join } from 'path';
 
-export abstract class NodeBase {
+export abstract class IONodeBase {
     public get name() {
         return basename(this.path);
     }

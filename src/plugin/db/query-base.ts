@@ -1,4 +1,4 @@
-export abstract class QueryBase<T> {
+export abstract class DbQueryBase<T> {
     public abstract count(): Promise<number>;
     public abstract order(...fields: string[]): this;
     public abstract orderByDesc(...fields: string[]): this;

@@ -1,7 +1,7 @@
-import { Directory } from '../../io/os';
+import { OSDirectory } from '../../io/os';
 
 export class Context {
-    public rootDir: Directory;
+    public rootDir: OSDirectory;
 
     public version: string;
 }

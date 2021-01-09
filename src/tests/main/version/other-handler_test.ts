@@ -1,15 +1,15 @@
 import { strictEqual } from 'assert';
 
-import { Directory, File } from '../../../io/os';
+import { OSDirectory, OSFile } from '../../../io/os';
 import { OtherHandler } from '../../../main/version/other-handler';
 
 describe('src/main/version/other-handler.ts', (): void => {
     describe('.handling(ctx: Context): Promise<void>', (): void => {
         it('ok', async (): Promise<void> => {
-            const dir = new Directory(__dirname, 'other-handler');
+            const dir = new OSDirectory(__dirname, 'other-handler');
             await dir.create();
 
-            const file = new File(dir.path, 'package.json');
+            const file = new OSFile(dir.path, 'package.json');
             await file.write({
                 version: '0.0.0'
             });

@@ -2,9 +2,9 @@ import { Cursor, FilterQuery } from 'mongodb';
 
 import { Pool } from './pool';
 import { docPK, modelPK, toEntries } from './helper';
-import { QueryBase } from '../query-base';
+import { DbQueryBase } from '../query-base';
 
-export class Query<T> extends QueryBase<T> {
+export class Query<T> extends DbQueryBase<T> {
     private m_Skip: number;
     private m_Sorts: [string, 1 | -1][] = [];
     private m_Take: number;
