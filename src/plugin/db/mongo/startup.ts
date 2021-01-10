@@ -4,7 +4,7 @@ import { MongoFactory } from './factory';
 import { DbFactoryBase } from '../factory-base';
 import { CORHandlerBase } from '../../../dp/cor';
 
-export class MongoStartupHandler extends CORHandlerBase<IMongoStartupContext> {
+export class MongoStartupHandler extends CORHandlerBase {
     protected async handling(ctx: IMongoStartupContext): Promise<void> {
         if (!ctx.mongo)
             return;

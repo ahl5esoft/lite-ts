@@ -1,0 +1,12 @@
+{
+    "host": "127.0.0.1",
+    "mongo": {
+        "name": "example",
+        "url": "mongodb://localhost:27017"
+    },
+    "redis": {
+        "host": "127.0.0.1",
+        "port": 6379
+    },
+    "port": 8888
+}

@@ -6,7 +6,7 @@ class Package {
     public version: string;
 }
 
-export class OtherHandler extends CORHandlerBase<Context> {
+export class OtherHandler extends CORHandlerBase {
     public constructor(private m_Filename: string) {
         super();
     }

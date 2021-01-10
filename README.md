@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.6-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.7-green.svg)
 
 ## 结构
 * dist - 编译后的目录(js)
@@ -7,6 +7,7 @@
   * api - api相关
   * dp - 设计模式
     * cor - 责任链
+  * example - 示例
   * io - io相关
     * os - 系统io
   * main - 入口

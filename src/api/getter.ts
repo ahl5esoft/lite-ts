@@ -1,40 +1,34 @@
+import { existsSync } from 'fs';
+import { join } from 'path';
 import Container from 'typedi';
 
 import { APIBase } from './base';
-import { APIError } from './error';
-import { APIErrorCode } from './error-code';
-import { OSDirectory, OSFile } from '../io/os';
-
-const err = new APIError(APIErrorCode.API);
+import { nullAPI } from './null';
 
 export class APIGetter {
-    public static get err(): Error {
-        return err;
-    }
-
-    private m_Dir: OSDirectory;
+    private m_DirPath: string;
 
     public constructor(...pathArgs: string[]) {
-        this.m_Dir = new OSDirectory(...pathArgs);
+        this.m_DirPath = join(...pathArgs);
     }
 
-    public async get(endpoint: string, name: string, version?: string): Promise<APIBase> {
-        const dir = new OSDirectory(this.m_Dir.path, endpoint);
-        let isExist = await dir.isExist();
+    public get(endpoint: string, name: string, version?: string): APIBase {
+        const dirPath = join(this.m_DirPath, endpoint);
+        let isExist = existsSync(dirPath);
         if (!isExist)
-            throw APIGetter.err;
+            return nullAPI;
 
-        const file = new OSFile(dir.path, name);
+        const filePath = join(dirPath, name);
         let ctor: Function;
         try {
             if (version)
-                ctor = require(`${file.path}-${version}`).default;
+                ctor = require(`${filePath}-${version}`).default;
 
             if (!ctor)
-                ctor = require(file.path).default;
+                ctor = require(filePath).default;
         } catch (ex) {
             console.error(ex);
-            throw APIGetter.err;
+            return nullAPI;
         }
 
         const instance = Container.get<APIBase>(ctor);

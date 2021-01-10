@@ -2,37 +2,28 @@ import 'reflect-metadata';
 
 import { ok, strictEqual } from 'assert';
 
-import { APIError, APIBase, APIGetter } from '../../api';
+import { APIBase, APIGetter } from '../../api';
+import { nullAPI } from '../../api/null';
 import { OSDirectory, OSFile } from '../../io/os';
 
 const self = new APIGetter(__dirname);
 
 describe('src/api/getter.ts', (): void => {
     describe('.get(endpoint: string, name: string, version?: string): Promise<Base>', (): void => {
-        it('endpoint not exists', async (): Promise<void> => {
-            let err: APIError;
-            try {
-                await self.get('endpoint', '');
-            } catch (ex) {
-                err = ex;
-            }
-            strictEqual(err, APIGetter.err);
+        it('endpoint not exists', (): void => {
+            const res = self.get('endpoint', '');
+            strictEqual(res, nullAPI);
         });
 
         it('api not exists', async (): Promise<void> => {
             const dir = new OSDirectory(__dirname, 'endpoint');
             await dir.create();
 
-            let err: APIError;
-            try {
-                await self.get('endpoint', '');
-            } catch (ex) {
-                err = ex;
-            }
+            const res = self.get('endpoint', '');
 
             await dir.remove();
 
-            strictEqual(err, APIGetter.err);
+            strictEqual(res, nullAPI);
         });
 
         it('api', async (): Promise<void> => {
@@ -59,7 +50,7 @@ export default class TestsAPI extends APIBase {
             let api: APIBase;
             let err: Error;
             try {
-                api = await self.get(dir.name, name);
+                api = self.get(dir.name, name);
             } catch (ex) {
                 err = ex;
             }
@@ -99,7 +90,7 @@ export default class TestsAPI extends APIBase {
             let api: APIBase;
             let err: Error;
             try {
-                api = await self.get(dir.name, name, version);
+                api = self.get(dir.name, name, version);
             } catch (ex) {
                 err = ex;
             }

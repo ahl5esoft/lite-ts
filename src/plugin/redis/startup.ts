@@ -7,7 +7,7 @@ import { IORedisAdapter } from './ioredis-adapter';
 import { CORHandlerBase } from '../../dp/cor';
 import { LockBase } from '../../thread';
 
-export class RedisStartupHandler extends CORHandlerBase<IRedisStartupContext> {
+export class RedisStartupHandler extends CORHandlerBase {
     protected async handling(ctx: IRedisStartupContext): Promise<void> {
         if (ctx.redis) {
             const redis = new IORedisAdapter(ctx.redis);

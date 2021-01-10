@@ -4,7 +4,7 @@ import { OSFile } from '../../io/os';
 
 const versionReg = /version-(\d+\.\d+\.\d+)-green/;
 
-export class ReadmeHandler extends CORHandlerBase<Context> {
+export class ReadmeHandler extends CORHandlerBase {
     public static filename = 'README.md';
 
     protected async handling(ctx: Context): Promise<void> {
