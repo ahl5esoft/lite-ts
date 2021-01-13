@@ -1,4 +1,5 @@
 export * from './base';
-export * from './ioredis-adapter';
+export * from './ioredis';
 export * from './lock';
+export * from './lock-startup';
 export * from './startup';

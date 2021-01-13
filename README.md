@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.7-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.8-green.svg)
 
 ## 结构
 * dist - 编译后的目录(js)

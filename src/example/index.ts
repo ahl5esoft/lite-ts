@@ -22,8 +22,6 @@ class StartupContext implements IExpressStartupContext, IMongoStartupContext, IR
 
     public redis: any;
 
-    public redisLock: any;
-
     public staticDirPath?: string;
 
     public get uploadDirPath(): string {

@@ -2,10 +2,8 @@ import * as IORedis from 'ioredis';
 import Container from 'typedi';
 
 import { RedisBase } from './base';
-import { RedisLock } from './lock';
-import { IORedisAdapter } from './ioredis-adapter';
+import { IORedisAdapter } from './ioredis';
 import { CORHandlerBase } from '../../dp/cor';
-import { LockBase } from '../../thread';
 
 export class RedisStartupHandler extends CORHandlerBase {
     protected async handling(ctx: IRedisStartupContext): Promise<void> {
@@ -17,23 +15,10 @@ export class RedisStartupHandler extends CORHandlerBase {
                 redis.close();
             });
         }
-
-        if (ctx.redisLock) {
-            const redis = new IORedisAdapter(ctx.redisLock);
-            Container.set(
-                LockBase,
-                new RedisLock(redis)
-            );
-
-            ctx.addReleaseRedis(async (): Promise<void> => {
-                redis.close();
-            });
-        }
     }
 }
 
 export interface IRedisStartupContext {
     redis?: IORedis.RedisOptions | IORedis.ClusterNode[];
-    redisLock?: IORedis.RedisOptions | IORedis.ClusterNode[];
     addReleaseRedis(action: () => Promise<void>): void;
 } 
