@@ -1,62 +1,56 @@
 import 'reflect-metadata';
 
-import { join } from 'path';
 import Container from 'typedi';
 
 import { APIGetter } from '../api';
-import { OSFile } from '../io/os';
-import { ExpressStartupHandler, IExpressStartupContext } from '../plugin/express';
-import { IMongoStartupContext, MongoStartupHandler } from '../plugin/db/mongo';
-import { IRedisStartupContext, RedisStartupHandler } from '../plugin/redis';
+import { OSDirectory, OSFile } from '../io/os';
+import { IDGeneratorBase } from '../object';
+import { DbFactoryBase } from '../plugin/db';
+import { MongoFactory, MongoIDGenerator } from '../plugin/db/mongo';
+import { ExpressServer, newPostExpessServerRunOption } from '../plugin/express';
+import { IORedisAdapter, RedisBase } from '../plugin/redis';
 
-class StartupContext implements IExpressStartupContext, IMongoStartupContext, IRedisStartupContext {
-    private m_ReleaseActions: (() => Promise<void>)[] = [];
+class Package {
+    public branch: string;
 
-    public controllers: Function[];
+    public mongo: {
+        name: string;
+        url: string;
+    };
 
-    public host: string;
-
-    public mongo: any;
+    public redis: {
+        host: string;
+        port: number;
+    };
 
     public port: number;
-
-    public redis: any;
-
-    public staticDirPath?: string;
-
-    public get uploadDirPath(): string {
-        return join(__dirname, 'upload');
-    }
-
-    public addReleaseRedis(action: () => Promise<void>): void {
-        this.m_ReleaseActions.push(action);
-    }
-
-    public async onExit(): Promise<void> {
-        for (const r of this.m_ReleaseActions) {
-            await r();
-        }
-    }
-
-    public setReleaseMongo(action: () => Promise<void>): void {
-        this.m_ReleaseActions.push(action);
-    }
 }
 
 (async (): Promise<void> => {
-    Container.set(
-        APIGetter,
-        new APIGetter(__dirname, 'api')
-    );
+    const apiGetter = new APIGetter(__dirname, 'api');
+    Container.set(APIGetter, apiGetter);
 
-    const pkg = await new OSFile(__dirname, 'package.json').readJSON<StartupContext>();
-    const ctx = Object.assign(
-        new StartupContext(),
-        pkg
+    const uploadDir = new OSDirectory(__dirname, 'upload');
+    await uploadDir.create();
+
+    const idGenerator = Container.get<IDGeneratorBase>(MongoIDGenerator);
+
+    const pkg = await new OSFile(__dirname, 'package.json').readJSON<Package>();
+    let server = new ExpressServer(pkg.branch, pkg.port);
+
+    const mongo = new MongoFactory(pkg.mongo.name, pkg.mongo.url);
+    Container.set(DbFactoryBase, mongo);
+    server.exitActions.push((): void => {
+        mongo.close().catch(console.error);
+    });
+
+    const redis = new IORedisAdapter(pkg.redis);
+    Container.set(RedisBase, redis);
+    server.exitActions.push((): void => {
+        redis.close();
+    });
+
+    await server.run(
+        newPostExpessServerRunOption(uploadDir.path, apiGetter, idGenerator)
     );
-    await new MongoStartupHandler().setNext(
-        new RedisStartupHandler()
-    ).setNext(
-        new ExpressStartupHandler()
-    ).handle(ctx);
 })();

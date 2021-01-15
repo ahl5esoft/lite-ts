@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.8-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.9-green.svg)
 
 ## 结构
 * dist - 编译后的目录(js)
@@ -18,14 +18,12 @@
     * db - 数据库相关
       * mongo - mongodb相关
         * id-generator - 用mongo.ObjectID实现IDGeneratorBase
-        * startup - 启动处理器
         * ... - mongodb CRUD
     * express - express扩展
     * redis - redis扩展
       * base.ts - reids接口
       * ioredis-adapter.ts - 基于ioredis的redis接口适配器
       * lock.ts - 基于redis的锁实现类
-      * startup.ts - 启动处理器
   * thread - 线程相关
     * lock-base.ts - 锁基类
     * sleep.ts - 休眠函数

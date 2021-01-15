@@ -1,6 +1,6 @@
 import { Field } from 'multer';
 
-export class FileUploadLimitOption {
+export class FileUploadOption {
     /** Maximum size of each form field name in bytes. (Default: 100) */
     public fieldNameSize?: number;
 
@@ -23,10 +23,10 @@ export class FileUploadLimitOption {
     public headerPairs?: number;
 }
 
-export class FileUploadOption {
+export class FileOption {
     public fields?: Field[];
 
-    public limit?: FileUploadLimitOption;
+    public limit?: FileUploadOption;
 
     public name?: string;
 }

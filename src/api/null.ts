@@ -1,14 +1,10 @@
 import { APIBase } from './base';
+import { APIError } from './error';
+import { APIErrorCode } from './error-code';
 
 class NullAPI extends APIBase {
-    public async auth(): Promise<boolean> {
-        return false;
-    }
-
-    public async call(): Promise<void> { }
-
-    public async valid(): Promise<boolean> {
-        return false;
+    public async call(): Promise<void> {
+        throw new APIError(APIErrorCode.API);
     }
 }
 

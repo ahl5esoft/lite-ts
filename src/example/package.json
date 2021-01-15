@@ -1,5 +1,5 @@
 {
-    "host": "127.0.0.1",
+    "branch": "local",
     "mongo": {
         "name": "example",
         "url": "mongodb://localhost:27017"
