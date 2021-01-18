@@ -33,7 +33,10 @@
         // 控制编译后输出的是什么js版本
         "target": "es6"
     },
+    "exclude": [
+        "./dist"
+    ],
     "include": [
-        "./src/**/*.ts"
+        "./**/*.ts"
     ]
 }

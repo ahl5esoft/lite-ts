@@ -4,9 +4,9 @@ import { extname } from 'path';
 import { Body, JsonController, Post, Req, UseBefore } from 'routing-controllers';
 
 import { ExpressServer, ExpressServerRunOption } from './server';
-import { APIBase, APIError, APIErrorCode, APIGetter, APIResponse, FileOption } from '../../api';
-import { OSFile } from '../../io/os';
-import { IDGeneratorBase } from '../../object';
+import { APIBase, APIError, APIErrorCode, APIGetter, APIResponse, FileOption } from '../../../api';
+import { OSFile } from '../../../io/os';
+import { IDGeneratorBase } from '../../../object';
 
 async function removeUploadFiles(api: APIBase): Promise<void> {
     for (const r of Object.keys(api.$nameOfFiles)) {
