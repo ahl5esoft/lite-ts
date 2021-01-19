@@ -1,5 +1,6 @@
 import { createReadStream, createWriteStream, existsSync } from 'fs';
 import { readFile, unlink, writeFile } from 'fs/promises';
+import { load } from 'js-yaml';
 import { dirname } from 'path';
 
 import { OSDirectory } from './directory';
@@ -38,6 +39,11 @@ export class OSFile extends FileBase {
 
     public async readString(): Promise<string> {
         return await readFile(this.path, 'utf8');
+    }
+
+    public async readYaml<T>(): Promise<T> {
+        const content = await this.readString();
+        return load(content) as any as T;
     }
 
     public async remove(): Promise<void> {

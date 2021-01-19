@@ -9,5 +9,6 @@ export abstract class FileBase extends IONodeBase {
 
     public abstract readJSON<T>(): Promise<T>;
     public abstract readString(): Promise<string>;
+    public abstract readYaml<T>(): Promise<T>;
     public abstract write(content: any): Promise<void>;
 }

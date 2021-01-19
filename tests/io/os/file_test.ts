@@ -147,6 +147,36 @@ describe('io/os/file.ts', (): void => {
         });
     });
 
+    describe('.readYaml<T>(): Promise<T>', (): void => {
+        it.only('ok', async (): Promise<void> => {
+            const file = new Self(__dirname, 'file-readYaml');
+            await writeFile(file.path, `a: 1
+b:
+ b1: 11
+ b2: bbb`);
+
+ class Yaml {
+     public a: number;
+
+     public b: {
+         b1: number;
+         b2: string;
+     }
+ }
+
+            const res = await file.readYaml<Yaml>();
+            await unlink(file.path);
+
+            deepStrictEqual(res, {
+                a: 1,
+                b: {
+                    b1: 11,
+                    b2: 'bbb'
+                }
+            });
+        });
+    });
+
     describe('.remove(): Promise<void>', (): void => {
         it('not exist', async (): Promise<void> => {
             let err: Error;
