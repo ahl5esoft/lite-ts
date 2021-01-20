@@ -34,7 +34,8 @@
         "target": "es6"
     },
     "exclude": [
-        "./dist"
+        "./dist",
+        "./node_modules"
     ],
     "include": [
         "./**/*.ts"
