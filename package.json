@@ -29,12 +29,17 @@
 	},
 	"keywords": [],
 	"license": "GPL-3.0",
-	"main": "index.ts",
+	"main": "dist/index.js",
 	"name": "lite-ts",
+	"private": false,
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ahl5esoft/lite-ts.git"
 	},
-	"scripts": {},
-	"version": "2.0.0"
+	"scripts": {
+		"build": "tsc",
+		"release": "tsc && npm publish"
+	},
+	"types": "dist/index.d.ts",
+	"version": "0.0.18"
 }

@@ -2,6 +2,7 @@
     "compilerOptions": {
         // 否始终以严格模式检查每个模块
         "alwaysStrict": true,
+        "declaration": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         // 指定要引入的库文件
@@ -20,6 +21,7 @@
             "es2015.symbol.wellknown",
             "esnext.asynciterable"
         ],
+        "module": "commonjs",
         // 模块的解析规则
         "moduleResolution": "node",
         // 当编译源文件出现错误的时候，是否继续输出编译结果
@@ -27,17 +29,17 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         // 指定编译结果的输出目录的
-        "outDir": "./dist",
+        "outDir": "dist",
         // 是否在输出文件中清除源文件中的注释
         "removeComments": true,
         // 控制编译后输出的是什么js版本
         "target": "es6"
     },
     "exclude": [
-        "./dist",
-        "./node_modules"
+        "dist",
+        "node_modules"
     ],
     "include": [
-        "./**/*.ts"
+        "**/*.ts"
     ]
 }
