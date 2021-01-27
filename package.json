@@ -29,14 +29,12 @@
 	},
 	"keywords": [],
 	"license": "GPL-3.0",
+	"main": "index.ts",
 	"name": "lite-ts",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ahl5esoft/lite-ts.git"
 	},
-	"scripts": {
-		"build:types": "tsc --project tsconfig.types.json"
-	},
-	"typings": "./types/index.d.ts",
+	"scripts": {},
 	"version": "0.0.11"
 }
