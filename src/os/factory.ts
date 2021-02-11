@@ -4,8 +4,8 @@ import { promisify } from 'util';
 
 import { OSDirectory } from './directory';
 import { OSFile } from './file';
-import { IOFactoryBase } from '../factory-base';
-import { IONodeBase } from '../node-base';
+import { IOFactoryBase } from '../io/factory-base';
+import { IONodeBase } from '../io/node-base';
 
 const statFunc = promisify(stat);
 
