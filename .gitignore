@@ -1,3 +1,3 @@
-/.vscode/
-/build/
-/dist/
+.vscode/
+dist/
+node_modules/
