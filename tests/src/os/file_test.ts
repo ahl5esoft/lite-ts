@@ -3,7 +3,7 @@ import { existsSync, mkdir, readFile, rmdir, unlink, writeFile } from 'fs';
 import { dirname, extname, join } from 'path';
 import { promisify } from 'util';
 
-import { OSFile as Self } from '../../src/os/file';
+import { OSFile as Self } from '../../../src/os/file';
 
 describe('src/lib/io/os/file', (): void => {
     describe('.ext', (): void => {
