@@ -12,6 +12,6 @@ export abstract class IONodeBase {
     }
 
     public abstract exists(): Promise<boolean>;
-    public abstract mv(dstPath: string): Promise<void>;
-    public abstract rm(): Promise<void>;
+    public abstract move(dstPath: string): Promise<void>;
+    public abstract remove(): Promise<void>;
 }

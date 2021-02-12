@@ -1,7 +1,7 @@
 import { CheckHandler } from './check-handler';
+import { JsonFileHandler } from './json-file-handler';
 import { ReadmeHandler } from './readme-handler';
 import { OSDirectory, OSFactory } from '../src/os';
-import { JsonFileHandler } from './json-file-handler';
 
 (async (): Promise<void> => {
     const ioFactory = new OSFactory();

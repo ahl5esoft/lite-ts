@@ -3,11 +3,11 @@ import { existsSync, mkdir, readFile, rmdir, unlink, writeFile } from 'fs';
 import { dirname, extname, join } from 'path';
 import { promisify } from 'util';
 
-import { OSFile as Self } from '../../../src/os/file';
+import { OSFile as Self } from '../../../src/os';
 
 describe('src/lib/io/os/file', (): void => {
     describe('.ext', (): void => {
-        it.only('ok', async (): Promise<void> => {
+        it('ok', async (): Promise<void> => {
             const name = `file-name-${Date.now()}.txt`;
             strictEqual(new Self(__dirname, name).ext, extname(name));
         });
@@ -43,7 +43,7 @@ describe('src/lib/io/os/file', (): void => {
             const srcPath = join(__dirname, 'file-mv-src-path-not-exists');
             let err: Error = undefined;
             try {
-                await new Self(srcPath).mv('');
+                await new Self(srcPath).move('');
             } catch (ex) {
                 err = ex;
             }
@@ -65,7 +65,7 @@ describe('src/lib/io/os/file', (): void => {
             const self = new Self(srcPath);
             let err: Error;
             try {
-                await self.mv(dstPath);
+                await self.move(dstPath);
             } catch (ex) {
                 err = ex;
             }
@@ -85,7 +85,7 @@ describe('src/lib/io/os/file', (): void => {
             isExist = await self.exists();
             strictEqual(isExist, false);
 
-            await self.rm();
+            await self.remove();
 
             srcPath = dirname(srcPath);
             await promisify(rmdir)(srcPath);
@@ -101,7 +101,7 @@ describe('src/lib/io/os/file', (): void => {
             const self = new Self('');
             let err: Error;
             try {
-                await self.mv(dstPath);
+                await self.move(dstPath);
             } catch (ex) {
                 err = ex;
             }
@@ -123,7 +123,7 @@ describe('src/lib/io/os/file', (): void => {
 
             const res = await file.readJSON();
 
-            await file.rm();
+            await file.remove();
 
             deepStrictEqual(res, obj);
         });
@@ -147,7 +147,7 @@ describe('src/lib/io/os/file', (): void => {
             const filePath = join(__dirname, `file-rm-not-exist-${Date.now()}.txt`);
             let err: Error;
             try {
-                await new Self(filePath).rm();
+                await new Self(filePath).remove();
             } catch (ex) {
                 err = ex;
             }
@@ -162,7 +162,7 @@ describe('src/lib/io/os/file', (): void => {
             const file = new Self(filePath);
             let err: Error;
             try {
-                await file.rm();
+                await file.remove();
             } catch (ex) {
                 err = ex;
             }

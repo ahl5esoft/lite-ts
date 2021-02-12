@@ -14,7 +14,7 @@ export class OSFile extends FileBase {
         return existsSync(this.path);
     }
 
-    public async mv(dstFilePath: string): Promise<void> {
+    public async move(dstFilePath: string): Promise<void> {
         let isExist = await this.exists();
         if (!isExist) {
             return;
@@ -25,7 +25,7 @@ export class OSFile extends FileBase {
             throw new Error(`文件已经存在: ${dstFilePath}`);
         }
 
-        await new OSDirectory(dirname(dstFilePath)).mk();
+        await new OSDirectory(dirname(dstFilePath)).create();
 
         await new Promise((s, f) => {
             createReadStream(this.path)
@@ -33,7 +33,7 @@ export class OSFile extends FileBase {
                 .on('end', s)
                 .pipe(createWriteStream(dstFilePath));
         });
-        await this.rm();
+        await this.remove();
     }
 
     public async readJSON<T>(): Promise<T> {
@@ -45,7 +45,7 @@ export class OSFile extends FileBase {
         return await readFileFunc(this.path, 'utf8');
     }
 
-    public async rm(): Promise<void> {
+    public async remove(): Promise<void> {
         const isExist = await this.exists();
         if (isExist) {
             await unlinkAction(this.path);

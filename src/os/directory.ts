@@ -12,30 +12,38 @@ const rmdirAction = promisify(rmdir);
 const statFunc = promisify(stat);
 
 export class OSDirectory extends DirectoryBase {
-    public async childDirectories(): Promise<OSDirectory[]> {
-        return this.children((stat): boolean => stat.isDirectory(), OSDirectory);
-    }
+    public async create(): Promise<void> {
+        const isExist = await this.exists();
+        if (isExist) {
+            return;
+        }
 
-    public async childFiles(): Promise<OSFile[]> {
-        return this.children((stat): boolean => stat.isFile(), OSFile);
+        await new OSDirectory(
+            dirname(this.path)
+        ).create();
+
+        await mkdirAction(this.path);
     }
 
     public async exists(): Promise<boolean> {
         return existsSync(this.path);
     }
 
-    public async mk(): Promise<void> {
-        const isExist = await this.exists();
-        if (isExist) {
-            return;
-        }
-
-        await new OSDirectory(dirname(this.path)).mk();
-
-        await mkdirAction(this.path);
+    public async findDirectories(): Promise<OSDirectory[]> {
+        return this.children(
+            (stat): boolean => stat.isDirectory(),
+            OSDirectory
+        );
     }
 
-    public async mv(dstDirPath: string): Promise<void> {
+    public async findFiles(): Promise<OSFile[]> {
+        return this.children(
+            (stat): boolean => stat.isFile(),
+            OSFile
+        );
+    }
+
+    public async move(dstDirPath: string): Promise<void> {
         const dstDir = new OSDirectory(dstDirPath);
         let isExist = await dstDir.exists();
         if (isExist) {
@@ -47,35 +55,39 @@ export class OSDirectory extends DirectoryBase {
             return;
         }
 
-        await dstDir.mk();
+        await dstDir.create();
 
-        const directories = await this.childDirectories();
+        const directories = await this.findDirectories();
         for (const r of directories) {
-            await r.mv(join(dstDirPath, r.name));
+            await r.move(
+                join(dstDirPath, r.name)
+            );
         }
 
-        const files = await this.childFiles();
+        const files = await this.findFiles();
         for (const r of files) {
-            await r.mv(join(dstDirPath, r.name));
+            await r.move(
+                join(dstDirPath, r.name)
+            );
         }
 
-        await this.rm();
+        await this.remove();
     }
 
-    public async rm(): Promise<void> {
+    public async remove(): Promise<void> {
         let ok = await this.exists();
         if (!ok) {
             return;
         }
 
-        const directories = await this.childDirectories();
+        const directories = await this.findDirectories();
         for (const r of directories) {
-            await r.rm();
+            await r.remove();
         }
 
-        const files = await this.childFiles();
+        const files = await this.findFiles();
         for (const r of files) {
-            await r.rm();
+            await r.remove();
         }
 
         await rmdirAction(this.path);
