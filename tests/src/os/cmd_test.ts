@@ -7,14 +7,14 @@ const self = new OSCmd();
 describe('src/lib/os/cmd/os.ts', (): void => {
     describe('.exec(opt: OSCmdExecOption): Promise<string>', (): void => {
         it('ok', async (): Promise<void> => {
-            const res = self.exec(
+            const res = await self.exec(
                 cmdOption('node'),
                 argsOption('-v'),
             );
             ok(res);
         });
 
-        it('ok', async (): Promise<void> => {
+        it.only('ignore return', async (): Promise<void> => {
             const res = await self.exec(
                 cmdOption('node'),
                 argsOption('-v'),

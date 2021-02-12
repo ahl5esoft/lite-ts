@@ -31,33 +31,37 @@ export class OSCmd extends CmdBase {
         }
 
         const child = spawn(this.m_Cmd, this.m_Args, this.m_Opt);
-        this.m_Args = [];
-        this.m_Cmd = '';
-        this.m_IgnoreReturn = false;
-        this.m_Opt = {};
-
         let bf: string[] = [];
 
         child.stderr.setEncoding('utf8').on('data', (chunk: any): void => {
             if (this.m_IgnoreReturn) {
-                bf.push(
-                    chunk.toString()
-                );
+                return;
             }
+
+            bf.push(
+                chunk.toString()
+            );
         });
 
         child.stdout.setEncoding('utf8').on('data', (chunk: any): void => {
             if (this.m_IgnoreReturn) {
-                bf.push(
-                    chunk.toString()
-                );
+                return;
             }
+
+            bf.push(
+                chunk.toString()
+            );
         });
 
         return new Promise((s, f) => {
             child.on('error', f);
 
             child.on('exit', (code: number): void => {
+                this.args = [];
+                this.cmd = '';
+                this.ignoreReturn = false;
+                this.opt = {};
+
                 if (code === 0) {
                     s(
                         bf.join('')
