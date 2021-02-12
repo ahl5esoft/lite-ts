@@ -5,7 +5,7 @@ export class IONullNode extends IONodeBase {
         return false;
     }
 
-    public async mv(): Promise<void> {}
+    public async move(): Promise<void> {}
 
-    public async rm(): Promise<void> {}
+    public async remove(): Promise<void> {}
 }
