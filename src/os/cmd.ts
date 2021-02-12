@@ -1,30 +1,45 @@
-import { spawn } from 'child_process';
+import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
 
 import { CmdBase } from './cmd-base';
 
-class OSCmdExecOption {
-    public cmd: string;
-
-    public args?: any[];
-
-    public opt?: any;
-}
+type ExecOption = (cmd: OSCmd) => void;
 
 export class OSCmd extends CmdBase {
-    public async exec(opt: OSCmdExecOption): Promise<string> {
-        return await this.execute(opt, true);
+    private m_Args: string[] = [];
+    public set args(value: string[]) {
+        this.m_Args = value;
     }
 
-    public async execWithoutReturn(opt: OSCmdExecOption): Promise<void> {
-        await this.execute(opt, false);
+    private m_Cmd: string = '';
+    public set cmd(value: string) {
+        this.m_Cmd = value;
     }
 
-    private async execute(opt: OSCmdExecOption, hasReturn: boolean): Promise<string> {
-        const child = spawn(opt.cmd, opt.args, opt.opt);
+    private m_IgnoreReturn = false;
+    public set ignoreReturn(value: boolean) {
+        this.m_IgnoreReturn = value;
+    }
+
+    private m_Opt: SpawnOptionsWithoutStdio = {};
+    public set opt(value: SpawnOptionsWithoutStdio) {
+        this.m_Opt = value;
+    }
+
+    public async exec(...opts: ExecOption[]): Promise<string> {
+        for (const r of opts) {
+            r(this);
+        }
+
+        const child = spawn(this.m_Cmd, this.m_Args, this.m_Opt);
+        this.m_Args = [];
+        this.m_Cmd = '';
+        this.m_IgnoreReturn = false;
+        this.m_Opt = {};
+
         let bf: string[] = [];
 
         child.stderr.setEncoding('utf8').on('data', (chunk: any): void => {
-            if (hasReturn) {
+            if (this.m_IgnoreReturn) {
                 bf.push(
                     chunk.toString()
                 );
@@ -32,7 +47,7 @@ export class OSCmd extends CmdBase {
         });
 
         child.stdout.setEncoding('utf8').on('data', (chunk: any): void => {
-            if (hasReturn) {
+            if (this.m_IgnoreReturn) {
                 bf.push(
                     chunk.toString()
                 );
@@ -59,4 +74,28 @@ export class OSCmd extends CmdBase {
             });
         });
     }
+}
+
+export function argsOption(...values: string[]): ExecOption {
+    return (cmd: OSCmd): void => {
+        cmd.args = values;
+    }
+}
+
+export function cmdOption(value: string): ExecOption {
+    return (cmd: OSCmd): void => {
+        cmd.cmd = value;
+    };
+}
+
+export function ignoreReturnOption(): ExecOption {
+    return (cmd: OSCmd): void => {
+        cmd.ignoreReturn = true;
+    };
+}
+
+export function spawnOptionOption(value: SpawnOptionsWithoutStdio): ExecOption {
+    return (cmd: OSCmd): void => {
+        cmd.opt = value;
+    };
 }
