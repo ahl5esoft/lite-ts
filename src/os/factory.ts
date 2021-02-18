@@ -16,9 +16,8 @@ export class OSFactory extends IOFactoryBase {
         if (isExist) {
             const stats = await statFunc(nodePath);
             const isDir = stats.isDirectory();
-            if (isDir) {
+            if (isDir)
                 return new OSDirectory(nodePath);
-            }
         }
 
         return new OSFile(nodePath);

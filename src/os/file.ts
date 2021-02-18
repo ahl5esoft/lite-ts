@@ -16,14 +16,12 @@ export class OSFile extends FileBase {
 
     public async move(dstFilePath: string): Promise<void> {
         let isExist = await this.exists();
-        if (!isExist) {
+        if (!isExist)
             return;
-        }
 
         isExist = await new OSFile(dstFilePath).exists();
-        if (isExist) {
+        if (isExist)
             throw new Error(`文件已经存在: ${dstFilePath}`);
-        }
 
         await new OSDirectory(dirname(dstFilePath)).create();
 
@@ -47,15 +45,13 @@ export class OSFile extends FileBase {
 
     public async remove(): Promise<void> {
         const isExist = await this.exists();
-        if (isExist) {
+        if (isExist)
             await unlinkAction(this.path);
-        }
     }
 
     public async write(content: any): Promise<void> {
-        if (typeof content != 'string') {
+        if (typeof content != 'string')
             content = JSON.stringify(content, null, '\t');
-        }
         await writeFileAction(this.path, content);
     }
 }

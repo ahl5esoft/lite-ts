@@ -14,9 +14,8 @@ const statFunc = promisify(stat);
 export class OSDirectory extends DirectoryBase {
     public async create(): Promise<void> {
         const isExist = await this.exists();
-        if (isExist) {
+        if (isExist)
             return;
-        }
 
         await new OSDirectory(
             dirname(this.path)
@@ -46,14 +45,12 @@ export class OSDirectory extends DirectoryBase {
     public async move(dstDirPath: string): Promise<void> {
         const dstDir = new OSDirectory(dstDirPath);
         let isExist = await dstDir.exists();
-        if (isExist) {
+        if (isExist)
             throw new Error(`目录已经存在: ${dstDirPath}`);
-        }
 
         isExist = await this.exists();
-        if (!isExist) {
+        if (!isExist)
             return;
-        }
 
         await dstDir.create();
 
@@ -76,19 +73,16 @@ export class OSDirectory extends DirectoryBase {
 
     public async remove(): Promise<void> {
         let ok = await this.exists();
-        if (!ok) {
+        if (!ok)
             return;
-        }
 
         const directories = await this.findDirectories();
-        for (const r of directories) {
+        for (const r of directories)
             await r.remove();
-        }
 
         const files = await this.findFiles();
-        for (const r of files) {
+        for (const r of files)
             await r.remove();
-        }
 
         await rmdirAction(this.path);
     }
@@ -98,9 +92,8 @@ export class OSDirectory extends DirectoryBase {
         Node: new (path: string) => T
     ): Promise<T[]> {
         const isExist = await this.exists();
-        if (!isExist) {
+        if (!isExist)
             return [];
-        }
 
         let children: T[] = [];
         const files = await readdirFunc(this.path);
@@ -108,7 +101,9 @@ export class OSDirectory extends DirectoryBase {
             const nodePath = join(this.path, r);
             const nodeStat = await statFunc(nodePath);
             if (checkFunc(nodeStat)) {
-                children.push(new Node(nodePath));
+                children.push(
+                    new Node(nodePath)
+                );
             }
         }
         return children;

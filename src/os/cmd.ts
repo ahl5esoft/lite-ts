@@ -26,17 +26,15 @@ export class OSCmd extends CmdBase {
     }
 
     public async exec(...opts: ExecOption[]): Promise<string> {
-        for (const r of opts) {
+        for (const r of opts)
             r(this);
-        }
 
         const child = spawn(this.m_Cmd, this.m_Args, this.m_Opt);
         let bf: string[] = [];
 
         child.stderr.setEncoding('utf8').on('data', (chunk: any): void => {
-            if (this.m_IgnoreReturn) {
+            if (this.m_IgnoreReturn)
                 return;
-            }
 
             bf.push(
                 chunk.toString()
@@ -44,9 +42,8 @@ export class OSCmd extends CmdBase {
         });
 
         child.stdout.setEncoding('utf8').on('data', (chunk: any): void => {
-            if (this.m_IgnoreReturn) {
+            if (this.m_IgnoreReturn)
                 return;
-            }
 
             bf.push(
                 chunk.toString()
@@ -83,7 +80,7 @@ export class OSCmd extends CmdBase {
 export function argsOption(...values: string[]): ExecOption {
     return (cmd: OSCmd): void => {
         cmd.args = values;
-    }
+    };
 }
 
 export function cmdOption(value: string): ExecOption {
