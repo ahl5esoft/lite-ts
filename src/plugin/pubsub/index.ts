@@ -1,2 +1,3 @@
-export * from './i-publisher';
-export * from './i-subscriber';
+export * from './api-port';
+export * from './publisher-base';
+export * from './subscriber-base';

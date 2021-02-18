@@ -119,10 +119,10 @@ export class IORedisAdapter extends RedisBase implements IPublisher, ISubscriber
         return this.client.mget(...keys);
     }
 
-    public async publish(channel: string, message: any): Promise<number> {
+    public async publish(channel: string, message: any): Promise<void> {
         if (typeof message != 'string')
             message = JSON.stringify(message);
-        return this.client.publish(channel, message);
+        await this.client.publish(channel, message);
     }
 
     public async rpop(key: string): Promise<string> {
@@ -149,5 +149,12 @@ export class IORedisAdapter extends RedisBase implements IPublisher, ISubscriber
 
     public async ttl(key: string): Promise<number> {
         return this.client.ttl(key);
+    }
+
+    public async unsubscribe(...channels: string[]): Promise<void> {
+        channels.forEach(r => {
+            delete this.m_SubCallbacks[r];
+        });
+        await this.sub.unsubscribe(channels);
     }
 }

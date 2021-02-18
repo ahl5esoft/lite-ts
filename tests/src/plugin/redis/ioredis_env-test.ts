@@ -465,4 +465,27 @@ describe('src/lib/plugin/redis/ioredis.ts', (): void => {
             ok(res > 0 && res <= 10);
         });
     });
+
+    describe('.unsubscribe(...channels: string[]): Promise<void>', (): void => {
+        it('ok', async (): Promise<void> => {
+            const channel = 'unsubscribe';
+            let sMessage: string;
+            await self.subscribe(channel, async (msg: string): Promise<void> => {
+                sMessage = msg;
+            });
+            await self.unsubscribe(channel);
+
+            const pMessage = 's-m';
+            await client.publish(channel, pMessage);
+
+            for (let i = 0; i < 5; i++) {
+                if (sMessage)
+                    break;
+
+                await sleep(10);
+            }
+
+            strictEqual(sMessage, undefined);
+        });
+    });
 });
