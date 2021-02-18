@@ -10,8 +10,8 @@ import { IONodeBase } from '../io/node-base';
 const statFunc = promisify(stat);
 
 export class OSFactory extends IOFactoryBase {
-    public async build(...pathArgs: string[]): Promise<IONodeBase> {
-        const nodePath = join(...pathArgs);
+    public async build(...paths: string[]): Promise<IONodeBase> {
+        const nodePath = join(...paths);
         const isExist = existsSync(nodePath);
         if (isExist) {
             const stats = await statFunc(nodePath);
@@ -23,11 +23,11 @@ export class OSFactory extends IOFactoryBase {
         return new OSFile(nodePath);
     }
 
-    public buildDirectory(...pathArgs: string[]): OSDirectory {
-        return new OSDirectory(...pathArgs);
+    public buildDirectory(...paths: string[]): OSDirectory {
+        return new OSDirectory(...paths);
     }
 
-    public buildFile(...pathArgs: string[]): OSFile {
-        return new OSFile(...pathArgs);
+    public buildFile(...paths: string[]): OSFile {
+        return new OSFile(...paths);
     }
 }

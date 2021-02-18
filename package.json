@@ -1,7 +1,8 @@
 {
 	"dependencies": {
 		"ioredis": "^4.22.0",
-		"mongodb": "^3.6.4"
+		"mongodb": "^3.6.4",
+		"typedi": "^0.10.0"
 	},
 	"description": "基础库(typescript)",
 	"devDependencies": {
@@ -29,5 +30,5 @@
 		"version": "ts-node version"
 	},
 	"types": "dist/index.d.ts",
-	"version": "0.1.9"
+	"version": "0.1.10"
 }

@@ -1,4 +1,5 @@
 import { strictEqual } from 'assert';
+
 import { CORBase } from '../../../src/dp';
 
 class TestHandler extends CORBase {

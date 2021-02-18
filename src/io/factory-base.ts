@@ -3,7 +3,7 @@ import { FileBase } from './file-base';
 import { IONodeBase } from './node-base';
 
 export abstract class IOFactoryBase {
-    public abstract build(...pathArgs: string[]): Promise<IONodeBase>;
-    public abstract buildDirectory(...pathArgs: string[]): DirectoryBase;
-    public abstract buildFile(...pathArgs: string[]): FileBase;
+    public abstract build(...paths: string[]): Promise<IONodeBase>;
+    public abstract buildDirectory(...paths: string[]): DirectoryBase;
+    public abstract buildFile(...paths: string[]): FileBase;
 }

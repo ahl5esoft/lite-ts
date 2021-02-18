@@ -8,17 +8,19 @@ const cfg = {
     host: '127.0.0.1',
     port: 6379,
 };
-let client: Ioredis.Redis, self: Self;
+let client: Ioredis.Redis, self: Self, sub: Ioredis.Redis;
 
 describe('src/lib/plugin/redis/ioredis.ts', (): void => {
     after((): void => {
         client.disconnect();
         self.close();
+        sub.disconnect();
     });
 
     before((): void => {
         client = new Ioredis(cfg);
         self = new Self(cfg);
+        sub = new Ioredis(cfg);
     });
 
     describe('.del(k: string): Promise<void>', (): void => {
@@ -346,6 +348,31 @@ describe('src/lib/plugin/redis/ioredis.ts', (): void => {
         });
     });
 
+    describe('.publish(channel: string, message: any): Promise<number>', (): void => {
+        it('ok', async (): Promise<void> => {
+            let pChannel = 'p-c';
+            let pMessage = 'p-m';
+            let sChannel: string, sMessage: string;
+            await sub.subscribe(pChannel);
+            sub.on('message', (channel: string, message: string): void => {
+                sChannel = channel;
+                sMessage = message;
+            });
+
+            await self.publish(pChannel, pMessage);
+
+            for (let i = 0; i < 5; i++) {
+                if (sChannel && sMessage)
+                    break;
+
+                await sleep(10);
+            }
+
+            strictEqual(sChannel, pChannel);
+            strictEqual(sMessage, pMessage);
+        });
+    });
+
     describe('.set(k: string, v: string, ...args: any[])', (): void => {
         it('only key, value', async (): Promise<void> => {
             const key = 'set.keyAndValue';
@@ -384,6 +411,28 @@ describe('src/lib/plugin/redis/ioredis.ts', (): void => {
             strictEqual(res1, true);
             strictEqual(res2, false);
             strictEqual(redisValue, key);
+        });
+    });
+
+    describe('.subscribe(channel: string, callback: CallbackType): Promise<void>', (): void => {
+        it('ok', async (): Promise<void> => {
+            const channel = 'subscribe';
+            let sMessage: string;
+            await self.subscribe(channel, async (message: string): Promise<void> => {
+                sMessage = message;
+            });
+
+            const pMessage = 's-m';
+            await client.publish(channel, pMessage);
+
+            for (let i = 0; i < 5; i++) {
+                if (sMessage)
+                    break;
+
+                await sleep(10);
+            }
+
+            strictEqual(sMessage, pMessage);
         });
     });
 
