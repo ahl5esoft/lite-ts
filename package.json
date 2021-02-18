@@ -29,5 +29,5 @@
 		"version": "ts-node version"
 	},
 	"types": "dist/index.d.ts",
-	"version": "0.1.8"
+	"version": "0.1.9"
 }
