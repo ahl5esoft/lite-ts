@@ -1,3 +1,5 @@
+export * from './string-generator';
+
 import { Pool } from './pool';
 import { Repository } from './repository';
 import { UnitOfWork } from './unit-of-work';
