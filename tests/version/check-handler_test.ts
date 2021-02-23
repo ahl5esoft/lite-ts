@@ -11,9 +11,9 @@ class NextHandler extends CORBase {
     }
 }
 
-describe('version/check-handler.ts', (): void => {
-    describe('.handle(): Promise<void>', (): void => {
-        it('无效版本号', async (): Promise<void> => {
+describe('version/check-handler.ts', () => {
+    describe('.handle(): Promise<void>', () => {
+        it('无效版本号', async () => {
             const self = new CheckHandler('a');
             let err: Error;
             try {
@@ -22,10 +22,10 @@ describe('version/check-handler.ts', (): void => {
                 err = ex;
             }
             ok(err);
-            strictEqual(err.message, '无效版本号: a')
+            strictEqual(err.message, '无效版本号: a');
         });
 
-        it('ok', async (): Promise<void> => {
+        it('ok', async () => {
             await new CheckHandler('1.0.0').setNext(
                 new NextHandler()
             ).handle();

@@ -9,7 +9,7 @@ import { IONodeBase } from '../io/node-base';
 
 const statFunc = promisify(stat);
 
-export class OSFactory extends IOFactoryBase {
+export class OSIOFactory extends IOFactoryBase {
     public async build(...paths: string[]): Promise<IONodeBase> {
         const nodePath = join(...paths);
         const isExist = existsSync(nodePath);

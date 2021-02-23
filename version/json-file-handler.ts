@@ -1,5 +1,5 @@
 import { CORBase } from '../src/dp';
-import { DirectoryBase, IOFactoryBase } from '../src/io';
+import { FileBase } from '../src/io';
 
 class Entry {
     public version: string;
@@ -7,22 +7,19 @@ class Entry {
 
 export class JsonFileHandler extends CORBase {
     public constructor(
-        private m_IOFactory: IOFactoryBase,
-        private m_Dir: DirectoryBase,
-        private m_Filename: string,
+        private m_File: FileBase,
         private m_Version: string
     ) {
         super();
     }
 
     public async handle(): Promise<void> {
-        const file = this.m_IOFactory.buildFile(this.m_Dir.path, this.m_Filename);
-        const isExist = await file.exists();
+        const isExist = await this.m_File.exists();
         if (!isExist)
             return;
 
-        const entry = await file.readJSON<Entry>();
+        const entry = await this.m_File.readJSON<Entry>();
         entry.version = this.m_Version;
-        await file.write(entry);
+        await this.m_File.write(entry);
     }
 }

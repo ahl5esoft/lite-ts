@@ -7,7 +7,7 @@ export class CheckHandler extends CORBase {
         super();
     }
 
-    public async handle(): Promise<void> {
+    public async handle() {
         const ok = reg.test(this.m_Version);
         if (!ok)
             throw new Error(`无效版本号: ${this.m_Version}`);

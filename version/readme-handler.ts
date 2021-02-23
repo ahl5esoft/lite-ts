@@ -1,17 +1,16 @@
 import { CORBase } from '../src/dp';
-import { DirectoryBase, IOFactoryBase } from '../src/io';
+import { FileBase } from '../src/io';
 
 export class ReadmeHandler extends CORBase {
-    public constructor(private m_IOFactory: IOFactoryBase, private m_Dir: DirectoryBase, private m_Version: string) {
+    public constructor(private m_File: FileBase, private m_Version: string) {
         super();
     }
 
     public async handle(): Promise<void> {
-        const file = this.m_IOFactory.buildFile(this.m_Dir.path, 'README.md');
-        let text = await file.readString();
+        let text = await this.m_File.readString();
         text = text.replace(/version-(\d+\.\d+\.\d+)-green/, (text, match): string => {
             return text.replace(match, this.m_Version);
         });
-        await file.write(text);
+        await this.m_File.write(text);
     }
 }
