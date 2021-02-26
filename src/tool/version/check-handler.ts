@@ -1,4 +1,4 @@
-import { CORBase } from '../src/dp';
+import { CORBase } from '../../dp';
 
 const reg = /\d+\.\d+\.\d+/;
 

@@ -3,7 +3,7 @@
 		"class-validator": "^0.13.1",
 		"ioredis": "^4.22.0",
 		"moment": "^2.29.1",
-		"mongodb": "^3.6.4",
+		"mongodb": "^3.6.3",
 		"reflect-metadata": "^0.1.13",
 		"typedi": "^0.10.0"
 	},
@@ -18,7 +18,7 @@
 	},
 	"keywords": [],
 	"license": "GPL-3.0",
-	"main": "dist/index.js",
+	"main": "./dist/index.js",
 	"name": "lite-ts",
 	"private": false,
 	"repository": {
@@ -32,6 +32,6 @@
 		"test": "mocha -t 3m -r ./node_modules/ts-node/register ./tests/**/*.ts",
 		"version": "ts-node version"
 	},
-	"typeings": "dist/index.d.ts",
-	"version": "0.1.14"
+	"typeings": "./dist/index.d.ts",
+	"version": "0.0.18"
 }

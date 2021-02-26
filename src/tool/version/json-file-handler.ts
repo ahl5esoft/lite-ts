@@ -1,5 +1,5 @@
-import { CORBase } from '../src/dp';
-import { FileBase } from '../src/io';
+import { CORBase } from '../../dp';
+import { FileBase } from '../../io';
 
 class Entry {
     public version: string;
