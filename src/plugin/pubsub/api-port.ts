@@ -1,6 +1,5 @@
 import { validate } from 'class-validator';
 import moment from 'moment';
-import Container from 'typedi';
 
 import { PublisherBase } from './publisher-base';
 import { SubscriberBase } from './subscriber-base';
@@ -18,34 +17,15 @@ class APIMessage {
 }
 
 export class PubSubAPIPort implements IAPIPort {
-    private m_APIFactory: APIFactory;
-    protected get apiFactory(): APIFactory {
-        if (!this.m_APIFactory)
-            this.m_APIFactory = Container.get(APIFactory);
-
-        return this.m_APIFactory;
-    }
-
-    private m_Pub: PublisherBase;
-    protected get pub(): PublisherBase {
-        if (!this.m_Pub)
-            this.m_Pub = Container.get(PublisherBase);
-
-        return this.m_Pub;
-    }
-
-    private m_Sub: SubscriberBase;
-    protected get sub(): SubscriberBase {
-        if (!this.m_Sub)
-            this.m_Sub = Container.get(SubscriberBase);
-
-        return this.m_Sub;
-    }
-
-    public constructor(private m_Channel: string) { }
+    public constructor(
+        private m_Channel: string,
+        private m_APIFactory: APIFactory,
+        private m_Pub: PublisherBase,
+        private m_Sub: SubscriberBase
+    ) { }
 
     public listen(): void {
-        this.sub.subscribe(this.m_Channel, async (message: string): Promise<void> => {
+        this.m_Sub.subscribe(this.m_Channel, async (message: string): Promise<void> => {
             return this.handle(message);
         });
         console.log(`${this.m_Channel}启动于${moment().format('YYYY-MM-DD HH:mm:ss')}`);
@@ -55,7 +35,7 @@ export class PubSubAPIPort implements IAPIPort {
         const req = JSON.parse(message) as APIMessage;
         const resp = new APIResponse();
         try {
-            const api = await this.apiFactory.build(req.endpoint, req.api);
+            const api = await this.m_APIFactory.build(req.endpoint, req.api);
             const body = JSON.parse(req.body);
             Object.keys(body).forEach(r => {
                 api[r] = body[r];
@@ -78,7 +58,8 @@ export class PubSubAPIPort implements IAPIPort {
                 console.log(ex);
             }
         } finally {
-            await this.pub.publish(`${this.m_Channel}-${req.replyID}`, resp);
+            if (req.replyID)
+                await this.m_Pub.publish(`${this.m_Channel}-${req.replyID}`, resp);
         }
     }
 }

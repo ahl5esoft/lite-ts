@@ -1,5 +1,3 @@
-import Container from 'typedi';
-
 import { APIBase } from './base';
 import { InvalidAPI } from './invalid';
 import { IOFactoryBase } from '../io';
@@ -7,10 +5,14 @@ import { IOFactoryBase } from '../io';
 const invalidAPI = new InvalidAPI();
 
 export class APIFactory {
-    public constructor(private m_RootPath: string, private m_IOFactory: IOFactoryBase) { }
+    public constructor(
+        private m_DirPath: string,
+        private m_IOFactory: IOFactoryBase,
+        private m_BuildFunc: (filePath: string) => APIBase
+    ) { }
 
     public async build(endpoint: string, apiName: string): Promise<APIBase> {
-        const dir = this.m_IOFactory.buildDirectory(this.m_RootPath, 'api');
+        const dir = this.m_IOFactory.buildDirectory(this.m_DirPath);
         let isExist = await dir.exists();
         if (!isExist)
             return invalidAPI;
@@ -23,9 +25,7 @@ export class APIFactory {
         const apiFile = this.m_IOFactory.buildFile(endpointDir.path, apiName);
         let api: APIBase;
         try {
-            const apiCtor: Function = require(apiFile.path).default;
-            api = Container.get<APIBase>(apiCtor);
-            Container.remove(apiCtor);
+            api = this.m_BuildFunc(apiFile.path);
         } catch {
             api = invalidAPI;
         }
