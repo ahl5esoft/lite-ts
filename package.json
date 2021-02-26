@@ -32,6 +32,6 @@
 		"test": "mocha -t 3m -r ./node_modules/ts-node/register ./tests/**/*.ts",
 		"version": "ts-node version"
 	},
-	"types": "dist/index.d.ts",
-	"version": "0.1.13"
+	"typeings": "dist/index.d.ts",
+	"version": "0.1.14"
 }
