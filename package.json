@@ -3,7 +3,9 @@
 		"class-validator": "^0.13.1",
 		"ioredis": "^4.22.0",
 		"moment": "^2.29.1",
-		"mongodb": "^3.6.3"
+		"mongodb": "^3.6.3",
+		"reflect-metadata": "^0.1.13",
+		"typedi": "^0.8.0"
 	},
 	"description": "基础库(typescript)",
 	"devDependencies": {
@@ -31,5 +33,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "0.1.21"
+	"version": "0.1.24"
 }

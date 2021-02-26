@@ -1,10 +1,10 @@
 import { Service } from 'typedi';
 
-import { IAPI } from '../../../src/api';
+import { APIBase } from '../../../src';
 
 @Service()
-export default class VersionAPI implements IAPI {
-    public async call(): Promise<string> {
+export default class VersionAPI extends APIBase {
+    public async call() {
         return '1.0.0';
     }
 }
