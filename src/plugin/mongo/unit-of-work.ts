@@ -2,9 +2,9 @@ import { ClientSession } from 'mongodb';
 
 import { toDoc } from './helper';
 import { Pool } from './pool';
-import { DBUnitOfWorkBase } from '../../db';
+import { UnitOfWorkBase } from '../../db';
 
-export class UnitOfWork extends DBUnitOfWorkBase {
+export class UnitOfWork extends UnitOfWorkBase {
     private m_Queue: ((session: ClientSession) => Promise<void>)[] = [];
 
     public constructor(private m_Pool: Pool) {

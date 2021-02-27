@@ -1,11 +1,11 @@
 import { DBQueryBase } from './query-base';
-import { DBUnitOfWorkBase } from './unit-of-work-base';
+import { UnitOfWorkBase } from './unit-of-work-base';
 
 export abstract class DBRepositoryBase<T> {
     public constructor(
         protected tableName: string,
         private m_IsTx: boolean,
-        private m_Uow: DBUnitOfWorkBase
+        private m_Uow: UnitOfWorkBase
     ) { }
 
     public async add(entry: T): Promise<void> {

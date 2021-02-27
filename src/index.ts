@@ -1,4 +1,5 @@
 export * from './api';
+export * from './api/value';
 export * from './db';
 export * from './dp';
 export * from './error';
