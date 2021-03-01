@@ -1,6 +1,6 @@
 import { ok, strictEqual } from 'assert';
 
-import { IORedisAdapter, RedisLock as Self } from '../../../../src/plugin/redis';
+import { IORedisAdapter, RedisLock as Self } from '../../../../src';
 
 const cfg = {
     host: '127.0.0.1',

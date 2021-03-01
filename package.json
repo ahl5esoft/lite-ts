@@ -29,9 +29,9 @@
 		"build": "tsc",
 		"login": "npm config delete registry && npm login",
 		"release": "tsc && npm config delete registry && npm publish && npm config set registry=https://registry.npm.taobao.org",
-		"test": "mocha -t 3m -r ./node_modules/ts-node/register ./tests/**/*.ts",
+		"test": "mocha -t 30s -r ./node_modules/ts-node/register ./tests/**/*.ts",
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "0.1.28"
+	"version": "0.1.29"
 }
