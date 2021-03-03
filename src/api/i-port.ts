@@ -1,3 +1,3 @@
 export interface IAPIPort {
-    listen(): void;
+    listen(): Promise<void>;
 }

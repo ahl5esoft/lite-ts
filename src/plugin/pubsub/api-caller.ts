@@ -2,11 +2,12 @@ import Container from 'typedi';
 
 import { PublisherBase } from './publisher-base';
 import { SubscriberBase } from './subscriber-base';
-import { APIResponse, IAPICaller } from '../../api';
+import { APICallerBase, APIResponse } from '../../api';
 import { CustomError, ErrorCode } from '../../error';
 import { StringGeneratorBase } from '../../object';
+import { APIMessage } from './api-message';
 
-export class PubSubAPICaller implements IAPICaller {
+export class PubSubAPICaller extends APICallerBase {
     public static expires = 5000;
 
     private m_IDGenerator: StringGeneratorBase;
@@ -70,10 +71,12 @@ export class PubSubAPICaller implements IAPICaller {
 
     public async voidCall(route: string, body: any) {
         const routeParams = route.split('/');
-        await this.pub.publish(routeParams[0], {
+        const message: APIMessage = {
             api: routeParams[2],
             body: typeof body == 'string' ? body : JSON.stringify(body),
-            endpoint: routeParams[1]
-        });
+            endpoint: routeParams[1],
+            replyID: ''
+        };
+        await this.pub.publish(routeParams[0], message);
     }
 }
