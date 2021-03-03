@@ -1,5 +1,6 @@
 export * from './api';
 export * from './api/value';
+export * from './assert';
 export * from './db';
 export * from './dp';
 export * from './error';
@@ -10,7 +11,6 @@ export * from './os';
 export * from './plugin/mongo';
 export * from './plugin/pubsub';
 export * from './plugin/redis';
-export * from './tests';
 export * from './time';
 export * from './tool';
 export * from './thread';

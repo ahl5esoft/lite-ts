@@ -6,9 +6,9 @@ class Record {
     public returnValues = [];
 }
 
-export class Mock<T> {
-    public static expectedKey = '$expect';
+export const mockAny = new Object();
 
+export class Mock<T> {
     private m_CurrentKey: string;
     private m_Records: { [key: string]: Record; } = {};
 
@@ -25,9 +25,12 @@ export class Mock<T> {
                         if (!record)
                             throw new Error(`${key}未被调用`);
 
+                        const recordArgs = record.args.shift();
                         deepStrictEqual(
-                            args,
-                            record.args.shift()
+                            args.map((r, i) => {
+                                return recordArgs[i] == mockAny ? mockAny : r;
+                            }),
+                            recordArgs
                         );
                         return record.returnValues.shift();
                     };
