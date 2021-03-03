@@ -30,6 +30,19 @@ class ProxyPerson implements IPerson {
     }
 }
 
+class TestPromise {
+    public constructor(private m_Car: ICar) { }
+
+    public async do() {
+        const car = await this.getCar();
+        car.setSpeed(50);
+    }
+
+    public async getCar(): Promise<ICar> {
+        return this.m_Car;
+    }
+}
+
 describe('src/assert/mock.ts', () => {
     describe('Person', () => {
         it('stub', () => {
@@ -54,6 +67,14 @@ describe('src/assert/mock.ts', () => {
             mockMiniCar.expected.setDriver(mockAny as any);
 
             person.drive(mockMiniCar.actual);
+        });
+    });
+
+    describe('Promise', () => {
+        it('ok', async () => {
+            const mockCar = new Mock<ICar>();
+            mockCar.expected.setSpeed(50);
+            await new TestPromise(mockCar.actual).do();
         });
     });
 });

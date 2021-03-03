@@ -20,9 +20,12 @@ export class Mock<T> {
                     if (key in target)
                         return target[key];
 
+                    if (key == 'then' || key == 'catch')
+                        return this.m_Actutal;
+
                     return (...args: any[]) => {
                         const record = this.m_Records[key];
-                        if (!record)
+                        if (!(record && record.args.length))
                             throw new Error(`${key}未被调用`);
 
                         const recordArgs = record.args.shift();
@@ -58,7 +61,7 @@ export class Mock<T> {
 
     public constructor(private m_Target = {}) { }
 
-    public async expectReturn(action: (target: T) => any, returnValue: any): Promise<void> {
+    public expectReturn(action: (target: T) => any, returnValue: any) {
         action(this.expected);
         this.m_Records[this.m_CurrentKey].returnValues.push(returnValue);
     }
