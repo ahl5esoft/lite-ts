@@ -34,7 +34,11 @@ export class APIFactory {
             const files = await r.findFiles();
             this.m_APICtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
                 const name = cr.name.split('.')[0];
-                memo[name] = require(cr.path).default;
+                const api = require(cr.path);
+                if (!api.default)
+                    throw new Error(`未导出default: ${cr.path}`);
+
+                memo[name] = api.default;
                 return memo;
             }, {});
         }

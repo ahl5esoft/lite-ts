@@ -47,7 +47,7 @@ export class PubSubAPICaller extends APICallerBase {
                 const routeParams = route.split('/');
                 const req = {
                     api: routeParams[2],
-                    body: typeof body == 'string' ? body : JSON.stringify(body),
+                    body: body,
                     endpoint: routeParams[1],
                     replyID: await this.idGenerator.generate()
                 };
@@ -73,7 +73,7 @@ export class PubSubAPICaller extends APICallerBase {
         const routeParams = route.split('/');
         const message: APIMessage = {
             api: routeParams[2],
-            body: typeof body == 'string' ? body : JSON.stringify(body),
+            body: body,
             endpoint: routeParams[1],
             replyID: ''
         };

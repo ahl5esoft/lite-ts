@@ -36,6 +36,8 @@ export class PubSubAPIPort implements IAPIPort {
             };
             try {
                 const api = await this.m_APIFactory.build(req.endpoint, req.api);
+                if (typeof req.body == 'string')
+                    req.body = JSON.parse(req.body);
                 Object.keys(req.body || {}).forEach(r => {
                     api[r] = req.body[r];
                 });
