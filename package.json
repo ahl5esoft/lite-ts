@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"bcryptjs": "^2.4.3",
 		"class-validator": "^0.13.1",
 		"ioredis": "^4.22.0",
 		"moment": "^2.29.1",
@@ -9,6 +10,7 @@
 	},
 	"description": "基础库(typescript)",
 	"devDependencies": {
+		"@types/bcryptjs": "^2.4.2",
 		"@types/ioredis": "^4.19.4",
 		"@types/mocha": "^8.2.1",
 		"@types/mongodb": "^3.6.7",
@@ -33,5 +35,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "0.1.39"
+	"version": "0.1.40"
 }
