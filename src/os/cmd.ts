@@ -7,6 +7,8 @@ export class OSCmd extends CmdBase {
         const opt: SpawnOptionsWithoutStdio = {};
         if (this.dir)
             opt.cwd = this.dir;
+        if (this.ms)
+            opt.timeout = this.ms;
 
         const child = spawn(name, args, opt);
         let bf: string[] = [];
