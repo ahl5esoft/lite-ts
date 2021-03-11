@@ -13,6 +13,6 @@ export * from './plugin/bcrypt';
 export * from './plugin/mongo';
 export * from './plugin/pubsub';
 export * from './plugin/redis';
+export * from './thread';
 export * from './time';
 export * from './tool';
-export * from './thread';

@@ -2,38 +2,17 @@ import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
 
 import { CmdBase } from './cmd-base';
 
-type ExecOption = (cmd: OSCmd) => void;
-
 export class OSCmd extends CmdBase {
-    private m_Args: string[] = [];
-    public set args(value: string[]) {
-        this.m_Args = value;
-    }
+    public async exec(name: string, ...args: any[]): Promise<string> {
+        const opt: SpawnOptionsWithoutStdio = {};
+        if (this.dir)
+            opt.cwd = this.dir;
 
-    private m_Cmd: string = '';
-    public set cmd(value: string) {
-        this.m_Cmd = value;
-    }
-
-    private m_IgnoreReturn = false;
-    public set ignoreReturn(value: boolean) {
-        this.m_IgnoreReturn = value;
-    }
-
-    private m_Opt: SpawnOptionsWithoutStdio = {};
-    public set opt(value: SpawnOptionsWithoutStdio) {
-        this.m_Opt = value;
-    }
-
-    public async exec(...opts: ExecOption[]): Promise<string> {
-        for (const r of opts)
-            r(this);
-
-        const child = spawn(this.m_Cmd, this.m_Args, this.m_Opt);
+        const child = spawn(name, args, opt);
         let bf: string[] = [];
 
-        child.stderr.setEncoding('utf8').on('data', (chunk: any): void => {
-            if (this.m_IgnoreReturn)
+        child.stderr.setEncoding('utf8').on('data', chunk => {
+            if (this.ignoreReturn)
                 return;
 
             bf.push(
@@ -41,8 +20,8 @@ export class OSCmd extends CmdBase {
             );
         });
 
-        child.stdout.setEncoding('utf8').on('data', (chunk: any): void => {
-            if (this.m_IgnoreReturn)
+        child.stdout.setEncoding('utf8').on('data', chunk => {
+            if (this.ignoreReturn)
                 return;
 
             bf.push(
@@ -53,11 +32,8 @@ export class OSCmd extends CmdBase {
         return new Promise((s, f) => {
             child.on('error', f);
 
-            child.on('exit', (code: number): void => {
-                this.args = [];
-                this.cmd = '';
-                this.ignoreReturn = false;
-                this.opt = {};
+            child.on('exit', code => {
+                this.reset();
 
                 if (code === 0) {
                     s(
@@ -75,28 +51,4 @@ export class OSCmd extends CmdBase {
             });
         });
     }
-}
-
-export function argsOption(...values: string[]): ExecOption {
-    return (cmd: OSCmd): void => {
-        cmd.args = values;
-    };
-}
-
-export function cmdOption(value: string): ExecOption {
-    return (cmd: OSCmd): void => {
-        cmd.cmd = value;
-    };
-}
-
-export function ignoreReturnOption(): ExecOption {
-    return (cmd: OSCmd): void => {
-        cmd.ignoreReturn = true;
-    };
-}
-
-export function spawnOptionOption(value: SpawnOptionsWithoutStdio): ExecOption {
-    return (cmd: OSCmd): void => {
-        cmd.opt = value;
-    };
 }

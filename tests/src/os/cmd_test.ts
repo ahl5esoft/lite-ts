@@ -1,25 +1,19 @@
 import { ok, strictEqual } from 'assert';
 
-import { argsOption, cmdOption, ignoreReturnOption, OSCmd } from '../../../src/os';
+import { OSCmd } from '../../../src/os';
 
 const self = new OSCmd();
 
-describe('src/lib/os/cmd/os.ts', (): void => {
-    describe('.exec(opt: OSCmdExecOption): Promise<string>', (): void => {
-        it('ok', async (): Promise<void> => {
-            const res = await self.exec(
-                cmdOption('node'),
-                argsOption('-v'),
-            );
+describe('src/lib/os/cmd/os.ts', () => {
+    describe('.exec(name: string, ...args: any[]): Promise<string>', () => {
+        it('ok', async () => {
+            const res = await self.exec('node', '-v');
             ok(res);
         });
 
-        it.only('ignore return', async (): Promise<void> => {
-            const res = await self.exec(
-                cmdOption('node'),
-                argsOption('-v'),
-                ignoreReturnOption(),
-            );
+        it('ignore return', async () => {
+            self.ignoreReturn = true;
+            const res = await self.exec('node', '-v');
             strictEqual(res, '');
         });
     });

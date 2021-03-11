@@ -1,6 +1,7 @@
 import 'reflect-metadata';
+import Container from 'typedi';
 
-import { APIFactory, IORedisAdapter, OSDirectory, PubSubAPIPort } from '../src';
+import { APIFactory, IORedisAdapter, OSDirectory, PublisherBase, PubSubAPIPort, SubscriberBase } from '../src';
 
 (async () => {
     const project = 'lite-ts';
@@ -9,6 +10,8 @@ import { APIFactory, IORedisAdapter, OSDirectory, PubSubAPIPort } from '../src';
         host: '127.0.0.1',
         port: 6379,
     });
+    Container.set(PublisherBase, redis);
+    Container.set(SubscriberBase, redis);
     setTimeout(async () => {
         await redis.publish(project, {
             api: 'version',
@@ -27,5 +30,5 @@ import { APIFactory, IORedisAdapter, OSDirectory, PubSubAPIPort } from '../src';
     await apiFactory.init(
         new OSDirectory(__dirname, 'api')
     );
-    new PubSubAPIPort(project, apiFactory, redis, redis).listen();
+    new PubSubAPIPort(project, apiFactory).listen();
 })();
