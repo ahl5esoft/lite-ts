@@ -43,6 +43,7 @@ export class OSCmd extends CmdBase {
                     );
                 } else {
                     const message = JSON.stringify({
+                        cmd: [name, ...args].join(' '),
                         code: code,
                         stderr: bf.join(''),
                     });
