@@ -1,14 +1,28 @@
-import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
+import { CommonOptions, exec, spawn } from 'child_process';
+import { promisify } from 'util';
 
 import { CmdBase } from './cmd-base';
 
+const execPromise = promisify(exec);
+
 export class OSCmd extends CmdBase {
     public async exec(name: string, ...args: any[]): Promise<string> {
-        const opt: SpawnOptionsWithoutStdio = {};
+        const opt: CommonOptions = {};
         if (this.dir)
             opt.cwd = this.dir;
         if (this.ms)
             opt.timeout = this.ms;
+
+        const isExec = args.some(r => {
+            return r == '|';
+        });
+        if (isExec) {
+            const res = await execPromise(
+                [name, ...args].join(' '),
+                opt,
+            );
+            return this.ignoreReturn ? '' : res.stdout;
+        }
 
         const child = spawn(name, args, opt);
         let bf: string[] = [];

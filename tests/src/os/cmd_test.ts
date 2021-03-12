@@ -1,4 +1,4 @@
-import { ok, strictEqual } from 'assert';
+import { notStrictEqual, ok, strictEqual } from 'assert';
 
 import { OSCmd } from '../../../src/os';
 
@@ -15,6 +15,11 @@ describe('src/lib/os/cmd/os.ts', () => {
             self.ignoreReturn = true;
             const res = await self.exec('node', '-v');
             strictEqual(res, '');
+        });
+
+        it('pipe', async () => {
+            const res = await self.exec('tasklist', '|', 'find', '\"redis\"');
+            notStrictEqual(res, '');
         });
     });
 });
