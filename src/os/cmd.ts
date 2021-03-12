@@ -17,11 +17,15 @@ export class OSCmd extends CmdBase {
             return r == '|';
         });
         if (isExec) {
-            const res = await execPromise(
-                [name, ...args].join(' '),
-                opt,
-            );
-            return this.ignoreReturn ? '' : res.stdout;
+            try {
+                const res = await execPromise(
+                    [name, ...args].join(' '),
+                    opt,
+                );
+                return this.ignoreReturn ? '' : res.stdout;
+            } catch {
+                return '';
+            }
         }
 
         const child = spawn(name, args, opt);

@@ -18,8 +18,13 @@ describe('src/lib/os/cmd/os.ts', () => {
         });
 
         it('pipe', async () => {
-            const res = await self.exec('tasklist', '|', 'find', '\"redis\"');
+            const res = await self.exec('tasklist', '|', 'find', `\"redis\"`);
             notStrictEqual(res, '');
+        });
+
+        it('pipe(没有结果)', async () => {
+            const res = await self.exec('tasklist', '|', 'find', `\"ssaw\"`);
+            strictEqual(res, '');
         });
     });
 });
