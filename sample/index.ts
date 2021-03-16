@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import Container from 'typedi';
 
-import { APIFactory, IORedisAdapter, OSDirectory, PublisherBase, PubSubAPIPort, SubscriberBase } from '../src';
+import { APIFactory, IORedisAdapter, OSDirectory, OSIOFactory, PublisherBase, PubSubAPIPort, SubscriberBase } from '../src';
 
 (async () => {
     const project = 'lite-ts';
@@ -30,5 +30,9 @@ import { APIFactory, IORedisAdapter, OSDirectory, PublisherBase, PubSubAPIPort, 
     await apiFactory.init(
         new OSDirectory(__dirname, 'api')
     );
-    new PubSubAPIPort(project, apiFactory).listen();
+    new PubSubAPIPort(
+        apiFactory,
+        new OSIOFactory(),
+        new OSDirectory(__dirname, '..')
+    ).listen();
 })();
