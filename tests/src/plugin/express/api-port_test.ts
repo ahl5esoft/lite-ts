@@ -1,23 +1,14 @@
 import { deepStrictEqual } from 'assert';
 import bent from 'bent';
 
-import { APIBase, APIFactory, ExpressAPIPort, FileBase, Mock } from '../../../../src';
+import { APIBase, APIFactory, ExpressAPIPort, Mock } from '../../../../src';
 
 describe('src/plugin/express/api-port.ts', () => {
     describe('.listen()', () => {
         it('ok', async () => {
             const mockAPIFactory = new Mock<APIFactory>();
-            const mockPackageFile = new Mock<FileBase>();
             const port = 19999;
-            const self = new ExpressAPIPort(mockAPIFactory.actual, mockPackageFile.actual, port);
-
-            mockPackageFile.expectReturn(
-                r => r.readJSON(),
-                {
-                    name: 'test',
-                    version: '0.0.0'
-                }
-            );
+            const self = new ExpressAPIPort(mockAPIFactory.actual, 'project', port, '0.0.0');
 
             self.listen();
 

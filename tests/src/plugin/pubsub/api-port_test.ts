@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { APIBase, APIFactory, APIResponse, FileBase, IORedisAdapter, Mock, PublisherBase, PubSubAPIPort } from '../../../../src';
+import { APIBase, APIFactory, APIResponse, IORedisAdapter, Mock, PublisherBase, PubSubAPIPort } from '../../../../src';
 import { APIMessage } from '../../../../src/plugin/pubsub/api-message';
 
 const redis = new IORedisAdapter({
@@ -16,18 +16,9 @@ describe('src/plugin/pubsub/api-port.ts', () => {
     describe('.listen()', () => {
         it('ok', async () => {
             const mockAPIFactory = new Mock<APIFactory>();
-            const mockPackageFile = new Mock<FileBase>();
-            const self = new PubSubAPIPort(mockAPIFactory.actual, mockPackageFile.actual);
+            const project = 'test';
+            const self = new PubSubAPIPort(mockAPIFactory.actual, project, '0.0.0');
             Reflect.set(self, 'm_Sub', redis);
-
-            const pkg = {
-                name: 'test',
-                version: '0.0.0'
-            };
-            mockPackageFile.expectReturn(
-                r => r.readJSON(),
-                pkg
-            );
 
             self.listen();
 
@@ -37,7 +28,7 @@ describe('src/plugin/pubsub/api-port.ts', () => {
                 endpoint: 'end',
                 replyID: 'x'
             };
-            await redis.publish(pkg.name, msg);
+            await redis.publish(project, msg);
 
             const mockAPI = new Mock<APIBase>();
             mockAPIFactory.expectReturn(
@@ -57,7 +48,7 @@ describe('src/plugin/pubsub/api-port.ts', () => {
             const mockPub = new Mock<PublisherBase>();
             Reflect.set(self, 'm_Pub', mockPub.actual);
 
-            mockPub.expected.publish(`${pkg.name}-${msg.replyID}`, apiResponse);
+            mockPub.expected.publish(`${project}-${msg.replyID}`, apiResponse);
         });
 
         // it('verify', async () => {

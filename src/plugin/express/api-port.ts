@@ -4,15 +4,15 @@ import { Server } from 'http';
 import moment from 'moment';
 
 import { APIFactory, IAPIPort } from '../../api';
-import { FileBase } from '../../io';
 
 export class ExpressAPIPort implements IAPIPort {
     private m_Server: Server;
 
     public constructor(
         private m_APIFactory: APIFactory,
-        private m_PackageFile: FileBase,
+        private m_Project: string,
         private m_Port: number,
+        private m_Version: string
     ) { }
 
     public close() {
@@ -20,12 +20,8 @@ export class ExpressAPIPort implements IAPIPort {
     }
 
     public async listen() {
-        const pkg = await this.m_PackageFile.readJSON<{
-            name: string;
-            version: string;
-        }>();
         const listenArgs: any[] = [this.m_Port, () => {
-            console.log(`${pkg.name}(v${pkg.version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]: ${this.m_Port}`);
+            console.log(`${this.m_Project}(v${this.m_Version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]: ${this.m_Port}`);
         }];
         if (process.platform == 'win32')
             listenArgs.splice(1, 0, '127.0.0.1');

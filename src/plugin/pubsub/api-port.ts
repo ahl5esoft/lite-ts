@@ -5,7 +5,6 @@ import { APIMessage } from './api-message';
 import { PublisherBase } from './publisher-base';
 import { SubscriberBase } from './subscriber-base';
 import { APIFactory, IAPIPort } from '../../api';
-import { FileBase } from '../../io';
 
 export class PubSubAPIPort implements IAPIPort {
     private m_Pub: PublisherBase;
@@ -24,14 +23,14 @@ export class PubSubAPIPort implements IAPIPort {
         return this.m_Sub;
     }
 
-    public constructor(private m_APIFactory: APIFactory, private m_PackageFile: FileBase) { }
+    public constructor(
+        private m_APIFactory: APIFactory,
+        private m_Project: string,
+        private m_Version: string
+    ) { }
 
     public async listen() {
-        const pkg = await this.m_PackageFile.readJSON<{
-            name: string;
-            version: string;
-        }>();
-        await this.sub.subscribe(pkg.name, async (message: string) => {
+        await this.sub.subscribe(this.m_Project, async (message: string) => {
             const req = JSON.parse(message) as APIMessage;
             const api = this.m_APIFactory.build(req.endpoint, req.api);
             if (typeof req.body == 'string')
@@ -41,8 +40,8 @@ export class PubSubAPIPort implements IAPIPort {
             });
             const res = await api.getResposne();
             if (req.replyID)
-                await this.pub.publish(`${pkg.name}-${req.replyID}`, res);
+                await this.pub.publish(`${this.m_Project}-${req.replyID}`, res);
         });
-        console.log(`${pkg.name}(v${pkg.version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]`);
+        console.log(`${this.m_Project}(v${this.m_Version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]`);
     }
 }
