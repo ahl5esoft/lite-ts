@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
 import { deepStrictEqual } from 'assert';
+import { Length } from 'class-validator';
 
 import { APIBase, CustomError, ErrorCode, PubSubAPIPort, sleep } from '../../../../src';
 import { APIMessage } from '../../../../src/plugin/pubsub/api-message';
-import { Length } from 'class-validator';
 
 class TestAPI extends APIBase {
     @Length(1, 6)
