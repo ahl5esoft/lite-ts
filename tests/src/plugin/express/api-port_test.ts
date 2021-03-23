@@ -30,15 +30,18 @@ describe('src/plugin/express/api-port.ts', () => {
             );
 
             mockAPI.expectReturn(
-                r => r.call(),
-                'ok'
+                r => r.getResposne(),
+                {
+                    data: 'ok',
+                    err: 0
+                }
             );
 
             const post = bent(`http://localhost:${port}`, 'POST', 'json', 200);
             const res = await post(`/${endpoint}/${api}`, {});
             deepStrictEqual(res, {
-                err: 0,
-                data: 'ok'
+                data: 'ok',
+                err: 0
             });
 
             self.close();

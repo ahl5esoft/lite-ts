@@ -9,7 +9,7 @@ const invalidAPI = new InvalidAPI();
 export class APIFactory {
     private m_APICtors: { [key: string]: { [key: string]: Function; }; } = {};
 
-    public async build(endpoint: string, apiName: string): Promise<APIBase> {
+    public build(endpoint: string, apiName: string): APIBase {
         const apiCtors = this.m_APICtors[endpoint];
         if (!apiCtors)
             return invalidAPI;

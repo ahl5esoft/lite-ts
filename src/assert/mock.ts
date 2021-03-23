@@ -6,7 +6,7 @@ class Record {
     public returnValues = [];
 }
 
-export const mockAny = new Object();
+export const mockAny: any = new Object();
 
 export class Mock<T> {
     private m_CurrentKey: string;

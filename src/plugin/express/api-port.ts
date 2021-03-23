@@ -1,11 +1,9 @@
 import { json } from 'body-parser';
-import { validate } from 'class-validator';
 import express from 'express';
 import { Server } from 'http';
 import moment from 'moment';
 
-import { APIFactory, APIResponse, IAPIPort } from '../../api';
-import { CustomError, ErrorCode } from '../../error';
+import { APIFactory, IAPIPort } from '../../api';
 import { FileBase } from '../../io';
 
 export class ExpressAPIPort implements IAPIPort {
@@ -35,38 +33,14 @@ export class ExpressAPIPort implements IAPIPort {
         this.m_Server = express().use(
             json()
         ).post('/:endpoint/:api', async (req, resp) => {
-            let res = new APIResponse();
-            try {
-                const api = await this.m_APIFactory.build(req.params.endpoint, req.params.api);
-                if (typeof req.body == 'string')
-                    req.body = JSON.parse(req.body);
-                Object.keys(req.body || {}).forEach(r => {
-                    api[r] = req.body[r];
-                });
-                const errors = await validate(api);
-                if (errors.length) {
-                    const message = errors.map((r): string => {
-                        return r.toString();
-                    }).join('\n-');
-                    throw new CustomError(ErrorCode.Verify, message);
-                }
-
-                res.data = await api.call();
-                res.err = 0;
-            } catch (ex) {
-                if (ex instanceof CustomError) {
-                    res.err = ex.code;
-                    if (ex.code == ErrorCode.Tip)
-                        res.data = ex.message;
-                    else
-                        console.log(ex.code, ex.message);
-                } else {
-                    res.err = ErrorCode.Panic;
-                    console.log('error', ex);
-                }
-            } finally {
-                resp.json(res);
-            }
+            const api = this.m_APIFactory.build(req.params.endpoint, req.params.api);
+            if (typeof req.body == 'string')
+                req.body = JSON.parse(req.body);
+            Object.keys(req.body || {}).forEach(r => {
+                api[r] = req.body[r];
+            });
+            const res = await api.getResposne();
+            resp.json(res);
         }).listen(...listenArgs);
     }
 }

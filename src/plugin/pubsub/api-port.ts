@@ -1,13 +1,11 @@
-import { validate } from 'class-validator';
 import moment from 'moment';
 import Container from 'typedi';
 
 import { APIMessage } from './api-message';
 import { PublisherBase } from './publisher-base';
 import { SubscriberBase } from './subscriber-base';
-import { APIFactory, APIResponse, IAPIPort } from '../../api';
-import { CustomError, ErrorCode } from '../../error';
-import { DirectoryBase, IOFactoryBase } from '../../io';
+import { APIFactory, IAPIPort } from '../../api';
+import { FileBase } from '../../io';
 
 export class PubSubAPIPort implements IAPIPort {
     private m_Pub: PublisherBase;
@@ -26,48 +24,24 @@ export class PubSubAPIPort implements IAPIPort {
         return this.m_Sub;
     }
 
-    public constructor(private m_APIFactory: APIFactory, private m_IOFactory: IOFactoryBase, private m_RootDir: DirectoryBase) { }
+    public constructor(private m_APIFactory: APIFactory, private m_PackageFile: FileBase) { }
 
     public async listen() {
-        const pkg = await this.m_IOFactory.buildFile(this.m_RootDir.path, 'package.json').readJSON<{
+        const pkg = await this.m_PackageFile.readJSON<{
             name: string;
             version: string;
         }>();
         await this.sub.subscribe(pkg.name, async (message: string) => {
             const req = JSON.parse(message) as APIMessage;
-            const resp: APIResponse = {
-                err: 0,
-                data: null
-            };
-            try {
-                const api = await this.m_APIFactory.build(req.endpoint, req.api);
-                if (typeof req.body == 'string')
-                    req.body = JSON.parse(req.body);
-                Object.keys(req.body || {}).forEach(r => {
-                    api[r] = req.body[r];
-                });
-                const errors = await validate(api);
-                if (errors.length) {
-                    const message = errors.map((r): string => {
-                        return r.toString();
-                    }).join('\n-');
-                    throw new CustomError(ErrorCode.Verify, message);
-                }
-
-                resp.data = await api.call();
-            } catch (ex) {
-                if (ex instanceof CustomError) {
-                    resp.data = ex.code == ErrorCode.Tip ? ex.message : '';
-                    resp.err = ex.code;
-                } else {
-                    resp.data = '';
-                    resp.err = ErrorCode.Panic;
-                    console.log(ex);
-                }
-            } finally {
-                if (req.replyID)
-                    await this.pub.publish(`${pkg.name}-${req.replyID}`, resp);
-            }
+            const api = this.m_APIFactory.build(req.endpoint, req.api);
+            if (typeof req.body == 'string')
+                req.body = JSON.parse(req.body);
+            Object.keys(req.body || {}).forEach(r => {
+                api[r] = req.body[r];
+            });
+            const res = await api.getResposne();
+            if (req.replyID)
+                await this.pub.publish(`${pkg.name}-${req.replyID}`, res);
         });
         console.log(`${pkg.name}(v${pkg.version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]`);
     }
