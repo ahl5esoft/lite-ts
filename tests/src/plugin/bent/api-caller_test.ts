@@ -14,40 +14,34 @@ describe('src/plugin/bent/api-caller.ts', () => {
 
     describe('.call<T>(route: string, body: any, ms?: number): Promise<T>', () => {
         it('ok', async () => {
-            const app = express();
-            app.use(
+            server = express().use(
                 json()
-            );
-            app.post('/:endpoint/:api', async (_, resp) => {
+            ).post('/:endpoint/:api', async (req, resp) => {
                 resp.json({
-                    data: 'ok',
+                    data: `${req.params.endpoint}/${req.params.api}`,
                     err: 0
                 });
-            });
-            server = app.listen(65000, '127.0.0.1');
+            }).listen(65000, '127.0.0.1');
 
-            const res = await new BentAPICaller('http://127.0.0.1:65000').call<string>('/a/b', {});
-            strictEqual(res, 'ok');
+            const res = await new BentAPICaller('http://127.0.0.1:65000').call<string>('a/b/c', {});
+            strictEqual(res, 'b/c');
         });
 
         it('timeout', async () => {
-            const app = express();
-            app.use(
+            server = express().use(
                 json()
-            );
-            app.post('/:endpoint/:api', async (_, resp) => {
+            ).post('/:endpoint/:api', async (_, resp) => {
                 setTimeout(() => {
                     resp.json({
                         data: 'ok',
                         err: 0
                     });
-                }, BentAPICaller.expires + 300);
-            });
-            server = app.listen(65000, '127.0.0.1');
+                }, BentAPICaller.expires);
+            }).listen(65000, '127.0.0.1');
 
             let err: CustomError;
             try {
-                await new BentAPICaller('http://127.0.0.1:65000').call<string>('/a/b', {});
+                await new BentAPICaller('http://127.0.0.1:65000').call<string>('a/b/c', {}, 300);
             } catch (ex) {
                 err = ex;
             }

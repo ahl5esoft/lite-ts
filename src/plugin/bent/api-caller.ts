@@ -11,6 +11,8 @@ export class BentAPICaller extends APICallerBase {
     public constructor(baseURL: string) {
         super();
 
+        if (!baseURL.endsWith('/'))
+            baseURL += '/';
         this.m_PostFunc = bent(baseURL, 'POST', 'json', 200);
     }
 
@@ -24,7 +26,11 @@ export class BentAPICaller extends APICallerBase {
                 }, ms || BentAPICaller.expires);
             }),
             new Promise<T>(async (s, f) => {
-                const resp = await this.m_PostFunc(route, body);
+                const routeArgs = route.split('/');
+                const resp = await this.m_PostFunc(
+                    [routeArgs[1], routeArgs[2]].join('/'),
+                    body
+                );
                 const res = resp as {
                     err: number;
                     data: any;

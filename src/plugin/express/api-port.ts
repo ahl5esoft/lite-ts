@@ -22,15 +22,20 @@ export class ExpressAPIPort implements IAPIPort {
     }
 
     public async listen() {
-        const app = express();
-        app.use(
+        const pkg = await this.m_PackageFile.readJSON<{
+            name: string;
+            version: string;
+        }>();
+        const listenArgs: any[] = [this.m_Port, () => {
+            console.log(`${pkg.name}(v${pkg.version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]: ${this.m_Port}`);
+        }];
+        if (process.platform == 'win32')
+            listenArgs.splice(1, 0, '127.0.0.1');
+
+        this.m_Server = express().use(
             json()
-        );
-        app.post('/:endpoint/:api', async (req, resp) => {
-            const res: APIResponse = {
-                err: 0,
-                data: null
-            };
+        ).post('/:endpoint/:api', async (req, resp) => {
+            let res = new APIResponse();
             try {
                 const api = await this.m_APIFactory.build(req.params.endpoint, req.params.api);
                 if (typeof req.body == 'string')
@@ -47,6 +52,7 @@ export class ExpressAPIPort implements IAPIPort {
                 }
 
                 res.data = await api.call();
+                res.err = 0;
             } catch (ex) {
                 if (ex instanceof CustomError) {
                     res.err = ex.code;
@@ -58,19 +64,9 @@ export class ExpressAPIPort implements IAPIPort {
                     res.err = ErrorCode.Panic;
                     console.log('error', ex);
                 }
+            } finally {
+                resp.json(res);
             }
-            resp.json(res);
-        });
-
-        const pkg = await this.m_PackageFile.readJSON<{
-            name: string;
-            version: string;
-        }>();
-        const listenArgs: any[] = [this.m_Port, () => {
-            console.log(`${pkg.name}(v${pkg.version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]: ${this.m_Port}`);
-        }];
-        if (process.platform == 'win32')
-            listenArgs.splice(1, 0, '127.0.0.1');
-        this.m_Server = app.listen(...listenArgs);
+        }).listen(...listenArgs);
     }
 }
