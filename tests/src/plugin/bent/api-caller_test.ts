@@ -16,15 +16,16 @@ describe('src/plugin/bent/api-caller.ts', () => {
         it('ok', async () => {
             server = express().use(
                 json()
-            ).post('/:endpoint/:api', async (req, resp) => {
+            ).post('/:app/:endpoint/:api', async (req, resp) => {
                 resp.json({
-                    data: `${req.params.endpoint}/${req.params.api}`,
+                    data: `${req.params.app}/${req.params.endpoint}/${req.params.api}`,
                     err: 0
                 });
             }).listen(65000, '127.0.0.1');
 
-            const res = await new BentAPICaller('http://127.0.0.1:65000').call<string>('a/b/c', {});
-            strictEqual(res, 'b/c');
+            const route = 'a/b/c';
+            const res = await new BentAPICaller('http://127.0.0.1:65000').call<string>(route, {});
+            strictEqual(res, route);
         });
 
         it('timeout', async () => {
