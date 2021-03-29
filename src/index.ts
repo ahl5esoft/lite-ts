@@ -15,6 +15,7 @@ export * from './plugin/express';
 export * from './plugin/mongo';
 export * from './plugin/pubsub';
 export * from './plugin/redis';
+export * from './plugin/log4js';
 export * from './thread';
 export * from './time';
 export * from './tool';

@@ -1,38 +1,25 @@
 import 'reflect-metadata';
-
 import Container from 'typedi';
 
-import { APIFactory, IORedisAdapter, OSDirectory, OSFile, PublisherBase, PubSubAPIPort, SubscriberBase } from '../src';
+import { APIFactory, BentAPICaller, ExpressAPIPort, Log4JSTraceLogFactory, MongoStringGenerator, OSDirectory, OSNowTime, StringGeneratorBase } from '../src';
 
 (async () => {
+    const idGenerator = new MongoStringGenerator();
+    Container.set(StringGeneratorBase, idGenerator);
+
+    const port = 65000;
     const project = 'lite-ts';
-    const replyID = 'reply';
-    const redis = new IORedisAdapter({
-        host: '127.0.0.1',
-        port: 6379,
-    });
-    Container.set(PublisherBase, redis);
-    Container.set(SubscriberBase, redis);
     setTimeout(async () => {
-        await redis.publish(project, {
-            api: 'version',
-            body: '{}',
-            endpoint: 'test',
-            replyID: replyID
-        });
-        const receiveChannel = `${project}-${replyID}`;
-        await redis.subscribe(receiveChannel, async (message: string): Promise<void> => {
-            console.log(message);
-            await redis.unsubscribe(receiveChannel);
-        });
+        const res = await new BentAPICaller(`http://127.0.0.1:${port}`).call(`test/version`, {});
+        console.log(res);
     }, 1000);
 
     const apiFactory = new APIFactory();
     await apiFactory.init(
         new OSDirectory(__dirname, 'api')
     );
-    new PubSubAPIPort(
-        apiFactory,
-        new OSFile(__dirname, '..', 'package.json')
-    ).listen();
+
+    const nowTime = new OSNowTime();
+    const traceLogFactory = new Log4JSTraceLogFactory(idGenerator, nowTime);
+    await new ExpressAPIPort(apiFactory, project, port, traceLogFactory, '0.0.0').listen();
 })();

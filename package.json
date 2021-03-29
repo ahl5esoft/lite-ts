@@ -6,6 +6,7 @@
 		"class-validator": "^0.13.1",
 		"express": "^4.17.1",
 		"ioredis": "^4.22.0",
+		"log4js": "^6.3.0",
 		"moment": "^2.29.1",
 		"mongodb": "^3.6.3",
 		"reflect-metadata": "^0.1.13",
@@ -41,5 +42,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "0.1.53"
+	"version": "0.1.54"
 }

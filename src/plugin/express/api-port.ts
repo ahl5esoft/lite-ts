@@ -4,14 +4,18 @@ import { Server } from 'http';
 import moment from 'moment';
 
 import { APIFactory, IAPIPort } from '../../api';
+import { TraceLogFactoryBase } from '../../log';
 
 export class ExpressAPIPort implements IAPIPort {
+    public static traceHeaderKey = '$trace';
+
     private m_Server: Server;
 
     public constructor(
         private m_APIFactory: APIFactory,
         private m_Project: string,
         private m_Port: number,
+        private m_TraceLogFactory: TraceLogFactoryBase,
         private m_Version: string
     ) { }
 
@@ -29,14 +33,26 @@ export class ExpressAPIPort implements IAPIPort {
         this.m_Server = express().use(
             json()
         ).post('/:endpoint/:api', async (req, resp) => {
+            const traceLog = await this.m_TraceLogFactory.build(req.headers[ExpressAPIPort.traceHeaderKey] as string);
+            const span = await traceLog.createSpan();
+            await span.begin(`${this.m_Project}/${req.params.endpoint}/${req.params.api}`);
+
             const api = this.m_APIFactory.build(req.params.endpoint, req.params.api);
             if (typeof req.body == 'string')
                 req.body = JSON.parse(req.body);
             Object.keys(req.body || {}).forEach(r => {
                 api[r] = req.body[r];
             });
+
+            span.addLabel('body', req.body);
+
             const res = await api.getResposne();
+
+            span.addLabel('resp', res);
+
             resp.json(res);
+
+            await span.end();
         }).listen(...listenArgs);
     }
 }
