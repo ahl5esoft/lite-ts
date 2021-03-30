@@ -4,7 +4,7 @@ import { Server } from 'http';
 import moment from 'moment';
 
 import { APIFactory, IAPIPort } from '../../api';
-import { traceKey, TraceLogFactoryBase, traceSpanKey } from '../../log';
+import { ITraceable, TraceFactoryBase, traceKey, traceSpanKey } from '../../runtime';
 
 export class ExpressAPIPort implements IAPIPort {
     private m_Server: Server;
@@ -13,7 +13,7 @@ export class ExpressAPIPort implements IAPIPort {
         private m_APIFactory: APIFactory,
         private m_Project: string,
         private m_Port: number,
-        private m_TraceLogFactory: TraceLogFactoryBase,
+        private m_TraceFactory: TraceFactoryBase,
         private m_Version: string
     ) { }
 
@@ -31,9 +31,11 @@ export class ExpressAPIPort implements IAPIPort {
         this.m_Server = express().use(
             json()
         ).post('/:endpoint/:api', async (req, resp) => {
-            const traceLog = await this.m_TraceLogFactory.build(req.headers[traceKey] as string);
-            const span = await traceLog.createSpan(req.headers[traceSpanKey] as string);
-            await span.begin(`${this.m_Project}/${req.params.endpoint}/${req.params.api}`);
+            const traceID = req.headers[traceKey] as string;
+            const trace = await this.m_TraceFactory.build(traceID);
+            const traceSpanID = req.headers[traceSpanKey] as string;
+            const traceSpan = await trace.createSpan(traceSpanID);
+            await traceSpan.begin(`${this.m_Project}/${req.params.endpoint}/${req.params.api}`);
 
             const api = this.m_APIFactory.build(req.params.endpoint, req.params.api);
             if (typeof req.body == 'string')
@@ -42,15 +44,22 @@ export class ExpressAPIPort implements IAPIPort {
                 api[r] = req.body[r];
             });
 
-            span.addLabel('body', req.body);
+            traceSpan.addLabel('body', req.body);
 
             const res = await api.getResposne();
 
-            span.addLabel('resp', res);
+            Object.values(api).forEach(r => {
+                if ('traceID' in r && 'traceSpanID' in r) {
+                    (r as ITraceable).traceID = traceID;
+                    (r as ITraceable).traceSpanID = traceSpanID;
+                }
+            });
+
+            traceSpan.addLabel('resp', res);
 
             resp.json(res);
 
-            await span.end();
+            await traceSpan.end();
         }).listen(...listenArgs);
     }
 }

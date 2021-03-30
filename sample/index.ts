@@ -4,13 +4,30 @@ import { strictEqual } from 'assert';
 import moment from 'moment';
 import Container from 'typedi';
 
-import { APIFactory, BentAPICaller, ExpressAPIPort, Log4JSTraceLogFactory, MongoStringGenerator, OSDirectory, OSFile, OSNowTime, sleep, StringGeneratorBase, traceSpanKey } from '../src';
+import {
+    APICallerBase,
+    APIFactory,
+    ExpressAPIPort,
+    Log4JSTraceFactory,
+    MongoStringGenerator,
+    OSDirectory,
+    OSFile,
+    OSNowTime,
+    sleep,
+    StringGeneratorBase,
+    TraceableBentAPICaller,
+    traceSpanKey
+} from '../src';
+import { traceKey } from '../src/runtime/trace-base';
 
 (async () => {
     const idGenerator = new MongoStringGenerator();
     Container.set(StringGeneratorBase, idGenerator);
 
     const port = 65000;
+    const apiCaller = new TraceableBentAPICaller(`http://127.0.0.1:${port}`);
+    Container.set(APICallerBase, apiCaller);
+
     const project = 'lite-ts';
     const apiFactory = new APIFactory();
     await apiFactory.init(
@@ -18,11 +35,12 @@ import { APIFactory, BentAPICaller, ExpressAPIPort, Log4JSTraceLogFactory, Mongo
     );
 
     const nowTime = new OSNowTime();
-    const traceLogFactory = new Log4JSTraceLogFactory(idGenerator, nowTime);
+    const traceLogFactory = new Log4JSTraceFactory(idGenerator, nowTime);
     const apiPort = new ExpressAPIPort(apiFactory, project, port, traceLogFactory, '0.0.0');
 
     setTimeout(async () => {
-        const res = await new BentAPICaller(`http://127.0.0.1:${port}`).setHeaders({
+        const res = await apiCaller.setHeaders({
+            [traceKey]: 'trace-id',
             [traceSpanKey]: 'span-id'
         }).call(`test/version`);
         strictEqual(res, '1.0.0');
@@ -32,6 +50,7 @@ import { APIFactory, BentAPICaller, ExpressAPIPort, Log4JSTraceLogFactory, Mongo
             const isExist = await file.exists();
             if (isExist) {
                 const traceLog = await file.readJSON<any>();
+                console.log(traceLog);
                 strictEqual(traceLog[0].parentID, 'span-id');
                 break;
             }

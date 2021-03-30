@@ -1,9 +1,9 @@
 import { Logger } from 'log4js';
 
-import { TraceLogSpanBase } from '../../log';
+import { TraceSpanBase } from '../../runtime';
 import { NowTimeBase } from '../../time';
 
-export class TraceLogSpan extends TraceLogSpanBase {
+export class TraceSpan extends TraceSpanBase {
     private m_Labels: { [key: string]: any; } = {};
 
     public constructor(

@@ -5,11 +5,11 @@ export * from './crypto';
 export * from './db';
 export * from './dp';
 export * from './error';
-export * from './io';
-export * from './log';
+export * from './io'
 export * from './math';
 export * from './object';
 export * from './os';
+export * from './runtime';
 export * from './plugin/bent';
 export * from './plugin/bcrypt';
 export * from './plugin/express';
