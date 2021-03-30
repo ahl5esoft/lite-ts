@@ -1,11 +1,11 @@
 import Container from 'typedi';
 
+import { APIMessage } from './api-message';
 import { PublisherBase } from './publisher-base';
 import { SubscriberBase } from './subscriber-base';
 import { APICallerBase, APIResponse } from '../../api';
 import { CustomError, ErrorCode } from '../../error';
 import { StringGeneratorBase } from '../../object';
-import { APIMessage } from './api-message';
 
 export class PubSubAPICaller extends APICallerBase {
     public static expires = 5000;
@@ -69,14 +69,17 @@ export class PubSubAPICaller extends APICallerBase {
         ]);
     }
 
-    public async voidCall(route: string, body: any) {
+    public async voidCall(route: string) {
         const routeParams = route.split('/');
         const message: APIMessage = {
             api: routeParams[2],
-            body: typeof body == 'string' ? body : JSON.stringify(body),
+            body: this.body,
             endpoint: routeParams[1],
             replyID: ''
         };
-        await this.pub.publish(routeParams[0], message);
+        await this.pub.publish(routeParams[0], message).finally(() => {
+            this.body = {};
+            this.headers = {};
+        });
     }
 }

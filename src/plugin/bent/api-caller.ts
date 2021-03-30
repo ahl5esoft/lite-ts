@@ -16,7 +16,7 @@ export class BentAPICaller extends APICallerBase {
         this.m_PostFunc = bent(baseURL, 'POST', 'json', 200);
     }
 
-    public async call<T>(route: string, body: any, ms?: number): Promise<T> {
+    public async call<T>(route: string, ms?: number): Promise<T> {
         return Promise.race([
             new Promise<T>((_, f) => {
                 setTimeout(() => {
@@ -26,7 +26,7 @@ export class BentAPICaller extends APICallerBase {
                 }, ms || BentAPICaller.expires);
             }),
             new Promise<T>(async (s, f) => {
-                const resp = await this.m_PostFunc(route, body);
+                const resp = await this.m_PostFunc(route, this.body, this.headers);
                 const res = resp as {
                     err: number;
                     data: any;
@@ -39,10 +39,16 @@ export class BentAPICaller extends APICallerBase {
                     s(res.data);
                 }
             })
-        ]);
+        ]).finally(() => {
+            this.body = {};
+            this.headers = {};
+        });
     }
 
-    public async voidCall(route: string, body: any) {
-        this.m_PostFunc(route, body).catch(console.log);
+    public async voidCall(route: string) {
+        this.m_PostFunc(route, this.body, this.headers).catch(console.log).finally(() => {
+            this.body = {};
+            this.headers = {};
+        });
     }
 }

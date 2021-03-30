@@ -17,23 +17,23 @@ describe('src/plugin/log4js/trace-log-span.ts', () => {
         });
     });
 
-    describe('.begin(action: string)', () => {
+    describe('.begin(name: string)', () => {
         it('ok', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new TraceLogSpan(null, mockNowTime.actual, '', '', '');
 
-            const nowUnix = 99;
+            const unixNano = 99;
             mockNowTime.expectReturn(
-                r => r.unix(),
-                nowUnix
+                r => r.unixNano(),
+                unixNano * 1000 * 1000
             );
 
             await self.begin('test');
 
             const res = Reflect.get(self, 'm_Labels');
             deepStrictEqual(res, {
-                action: 'test',
-                beganOn: nowUnix
+                name: 'test',
+                beganOn: unixNano
             });
         });
     });
@@ -44,15 +44,15 @@ describe('src/plugin/log4js/trace-log-span.ts', () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new TraceLogSpan(mockLogger.actual, mockNowTime.actual, 'parent', 'span', 'trace');
 
-            const nowUnix = 999;
+            const unixNano = 999;
             mockNowTime.expectReturn(
-                r => r.unix(),
-                nowUnix
+                r => r.unixNano(),
+                unixNano * 1000 * 1000
             );
 
             mockLogger.expected.trace({
                 labels: {
-                    endedOn: nowUnix,
+                    endedOn: unixNano,
                 },
                 parentID: 'parent',
                 spanID: 'span',

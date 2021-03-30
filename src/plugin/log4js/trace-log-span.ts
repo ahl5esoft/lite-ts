@@ -20,16 +20,22 @@ export class TraceLogSpan extends TraceLogSpanBase {
         this.m_Labels[key] = value;
     }
 
-    public async begin(action: string) {
-        this.addLabel('action', action);
+    public async begin(name: string) {
+        this.addLabel('name', name);
 
-        const nowUnix = await this.m_NowTime.unix();
-        this.addLabel('beganOn', nowUnix);
+        const unixNano = await this.m_NowTime.unixNano();
+        this.addLabel(
+            'beganOn',
+            Math.floor(unixNano / 1000 / 1000)
+        );
     }
 
     public async end() {
-        const nowUnix = await this.m_NowTime.unix();
-        this.addLabel('endedOn', nowUnix);
+        const unixNano = await this.m_NowTime.unixNano();
+        this.addLabel(
+            'endedOn',
+            Math.floor(unixNano / 1000 / 1000)
+        );
 
         this.m_Logger.trace({
             labels: this.m_Labels,

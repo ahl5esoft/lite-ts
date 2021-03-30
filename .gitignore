@@ -1,4 +1,4 @@
 .vscode/
+/log/
 dist/
-log/
 node_modules/

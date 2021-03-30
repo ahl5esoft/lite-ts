@@ -4,11 +4,9 @@ import { Server } from 'http';
 import moment from 'moment';
 
 import { APIFactory, IAPIPort } from '../../api';
-import { TraceLogFactoryBase } from '../../log';
+import { traceKey, TraceLogFactoryBase, traceSpanKey } from '../../log';
 
 export class ExpressAPIPort implements IAPIPort {
-    public static traceHeaderKey = '$trace';
-
     private m_Server: Server;
 
     public constructor(
@@ -33,8 +31,8 @@ export class ExpressAPIPort implements IAPIPort {
         this.m_Server = express().use(
             json()
         ).post('/:endpoint/:api', async (req, resp) => {
-            const traceLog = await this.m_TraceLogFactory.build(req.headers[ExpressAPIPort.traceHeaderKey] as string);
-            const span = await traceLog.createSpan();
+            const traceLog = await this.m_TraceLogFactory.build(req.headers[traceKey] as string);
+            const span = await traceLog.createSpan(req.headers[traceSpanKey] as string);
             await span.begin(`${this.m_Project}/${req.params.endpoint}/${req.params.api}`);
 
             const api = this.m_APIFactory.build(req.params.endpoint, req.params.api);

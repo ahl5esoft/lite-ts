@@ -24,7 +24,7 @@ describe('src/plugin/bent/api-caller.ts', () => {
             }).listen(65000, '127.0.0.1');
 
             const route = 'a/b/c';
-            const res = await new BentAPICaller('http://127.0.0.1:65000').call<string>(route, {});
+            const res = await new BentAPICaller('http://127.0.0.1:65000').call<string>(route);
             strictEqual(res, route);
         });
 
@@ -42,7 +42,7 @@ describe('src/plugin/bent/api-caller.ts', () => {
 
             let err: CustomError;
             try {
-                await new BentAPICaller('http://127.0.0.1:65000').call<string>('a/b/c', {}, 300);
+                await new BentAPICaller('http://127.0.0.1:65000').call<string>('a/b/c', 300);
             } catch (ex) {
                 err = ex;
             }
