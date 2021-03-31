@@ -7,7 +7,7 @@ import { NowTimeBase } from '../../time';
 
 export class Log4JSTraceFactory extends TraceFactoryBase {
     public constructor(
-        private m_IDGenerator: StringGeneratorBase,
+        private m_StringGenerator: StringGeneratorBase,
         private m_NowTime: NowTimeBase
     ) {
         super();
@@ -39,11 +39,8 @@ export class Log4JSTraceFactory extends TraceFactoryBase {
     }
 
     public async build(traceID: string): Promise<TraceBase> {
-        if (!traceID)
-            traceID = await this.m_IDGenerator.generate();
-
         return new Trace(
-            this.m_IDGenerator,
+            this.m_StringGenerator,
             getLogger(),
             this.m_NowTime,
             traceID

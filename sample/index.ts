@@ -50,7 +50,6 @@ import { traceKey } from '../src/runtime/trace-base';
             const isExist = await file.exists();
             if (isExist) {
                 const traceLog = await file.readJSON<any>();
-                console.log(traceLog);
                 strictEqual(traceLog[0].parentID, 'span-id');
                 break;
             }

@@ -31,10 +31,8 @@ export class ExpressAPIPort implements IAPIPort {
         this.m_Server = express().use(
             json()
         ).post('/:endpoint/:api', async (req, resp) => {
-            const traceID = req.headers[traceKey] as string;
-            const trace = await this.m_TraceFactory.build(traceID);
-            const traceSpanID = req.headers[traceSpanKey] as string;
-            const traceSpan = await trace.createSpan(traceSpanID);
+            const trace = await this.m_TraceFactory.build(req.headers[traceKey] as string);
+            const traceSpan = await trace.createSpan(req.headers[traceSpanKey] as string);
             await traceSpan.begin(`${this.m_Project}/${req.params.endpoint}/${req.params.api}`);
 
             const api = this.m_APIFactory.build(req.params.endpoint, req.params.api);
@@ -47,18 +45,16 @@ export class ExpressAPIPort implements IAPIPort {
             traceSpan.addLabel('body', req.body);
 
             const res = await api.getResposne();
-
-            Object.values(api).forEach(r => {
-                if ('traceID' in r && 'traceSpanID' in r) {
-                    (r as ITraceable).traceID = traceID;
-                    (r as ITraceable).traceSpanID = traceSpanID;
-                }
-            });
-
-            traceSpan.addLabel('resp', res);
-
             resp.json(res);
 
+            for (const r of Object.values(api)) {
+                if (typeof r == 'object' && 'traceID' in r && 'traceSpanID' in r) {
+                    (r as ITraceable).traceID = await trace.getID();
+                    (r as ITraceable).traceSpanID = await traceSpan.getID();
+                }
+            }
+
+            traceSpan.addLabel('resp', res);
             await traceSpan.end();
         }).listen(...listenArgs);
     }

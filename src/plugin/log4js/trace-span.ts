@@ -1,4 +1,5 @@
 import { Logger } from 'log4js';
+import { StringGeneratorBase } from '../../object';
 
 import { TraceSpanBase } from '../../runtime';
 import { NowTimeBase } from '../../time';
@@ -10,10 +11,10 @@ export class TraceSpan extends TraceSpanBase {
         private m_Logger: Logger,
         private m_NowTime: NowTimeBase,
         private m_ParentID: string,
-        private m_SpanID: string,
+        stringGenerator: StringGeneratorBase,
         private m_TraceID: string
     ) {
-        super();
+        super(stringGenerator);
     }
 
     public addLabel(key: string, value: any) {
@@ -40,7 +41,7 @@ export class TraceSpan extends TraceSpanBase {
         this.m_Logger.trace({
             labels: this.m_Labels,
             parentID: this.m_ParentID,
-            spanID: this.m_SpanID,
+            spanID: await this.getID(),
             traceID: this.m_TraceID,
         });
     }
