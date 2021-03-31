@@ -14,7 +14,7 @@ export class Log4JSTraceFactory extends TraceFactoryBase {
 
         addLayout('json', () => {
             return e => {
-                return JSON.stringify(e.data);
+                return JSON.stringify(e.data[0]);
             };
         });
         configure({
@@ -38,7 +38,7 @@ export class Log4JSTraceFactory extends TraceFactoryBase {
         });
     }
 
-    public async build(traceID: string): Promise<TraceBase> {
+    public build(traceID: string): TraceBase {
         return new Trace(
             this.m_StringGenerator,
             getLogger(),

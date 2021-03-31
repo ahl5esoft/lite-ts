@@ -6,7 +6,7 @@ export const traceSpanKey = '$trace-span';
 export abstract class TraceBase {
     public constructor(protected stringGenerator: StringGeneratorBase, private m_ID: string) { }
 
-    public abstract createSpan(parentID: string): Promise<TraceSpanBase>;
+    public abstract createSpan(parentID: string): TraceSpanBase;
 
     public async getID(): Promise<string> {
         if (!this.m_ID)
@@ -17,7 +17,7 @@ export abstract class TraceBase {
 }
 
 export abstract class TraceFactoryBase {
-    public abstract build(traceID: string): Promise<TraceBase>;
+    public abstract build(traceID: string): TraceBase;
 }
 
 export abstract class TraceSpanBase {

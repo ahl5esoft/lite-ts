@@ -2,13 +2,14 @@ import { validate } from 'class-validator';
 
 import { APIResponse } from './response';
 import { CustomError, ErrorCode } from '../error';
+import { TraceSpanBase } from '../runtime';
 
 export abstract class APIBase {
     public $route: string;
 
     public $user: any;
 
-    public async getResposne(): Promise<APIResponse> {
+    public async getResposne(traceSpan?: TraceSpanBase): Promise<APIResponse> {
         let resp: APIResponse = {
             data: null,
             err: 0
@@ -24,15 +25,19 @@ export abstract class APIBase {
 
             resp.data = await this.call();
         } catch (ex) {
+            traceSpan?.addLabel('err', ex);
             if (ex instanceof CustomError) {
                 resp.err = ex.code;
                 if (ex.code == ErrorCode.Tip)
                     resp.data = ex.message;
-                else
-                    console.log(ex.code, ex.message);
+
+                traceSpan?.addLabel('err', ex);
             } else {
                 resp.err = ErrorCode.Panic;
-                console.log('error', ex);
+                traceSpan?.addLabel('err', {
+                    message: ex.message,
+                    stack: ex.stack
+                });
             }
         }
         return resp;

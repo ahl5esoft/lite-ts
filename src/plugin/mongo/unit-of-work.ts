@@ -11,7 +11,7 @@ export class UnitOfWork extends UnitOfWorkBase {
         super();
     }
 
-    public async commit(): Promise<void> {
+    public async commit() {
         const client = await this.m_Pool.getClient();
         const session = client.startSession();
         session.startTransaction();
@@ -24,8 +24,8 @@ export class UnitOfWork extends UnitOfWorkBase {
         this.m_Queue = [];
     }
 
-    public registerAdd(table: string, entry: any): void {
-        this.m_Queue.push(async (session: ClientSession): Promise<void> => {
+    public registerAdd(table: string, entry: any) {
+        this.m_Queue.push(async session => {
             const db = await this.m_Pool.getDb();
             await db.collection(table, {
                 session: session,
@@ -33,31 +33,27 @@ export class UnitOfWork extends UnitOfWorkBase {
         });
     }
 
-    public registerRemove(table: string, entry: any): void {
-        this.m_Queue.push(
-            async (session: ClientSession): Promise<void> => {
-                const db = await this.m_Pool.getDb();
-                await db.collection(table, {
-                    session: session,
-                }).deleteOne({
-                    _id: entry.id,
-                });
-            }
-        );
+    public registerRemove(table: string, entry: any) {
+        this.m_Queue.push(async session => {
+            const db = await this.m_Pool.getDb();
+            await db.collection(table, {
+                session: session,
+            }).deleteOne({
+                _id: entry.id,
+            });
+        });
     }
 
-    public registerSave(table: string, entry: any): void {
-        this.m_Queue.push(
-            async (session: ClientSession): Promise<void> => {
-                const db = await this.m_Pool.getDb();
-                await db.collection(table, {
-                    session: session,
-                }).updateOne({
-                    _id: entry.id,
-                }, {
-                    $set: toDoc(entry),
-                });
-            }
-        );
+    public registerSave(table: string, entry: any) {
+        this.m_Queue.push(async session => {
+            const db = await this.m_Pool.getDb();
+            await db.collection(table, {
+                session: session,
+            }).updateOne({
+                _id: entry.id,
+            }, {
+                $set: toDoc(entry),
+            });
+        });
     }
 }

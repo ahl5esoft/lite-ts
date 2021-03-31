@@ -1,10 +1,12 @@
 import { deepStrictEqual } from 'assert';
+import { MongoFactory } from '../../../../src';
 
 import { toEntries } from '../../../../src/plugin/mongo/helper';
 import { Pool } from '../../../../src/plugin/mongo/pool';
 import { Repository as Self } from '../../../../src/plugin/mongo/repository';
 import { UnitOfWork } from '../../../../src/plugin/mongo/unit-of-work';
 
+const dbFactory = new MongoFactory('test-repository', 'mongodb://localhost:27017');
 const pool = new Pool('test-repository', 'mongodb://localhost:27017');
 
 describe('src/plugin/mongo/repository.ts', (): void => {
@@ -14,13 +16,15 @@ describe('src/plugin/mongo/repository.ts', (): void => {
 
         const client = await pool.getClient();
         await client.close();
+
+        await dbFactory.close();
     });
 
     describe('.add(entry: any): Promise<void>', (): void => {
         const table = 'add';
         it('m_IsTx = true', async (): Promise<void> => {
             const uow = new UnitOfWork(pool);
-            const self = new Self(pool, table, true, uow);
+            const self = new Self(pool, dbFactory, table, uow);
             const entry = {
                 id: `${table}-1`,
                 name: 'test',
@@ -33,8 +37,7 @@ describe('src/plugin/mongo/repository.ts', (): void => {
         });
 
         it('m_IsTx = false', async (): Promise<void> => {
-            const uow = new UnitOfWork(pool);
-            const self = new Self(pool, table, false, uow);
+            const self = new Self(pool, dbFactory, table, null);
             const entry = {
                 id: `${table}-2`,
                 name: 'test',
@@ -62,7 +65,7 @@ describe('src/plugin/mongo/repository.ts', (): void => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const res = await new Self(pool, table, false, null).query().toArray();
+            const res = await new Self(pool, dbFactory, table, null).query().toArray();
 
             await collection.deleteMany(null);
 
@@ -82,7 +85,7 @@ describe('src/plugin/mongo/repository.ts', (): void => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const res = await new Self(pool, table, false, null).query().where({
+            const res = await new Self(pool, dbFactory, table, null).query().where({
                 id: rows[0]._id
             }).toArray();
 
@@ -106,7 +109,7 @@ describe('src/plugin/mongo/repository.ts', (): void => {
             await collection.insertMany(rows);
 
             const uow = new UnitOfWork(pool);
-            const self = new Self(pool, table, true, uow);
+            const self = new Self(pool, dbFactory, table, uow);
             await self.remove({
                 id: rows[0]._id,
             });
@@ -125,8 +128,7 @@ describe('src/plugin/mongo/repository.ts', (): void => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const uow = new UnitOfWork(pool);
-            const self = new Self(pool, table, false, uow);
+            const self = new Self(pool, dbFactory, table, null);
             await self.remove({
                 id: rows[0]._id,
             });
@@ -148,7 +150,7 @@ describe('src/plugin/mongo/repository.ts', (): void => {
             await collection.insertMany(rows);
 
             const uow = new UnitOfWork(pool);
-            const self = new Self(pool, table, true, uow);
+            const self = new Self(pool, dbFactory, table, uow);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
             await self.save(entry);
@@ -168,8 +170,7 @@ describe('src/plugin/mongo/repository.ts', (): void => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const uow = new UnitOfWork(pool);
-            const self = new Self(pool, table, false, uow);
+            const self = new Self(pool, dbFactory, table, null);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
             await self.save(entry);

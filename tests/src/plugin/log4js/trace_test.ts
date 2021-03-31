@@ -4,7 +4,7 @@ import { Mock, StringGeneratorBase } from '../../../../src';
 import { Trace } from '../../../../src/plugin/log4js/trace';
 
 describe('src/plugin/log4js/trace.ts', () => {
-    describe('.startSpan(parentID?: string): Promise<TraceLogSpanBase>', () => {
+    describe('.createSpan(parentID: string): Promise<TraceLogSpanBase>', () => {
         it('ok', async () => {
             const mockIDGenerator = new Mock<StringGeneratorBase>();
             const self = new Trace(mockIDGenerator.actual, null, null, 'trace');
@@ -16,18 +16,8 @@ describe('src/plugin/log4js/trace.ts', () => {
             );
 
             const span = await self.createSpan('p');
-            strictEqual(
-                Reflect.get(span, 'm_SpanID'),
-                spanID
-            );
-            strictEqual(
-                Reflect.get(span, 'm_ParentID'),
-                'p'
-            );
-            strictEqual(
-                Reflect.get(span, 'm_TraceID'),
-                'trace'
-            );
+            const id = await span.getID();
+            strictEqual(id, spanID);
         });
     });
 });

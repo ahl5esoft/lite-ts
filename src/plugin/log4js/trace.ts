@@ -15,8 +15,7 @@ export class Trace extends TraceBase {
         super(stringGenerator, traceID);
     }
 
-    public async createSpan(parentID: string): Promise<TraceSpanBase> {
-        const traceID = await this.getID();
-        return new TraceSpan(this.m_Logger, this.m_NowTime, parentID, this.stringGenerator, traceID);
+    public createSpan(parentID: string): TraceSpanBase {
+        return new TraceSpan(this.m_Logger, this.m_NowTime, parentID, this.stringGenerator, this);
     }
 }
