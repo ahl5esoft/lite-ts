@@ -35,7 +35,7 @@ export class TraceableAPICaller extends APICallerBase implements ITraceable {
         const trace = this.m_TraceFactory.build(this.traceID);
         this.headers[traceKey] = await trace.getID();
         const traceSpan = trace.createSpan(this.traceSpanID);
-        this.headers[traceSpanKey] = traceSpan.getID();
+        this.headers[traceSpanKey] = await traceSpan.getID();
         await traceSpan.begin('api-caller');
         traceSpan.addLabel('action', action);
         traceSpan.addLabel('route', route);
