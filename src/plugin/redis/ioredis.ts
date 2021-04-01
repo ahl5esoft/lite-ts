@@ -33,12 +33,12 @@ export class IORedisAdapter extends RedisBase implements IPublisher, ISubscriber
         super();
     }
 
-    public close(): void {
+    public close() {
         this.client?.disconnect();
         this.sub?.disconnect();
     }
 
-    public async del(key: string): Promise<void> {
+    public async del(key: string) {
         await this.client.del(key);
     }
 
@@ -47,7 +47,7 @@ export class IORedisAdapter extends RedisBase implements IPublisher, ISubscriber
         return count > 0;
     }
 
-    public async expire(key: string, seconds: number): Promise<void> {
+    public async expire(key: string, seconds: number) {
         await this.client.expire(key, seconds);
     }
 
@@ -90,7 +90,7 @@ export class IORedisAdapter extends RedisBase implements IPublisher, ISubscriber
         return this.client.hkeys(key);
     }
 
-    public async hset(key: string, field: string, value: string): Promise<void> {
+    public async hset(key: string, field: string, value: string) {
         await this.client.hset(key, field, value);
     }
 
@@ -119,7 +119,7 @@ export class IORedisAdapter extends RedisBase implements IPublisher, ISubscriber
         return this.client.mget(...keys);
     }
 
-    public async publish(channel: string, message: any): Promise<void> {
+    public async publish(channel: string, message: any) {
         if (typeof message != 'string')
             message = JSON.stringify(message);
         await this.client.publish(channel, message);
@@ -138,7 +138,7 @@ export class IORedisAdapter extends RedisBase implements IPublisher, ISubscriber
         return res === 'OK';
     }
 
-    public async subscribe(channel: string, callback: CallbackType): Promise<void> {
+    public async subscribe(channel: string, callback: CallbackType) {
         this.m_SubCallbacks[channel] = callback;
         await this.sub.subscribe(channel);
     }

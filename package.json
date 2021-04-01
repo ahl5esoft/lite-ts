@@ -42,5 +42,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "0.1.60"
+	"version": "0.1.61"
 }
