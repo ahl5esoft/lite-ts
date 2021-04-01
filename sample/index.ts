@@ -7,6 +7,7 @@ import Container from 'typedi';
 import {
     APICallerBase,
     APIFactory,
+    BentAPICaller,
     DBFactoryBase,
     ExpressAPIPort,
     Log4JSTraceFactory,
@@ -17,23 +18,27 @@ import {
     OSNowTime,
     sleep,
     StringGeneratorBase,
-    TraceableBentAPICaller,
+    TraceableAPICaller,
     TraceableDBFactory,
+    traceKey,
     traceSpanKey
 } from '../src';
-import { traceKey } from '../src/runtime/trace-base';
 
 (async () => {
-    const port = 65000;
-    const apiCaller = new TraceableBentAPICaller(`http://127.0.0.1:${port}`);
-    Container.set(APICallerBase, apiCaller);
-
     const idGenerator = new MongoStringGenerator();
     Container.set(StringGeneratorBase, idGenerator);
 
     const dbFactory = new MongoFactory('lite-config', 'mongodb://localhost:27017');
     const nowTime = new OSNowTime();
     const traceFactory = new Log4JSTraceFactory(idGenerator, nowTime);
+
+    const port = 65000;
+    const bentAPICaller = new BentAPICaller(`http://127.0.0.1:${port}`);
+    Container.set(
+        APICallerBase,
+        new TraceableAPICaller(bentAPICaller, traceFactory)
+    );
+
     Container.set(
         DBFactoryBase,
         new TraceableDBFactory(dbFactory, traceFactory)
@@ -50,7 +55,7 @@ import { traceKey } from '../src/runtime/trace-base';
     setTimeout(async () => {
         const traceID = 'trace-id';
         const traceSpanID = 'span-id';
-        const res = await apiCaller.setHeaders({
+        const res = await bentAPICaller.setHeaders({
             [traceKey]: traceID,
             [traceSpanKey]: traceSpanID
         }).call(`test/version`);
@@ -66,16 +71,16 @@ import { traceKey } from '../src/runtime/trace-base';
                 });
                 strictEqual(traceLogs.length, 6);
                 deepStrictEqual(traceLogs, [{
-                    labels: {
-                        name: "db",
-                        beganOn: traceLogs[0].labels.beganOn,
-                        query: "count",
-                        table: "Version",
-                        endedOn: traceLogs[0].labels.endedOn
+                    "labels": {
+                        "name": "db",
+                        "beganOn": traceLogs[0].labels.beganOn,
+                        "query": "count",
+                        "table": "Version",
+                        "endedOn": traceLogs[0].labels.endedOn,
                     },
-                    parentID: traceLogs[traceLogs.length - 1].spanID,
-                    spanID: traceLogs[0].spanID,
-                    traceID: traceID
+                    "parentID": traceLogs[traceLogs.length - 1].spanID,
+                    "spanID": traceLogs[0].spanID,
+                    "traceID": traceID
                 }, {
                     "labels": {
                         "name": "uow",
@@ -166,15 +171,19 @@ import { traceKey } from '../src/runtime/trace-base';
                     "spanID": traceLogs[4].spanID,
                     "traceID": traceID
                 }, {
-                    labels: {
-                        name: "lite-ts/test/version",
-                        beganOn: traceLogs[traceLogs.length - 1].labels.beganOn,
-                        body: {},
-                        endedOn: traceLogs[traceLogs.length - 1].labels.endedOn
+                    "labels": {
+                        "name": "api-port",
+                        "beganOn": traceLogs[traceLogs.length - 1].labels.beganOn,
+                        "params": {
+                            "endpoint": "test",
+                            "api": "version"
+                        },
+                        "body": {},
+                        "endedOn": traceLogs[traceLogs.length - 1].labels.endedOn
                     },
-                    parentID: traceSpanID,
-                    spanID: traceLogs[traceLogs.length - 1].spanID,
-                    traceID: traceID
+                    "parentID": traceSpanID,
+                    "spanID": traceLogs[traceLogs.length - 1].spanID,
+                    "traceID": traceID
                 }]);
                 break;
             }
