@@ -17,10 +17,11 @@ export abstract class APIBase {
         try {
             const validateErrors = await validate(this);
             if (validateErrors.length) {
-                const message = validateErrors.map((r): string => {
+                const messages = validateErrors.map((r): string => {
                     return r.toString();
-                }).join('\n-');
-                throw new CustomError(ErrorCode.Verify, message);
+                });
+                traceSpan?.addLabel('valid', messages);
+                throw new CustomError(ErrorCode.Verify);
             }
 
             resp.data = await this.call();
