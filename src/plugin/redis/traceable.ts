@@ -1,4 +1,4 @@
-import { ITraceable, TraceFactoryBase } from '../../runtime';
+import { ITraceable, TraceFactory } from '../../runtime';
 import { GeoAddMessage, RedisBase } from './base';
 
 export class TraceableRedis extends RedisBase implements ITraceable {
@@ -8,7 +8,7 @@ export class TraceableRedis extends RedisBase implements ITraceable {
 
     public constructor(
         private m_Redis: RedisBase,
-        private m_TraceFactory: TraceFactoryBase
+        private m_TraceFactory: TraceFactory
     ) {
         super();
     }
@@ -157,8 +157,7 @@ export class TraceableRedis extends RedisBase implements ITraceable {
 
     private async exec<T>(name: string, args: any[], fn: () => Promise<T>): Promise<T> {
         const trace = this.m_TraceFactory.build(this.traceID);
-        const traceSpan = trace.createSpan(this.traceSpanID);
-        await traceSpan.begin('redis');
+        const traceSpan = await trace.beginSpan('redis', this.traceSpanID);
         traceSpan.addLabel('action', name);
         if (args)
             traceSpan.addLabel('args', args);

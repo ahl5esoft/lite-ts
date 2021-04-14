@@ -1,7 +1,7 @@
-import { TraceBase } from '../runtime';
 import { UnitOfWorkBase } from './unit-of-work-base';
+import { Trace } from '../runtime';
 
-class Action {
+class Item {
     public action: string;
 
     public entry: any;
@@ -10,10 +10,10 @@ class Action {
 }
 
 export class TraceableUnitOfWork extends UnitOfWorkBase {
-    private m_Actions: Action[] = [];
+    private m_Items: Item[] = [];
 
     public constructor(
-        private m_Trace: TraceBase,
+        private m_Trace: Trace,
         private m_TraceSpanID: string,
         private m_Uow: UnitOfWorkBase,
     ) {
@@ -21,12 +21,11 @@ export class TraceableUnitOfWork extends UnitOfWorkBase {
     }
 
     public async commit() {
-        const traceSpan = this.m_Trace.createSpan(this.m_TraceSpanID);
-        await traceSpan.begin('uow');
-        traceSpan.addLabel('actions', this.m_Actions);
+        const traceSpan = await this.m_Trace.beginSpan('uow', this.m_TraceSpanID);
+        traceSpan.addLabel('items', this.m_Items);
         await this.m_Uow.commit().finally(() => {
             traceSpan.end().catch(console.log);
-            this.m_Actions = [];
+            this.m_Items = [];
         });
     }
 
@@ -46,7 +45,7 @@ export class TraceableUnitOfWork extends UnitOfWorkBase {
     }
 
     private addAction(action: string, entry: any, table: string) {
-        this.m_Actions.push({
+        this.m_Items.push({
             action: action,
             entry: JSON.parse(
                 JSON.stringify(entry)

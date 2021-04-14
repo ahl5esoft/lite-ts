@@ -3,14 +3,17 @@ import { DBRepositoryBase } from './repository-base';
 import { TraceableDBRepository } from './traceable-repository';
 import { TraceableUnitOfWork } from './traceable-unit-of-work';
 import { UnitOfWorkBase } from './unit-of-work-base';
-import { ITraceable, TraceFactoryBase } from '../runtime';
+import { ITraceable, TraceFactory } from '../runtime';
 
 export class TraceableDBFactory extends DBFactoryBase implements ITraceable {
     public traceID = '';
 
     public traceSpanID = '';
 
-    public constructor(private m_DBFactory: DBFactoryBase, private m_TraceFactory: TraceFactoryBase) {
+    public constructor(
+        private m_DBFactory: DBFactoryBase,
+        private m_TraceFactory: TraceFactory
+    ) {
         super();
     }
 
@@ -29,7 +32,7 @@ export class TraceableDBFactory extends DBFactoryBase implements ITraceable {
         return new TraceableUnitOfWork(
             this.m_TraceFactory.build(this.traceID),
             this.traceSpanID,
-            this.m_DBFactory.uow()
+            this.m_DBFactory.uow(),
         );
     }
 }

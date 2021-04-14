@@ -1,1 +1,1 @@
-export * from './trace-factory';
+export * from './trace-span';

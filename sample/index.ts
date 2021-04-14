@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 
 import { deepStrictEqual, strictEqual } from 'assert';
+import { addLayout, configure, getLogger } from 'log4js';
 import moment from 'moment';
 import Container from 'typedi';
 
@@ -10,7 +11,7 @@ import {
     BentAPICaller,
     DBFactoryBase,
     ExpressAPIPort,
-    Log4JSTraceFactory,
+    Log4JSTraceSpan,
     MongoFactory,
     MongoStringGenerator,
     OSDirectory,
@@ -18,19 +19,57 @@ import {
     OSNowTime,
     sleep,
     StringGeneratorBase,
+    Trace,
     TraceableAPICaller,
     TraceableDBFactory,
+    TraceFactory,
     traceKey,
+    TraceSpanBase,
     traceSpanKey
 } from '../src';
 
 (async () => {
-    const idGenerator = new MongoStringGenerator();
-    Container.set(StringGeneratorBase, idGenerator);
+    addLayout('json', () => {
+        return e => {
+            return JSON.stringify(e.data[0]);
+        };
+    });
+    configure({
+        appenders: {
+            out: {
+                alwaysIncludePattern: true,
+                filename: 'log/trace',
+                layout: {
+                    type: 'json',
+                },
+                pattern: '.yyyy-MM-dd',
+                type: 'dateFile',
+            }
+        },
+        categories: {
+            default: {
+                appenders: ['out'],
+                level: 'trace'
+            }
+        }
+    });
 
     const dbFactory = new MongoFactory('lite-config', 'mongodb://localhost:27017');
     const nowTime = new OSNowTime();
-    const traceFactory = new Log4JSTraceFactory(idGenerator, nowTime);
+    const stringGenerator = new MongoStringGenerator();
+    const traceFactory = new TraceFactory(
+        stringGenerator,
+        (trace: Trace, name: string, parentID: string): TraceSpanBase => {
+            return new Log4JSTraceSpan(
+                getLogger(),
+                nowTime,
+                stringGenerator,
+                trace,
+                name,
+                parentID
+            );
+        }
+    );
 
     const port = 65000;
     const bentAPICaller = new BentAPICaller(`http://127.0.0.1:${port}`);
@@ -43,6 +82,8 @@ import {
         DBFactoryBase,
         new TraceableDBFactory(dbFactory, traceFactory)
     );
+
+    Container.set(StringGeneratorBase, stringGenerator);
 
     const project = 'lite-ts';
     const apiFactory = new APIFactory();
@@ -71,21 +112,22 @@ import {
                 });
                 strictEqual(traceLogs.length, 6);
                 deepStrictEqual(traceLogs, [{
+                    "beganOn": traceLogs[0].beganOn,
+                    "endedOn": traceLogs[0].endedOn,
+                    "id": traceLogs[0].id,
                     "labels": {
-                        "name": "db",
-                        "beganOn": traceLogs[0].labels.beganOn,
-                        "query": "count",
+                        "action": "count",
                         "table": "Version",
-                        "endedOn": traceLogs[0].labels.endedOn,
                     },
-                    "parentID": traceLogs[traceLogs.length - 1].spanID,
-                    "spanID": traceLogs[0].spanID,
+                    "name": "db-query",
+                    "parentID": traceLogs[traceLogs.length - 1].id,
                     "traceID": traceID
                 }, {
+                    "beganOn": traceLogs[1].beganOn,
+                    "endedOn": traceLogs[1].endedOn,
+                    "id": traceLogs[1].id,
                     "labels": {
-                        "name": "uow",
-                        "beganOn": traceLogs[1].labels.beganOn,
-                        "actions": [
+                        "items": [
                             {
                                 "action": "add",
                                 "entry": {
@@ -96,16 +138,16 @@ import {
                                 "table": "Version"
                             }
                         ],
-                        "endedOn": traceLogs[1].labels.endedOn,
                     },
-                    "parentID": traceLogs[traceLogs.length - 1].spanID,
-                    "spanID": traceLogs[1].spanID,
+                    "name": "uow",
+                    "parentID": traceLogs[traceLogs.length - 1].id,
                     "traceID": traceID
                 }, {
+                    "beganOn": traceLogs[2].beganOn,
+                    "endedOn": traceLogs[2].endedOn,
+                    "id": traceLogs[2].id,
                     "labels": {
-                        "name": "uow",
-                        "beganOn": traceLogs[2].labels.beganOn,
-                        "actions": [
+                        "items": [
                             {
                                 "action": "save",
                                 "entry": {
@@ -116,16 +158,16 @@ import {
                                 "table": "Version"
                             }
                         ],
-                        "endedOn": traceLogs[2].labels.endedOn,
                     },
-                    "parentID": traceLogs[traceLogs.length - 1].spanID,
-                    "spanID": traceLogs[2].spanID,
+                    "name": "uow",
+                    "parentID": traceLogs[traceLogs.length - 1].id,
                     "traceID": traceID
                 }, {
+                    "beganOn": traceLogs[3].beganOn,
+                    "endedOn": traceLogs[3].endedOn,
+                    "id": traceLogs[3].id,
                     "labels": {
-                        "name": "uow",
-                        "beganOn": traceLogs[3].labels.beganOn,
-                        "actions": [
+                        "items": [
                             {
                                 "action": "remove",
                                 "entry": {
@@ -136,16 +178,16 @@ import {
                                 "table": "Version"
                             }
                         ],
-                        "endedOn": traceLogs[3].labels.endedOn
                     },
-                    "parentID": traceLogs[traceLogs.length - 1].spanID,
-                    "spanID": traceLogs[3].spanID,
+                    "name": "uow",
+                    "parentID": traceLogs[traceLogs.length - 1].id,
                     "traceID": traceID
                 }, {
+                    "beganOn": traceLogs[4].beganOn,
+                    "endedOn": traceLogs[4].endedOn,
+                    "id": traceLogs[4].id,
                     "labels": {
-                        "name": "uow",
-                        "beganOn": traceLogs[4].labels.beganOn,
-                        "actions": [
+                        "items": [
                             {
                                 "action": "add",
                                 "entry": {
@@ -165,24 +207,23 @@ import {
                                 "table": "Version"
                             }
                         ],
-                        "endedOn": traceLogs[4].labels.endedOn
                     },
-                    "parentID": traceLogs[traceLogs.length - 1].spanID,
-                    "spanID": traceLogs[4].spanID,
+                    "name": "uow",
+                    "parentID": traceLogs[traceLogs.length - 1].id,
                     "traceID": traceID
                 }, {
+                    "id": traceLogs[traceLogs.length - 1].id,
+                    "beganOn": traceLogs[traceLogs.length - 1].beganOn,
+                    "endedOn": traceLogs[traceLogs.length - 1].endedOn,
                     "labels": {
-                        "name": "api-port",
-                        "beganOn": traceLogs[traceLogs.length - 1].labels.beganOn,
                         "params": {
                             "endpoint": "test",
                             "api": "version"
                         },
                         "body": {},
-                        "endedOn": traceLogs[traceLogs.length - 1].labels.endedOn
                     },
+                    "name": "express-api-port",
                     "parentID": traceSpanID,
-                    "spanID": traceLogs[traceLogs.length - 1].spanID,
                     "traceID": traceID
                 }]);
                 break;

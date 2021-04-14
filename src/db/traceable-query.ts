@@ -1,5 +1,5 @@
 import { DBQueryBase } from '.';
-import { TraceBase, TraceSpanBase } from '../runtime';
+import { Trace, TraceSpanBase } from '../runtime';
 
 export class TraceableDBQuery<T> extends DBQueryBase<T> {
     private m_Labels: { [key: string]: any; } = {};
@@ -7,7 +7,7 @@ export class TraceableDBQuery<T> extends DBQueryBase<T> {
     public constructor(
         private m_Query: DBQueryBase<T>,
         private m_TableName: string,
-        private m_Trace: TraceBase,
+        private m_Trace: Trace,
         private m_TraceSpanID: string
     ) {
         super();
@@ -58,9 +58,8 @@ export class TraceableDBQuery<T> extends DBQueryBase<T> {
     }
 
     private async createTraceSpan(action: string): Promise<TraceSpanBase> {
-        const traceSpan = this.m_Trace.createSpan(this.m_TraceSpanID);
-        await traceSpan.begin('db');
-        traceSpan.addLabel('query', action);
+        const traceSpan = await this.m_Trace.beginSpan('db-query', this.m_TraceSpanID);
+        traceSpan.addLabel('action', action);
         traceSpan.addLabel('table', this.m_TableName);
         Object.keys(this.m_Labels).forEach(r => {
             traceSpan.addLabel(r, this.m_Labels[r]);

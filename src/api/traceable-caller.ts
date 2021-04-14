@@ -1,5 +1,5 @@
 import { APICallerBase } from './caller-base';
-import { ITraceable, TraceFactoryBase, traceKey, TraceSpanBase, traceSpanKey } from '../runtime';
+import { ITraceable, TraceFactory, traceKey, TraceSpanBase, traceSpanKey } from '../runtime';
 
 export class TraceableAPICaller extends APICallerBase implements ITraceable {
     public traceID: string;
@@ -8,7 +8,7 @@ export class TraceableAPICaller extends APICallerBase implements ITraceable {
 
     public constructor(
         private m_APICaller: APICallerBase,
-        private m_TraceFactory: TraceFactoryBase
+        private m_TraceFactory: TraceFactory
     ) {
         super();
     }
@@ -34,9 +34,10 @@ export class TraceableAPICaller extends APICallerBase implements ITraceable {
     private async beginSpan(action: string, route: string): Promise<TraceSpanBase> {
         const trace = this.m_TraceFactory.build(this.traceID);
         this.headers[traceKey] = await trace.getID();
-        const traceSpan = trace.createSpan(this.traceSpanID);
+
+        const traceSpan = await trace.beginSpan('api-caller', this.traceSpanID);
         this.headers[traceSpanKey] = await traceSpan.getID();
-        await traceSpan.begin('api-caller');
+
         traceSpan.addLabel('action', action);
         traceSpan.addLabel('route', route);
         return traceSpan;
