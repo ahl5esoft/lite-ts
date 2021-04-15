@@ -1,7 +1,7 @@
 import { Logger } from 'log4js';
 
 import { StringGeneratorBase } from '../../object';
-import { Trace, TraceSpanBase } from '../../runtime';
+import { TraceSpanBase } from '../../runtime';
 import { NowTimeBase } from '../../time';
 
 export class Log4JSTraceSpan extends TraceSpanBase {
@@ -9,16 +9,11 @@ export class Log4JSTraceSpan extends TraceSpanBase {
         private m_Logger: Logger,
         nowTime: NowTimeBase,
         stringGenerator: StringGeneratorBase,
-        trace: Trace,
-        name: string,
-        parentID: string,
     ) {
-        super(nowTime, stringGenerator, trace, name, parentID);
+        super(nowTime, stringGenerator);
     }
 
-    public async end() {
-        this.m_Logger.trace(
-            await this.getEntry()
-        );
+    public async onEnd(labels: { [key: string]: any }) {
+        this.m_Logger.trace(labels);
     }
 }

@@ -1,65 +1,37 @@
-import { Trace } from './trace';
 import { StringGeneratorBase } from '../object';
 import { NowTimeBase } from '../time';
 
-class Model {
-    public beganOn: number;
-
-    public endedOn: number;
-
-    public id = '';
-
-    public labels: { [key: string]: any; } = {};
-
-    public name = '';
-
-    public parentID = '';
-
-    public traceID = '';
-}
-
 export abstract class TraceSpanBase {
-    private m_Entry = new Model();
+    private m_Labels: { [key: string]: any } = {};
 
     public constructor(
-        protected nowTime: NowTimeBase,
+        private m_NowTime: NowTimeBase,
         private m_StringGenerator: StringGeneratorBase,
-        private m_Trace: Trace,
-        name: string,
-        parentID: string
-    ) {
-        this.m_Entry.name = name;
-        this.m_Entry.parentID = parentID;
-    }
+    ) { }
 
     public addLabel(key: string, value: any) {
-        this.m_Entry.labels[key] = value;
+        this.m_Labels[key] = value;
+    }
+
+    public async end() {
+        const unixNano = await this.m_NowTime.unixNano();
+        this.addLabel(
+            'endedOn',
+            Math.floor(unixNano / 1000 / 1000)
+        );
+        this.addLabel(
+            'id',
+            await this.getID(),
+        );
+        await this.onEnd(this.m_Labels);
     }
 
     public async getID(): Promise<string> {
-        if (!this.m_Entry.id)
-            this.m_Entry.id = await this.m_StringGenerator.generate();
+        if (!this.m_Labels.id)
+            this.m_Labels.id = await this.m_StringGenerator.generate();
 
-        return this.m_Entry.id;
+        return this.m_Labels.id;
     }
 
-    public async begin() {
-        this.m_Entry.beganOn = await this.getNowTime();
-    }
-
-    protected async getEntry(): Promise<Model> {
-        return {
-            ...this.m_Entry,
-            endedOn: await this.getNowTime(),
-            id: await this.getID(),
-            traceID: await this.m_Trace.getID()
-        };
-    }
-
-    protected async getNowTime(): Promise<number> {
-        const unixNano = await this.nowTime.unixNano();
-        return Math.floor(unixNano / 1000 / 1000);
-    }
-
-    public abstract end(): Promise<void>;
+    protected abstract onEnd(labels: { [key: string]: any }): Promise<void>;
 }

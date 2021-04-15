@@ -1,22 +1,18 @@
 import { APICallerBase } from './caller-base';
 import { StringGeneratorBase } from '../object';
-import { Trace, TraceSpanBase } from '../runtime';
+import { TraceSpanBase } from '../runtime';
 import { NowTimeBase } from '../time';
 
 export class APICallerTraceSpan extends TraceSpanBase {
     public constructor(
         private m_APICaller: APICallerBase,
         nowTime: NowTimeBase,
-        stringGenerator: StringGeneratorBase,
-        trace: Trace,
-        name: string,
-        parentID: string
+        stringGenerator: StringGeneratorBase
     ) {
-        super(nowTime, stringGenerator, trace, name, parentID);
+        super(nowTime, stringGenerator);
     }
 
-    public async end() {
-        const entry = await this.getEntry();
-        await this.m_APICaller.setBody(entry).voidCall('lite-log/server/add-trace-span');
+    protected async onEnd(labels: { [key: string]: any }) {
+        await this.m_APICaller.setBody(labels).voidCall('lite-log/internal/add-trace-span');
     }
 }
