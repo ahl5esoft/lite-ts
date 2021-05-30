@@ -1,29 +1,29 @@
 import Container from 'typedi';
 
-import { APIBase } from './base';
-import { InvalidAPI } from './invalid';
+import { IAPI } from './i-api';
+import { NullAPI } from './null';
 import { OSDirectory } from '../os';
 
-const invalidAPI = new InvalidAPI();
+const nullAPI = new NullAPI();
 
 export class APIFactory {
     private m_APICtors: { [key: string]: { [key: string]: Function; }; } = {};
 
-    public build(endpoint: string, apiName: string): APIBase {
+    public build(endpoint: string, apiName: string): IAPI {
         const apiCtors = this.m_APICtors[endpoint];
         if (!apiCtors)
-            return invalidAPI;
+            return nullAPI;
 
         const apiCtor = apiCtors[apiName];
         if (!apiCtor)
-            return invalidAPI;
+            return nullAPI;
 
-        let api: APIBase;
+        let api: IAPI;
         try {
-            api = Container.get<APIBase>(apiCtor);
+            api = Container.get<IAPI>(apiCtor);
             Container.remove(apiCtor);
         } catch {
-            api = invalidAPI;
+            api = nullAPI;
         }
         return api;
     }
