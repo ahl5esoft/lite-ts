@@ -1,7 +1,6 @@
 import { ok, strictEqual } from 'assert';
 
-import { CORBase } from '../../src/dp/cor-base';
-import { CheckHandler } from '../../version/check-handler';
+import { CORBase, tool } from '../../../../src';
 
 let count = 0;
 
@@ -11,10 +10,10 @@ class NextHandler extends CORBase {
     }
 }
 
-describe('version/check-handler.ts', () => {
+describe('src/tool/version/check-handler.ts', () => {
     describe('.handle(): Promise<void>', () => {
         it('无效版本号', async () => {
-            const self = new CheckHandler('a');
+            const self = new tool.version.CheckHandler('a');
             let err: Error;
             try {
                 await self.handle();
@@ -26,7 +25,7 @@ describe('version/check-handler.ts', () => {
         });
 
         it('ok', async () => {
-            await new CheckHandler('1.0.0').setNext(
+            await new tool.version.CheckHandler('1.0.0').setNext(
                 new NextHandler()
             ).handle();
             strictEqual(count, 100);

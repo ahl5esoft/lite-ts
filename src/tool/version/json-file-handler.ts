@@ -19,7 +19,11 @@ export class JsonFileHandler extends CORBase {
             return;
 
         const entry = await this.m_File.readJSON<Entry>();
-        entry.version = this.m_Version;
+        const oldVersionParts = entry.version.split('.');
+        const versionParts = this.m_Version.split('.');
+        entry.version = oldVersionParts.map((r, i) => {
+            return parseInt(r) + parseInt(versionParts[i]);
+        }).join('.');
         await this.m_File.write(entry);
     }
 }
