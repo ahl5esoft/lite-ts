@@ -1,4 +1,4 @@
-import { load } from 'js-yaml'
+import { load } from 'js-yaml';
 
 import { ConfigBase } from '../conf';
 import { FileBase } from '../../io';
