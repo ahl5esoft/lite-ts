@@ -4,3 +4,4 @@ export * from './directory';
 export * from './factory';
 export * from './file';
 export * from './now-time';
+export * from './std-log';

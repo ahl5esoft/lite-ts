@@ -4,7 +4,8 @@ export * from './crypto';
 export * from './db';
 export * from './dp';
 export * from './error';
-export * from './io'
+export * from './io';
+export * from './log';
 export * from './math';
 export * from './object';
 export * from './os';

@@ -2,7 +2,7 @@ import Container from 'typedi';
 
 import { IAPI } from './i-api';
 import { NullAPI } from './null';
-import { OSDirectory } from '../os';
+import { DirectoryBase } from '../io';
 
 const nullAPI = new NullAPI();
 
@@ -28,7 +28,7 @@ export class APIFactory {
         return api;
     }
 
-    public async init(dir: OSDirectory) {
+    public async init(dir: DirectoryBase) {
         const dirs = await dir.findDirectories();
         for (const r of dirs) {
             const files = await r.findFiles();

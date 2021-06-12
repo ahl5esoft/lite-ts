@@ -1,16 +1,16 @@
-import { CORBase } from '../../dp';
+import { HandlerBase } from './handler-base';
 import { FileBase } from '../../io';
 
 class Entry {
     public version: string;
 }
 
-export class JsonFileHandler extends CORBase {
+export class JsonFileHandler extends HandlerBase {
     public constructor(
         private m_File: FileBase,
-        private m_Version: string
+        version: string
     ) {
-        super();
+        super(version);
     }
 
     public async handle(): Promise<void> {
@@ -19,11 +19,7 @@ export class JsonFileHandler extends CORBase {
             return;
 
         const entry = await this.m_File.readJSON<Entry>();
-        const oldVersionParts = entry.version.split('.');
-        const versionParts = this.m_Version.split('.');
-        entry.version = oldVersionParts.map((r, i) => {
-            return parseInt(r) + parseInt(versionParts[i]);
-        }).join('.');
+        entry.version = this.getVersion(entry.version);
         await this.m_File.write(entry);
     }
 }
