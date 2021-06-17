@@ -1,8 +1,8 @@
 import { compare, genSalt, hash } from 'bcryptjs';
 
-import { CryptoBase } from '../../crypto';
+import { CryptBase } from '../../crypt';
 
-export class BCrypt extends CryptoBase {
+export class BCrypt extends CryptBase {
     public static errDecrypt = new Error('bcrypt不支持解密');
 
     public async decrypt(): Promise<string> {

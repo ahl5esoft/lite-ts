@@ -1,6 +1,6 @@
 export * from './api';
 export * from './assert';
-export * from './crypto';
+export * from './crypt';
 export * from './db';
 export * from './dp';
 export * from './error';

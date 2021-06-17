@@ -1,6 +1,6 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { FileBase,Mock,YmlConfig as Self } from '../../../../src';
+import { FileBase, Mock, YmlConfig as Self } from '../../../../src';
 
 describe('src/plugin/yml/yml-config.ts', () => {
     describe('.get<T>(group: string, key?: string): Promise<T>', () => {
