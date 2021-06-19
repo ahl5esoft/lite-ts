@@ -17,9 +17,8 @@ export function expressPostOption(apiFactory: APIFactory, logFactory: LogFactory
                 res.data = await api.call();
             } catch (ex) {
                 if (ex instanceof CustomError) {
+                    res.data = ex.data;
                     res.err = ex.code;
-                    if (ex.code == ErrorCode.Custom)
-                        res.data = ex.data;
                 } else {
                     res.err = ErrorCode.Panic;
                     logFactory.build().title('express-post').desc(req.path).error(ex);

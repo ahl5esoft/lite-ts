@@ -3,6 +3,5 @@ export enum ErrorCode {
     Auth,
     Verify,
     Timeout,
-    Custom,
     Panic = 599,
 }

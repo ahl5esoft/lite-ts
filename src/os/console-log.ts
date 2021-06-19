@@ -1,6 +1,6 @@
 import { LogBase } from '../log';
 
-export class OSStdLog extends LogBase {
+export class OSConsoleLog extends LogBase {
     public debug() {
         console.debug(this.labels);
         this.labels = {};
