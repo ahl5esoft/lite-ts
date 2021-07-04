@@ -1,1 +1,0 @@
-export * from './string-generator-base';

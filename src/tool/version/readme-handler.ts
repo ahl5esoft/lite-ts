@@ -1,5 +1,5 @@
 import { HandlerBase } from './handler-base';
-import { FileBase } from '../../io';
+import { FileBase } from '../../contract';
 
 const reg = /version-(\d+\.\d+\.\d+)-green/;
 

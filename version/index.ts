@@ -1,5 +1,4 @@
-import { OSFile } from '../src/os';
-import { tool } from '../src/tool';
+import { OSFile, tool } from '../src';
 
 (async (): Promise<void> => {
     const readmeFile = new OSFile(__dirname, '..', 'README.md');

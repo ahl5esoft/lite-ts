@@ -1,4 +1,4 @@
-import { CORBase } from '../../dp';
+import { CORBase } from '../../contract';
 
 export abstract class HandlerBase extends CORBase {
     public constructor(private m_Version: string) {
