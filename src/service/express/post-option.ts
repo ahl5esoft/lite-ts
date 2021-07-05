@@ -20,7 +20,7 @@ export function expressPostOption(apiFactory: APIFactory, logFactory: LogFactory
                     res.err = ex.code;
                 } else {
                     res.err = ErrorCode.Panic;
-                    logFactory.build().title('express-post').desc(req.path).error(ex);
+                    logFactory.build().title(expressPostOption.name).desc(req.path).error(ex);
                 }
             }
             resp.json(res);

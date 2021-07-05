@@ -1,8 +1,8 @@
 import { Request } from 'express';
 
-import { IAPIPort } from '../../contract';
+import { IAPI } from '../../contract';
 
-export async function expressBodyAPIOption(api: IAPIPort, req: Request) {
+export async function expressBodyAPIOption(api: IAPI, req: Request) {
     Object.keys(req.body).forEach(r => {
         if (r in api)
             return;
