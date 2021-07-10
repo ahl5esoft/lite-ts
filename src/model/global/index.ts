@@ -1,2 +1,2 @@
 export * from './redis-geo-add-message';
-export * from './value';
+export * from './value-data';

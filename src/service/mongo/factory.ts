@@ -17,7 +17,7 @@ export class MongoFactory extends DBFactoryBase {
         await client.close();
     }
 
-    public db<T>(model: Function, uow?: UnitOfWorkBase): Repository<T> {
+    public db<T>(model: new () => T, uow?: UnitOfWorkBase): Repository<T> {
         return new Repository<T>(this.m_Pool, this, model.name, uow);
     }
 
