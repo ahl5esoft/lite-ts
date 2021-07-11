@@ -1,7 +1,6 @@
 export enum ErrorCode {
-    API = 501,
-    Auth,
-    Verify,
-    Timeout,
-    Panic = 599,
+    api = 501,
+    auth,
+    verify,
+    panic = 599,
 }

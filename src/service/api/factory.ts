@@ -4,8 +4,8 @@ import { CustomError } from '../error';
 import { DirectoryBase, IAPI } from '../../contract';
 import { ErrorCode } from '../../model/enum';
 
-const invalidAPIError = new CustomError(ErrorCode.API);
-const nullAPI: IAPI = {
+const invalidAPIError = new CustomError(ErrorCode.api);
+const invalidAPI: IAPI = {
     call: async () => {
         throw invalidAPIError;
     }
@@ -18,18 +18,18 @@ export class APIFactory {
     public build(endpoint: string, apiName: string): IAPI {
         const apiCtors = this.m_APICtors[endpoint];
         if (!apiCtors)
-            return nullAPI;
+            return invalidAPI;
 
         const apiCtor = apiCtors[apiName];
         if (!apiCtor)
-            return nullAPI;
+            return invalidAPI;
 
         let api: IAPI;
         try {
             api = Container.get<IAPI>(apiCtor);
             Container.remove(apiCtor);
         } catch {
-            api = nullAPI;
+            api = invalidAPI;
         }
         return api;
     }

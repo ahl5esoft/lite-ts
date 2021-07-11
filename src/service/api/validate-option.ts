@@ -15,7 +15,7 @@ export function validateAPIOption(logFactory: LogFactory): APIOption {
             }).join('\n-');
             logFactory.build().title('validate').desc(message).warning();
 
-            throw new CustomError(ErrorCode.Verify);
+            throw new CustomError(ErrorCode.verify);
         }
     }
 }
