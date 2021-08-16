@@ -1,7 +1,4 @@
 export * from './contract';
-
-import * as model from './model';
-import * as service from './service';
-import * as version from './version';
-
-export { model, service, version }
+export * as model from './model';
+export * as service from './service';
+export * as version from './version';
