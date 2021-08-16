@@ -1,12 +1,14 @@
 import { Express } from 'express';
 
 import { ExpressOption } from './option';
-import { ErrorCode } from '../../model';
-import { APIFactory, APIOption, APIResponse, CustomError, LogFactory } from '../../service';
+import { APIFactory, APIOption } from '../api';
+import { DefaultLogFactory } from '../default';
+import { CustomError } from '../global';
+import { APIResponse, ErrorCode } from '../../model';
 
-export function expressPostOption(apiFactory: APIFactory, logFactory: LogFactory, ...options: APIOption[]): ExpressOption {
+export function expressPostOption(apiFactory: APIFactory, logFactory: DefaultLogFactory, ...options: APIOption[]): ExpressOption {
     return function (app: Express) {
-        app.post('/:endpoint/:api', async (req, resp) => {
+        app.post('/:endpoint/:api', async (req: any, resp: any) => {
             let api = apiFactory.build(req.params.endpoint, req.params.api);
             let res = new APIResponse();
             try {
@@ -20,7 +22,7 @@ export function expressPostOption(apiFactory: APIFactory, logFactory: LogFactory
                     res.err = ex.code;
                 } else {
                     res.err = ErrorCode.panic;
-                    logFactory.build().title(expressPostOption.name).desc(req.path).error(ex);
+                    logFactory.build().addLabel('path', req.path).error(ex);
                 }
             }
             resp.json(res);

@@ -1,3 +1,3 @@
 export interface ISession {
-    setSession(req: any): Promise<void>;
+    set(req: any): Promise<void>;
 }

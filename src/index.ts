@@ -1,5 +1,11 @@
-export * from './assert';
-export * from './contract';
-export * from './model';
-export * from './service';
-export * from './tool';
+import * as contract from './contract';
+import * as model from './model';
+import * as service from './service';
+import * as version from './version';
+
+export default {
+    contract,
+    model,
+    service,
+    version
+}

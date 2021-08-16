@@ -1,7 +1,7 @@
 import Container from 'typedi';
 
-import { CustomError } from '../error';
-import { DirectoryBase, IAPI } from '../../contract';
+import { CustomError } from '../global';
+import { IODirectoryBase, IAPI } from '../../contract';
 import { ErrorCode } from '../../model/enum';
 
 const invalidAPIError = new CustomError(ErrorCode.api);
@@ -13,9 +13,9 @@ const invalidAPI: IAPI = {
 
 
 export class APIFactory {
-    private m_APICtors: { [key: string]: { [key: string]: Function; }; } = {};
+    private constructor(private m_APICtors: { [key: string]: { [key: string]: Function; }; }) { }
 
-    public build(endpoint: string, apiName: string): IAPI {
+    public build(endpoint: string, apiName: string) {
         const apiCtors = this.m_APICtors[endpoint];
         if (!apiCtors)
             return invalidAPI;
@@ -34,11 +34,12 @@ export class APIFactory {
         return api;
     }
 
-    public async init(dir: DirectoryBase) {
+    public static async create(dir: IODirectoryBase) {
+        let apiCtors = {};
         const dirs = await dir.findDirectories();
         for (const r of dirs) {
             const files = await r.findFiles();
-            this.m_APICtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
+            apiCtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
                 const name = cr.name.split('.')[0];
                 const api = require(cr.path);
                 if (!api.default)
@@ -48,5 +49,6 @@ export class APIFactory {
                 return memo;
             }, {});
         }
+        return new APIFactory(apiCtors);
     }
 }
