@@ -35,7 +35,7 @@ export class FSFile extends IOFileBase {
         await this.remove();
     }
 
-    public async readJSON() {
+    public async readJSON<T>(): Promise<T> {
         const content = await this.readString();
         return JSON.parse(content);
     }

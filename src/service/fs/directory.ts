@@ -3,7 +3,7 @@ import { dirname, join } from 'path';
 import { promisify } from 'util';
 
 import { FSFile } from './file';
-import { IODirectoryBase, IONodeBase } from '../../contract';
+import { IODirectoryBase, IOFileBase, IONodeBase } from '../../contract';
 
 const mkdirAction = promisify(mkdir);
 const readdirFunc = promisify(readdir);
@@ -27,14 +27,14 @@ export class FSDirectory extends IODirectoryBase {
         return existsSync(this.path);
     }
 
-    public async findDirectories() {
+    public async findDirectories(): Promise<IODirectoryBase[]> {
         return this.children(
             (stat): boolean => stat.isDirectory(),
             FSDirectory
         );
     }
 
-    public async findFiles() {
+    public async findFiles(): Promise<IOFileBase[]> {
         return this.children(
             (stat): boolean => stat.isFile(),
             FSFile

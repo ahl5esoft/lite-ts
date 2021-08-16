@@ -1,6 +1,6 @@
 import { NowTimeBase } from '../../contract';
 
-export class OSNowTime extends NowTimeBase {
+export class DateNowTime extends NowTimeBase {
     public async unix() {
         return Math.floor(
             Date.now() / 1000

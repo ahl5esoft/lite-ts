@@ -1,6 +1,6 @@
 import { StringGeneratorBase } from '../../contract';
 
-export class MathRandomStringGenerator extends StringGeneratorBase {
+export class MathStringGenerator extends StringGeneratorBase {
     public constructor(private m_Length: number) {
         super();
     }

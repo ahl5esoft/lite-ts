@@ -4,12 +4,12 @@ import { promisify } from 'util';
 
 import { FSDirectory } from './directory';
 import { FSFile } from './file';
-import { IOFactoryBase } from '../../contract';
+import { IODirectoryBase, IOFactoryBase, IOFileBase, IONodeBase } from '../../contract';
 
 const statFunc = promisify(stat);
 
 export class FSFactory extends IOFactoryBase {
-    public async build(...paths: string[]) {
+    public async build(...paths: string[]): Promise<IONodeBase> {
         const nodePath = join(...paths);
         const isExist = existsSync(nodePath);
         if (isExist) {
@@ -22,11 +22,11 @@ export class FSFactory extends IOFactoryBase {
         return new FSFile(nodePath);
     }
 
-    public buildDirectory(...paths: string[]) {
+    public buildDirectory(...paths: string[]): IODirectoryBase {
         return new FSDirectory(...paths);
     }
 
-    public buildFile(...paths: string[]) {
+    public buildFile(...paths: string[]): IOFileBase {
         return new FSFile(...paths);
     }
 }

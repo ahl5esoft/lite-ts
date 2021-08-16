@@ -1,11 +1,11 @@
 import { LogBase } from '../../contract';
 
-export class OSConsoleLog extends LogBase{
+export class ConsoleLog extends LogBase {
     public debug() {
         console.debug(this.labels);
         this.labels = {};
     }
-    
+
     public error(err: Error) {
         this.addLabel('err', err);
         console.error(this.labels);
