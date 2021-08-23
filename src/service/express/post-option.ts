@@ -9,9 +9,9 @@ import { APIResponse, ErrorCode } from '../../model';
 export function expressPostOption(apiFactory: APIFactory, logFactory: DefaultLogFactory, ...options: APIOption[]): ExpressOption {
     return function (app: Express) {
         app.post('/:endpoint/:api', async (req: any, resp: any) => {
-            let api = apiFactory.build(req.params.endpoint, req.params.api);
             let res = new APIResponse();
             try {
+                let api = apiFactory.build(req.params.endpoint, req.params.api);
                 for (const r of options)
                     await r(api, req);
 

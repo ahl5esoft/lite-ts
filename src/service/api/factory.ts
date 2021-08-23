@@ -24,13 +24,8 @@ export class APIFactory {
         if (!apiCtor)
             return invalidAPI;
 
-        let api: IAPI;
-        try {
-            api = Container.get<IAPI>(apiCtor);
-            Container.remove(apiCtor);
-        } catch {
-            api = invalidAPI;
-        }
+        const api = Container.get<IAPI>(apiCtor);
+        Container.remove(apiCtor);
         return api;
     }
 
