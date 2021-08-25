@@ -3,7 +3,7 @@ import { Express } from 'express';
 import { ExpressOption } from './option';
 import { APIFactory, APIOption } from '../api';
 import { DefaultLogFactory } from '../default';
-import { CustomError } from '../global';
+import { CustomError } from '../error';
 import { APIResponse, ErrorCode } from '../../model';
 
 export function expressPostOption(apiFactory: APIFactory, logFactory: DefaultLogFactory, ...options: APIOption[]): ExpressOption {

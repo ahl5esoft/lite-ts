@@ -2,7 +2,7 @@ import { validate } from 'class-validator';
 
 import { APIOption } from '../api';
 import { DefaultLogFactory } from '../default';
-import { CustomError } from '../global';
+import { CustomError } from '../error';
 import { IAPI } from '../../contract';
 import { ErrorCode } from '../../model/enum';
 

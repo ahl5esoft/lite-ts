@@ -1,6 +1,6 @@
 import Container from 'typedi';
 
-import { CustomError } from '../global';
+import { CustomError } from '../error';
 import { IODirectoryBase, IAPI } from '../../contract';
 import { ErrorCode } from '../../model/enum';
 
