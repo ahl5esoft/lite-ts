@@ -1,5 +1,3 @@
-import { LockBase } from '../../contract';
-
 let isLock = false;
 let lockQueue: Wait[] = [];
 
@@ -17,18 +15,17 @@ async function unlock() {
     }
 }
 
-export class PromiseLock extends LockBase {
-    public async lock(): Promise<() => Promise<void>> {
-        if (isLock) {
-            return new Promise((s, r) => {
-                lockQueue.push({
-                    resolve: s,
-                    reject: r,
-                });
+
+export async function lock(): Promise<() => Promise<void>> {
+    if (isLock) {
+        return new Promise((s, r) => {
+            lockQueue.push({
+                resolve: s,
+                reject: r,
             });
-        } else {
-            isLock = true;
-            return unlock;
-        }
+        });
+    } else {
+        isLock = true;
+        return unlock;
     }
 }
