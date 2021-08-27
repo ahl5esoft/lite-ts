@@ -6,19 +6,14 @@ export abstract class HandlerBase extends CORBase {
     }
 
     protected getVersion(version: string): string {
-        const oldParts = version.split('.');
-        let isReset = false;
-        return this.m_Version.split('.').map((r, i) => {
-            const oldValue = parseInt(oldParts[i]);
-            let v: number;
-            if (isReset) {
-                v = -oldValue;
-            } else {
-                v = parseInt(r);
-                if (v)
-                    isReset = true;
-            }
-            return v + oldValue;
+        const parts = this.m_Version.split('.').map(r => {
+            return parseInt(r);
+        });
+        const total = parts.reduce((memo, r) => {
+            return memo + r;
+        }, 0);
+        return total != 1 ? this.m_Version : version.split('.').map((r, i) => {
+            return parseInt(r) + parts[i];
         }).join('.');
     }
 }
