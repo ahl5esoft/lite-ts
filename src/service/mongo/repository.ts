@@ -1,18 +1,18 @@
 import { Pool } from './pool';
 import { Query } from './query';
-import { DBFactoryBase, DBQueryBase, DBRepositoryBase, UnitOfWorkBase } from '../../contract';
+import { DBFactoryBase, DBRepositoryBase, IUnitOfWorkRepository } from '../../contract';
 
 export class Repository<T> extends DBRepositoryBase<T> {
     public constructor(
         private m_Pool: Pool,
         dbFactory: DBFactoryBase,
         tableName: string,
-        uow: UnitOfWorkBase
+        uow: IUnitOfWorkRepository
     ) {
         super(tableName, dbFactory, uow);
     }
 
-    public query(): DBQueryBase<T> {
+    public query() {
         return new Query<T>(this.m_Pool, this.tableName);
     }
 }

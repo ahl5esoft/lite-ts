@@ -1,5 +1,5 @@
-import { ConfigServiceBase } from './config-service-base';
+import { IConfigService } from './i-config-service';
 
 export abstract class ConfigFactoryBase {
-    public abstract build(group: string): ConfigServiceBase;
+    public abstract build(group: string): IConfigService;
 }

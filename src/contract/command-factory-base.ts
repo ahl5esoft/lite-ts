@@ -1,5 +1,5 @@
-import { CommandServiceBase } from './command-service-base';
+import { ICommandService } from './i-command-service';
 
 export abstract class CommandFactoryBase {
-    public abstract build(...cmdArgs: any[]): CommandServiceBase;
+    public abstract build(...cmdArgs: any[]): ICommandService;
 }

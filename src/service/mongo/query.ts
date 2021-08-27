@@ -1,10 +1,10 @@
-import { Cursor, FilterQuery } from 'mongodb';
+import { FilterQuery } from 'mongodb';
 
 import { toEntries } from './helper';
 import { Pool } from './pool';
-import { DBQueryBase } from '../../contract';
+import { IDBQuery } from '../../contract';
 
-export class Query<T> extends DBQueryBase<T> {
+export class Query<T> implements IDBQuery<T> {
     private m_Skip: number;
     private m_Sorts: [string, 1 | -1][] = [];
     private m_Take: number;
@@ -13,29 +13,27 @@ export class Query<T> extends DBQueryBase<T> {
     public constructor(
         private m_Pool: Pool,
         private m_TableName: string
-    ) {
-        super();
-    }
+    ) { }
 
-    public async count(): Promise<number> {
+    public async count() {
         const cursor = await this.getCursor();
         return await cursor.count();
     }
 
-    public order(...fields: string[]): this {
+    public order(...fields: string[]) {
         return this.sort(1, ...fields);
     }
 
-    public orderByDesc(...fields: string[]): this {
+    public orderByDesc(...fields: string[]) {
         return this.sort(-1, ...fields);
     }
 
-    public skip(value: number): this {
+    public skip(value: number) {
         this.m_Skip = value;
         return this;
     }
 
-    public take(value: number): this {
+    public take(value: number) {
         this.m_Take = value;
         return this;
     }
@@ -46,7 +44,7 @@ export class Query<T> extends DBQueryBase<T> {
         return toEntries(rows);
     }
 
-    public where(filter: any): this {
+    public where(filter: any) {
         this.m_Where = 'id' in filter ? Object.keys(filter).reduce((memo, r): any => {
             memo[r == 'id' ? '_id' : r] = filter[r];
             return memo;
@@ -54,7 +52,7 @@ export class Query<T> extends DBQueryBase<T> {
         return this;
     }
 
-    private async getCursor(): Promise<Cursor<any>> {
+    private async getCursor() {
         const db = await this.m_Pool.getDb();
         const cursor = db.collection(this.m_TableName).find(this.m_Where);
         this.m_Where = null;

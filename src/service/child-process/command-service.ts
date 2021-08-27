@@ -1,22 +1,25 @@
 import { CommonOptions, exec, spawn } from 'child_process';
 import { promisify } from 'util';
-import { CommandServiceBase } from '../../contract';
+
+import { ICommandService } from '../../contract';
 
 const execPromise = promisify(exec);
 
-export class ChildProcessCommandService extends CommandServiceBase {
-    public constructor(args: any[]) {
-        super(args);
-    }
+export class ChildProcessCommandService implements ICommandService {
+    private m_Dir: string;
+    private m_Extra: any;
+    private m_Timeout: number;
+
+    public constructor(private m_Args: any[]) { }
 
     public async exec(): Promise<string> {
         const opt: CommonOptions = {};
-        if (this.dirPath)
-            opt.cwd = this.dirPath;
-        if (this.expires)
-            opt.timeout = this.expires;
+        if (this.m_Dir)
+            opt.cwd = this.m_Dir;
+        if (this.m_Timeout)
+            opt.timeout = this.m_Timeout;
 
-        const [name, ...args] = this.args;
+        const [name, ...args] = this.m_Args;
         const isExec = args.some(r => {
             return r == '|';
         });
@@ -26,7 +29,7 @@ export class ChildProcessCommandService extends CommandServiceBase {
                     [name, ...args].join(' '),
                     opt,
                 );
-                return this.extra && this.extra.ignoreReturn ? '' : res.stdout;
+                return this.m_Extra && this.m_Extra.ignoreReturn ? '' : res.stdout;
             } catch {
                 return '';
             }
@@ -36,7 +39,7 @@ export class ChildProcessCommandService extends CommandServiceBase {
         let bf: string[] = [];
 
         child.stderr.setEncoding('utf8').on('data', chunk => {
-            if (this.extra && this.extra.ignoreReturn)
+            if (this.m_Extra && this.m_Extra.ignoreReturn)
                 return;
 
             bf.push(
@@ -45,7 +48,7 @@ export class ChildProcessCommandService extends CommandServiceBase {
         });
 
         child.stdout.setEncoding('utf8').on('data', chunk => {
-            if (this.extra && this.extra.ignoreReturn)
+            if (this.m_Extra && this.m_Extra.ignoreReturn)
                 return;
 
             bf.push(
@@ -73,5 +76,20 @@ export class ChildProcessCommandService extends CommandServiceBase {
                 }
             });
         });
+    }
+
+    public setDir(v: string): this {
+        this.m_Dir = v;
+        return this;
+    }
+
+    public setExtra(v: any): this {
+        this.m_Extra = v;
+        return this;
+    }
+
+    public setTimeout(v: number): this {
+        this.m_Timeout = v;
+        return this;
     }
 }

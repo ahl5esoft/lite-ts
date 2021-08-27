@@ -2,14 +2,12 @@ import { ClientSession } from 'mongodb';
 
 import { toDoc } from './helper';
 import { Pool } from './pool';
-import { UnitOfWorkBase } from '../../contract';
+import { IUnitOfWorkRepository } from '../../contract';
 
-export class UnitOfWork extends UnitOfWorkBase {
+export class UnitOfWork implements IUnitOfWorkRepository {
     private m_Queue: ((session: ClientSession) => Promise<void>)[] = [];
 
-    public constructor(private m_Pool: Pool) {
-        super();
-    }
+    public constructor(private m_Pool: Pool) { }
 
     public async commit() {
         const client = await this.m_Pool.getClient();

@@ -1,4 +1,4 @@
-export function toDoc(entry: any): any {
+export function toDoc(entry: any) {
     return Object.keys(entry).reduce((memo, r): any => {
         if (r != 'id')
             memo[r] = entry[r];
@@ -9,7 +9,7 @@ export function toDoc(entry: any): any {
     });
 }
 
-export function toEntries(docs: any[]): any[] {
+export function toEntries(docs: any[]) {
     return docs.map((r): any => {
         return Object.keys(r).reduce((memo, cr): any => {
             if (cr != '_id')

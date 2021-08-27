@@ -1,10 +1,8 @@
 import { YamlConfigFactory } from './config-factory';
-import { ConfigServiceBase } from '../../contract';
+import { IConfigService } from '../../contract';
 
-export class ConfigSerivce extends ConfigServiceBase {
-    public constructor(private m_Factory: YamlConfigFactory, private m_Group: string) {
-        super();
-    }
+export class ConfigSerivce implements IConfigService {
+    public constructor(private m_Factory: YamlConfigFactory, private m_Group: string) { }
 
     public async get(key?: string) {
         const doc = await this.m_Factory.getDoc();

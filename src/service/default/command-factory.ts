@@ -1,7 +1,7 @@
-import { CommandFactoryBase, CommandServiceBase } from '../../contract';
+import { CommandFactoryBase, ICommandService } from '../../contract';
 
 export class DefaultCommandFactory extends CommandFactoryBase {
-    public constructor(private m_BuildCmdFunc: (args: any[]) => CommandServiceBase) {
+    public constructor(private m_BuildCmdFunc: (args: any[]) => ICommandService) {
         super();
     }
 
