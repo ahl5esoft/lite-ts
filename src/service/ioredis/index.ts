@@ -102,7 +102,7 @@ export class IoredisAdapter extends RedisBase {
         return this.client.incr(key);
     }
 
-    public async keys(pattern?: string) {
+    public async keys(pattern: string) {
         return this.client.keys(pattern);
     }
 

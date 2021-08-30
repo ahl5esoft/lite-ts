@@ -78,7 +78,7 @@ describe('src/service/ioredis/index.ts', () => {
         });
     });
 
-    describe('.geoadd(key: string, ...entries: RedisGeoAddEntry[]): Promise<number>', () => {
+    describe('.geoadd(key: string, ...entries: IRedisGeo[]): Promise<number>', () => {
         it('ok', async () => {
             const key = 'test-geoadd';
             const message: IRedisGeo = {
@@ -263,8 +263,10 @@ describe('src/service/ioredis/index.ts', () => {
     describe('.keys(pattern: string)', () => {
         const key = 'test-keys';
         it('all', async () => {
-            const res = await self.keys();
-            deepStrictEqual(res, []);
+            await client.set(key, 'v');
+
+            const res = await self.keys('*');
+            deepStrictEqual(res, [key]);
 
             await client.del(key);
         });

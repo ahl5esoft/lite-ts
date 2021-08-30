@@ -16,7 +16,7 @@ export abstract class RedisBase {
     public abstract hset(key: string, field: string, value: string): Promise<void>;
     public abstract hsetnx(key: string, field: string, value: string): Promise<boolean>;
     public abstract incr(key: string): Promise<number>;
-    public abstract keys(pattern?: string): Promise<string[]>;
+    public abstract keys(pattern: string): Promise<string[]>;
     public abstract lpop(key: string): Promise<string>;
     public abstract lpush(key: string, ...values: string[]): Promise<number>;
     public abstract lrange(key: string, start: number, stop: number): Promise<string[]>;
