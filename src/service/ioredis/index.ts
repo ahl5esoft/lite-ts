@@ -1,7 +1,6 @@
 import Ioredis from 'ioredis';
 
-import { RedisBase } from '../../contract';
-import { RedisGeoAddMessage } from '../../model';
+import { IRedisGeo, RedisBase } from '../../contract';
 
 type RedisType = Ioredis.Cluster | Ioredis.Redis;
 
@@ -42,7 +41,7 @@ export class IoredisAdapter extends RedisBase {
         await this.client.del(key);
     }
 
-    public async exists(key: string): Promise<boolean> {
+    public async exists(key: string) {
         const count = await this.client.exists(key);
         return count > 0;
     }
@@ -55,38 +54,38 @@ export class IoredisAdapter extends RedisBase {
         return this.client.get(key);
     }
 
-    public async geoadd(key: string, ...messages: RedisGeoAddMessage[]): Promise<number> {
-        let args = messages.reduce((memo: any[], r): any[] => {
+    public async geoadd(key: string, ...values: IRedisGeo[]) {
+        let args = values.reduce((memo: any[], r): any[] => {
             memo.push(r.longitude, r.latitude, r.member);
             return memo;
         }, []);
         return (this.client as any).geoadd(key, ...args);
     }
 
-    public async geopos(key: string, ...members: string[]): Promise<[number, number][]> {
+    public async geopos(key: string, ...members: string[]) {
         const res = await (this.client as any).geopos(key, ...members);
         return res.map((r: [string, string]): [number, number] => {
             return [parseFloat(r[0]), parseFloat(r[1])];
         });
     }
 
-    public async hdel(key: string, ...fields: string[]): Promise<number> {
+    public async hdel(key: string, ...fields: string[]) {
         return this.client.hdel(key, fields);
     }
 
-    public async hget(key: string, field: string): Promise<string> {
+    public async hget(key: string, field: string) {
         return this.client.hget(key, field);
     }
 
-    public async hgetall(key: string): Promise<{ [key: string]: string; }> {
-        return await this.client.hgetall(key);
+    public async hgetall(key: string) {
+        return this.client.hgetall(key);
     }
 
-    public async hlen(key: string): Promise<number> {
+    public async hlen(key: string) {
         return this.client.hlen(key);
     }
 
-    public async hkeys(key: string): Promise<string[]> {
+    public async hkeys(key: string) {
         return this.client.hkeys(key);
     }
 
@@ -94,28 +93,32 @@ export class IoredisAdapter extends RedisBase {
         await this.client.hset(key, field, value);
     }
 
-    public async hsetnx(key: string, field: string, value: string): Promise<boolean> {
+    public async hsetnx(key: string, field: string, value: string) {
         const res = await this.client.hsetnx(key, field, value);
         return res == 1;
     }
 
-    public async incr(key: string): Promise<number> {
-        return await this.client.incr(key);
+    public async incr(key: string) {
+        return this.client.incr(key);
     }
 
-    public async lpop(key: string): Promise<string> {
+    public async keys(pattern?: string) {
+        return this.client.keys(pattern);
+    }
+
+    public async lpop(key: string) {
         return this.client.lpop(key);
     }
 
-    public async lpush(key: string, ...values: string[]): Promise<number> {
+    public async lpush(key: string, ...values: string[]) {
         return this.client.lpush(key, ...values);
     }
 
-    public async lrange(key: string, start: number, stop: number): Promise<string[]> {
+    public async lrange(key: string, start: number, stop: number) {
         return this.client.lrange(key, start, stop);
     }
 
-    public async mget(...keys: string[]): Promise<string[]> {
+    public async mget(...keys: string[]) {
         return this.client.mget(...keys);
     }
 
@@ -125,28 +128,28 @@ export class IoredisAdapter extends RedisBase {
         await this.client.publish(channel, message);
     }
 
-    public async rpop(key: string): Promise<string> {
+    public async rpop(key: string) {
         return this.client.rpop(key);
     }
 
-    public async rpush(key: string, ...values: string[]): Promise<number> {
+    public async rpush(key: string, ...values: string[]) {
         return this.client.rpush(key, ...values);
     }
 
-    public async set(key: string, value: string, ...args: any[]): Promise<boolean> {
+    public async set(key: string, value: string, ...args: any[]) {
         const res = await this.client.set(key, value, ...args);
         return res === 'OK';
     }
 
-    public async time(): Promise<[string, string]> {
+    public async time() {
         return this.client.time();
     }
 
-    public async ttl(key: string): Promise<number> {
+    public async ttl(key: string) {
         return this.client.ttl(key);
     }
 
-    public async unsubscribe(...channels: string[]): Promise<void> {
+    public async unsubscribe(...channels: string[]) {
         channels.forEach(r => {
             delete this.m_SubCallbacks[r];
         });

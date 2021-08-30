@@ -2,8 +2,8 @@ import { deepStrictEqual, ifError, ok, strictEqual } from 'assert';
 import Ioredis from 'ioredis';
 
 import { IoredisAdapter as Self } from './index';
-import { sleep } from '../global';
-import { RedisGeoAddMessage } from '../../model';
+import { sleep } from '../set-timeout';
+import { IRedisGeo } from '../../contract';
 
 const cfg = {
     host: '127.0.0.1',
@@ -11,22 +11,22 @@ const cfg = {
 };
 let client: Ioredis.Redis, self: Self, sub: Ioredis.Redis;
 
-describe('src/service/ioredis/index.ts', (): void => {
-    after((): void => {
+describe('src/service/ioredis/index.ts', () => {
+    after(() => {
         client.disconnect();
         self.close();
         sub.disconnect();
     });
 
-    before((): void => {
+    before(() => {
         client = new Ioredis(cfg);
         self = new Self(cfg);
         sub = new Ioredis(cfg);
     });
 
-    describe('.del(k: string): Promise<void>', (): void => {
+    describe('.del(k: string): Promise<void>', () => {
         let key = 'del';
-        it('exist', async (): Promise<void> => {
+        it('exist', async () => {
             await client.set(key, key);
 
             await self.del(key);
@@ -35,7 +35,7 @@ describe('src/service/ioredis/index.ts', (): void => {
             strictEqual(res, null);
         });
 
-        it('not exist', async (): Promise<void> => {
+        it('not exist', async () => {
             let err: Error;
             try {
                 await self.del(`${key}-not-exists`);
@@ -46,9 +46,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.get(k: string): Promise<string>', (): void => {
+    describe('.get(k: string): Promise<string>', () => {
         const key = 'get';
-        it('ok', async (): Promise<void> => {
+        it('ok', async () => {
             await client.set(key, 'aa');
 
             const res = await self.get(key);
@@ -58,9 +58,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.expire(key: string, seconds: number): Promise<void>', (): void => {
+    describe('.expire(key: string, seconds: number): Promise<void>', () => {
         const key = 'expire';
-        it('ok', async (): Promise<void> => {
+        it('ok', async () => {
             await client.set(key, 'expire');
 
             let err: Error;
@@ -78,10 +78,10 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.geoadd(key: string, ...entries: RedisGeoAddEntry[]): Promise<number>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.geoadd(key: string, ...entries: RedisGeoAddEntry[]): Promise<number>', () => {
+        it('ok', async () => {
             const key = 'test-geoadd';
-            const message: RedisGeoAddMessage = {
+            const message: IRedisGeo = {
                 longitude: 0.10000079870223999,
                 latitude: 0.20000090571705442,
                 member: 'a',
@@ -95,10 +95,10 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.geopos(key: string, ...members: string[]): Promise<[number, number][]>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.geopos(key: string, ...members: string[]): Promise<[number, number][]>', () => {
+        it('ok', async () => {
             const key = 'test-geopos';
-            const entry: RedisGeoAddMessage = {
+            const entry: IRedisGeo = {
                 longitude: 0.10000079870223999,
                 latitude: 0.20000090571705442,
                 member: 'c',
@@ -112,9 +112,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.hdel(key: string, ...fields: string[]): Promise<number>', (): void => {
+    describe('.hdel(key: string, ...fields: string[]): Promise<number>', () => {
         const key = 'hdel';
-        it('ok', async (): Promise<void> => {
+        it('ok', async () => {
             await client.hset(key, 'a', 1);
             await client.hset(key, 'b', 2);
             await client.hset(key, 'c', 3);
@@ -127,9 +127,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.hget(k: string, f: string): Promise<string>', (): void => {
+    describe('.hget(k: string, f: string): Promise<string>', () => {
         const key = 'hget';
-        it('exists', async (): Promise<void> => {
+        it('exists', async () => {
             await client.hset(key, 'a', 'aa');
 
             const res = await self.hget(key, 'a');
@@ -139,15 +139,15 @@ describe('src/service/ioredis/index.ts', (): void => {
             strictEqual(res, 'aa');
         });
 
-        it('not exist', async (): Promise<void> => {
+        it('not exist', async () => {
             const res = await self.hget(key, 'b');
             strictEqual(res, null);
         });
     });
 
-    describe('.hgetall(key: string): Promise<{ [key: string]: string }>', (): void => {
+    describe('.hgetall(key: string): Promise<{ [key: string]: string }>', () => {
         const key = 'hgetall';
-        it('exists', async (): Promise<void> => {
+        it('exists', async () => {
             await client.hset(key, 'a', 1);
             await client.hset(key, 'b', 2);
             await client.hset(key, 'c', 3);
@@ -162,15 +162,15 @@ describe('src/service/ioredis/index.ts', (): void => {
             });
         });
 
-        it('not exist', async (): Promise<void> => {
+        it('not exist', async () => {
             const res = await self.hgetall(key);
             deepStrictEqual(res, {});
         });
     });
 
-    describe('.hlen(key:string): Promise<number>', (): void => {
+    describe('.hlen(key:string): Promise<number>', () => {
         const key = 'hlen';
-        it('ok', async (): Promise<void> => {
+        it('ok', async () => {
             await client.hset(key, 'a', 1);
             await client.hset(key, 'b', 2);
             await client.hset(key, 'c', 3);
@@ -182,7 +182,7 @@ describe('src/service/ioredis/index.ts', (): void => {
             strictEqual(res, 3);
         });
 
-        it('not exists', async (): Promise<void> => {
+        it('not exists', async () => {
             const res = await self.hlen(key);
 
             await client.del(key);
@@ -191,9 +191,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.hkeys(key: string): Promise<string[]>', (): void => {
+    describe('.hkeys(key: string): Promise<string[]>', () => {
         const key = 'hkeys';
-        it('ok', async (): Promise<void> => {
+        it('ok', async () => {
             await client.hset(key, 'a', 1);
             await client.hset(key, 'b', 2);
             await client.hset(key, 'c', 3);
@@ -206,9 +206,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.hset(k: string, f: string, v: string): Promise<void>', (): void => {
+    describe('.hset(k: string, f: string, v: string): Promise<void>', () => {
         const key = 'hset';
-        it('exists', async (): Promise<void> => {
+        it('exists', async () => {
             await client.hset(key, 'a', 'aaa');
 
             await self.hset(key, 'a', 'aaaa');
@@ -219,7 +219,7 @@ describe('src/service/ioredis/index.ts', (): void => {
             await client.del(key);
         });
 
-        it('not exist', async (): Promise<void> => {
+        it('not exist', async () => {
             await self.hset(key, 'b', 'bb');
 
             const res = await client.hget(key, 'b');
@@ -229,9 +229,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.hsetnx(key: string, field: string, value: string): Promise<boolean>', (): void => {
+    describe('.hsetnx(key: string, field: string, value: string): Promise<boolean>', () => {
         const key = 'hsetnx';
-        it('exists', async (): Promise<void> => {
+        it('exists', async () => {
             await client.hset(key, 'a', 'aaa');
 
             const res = await self.hsetnx(key, 'a', 'aaaa');
@@ -241,7 +241,7 @@ describe('src/service/ioredis/index.ts', (): void => {
             strictEqual(res, false);
         });
 
-        it('not exist', async (): Promise<void> => {
+        it('not exist', async () => {
             const res = await self.hsetnx(key, 'b', 'bb');
 
             await client.del(key);
@@ -250,9 +250,9 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.incr(key: string): Promise<number>', (): void => {
+    describe('.incr(key: string): Promise<number>', () => {
         const key = 'incr';
-        it('ok', async (): Promise<void> => {
+        it('ok', async () => {
             const res = await self.incr(key);
             await client.del(key);
 
@@ -260,8 +260,18 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.lpop(key: string): Promise<string>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.keys(pattern: string)', () => {
+        const key = 'test-keys';
+        it('all', async () => {
+            const res = await self.keys();
+            deepStrictEqual(res, []);
+
+            await client.del(key);
+        });
+    });
+
+    describe('.lpop(key: string): Promise<string>', () => {
+        it('ok', async () => {
             const key = 'test-lpop-ok';
             await client.rpush(key, 'a', 'b');
 
@@ -272,7 +282,7 @@ describe('src/service/ioredis/index.ts', (): void => {
             strictEqual(res, 'a');
         });
 
-        it('empty', async (): Promise<void> => {
+        it('empty', async () => {
             const key = 'test-lpop-empty';
 
             const res = await self.lpop(key);
@@ -280,8 +290,8 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.lpush(key: string, ...values: string[]): Promise<number>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.lpush(key: string, ...values: string[]): Promise<number>', () => {
+        it('ok', async () => {
             const key = 'test-lpush-ok';
             await self.lpush(key, 'aa');
 
@@ -292,8 +302,8 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.lrange(key: string, start: number, stop: number): Promise<string[]>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.lrange(key: string, start: number, stop: number): Promise<string[]>', () => {
+        it('ok', async () => {
             const key = 'test-lrange';
             await client.rpush(key, 'a');
             await client.rpush(key, 'b');
@@ -307,8 +317,8 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.mget(...keys: string[]): Promise<string[]>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.mget(...keys: string[]): Promise<string[]>', () => {
+        it('ok', async () => {
             const keys = ['a', 'b', 'c'];
             for (const r of keys) {
                 await client.set(r, r);
@@ -324,8 +334,8 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.rpop(key: string): Promise<string>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.rpop(key: string): Promise<string>', () => {
+        it('ok', async () => {
             const key = 'test-rpop-ok';
             await self.lpush(key, 'aaa', 'bbb');
 
@@ -336,8 +346,8 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.rpush(key: string, ...values: string[]): Promise<number>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.rpush(key: string, ...values: string[]): Promise<number>', () => {
+        it('ok', async () => {
             const key = 'test-rpush-ok';
             const res = await self.rpush(key, 'r1', 'r2');
 
@@ -349,8 +359,8 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.publish(channel: string, message: any): Promise<number>', (): void => {
-        it('ok', async (): Promise<void> => {
+    describe('.publish(channel: string, message: any): Promise<number>', () => {
+        it('ok', async () => {
             let pChannel = 'p-c';
             let pMessage = 'p-m';
             let sChannel: string, sMessage: string;
@@ -374,8 +384,8 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.set(k: string, v: string, ...args: any[])', (): void => {
-        it('only key, value', async (): Promise<void> => {
+    describe('.set(k: string, v: string, ...args: any[])', () => {
+        it('only key, value', async () => {
             const key = 'set.keyAndValue';
             await self.set(key, key);
 
@@ -385,7 +395,7 @@ describe('src/service/ioredis/index.ts', (): void => {
             strictEqual(key, value);
         });
 
-        it('key, value, expiryMode, value', async (): Promise<void> => {
+        it('key, value, expiryMode, value', async () => {
             let key = 'set.expiryMode';
             await self.set(key, key, 'EX', 1);
 
@@ -415,14 +425,14 @@ describe('src/service/ioredis/index.ts', (): void => {
         });
     });
 
-    describe('.ttl(key: string): Promise<number>', (): void => {
-        it('key not exsits', async (): Promise<void> => {
+    describe('.ttl(key: string): Promise<number>', () => {
+        it('key not exsits', async () => {
             const key = 'ttl-key-not-exists';
             const res = await self.ttl(key);
             strictEqual(res, -2);
         });
 
-        it('not expire', async (): Promise<void> => {
+        it('not expire', async () => {
             const key = 'ttl-not-expire';
             await client.set(key, key);
 
@@ -433,7 +443,7 @@ describe('src/service/ioredis/index.ts', (): void => {
             strictEqual(res, -1);
         });
 
-        it('has expire', async (): Promise<void> => {
+        it('has expire', async () => {
             const key = 'ttl-has-expire';
             await client.set(key, key, 'ex', 10);
 

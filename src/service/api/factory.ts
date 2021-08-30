@@ -35,7 +35,7 @@ export class APIFactory {
         for (const r of dirs) {
             const files = await r.findFiles();
             apiCtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
-                if (cr.name.includes('_test'))
+                if (cr.name.includes('_env-test') || cr.name.includes('_test'))
                     return memo;
 
                 const name = cr.name.split('.')[0];

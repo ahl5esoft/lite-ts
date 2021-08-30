@@ -1,4 +1,4 @@
-import { RedisGeoAddMessage } from '../model';
+import { IRedisGeo } from './i-redis-geo';
 
 export abstract class RedisBase {
     public abstract close(): void;
@@ -6,7 +6,7 @@ export abstract class RedisBase {
     public abstract exists(key: string): Promise<boolean>;
     public abstract expire(key: string, seconds: number): Promise<void>;
     public abstract get(key: string): Promise<string>;
-    public abstract geoadd(key: string, ...messages: RedisGeoAddMessage[]): Promise<number>;
+    public abstract geoadd(key: string, ...messages: IRedisGeo[]): Promise<number>;
     public abstract geopos(key: string, ...members: string[]): Promise<[number, number][]>;
     public abstract hdel(key: string, ...fields: string[]): Promise<number>;
     public abstract hget(key: string, field: string): Promise<string>;
@@ -16,6 +16,7 @@ export abstract class RedisBase {
     public abstract hset(key: string, field: string, value: string): Promise<void>;
     public abstract hsetnx(key: string, field: string, value: string): Promise<boolean>;
     public abstract incr(key: string): Promise<number>;
+    public abstract keys(pattern?: string): Promise<string[]>;
     public abstract lpop(key: string): Promise<string>;
     public abstract lpush(key: string, ...values: string[]): Promise<number>;
     public abstract lrange(key: string, start: number, stop: number): Promise<string[]>;
