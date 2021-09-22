@@ -5,6 +5,7 @@ export * from './body-parser';
 export * from './child-process';
 export * from './class-validator';
 export * from './console';
+export * from './cors';
 export * from './date';
 export * from './default';
 export * from './error';

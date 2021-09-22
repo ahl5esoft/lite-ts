@@ -4,6 +4,7 @@
 		"bent": "^7.3.12",
 		"body-parser": "^1.19.0",
 		"class-validator": "^0.13.1",
+		"cors": "^2.8.5",
 		"express": "^4.17.1",
 		"ioredis": "^4.27.3",
 		"js-yaml": "^4.1.0",
@@ -18,6 +19,7 @@
 		"@types/bcryptjs": "^2.4.2",
 		"@types/bent": "^7.3.2",
 		"@types/body-parser": "^1.19.0",
+		"@types/cors": "^2.8.12",
 		"@types/express": "^4.17.12",
 		"@types/ioredis": "^4.26.4",
 		"@types/js-yaml": "^4.0.1",
@@ -44,5 +46,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "4.4.10"
+	"version": "4.5.10"
 }
