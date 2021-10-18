@@ -41,7 +41,7 @@ export class FSDirectory extends IODirectoryBase {
         );
     }
 
-    public async move(dstDirPath: string) {
+    public async copyTo(dstDirPath: string) {
         const dstDir = new FSDirectory(dstDirPath);
         let isExist = await dstDir.exists();
         if (isExist)
@@ -55,17 +55,21 @@ export class FSDirectory extends IODirectoryBase {
 
         const directories = await this.findDirectories();
         for (const r of directories) {
-            await r.move(
+            await r.copyTo(
                 join(dstDirPath, r.name)
             );
         }
 
         const files = await this.findFiles();
         for (const r of files) {
-            await r.move(
+            await r.copyTo(
                 join(dstDirPath, r.name)
             );
         }
+    }
+
+    public async move(dstDirPath: string) {
+        await this.copyTo(dstDirPath);
 
         await this.remove();
     }

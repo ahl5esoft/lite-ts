@@ -14,7 +14,7 @@ export class FSFile extends IOFileBase {
         return existsSync(this.path);
     }
 
-    public async move(dstFilePath: string) {
+    public async copyTo(dstFilePath: string) {
         let isExist = await this.exists();
         if (!isExist)
             return;
@@ -32,6 +32,15 @@ export class FSFile extends IOFileBase {
                 createWriteStream(dstFilePath)
             );
         });
+    }
+
+    public async move(dstFilePath: string) {
+        let isExist = await this.exists();
+        if (!isExist)
+            return;
+
+        await this.copyTo(dstFilePath);
+
         await this.remove();
     }
 

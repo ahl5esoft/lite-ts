@@ -11,6 +11,7 @@ export abstract class IONodeBase {
         this.path = join(...paths);
     }
 
+    public abstract copyTo(dstPath: string): Promise<void>;
     public abstract exists(): Promise<boolean>;
     public abstract move(dstPath: string): Promise<void>;
     public abstract remove(): Promise<void>;

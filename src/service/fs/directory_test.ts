@@ -24,6 +24,51 @@ describe('src/service/fs/directory.ts', (): void => {
         });
     });
 
+    describe('.copyTo(dstDirPath: string)', () => {
+        it('ok', async () => {
+            const srcPath = join(__dirname, 'directory-copy-src');
+            await promisify(mkdir)(srcPath);
+
+            const fileA = 'file-a.txt';
+            await promisify(writeFile)(
+                join(srcPath, fileA),
+                'a',
+            );
+
+            const dstPath = join(__dirname, 'directory-copy-dst');
+
+            let err: Error;
+            let isSrcExist: boolean;
+            let res: string;
+            try {
+                await new Self(srcPath).copyTo(dstPath);
+            } catch (ex) {
+                err = ex;
+
+                isSrcExist = existsSync(
+                    join(srcPath, fileA),
+                );
+
+                res = await promisify(readFile)(
+                    join(dstPath, fileA),
+                    'ut8f',
+                );
+
+                await promisify(unlink)(
+                    join(srcPath, fileA)
+                );
+                await promisify(rmdir)(srcPath);
+                await promisify(unlink)(
+                    join(dstPath, fileA)
+                );
+                await promisify(rmdir)(dstPath);
+            }
+            strictEqual(err, undefined);
+            ok(isSrcExist);
+            strictEqual(res, 'a');
+        });
+    });
+
     describe('.findDirectories(): Promise<OSDirectory[]>', (): void => {
         it('ok', async (): Promise<void> => {
             const dirPath = join(__dirname, 'childDirectories');

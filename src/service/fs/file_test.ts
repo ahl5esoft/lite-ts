@@ -20,6 +20,60 @@ describe('src/service/fs/file.ts', () => {
         });
     });
 
+    describe('.copyTo(dstPath: string)', () => {
+        it('源文件不存在', async () => {
+            const srcPath = join(__dirname, 'file-copy-src-path-not-exists');
+            let err: Error = undefined;
+            try {
+                await new Self(srcPath).copyTo('');
+            } catch (ex) {
+                err = ex;
+            }
+            strictEqual(err, undefined);
+        });
+
+        it('目标为文件已存在', async () => {
+            const srcPath = join(__dirname, 'file-copy-src-path-exists');
+            await promisify(writeFile)(srcPath, 'src');
+
+            const dstPath = join(__dirname, 'file-copy-dst-path-exists');
+            await promisify(writeFile)(dstPath, 'src');
+
+            let err: Error = undefined;
+            try {
+                await new Self(srcPath).copyTo(dstPath);
+            } catch (ex) {
+                err = ex;
+            } finally {
+                await promisify(unlink)(srcPath);
+                await promisify(unlink)(dstPath);
+            }
+            ok(err);
+        });
+
+        it('ok', async () => {
+            const srcPath = join(__dirname, 'file-copy-src-path-exists');
+            await promisify(writeFile)(srcPath, 'src');
+
+            const dstPath = join(__dirname, 'file-copy-dst-path-exists');
+
+            let err: Error = undefined;
+            let res: string;
+            try {
+                await new Self(srcPath).copyTo(dstPath);
+
+                res = await promisify(readFile)(dstPath, 'utf8');
+            } catch (ex) {
+                err = ex;
+            } finally {                
+                await promisify(unlink)(srcPath);
+                await promisify(unlink)(dstPath);
+            }
+            strictEqual(err, undefined);
+            strictEqual(res, 'src');
+        });
+    });
+
     describe('.exists(): Promise<boolean>', () => {
         it('not exist', async () => {
             const filePath = join(__dirname, `file-exists-not-exist-${Date.now()}.txt`);
@@ -38,9 +92,9 @@ describe('src/service/fs/file.ts', () => {
         });
     });
 
-    describe('.mv(dstPath: string): Promise<void>', () => {
+    describe('.move(dstPath: string): Promise<void>', () => {
         it('src path not exists', async () => {
-            const srcPath = join(__dirname, 'file-mv-src-path-not-exists');
+            const srcPath = join(__dirname, 'file-move-src-path-not-exists');
             let err: Error = undefined;
             try {
                 await new Self(srcPath).move('');
@@ -51,7 +105,7 @@ describe('src/service/fs/file.ts', () => {
         });
 
         it('dst path not exists', async () => {
-            let srcPath = join(__dirname, 'file-mv-dst-path-not-exists-src');
+            let srcPath = join(__dirname, 'file-move-dst-path-not-exists-src');
             await promisify(mkdir)(srcPath);
 
             srcPath = join(srcPath, 'dir');
@@ -60,7 +114,7 @@ describe('src/service/fs/file.ts', () => {
             srcPath = join(srcPath, 'file.txt');
             await promisify(writeFile)(srcPath, 'src');
 
-            let dstPath = join(__dirname, 'file-mv-dst-path-not-exists-dst', 'dir', 'file.txt');
+            let dstPath = join(__dirname, 'file-move-dst-path-not-exists-dst', 'dir', 'file.txt');
 
             const self = new Self(srcPath);
             let err: Error;
@@ -95,7 +149,7 @@ describe('src/service/fs/file.ts', () => {
         });
 
         it('dst path is exist', async () => {
-            const dstPath = join(__dirname, 'file-mv-dst-path-is-exists-dst');
+            const dstPath = join(__dirname, 'file-move-dst-path-is-exists-dst');
             await promisify(writeFile)(dstPath, 'dst');
 
             const self = new Self('');
