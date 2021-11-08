@@ -8,11 +8,12 @@ import { enum_ } from '../../model';
 
 export function buildPostExpressOption(
     logFactory: LogFactoryBase,
-    getApiFunc: (log: ILog, req: any) => Promise<IApi>
+    routeRule: string,
+    getApiFunc: (log: ILog, req: any) => Promise<IApi>,
 ): ExpressOption {
     return function (app: Express) {
-        app.post('/:endpoint/:api', async (req: any, resp: any) => {
-            const log = logFactory.build().addLabel('route', req.path);
+        app.post(routeRule, async (req: any, resp: any) => {
+            const log = logFactory.build();
             let res: IApiResponse = {
                 data: null,
                 err: 0,

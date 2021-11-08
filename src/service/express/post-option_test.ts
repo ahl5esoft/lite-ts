@@ -12,7 +12,7 @@ describe('src/service/express/post-option.ts', () => {
             const mockLogFactory = new Mock<LogFactoryBase>();
             const mockApi = new Mock<IApi>({});
             const app = express();
-            self(mockLogFactory.actual, async (_: ILog, __: any) => {
+            self(mockLogFactory.actual, '/:route', async (_: ILog, __: any) => {
                 return mockApi.actual;
             })(app);
 
@@ -22,7 +22,7 @@ describe('src/service/express/post-option.ts', () => {
                 mockLog.actual
             );
 
-            const route = '/endpoint/api';
+            const route = '/test';
             mockLog.expectReturn(
                 r => r.addLabel('route', route),
                 mockLog.actual
