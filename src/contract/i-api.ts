@@ -1,3 +1,3 @@
-export interface IAPI {
+export interface IApi {
     call(): Promise<any>;
 }

@@ -5,7 +5,7 @@ import { ICommandService } from '../../contract';
 
 const execPromise = promisify(exec);
 
-export class ChildProcessCommandService implements ICommandService {
+export class CommandService implements ICommandService {
     private m_Dir: string;
     private m_Extra: any;
     private m_Timeout: number;

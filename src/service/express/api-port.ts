@@ -1,9 +1,9 @@
 import express from 'express';
 
 import { ExpressOption } from './option';
-import { IAPIPort } from '../../contract';
+import { IApiPort } from '../../contract';
 
-export class ExpressAPIPort implements IAPIPort {
+export class ExpressApiPort implements IApiPort {
     public constructor(
         private m_Options: ExpressOption[]
     ) { }

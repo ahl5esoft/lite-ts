@@ -1,11 +1,11 @@
 import Container from 'typedi';
 
 import { CustomError } from '../error';
-import { IODirectoryBase, IAPI } from '../../contract';
+import { IODirectoryBase, IApi } from '../../contract';
 import { ErrorCode } from '../../model/enum';
 
 const invalidAPIError = new CustomError(ErrorCode.api);
-const invalidAPI: IAPI = {
+const invalidAPI: IApi = {
     call: async () => {
         throw invalidAPIError;
     }
@@ -24,7 +24,7 @@ export class APIFactory {
         if (!apiCtor)
             return invalidAPI;
 
-        const api = Container.get<IAPI>(apiCtor);
+        const api = Container.get<IApi>(apiCtor);
         Container.remove(apiCtor);
         return api;
     }

@@ -1,23 +1,38 @@
+import { validate } from 'class-validator';
 import { Express } from 'express';
 
 import { ExpressOption } from './option';
-import { APIFactory, APIOption } from '../api';
-import { DefaultLogFactory } from '../default';
 import { CustomError } from '../error';
-import { IAPIResponse } from '../../contract';
+import { IApi, IApiResponse, ILog, LogFactoryBase } from '../..';
 import { enum_ } from '../../model';
 
-export function expressPostOption(apiFactory: APIFactory, logFactory: DefaultLogFactory, ...options: APIOption[]): ExpressOption {
+export function buildPostExpressOption(
+    logFactory: LogFactoryBase,
+    getApiFunc: (log: ILog, req: any) => Promise<IApi>
+): ExpressOption {
     return function (app: Express) {
         app.post('/:endpoint/:api', async (req: any, resp: any) => {
-            let res: IAPIResponse = {
+            const log = logFactory.build().addLabel('route', req.path);
+            let res: IApiResponse = {
                 data: null,
                 err: 0,
             };
             try {
-                let api = apiFactory.build(req.params.endpoint, req.params.api);
-                for (const r of options)
-                    await r(api, req);
+                let api = await getApiFunc(log, req);
+                if (req.body) {
+                    Object.keys(req.body).forEach(r => {
+                        if (r in api)
+                            return;
+
+                        api[r] = req.body[r];
+                    });
+                }
+
+                const validationErrors = await validate(api);
+                if (validationErrors.length) {
+                    log.addLabel('validate', validationErrors);
+                    throw new CustomError(enum_.ErrorCode.verify);
+                }
 
                 res.data = await api.call();
             } catch (ex) {
@@ -26,7 +41,7 @@ export function expressPostOption(apiFactory: APIFactory, logFactory: DefaultLog
                     res.err = ex.code;
                 } else {
                     res.err = enum_.ErrorCode.panic;
-                    logFactory.build().addLabel('path', req.path).error(ex);
+                    log.error(ex);
                 }
             }
             resp.json(res);
