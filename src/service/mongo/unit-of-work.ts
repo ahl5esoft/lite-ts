@@ -6,6 +6,7 @@ import { IUnitOfWorkRepository } from '../../contract';
 
 export class UnitOfWork implements IUnitOfWorkRepository {
     private m_Queue: ((session: ClientSession) => Promise<void>)[] = [];
+    private m_AfterActions: (() => Promise<void>)[] = [];
 
     public constructor(private m_Pool: Pool) { }
 
@@ -14,12 +15,15 @@ export class UnitOfWork implements IUnitOfWorkRepository {
         const session = client.startSession();
         session.startTransaction();
 
-        for (let r of this.m_Queue)
+        for (const r of this.m_Queue)
             await r(session);
+        this.m_Queue = [];
 
         await session.commitTransaction();
 
-        this.m_Queue = [];
+        for (const r of this.m_AfterActions)
+            await r();
+        this.m_AfterActions = [];
     }
 
     public registerAdd(table: string, entry: any) {
@@ -29,6 +33,10 @@ export class UnitOfWork implements IUnitOfWorkRepository {
                 session: session,
             }).insertOne(toDoc(entry));
         });
+    }
+
+    public registerAfter(action: () => Promise<void>) {
+        this.m_AfterActions.push(action);
     }
 
     public registerRemove(table: string, entry: any) {

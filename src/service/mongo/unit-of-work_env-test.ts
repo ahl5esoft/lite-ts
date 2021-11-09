@@ -35,6 +35,17 @@ describe('src/service/mongo/unit-of-work.ts', () => {
         });
     });
 
+    describe('.registerAfter(action: () => Promise<void>)', () => {
+        it('ok', () => {
+            const self = new Self(null);
+            const action = async () => { };
+            self.registerAfter(action);
+
+            const actions = Reflect.get(self, 'm_AfterActions');
+            deepStrictEqual(actions, [action]);
+        });
+    });
+
     describe('.registerRemove(table: string, entry: any): void', () => {
         const table = 'registerRemove';
         it('ok', async () => {
