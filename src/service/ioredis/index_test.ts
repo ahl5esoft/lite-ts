@@ -24,6 +24,42 @@ describe('src/service/ioredis/index.ts', () => {
         sub = new Ioredis(cfg);
     });
 
+    describe('.blpop(...keys: string[])', () => {
+        it('ok', async () => {
+            const key = 'test-blpop-ok';
+            await client.rpush(key, 'a', 'b');
+
+            const res = await self.blpop(5, key);
+            deepStrictEqual(res, [key, 'a']);
+
+            await client.del(key);
+        });
+
+        it('不存在', async () => {
+            const key = 'test-blpop-not-exists';
+            const res = await self.blpop(1, key);
+            strictEqual(res, null);
+        });
+    });
+
+    describe('.brpop(timeout: number, ...keys: string[])', () => {
+        it('ok', async () => {
+            const key = 'test-brpop-ok';
+            await client.rpush(key, 'a', 'b');
+
+            const res = await self.brpop(5, key);
+            deepStrictEqual(res, [key, 'b']);
+
+            await client.del(key);
+        });
+
+        it('不存在', async () => {
+            const key = 'test-brpop-not-exists';
+            const res = await self.brpop(1, key);
+            strictEqual(res, null);
+        });
+    });
+
     describe('.del(k: string): Promise<void>', () => {
         let key = 'del';
         it('exist', async () => {

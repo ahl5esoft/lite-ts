@@ -28,8 +28,30 @@ export class IoredisAdapter extends RedisBase {
         return this.m_Sub;
     }
 
-    public constructor(private m_Opt: Ioredis.RedisOptions | Ioredis.ClusterNode[]) {
+    public constructor(
+        private m_Opt: Ioredis.RedisOptions | Ioredis.ClusterNode[]
+    ) {
         super();
+    }
+
+    public async blpop(timeout: number, ...keys: string[]) {
+        if (timeout < 0)
+            timeout = 0;
+
+        keys.push(
+            timeout.toString()
+        );
+        return await this.client.blpop(keys);
+    }
+
+    public async brpop(timeout: number, ...keys: string[]) {
+        if (timeout < 0)
+            timeout = 0;
+
+        keys.push(
+            timeout.toString()
+        );
+        return await this.client.brpop(keys);
     }
 
     public close() {
