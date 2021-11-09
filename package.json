@@ -48,5 +48,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "4.10.11"
+	"version": "4.11.11"
 }

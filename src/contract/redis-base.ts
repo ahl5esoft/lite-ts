@@ -1,6 +1,8 @@
 import { IRedisGeo } from './i-redis-geo';
 
 export abstract class RedisBase {
+    public abstract blpop(timeout: number, ...keys: string[]): Promise<[string, string]>;
+    public abstract brpop(timeout: number, ...keys: string[]): Promise<[string, string]>;
     public abstract close(): void;
     public abstract del(key: string): Promise<void>;
     public abstract exists(key: string): Promise<boolean>;
