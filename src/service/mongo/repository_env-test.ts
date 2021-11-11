@@ -24,7 +24,7 @@ describe('src/service/mongo/repository.ts', () => {
         const table = 'add';
         it('m_IsTx = true', async () => {
             const uow = new UnitOfWork(pool);
-            const self = new Self(pool, dbFactory, table, uow);
+            const self = new Self(pool, uow, dbFactory, table);
             const entry = {
                 id: `${table}-1`,
                 name: 'test',
@@ -37,7 +37,7 @@ describe('src/service/mongo/repository.ts', () => {
         });
 
         it('m_IsTx = false', async () => {
-            const self = new Self(pool, dbFactory, table, null);
+            const self = new Self(pool, null, dbFactory, table);
             const entry = {
                 id: `${table}-2`,
                 name: 'test',
@@ -65,7 +65,7 @@ describe('src/service/mongo/repository.ts', () => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const res = await new Self(pool, dbFactory, table, null).query().toArray();
+            const res = await new Self(pool, null, dbFactory, table).query().toArray();
 
             await collection.deleteMany(null);
 
@@ -85,7 +85,7 @@ describe('src/service/mongo/repository.ts', () => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const res = await new Self(pool, dbFactory, table, null).query().where({
+            const res = await new Self(pool, null, dbFactory, table).query().where({
                 id: rows[0]._id
             }).toArray();
 
@@ -109,7 +109,7 @@ describe('src/service/mongo/repository.ts', () => {
             await collection.insertMany(rows);
 
             const uow = new UnitOfWork(pool);
-            const self = new Self(pool, dbFactory, table, uow);
+            const self = new Self(pool, uow, dbFactory, table);
             await self.remove({
                 id: rows[0]._id,
             });
@@ -128,7 +128,7 @@ describe('src/service/mongo/repository.ts', () => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const self = new Self(pool, dbFactory, table, null);
+            const self = new Self(pool, null, dbFactory, table);
             await self.remove({
                 id: rows[0]._id,
             });
@@ -150,7 +150,7 @@ describe('src/service/mongo/repository.ts', () => {
             await collection.insertMany(rows);
 
             const uow = new UnitOfWork(pool);
-            const self = new Self(pool, dbFactory, table, uow);
+            const self = new Self(pool, uow, dbFactory, table);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
             await self.save(entry);
@@ -170,7 +170,7 @@ describe('src/service/mongo/repository.ts', () => {
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
-            const self = new Self(pool, dbFactory, table, null);
+            const self = new Self(pool, null, dbFactory, table);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
             await self.save(entry);

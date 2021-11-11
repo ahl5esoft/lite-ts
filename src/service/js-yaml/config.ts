@@ -1,7 +1,7 @@
 import { YamlConfigFactory } from './config-factory';
-import { IConfigService } from '../../contract';
+import { IConfig } from '../../contract';
 
-export class ConfigSerivce implements IConfigService {
+export class Config implements IConfig {
     public constructor(private m_Factory: YamlConfigFactory, private m_Group: string) { }
 
     public async get(key?: string) {

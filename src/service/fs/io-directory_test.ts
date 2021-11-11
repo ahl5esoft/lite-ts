@@ -3,9 +3,9 @@ import { existsSync, mkdir, readFile, rmdir, writeFile, unlink } from 'fs';
 import { join } from 'path';
 import { promisify } from 'util';
 
-import { FSDirectory as Self } from './directory';
+import { IODirectory as Self } from './io-directory';
 
-describe('src/service/fs/directory.ts', (): void => {
+describe('src/service/fs/io-directory.ts', (): void => {
     describe('.exists(): Promise<void>', (): void => {
         it('ok', async (): Promise<void> => {
             const dirPath = join(__dirname, 'directory-exsits-ok');
@@ -26,7 +26,7 @@ describe('src/service/fs/directory.ts', (): void => {
 
     describe('.copyTo(dstDirPath: string)', () => {
         it('ok', async () => {
-            const srcPath = join(__dirname, 'directory-copy-src');
+            const srcPath = join(__dirname, 'directory-copyTo-src');
             await promisify(mkdir)(srcPath);
 
             const fileA = 'file-a.txt';
@@ -35,7 +35,7 @@ describe('src/service/fs/directory.ts', (): void => {
                 'a',
             );
 
-            const dstPath = join(__dirname, 'directory-copy-dst');
+            const dstPath = join(__dirname, 'directory-copyTo-dst');
 
             let err: Error;
             let isSrcExist: boolean;
@@ -44,14 +44,14 @@ describe('src/service/fs/directory.ts', (): void => {
                 await new Self(srcPath).copyTo(dstPath);
             } catch (ex) {
                 err = ex;
-
+            } finally {
                 isSrcExist = existsSync(
                     join(srcPath, fileA),
                 );
 
                 res = await promisify(readFile)(
                     join(dstPath, fileA),
-                    'ut8f',
+                    'utf8',
                 );
 
                 await promisify(unlink)(

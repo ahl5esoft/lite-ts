@@ -2,14 +2,14 @@ import { createReadStream, createWriteStream, existsSync, readFile, unlink, writ
 import { dirname } from 'path';
 import { promisify } from 'util';
 
-import { FSDirectory } from './directory';
+import { IODirectory } from './io-directory';
 import { IOFileBase } from '../../contract';
 
 const readFileFunc = promisify(readFile);
 const unlinkAction = promisify(unlink);
 const writeFileAction = promisify(writeFile);
 
-export class FSFile extends IOFileBase {
+export class IOFile extends IOFileBase {
     public async exists() {
         return existsSync(this.path);
     }
@@ -19,15 +19,15 @@ export class FSFile extends IOFileBase {
         if (!isExist)
             return;
 
-        isExist = await new FSFile(dstFilePath).exists();
+        isExist = await new IOFile(dstFilePath).exists();
         if (isExist)
             throw new Error(`文件已经存在: ${dstFilePath}`);
 
-        await new FSDirectory(
+        await new IODirectory(
             dirname(dstFilePath)
         ).create();
 
-        await new Promise((s, f) => {
+        await new Promise<void>((s, f) => {
             createReadStream(this.path).on('err', f).on('end', s).pipe(
                 createWriteStream(dstFilePath)
             );
@@ -44,7 +44,7 @@ export class FSFile extends IOFileBase {
         await this.remove();
     }
 
-    public async readJSON<T>(): Promise<T> {
+    public async readJSON() {
         const content = await this.readString();
         return JSON.parse(content);
     }

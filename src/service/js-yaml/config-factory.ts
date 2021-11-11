@@ -1,6 +1,6 @@
 import { load } from 'js-yaml';
 
-import { ConfigSerivce } from './config-service';
+import { Config } from './config';
 import { ConfigFactoryBase, IOFileBase } from '../../contract';
 
 export class YamlConfigFactory extends ConfigFactoryBase {
@@ -11,7 +11,7 @@ export class YamlConfigFactory extends ConfigFactoryBase {
     }
 
     public build(model: Function) {
-        return new ConfigSerivce(this, model.name);
+        return new Config(this, model.name);
     }
 
     public async getDoc() {

@@ -2,7 +2,7 @@ import { existsSync, mkdir, readdir, rmdir, stat, Stats } from 'fs';
 import { dirname, join } from 'path';
 import { promisify } from 'util';
 
-import { FSFile } from './file';
+import { IOFile } from './io-file';
 import { IODirectoryBase, IOFileBase, IONodeBase } from '../../contract';
 
 const mkdirAction = promisify(mkdir);
@@ -10,13 +10,13 @@ const readdirFunc = promisify(readdir);
 const rmdirAction = promisify(rmdir);
 const statFunc = promisify(stat);
 
-export class FSDirectory extends IODirectoryBase {
+export class IODirectory extends IODirectoryBase {
     public async create() {
         const isExist = await this.exists();
         if (isExist)
             return;
 
-        await new FSDirectory(
+        await new IODirectory(
             dirname(this.path)
         ).create();
 
@@ -30,19 +30,19 @@ export class FSDirectory extends IODirectoryBase {
     public async findDirectories(): Promise<IODirectoryBase[]> {
         return this.children(
             (stat): boolean => stat.isDirectory(),
-            FSDirectory
+            IODirectory
         );
     }
 
     public async findFiles(): Promise<IOFileBase[]> {
         return this.children(
             (stat): boolean => stat.isFile(),
-            FSFile
+            IOFile
         );
     }
 
     public async copyTo(dstDirPath: string) {
-        const dstDir = new FSDirectory(dstDirPath);
+        const dstDir = new IODirectory(dstDirPath);
         let isExist = await dstDir.exists();
         if (isExist)
             throw new Error(`目录已经存在: ${dstDirPath}`);

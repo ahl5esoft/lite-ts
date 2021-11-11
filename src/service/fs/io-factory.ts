@@ -2,13 +2,13 @@ import { existsSync, stat } from 'fs';
 import { join } from 'path';
 import { promisify } from 'util';
 
-import { FSDirectory } from './directory';
-import { FSFile } from './file';
+import { IODirectory } from './io-directory';
+import { IOFile } from './io-file';
 import { IODirectoryBase, IOFactoryBase, IOFileBase, IONodeBase } from '../../contract';
 
 const statFunc = promisify(stat);
 
-export class FSFactory extends IOFactoryBase {
+export class FSIOFactory extends IOFactoryBase {
     public async build(...paths: string[]): Promise<IONodeBase> {
         const nodePath = join(...paths);
         const isExist = existsSync(nodePath);
@@ -16,17 +16,17 @@ export class FSFactory extends IOFactoryBase {
             const stats = await statFunc(nodePath);
             const isDir = stats.isDirectory();
             if (isDir)
-                return new FSDirectory(nodePath);
+                return new IODirectory(nodePath);
         }
 
-        return new FSFile(nodePath);
+        return new IOFile(nodePath);
     }
 
     public buildDirectory(...paths: string[]): IODirectoryBase {
-        return new FSDirectory(...paths);
+        return new IODirectory(...paths);
     }
 
     public buildFile(...paths: string[]): IOFileBase {
-        return new FSFile(...paths);
+        return new IOFile(...paths);
     }
 }

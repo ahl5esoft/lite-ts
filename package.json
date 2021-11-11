@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"@types/ssh2": "^0.5.48",
 		"bcryptjs": "^2.4.3",
 		"bent": "^7.3.12",
 		"body-parser": "^1.19.0",
@@ -12,6 +13,7 @@
 		"moment": "^2.29.1",
 		"mongodb": "^3.6.9",
 		"reflect-metadata": "^0.1.13",
+		"ssh2": "^1.5.0",
 		"typedi": "^0.8.0"
 	},
 	"description": "基础库(typescript)",
@@ -48,5 +50,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "4.11.11"
+	"version": "5.11.11"
 }

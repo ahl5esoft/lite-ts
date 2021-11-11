@@ -1,8 +1,8 @@
-import { CommandService } from './command-service';
+import { Command } from './command';
 import { CommandFactoryBase } from '../..';
 
 export class CommandFactory extends CommandFactoryBase {
     public build(...cmdArgs: any[]) {
-        return new CommandService(cmdArgs);
+        return new Command(cmdArgs);
     }
 }

@@ -1,9 +1,9 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
+import { Config as Self } from './config';
 import { YamlConfigFactory } from './config-factory';
-import { ConfigSerivce as Self } from './config-service';
 
-describe('src/service/js-yaml/config-service.ts', () => {
+describe('src/service/js-yaml/config.ts', () => {
     describe('.get<T>(key?: string): Promise<T>', () => {
         it('group', async () => {
             let factory = new YamlConfigFactory(null);

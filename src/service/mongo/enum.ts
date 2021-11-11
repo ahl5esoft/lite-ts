@@ -1,4 +1,4 @@
-import { DBFactoryBase, IEnum, IEnumItem } from '../..';
+import { DbFactoryBase, IEnum, IEnumItem } from '../..';
 import { global } from '../../model';
 import { EnumItem } from './enum-item';
 
@@ -6,7 +6,7 @@ export class Enum implements IEnum {
     private m_Items: IEnumItem[];
 
     public constructor(
-        private m_DbFactory: DBFactoryBase,
+        private m_DbFactory: DbFactoryBase,
         private m_Name: string
     ) { }
 

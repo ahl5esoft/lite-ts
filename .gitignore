@@ -1,4 +1,5 @@
 .vscode/
-/log/
 dist/
+log/
 node_modules/
+src/service/ssh2/io-file_test.ts

@@ -3,9 +3,9 @@ import { existsSync, mkdir, readFile, rmdir, unlink, writeFile } from 'fs';
 import { dirname, extname, join } from 'path';
 import { promisify } from 'util';
 
-import { FSFile as Self } from './file';
+import { IOFile as Self } from './io-file';
 
-describe('src/service/fs/file.ts', () => {
+describe('src/service/fs/io-file.ts', () => {
     describe('.ext', () => {
         it('ok', async () => {
             const name = `file-name-${Date.now()}.txt`;
@@ -65,7 +65,7 @@ describe('src/service/fs/file.ts', () => {
                 res = await promisify(readFile)(dstPath, 'utf8');
             } catch (ex) {
                 err = ex;
-            } finally {                
+            } finally {
                 await promisify(unlink)(srcPath);
                 await promisify(unlink)(dstPath);
             }

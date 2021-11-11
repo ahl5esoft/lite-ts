@@ -1,9 +1,10 @@
 import { service, version } from '../src';
 
 (async (): Promise<void> => {
-    const readmeFile = new service.FSFile(__dirname, '..', 'README.md');
-    const packageLockJSONFile = new service.FSFile(__dirname, '..', 'package-lock.json');
-    const packageJSONFile = new service.FSFile(__dirname, '..', 'package.json');
+    const ioFactory = new service.FSIOFactory();
+    const readmeFile = ioFactory.buildFile(__dirname, '..', 'README.md');
+    const packageLockJSONFile = ioFactory.buildFile(__dirname, '..', 'package-lock.json');
+    const packageJSONFile = ioFactory.buildFile(__dirname, '..', 'package.json');
     new version.CheckHandler(process.argv[2]).setNext(
         new version.ReadmeHandler(readmeFile, process.argv[2])
     ).setNext(

@@ -1,9 +1,9 @@
 import { Pool } from './pool';
 import { Repository } from './repository';
 import { UnitOfWork } from './unit-of-work';
-import { DBFactoryBase, IUnitOfWork, IUnitOfWorkRepository } from '../../contract';
+import { DbFactoryBase, IUnitOfWork, IUnitOfWorkRepository } from '../../contract';
 
-export class MongoFactory extends DBFactoryBase {
+export class MongoFactory extends DbFactoryBase {
     private m_Pool: Pool;
 
     public constructor(name: string, url: string) {
@@ -18,7 +18,7 @@ export class MongoFactory extends DBFactoryBase {
     }
 
     public db<T>(model: new () => T, uow?: IUnitOfWork) {
-        return new Repository<T>(this.m_Pool, this, model.name, uow as IUnitOfWorkRepository);
+        return new Repository<T>(this.m_Pool, uow as IUnitOfWorkRepository, this, model.name);
     }
 
     public uow() {

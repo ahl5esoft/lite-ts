@@ -1,4 +1,4 @@
-export interface IDBQuery<T> {
+export interface IDbQuery<T> {
     count(): Promise<number>;
     order(...fields: string[]): this;
     orderByDesc(...fields: string[]): this;

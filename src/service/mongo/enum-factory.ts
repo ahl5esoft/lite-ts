@@ -1,9 +1,9 @@
 import { Enum } from './enum';
-import { DBFactoryBase, EnumFacatoryBase } from '../..';
+import { DbFactoryBase, EnumFacatoryBase } from '../..';
 
 export class EnumFactory extends EnumFacatoryBase {
     public constructor(
-        private m_DbFactory: DBFactoryBase
+        private m_DbFactory: DbFactoryBase
     ) {
         super();
     }

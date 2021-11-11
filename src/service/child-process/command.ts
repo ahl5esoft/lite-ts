@@ -1,11 +1,11 @@
 import { CommonOptions, exec, spawn } from 'child_process';
 import { promisify } from 'util';
 
-import { ICommandService } from '../../contract';
+import { ICommand } from '../../contract';
 
 const execPromise = promisify(exec);
 
-export class CommandService implements ICommandService {
+export class Command implements ICommand {
     private m_Dir: string;
     private m_Extra: any;
     private m_Timeout: number;
