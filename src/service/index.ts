@@ -16,3 +16,4 @@ export * from './mongo';
 export * from './promise';
 export * from './redis';
 export * from './set-timeout';
+export * from './ssh2';
