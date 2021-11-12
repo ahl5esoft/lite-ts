@@ -1,6 +1,7 @@
 export * from './api';
 export * from './assert';
 export * from './bcrypt';
+export * from './bent';
 export * from './body-parser';
 export * from './child-process';
 export * from './console';
