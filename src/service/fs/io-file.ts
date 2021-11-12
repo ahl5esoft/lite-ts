@@ -2,7 +2,7 @@ import { createReadStream, createWriteStream, existsSync, readFile, unlink, writ
 import { dirname } from 'path';
 import { promisify } from 'util';
 
-import { IODirectory } from './io-directory';
+import { FSIOFactory } from '.';
 import { IOFileBase } from '../../contract';
 
 const readFileFunc = promisify(readFile);
@@ -10,6 +10,13 @@ const unlinkAction = promisify(unlink);
 const writeFileAction = promisify(writeFile);
 
 export class IOFile extends IOFileBase {
+    public constructor(
+        private m_IOFactory: FSIOFactory,
+        ...paths: string[]
+    ) {
+        super(...paths);
+    }
+
     public async exists() {
         return existsSync(this.path);
     }
@@ -19,11 +26,11 @@ export class IOFile extends IOFileBase {
         if (!isExist)
             return;
 
-        isExist = await new IOFile(dstFilePath).exists();
+        isExist = await this.m_IOFactory.buildFile(dstFilePath).exists();
         if (isExist)
             throw new Error(`文件已经存在: ${dstFilePath}`);
 
-        await new IODirectory(
+        await this.m_IOFactory.buildDirectory(
             dirname(dstFilePath)
         ).create();
 

@@ -3,7 +3,10 @@ import { existsSync, mkdir, readFile, rmdir, writeFile, unlink } from 'fs';
 import { join } from 'path';
 import { promisify } from 'util';
 
+import { FSIOFactory } from '.';
 import { IODirectory as Self } from './io-directory';
+
+const ioFactory = new FSIOFactory();
 
 describe('src/service/fs/io-directory.ts', (): void => {
     describe('.exists(): Promise<void>', (): void => {
@@ -11,7 +14,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             const dirPath = join(__dirname, 'directory-exsits-ok');
             await promisify(mkdir)(dirPath);
 
-            const res = await new Self(dirPath).exists();
+            const res = await new Self(ioFactory, dirPath).exists();
             ok(res);
 
             await promisify(rmdir)(dirPath);
@@ -19,7 +22,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
 
         it('not exist', async (): Promise<void> => {
             const dirPath = join(__dirname, 'directory-exsits-not-exist');
-            const res = await new Self(dirPath).exists();
+            const res = await new Self(ioFactory, dirPath).exists();
             strictEqual(res, false);
         });
     });
@@ -41,7 +44,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             let isSrcExist: boolean;
             let res: string;
             try {
-                await new Self(srcPath).copyTo(dstPath);
+                await new Self(ioFactory, srcPath).copyTo(dstPath);
             } catch (ex) {
                 err = ex;
             } finally {
@@ -83,7 +86,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             const fileA = join(dirPath, 'f-a.txt');
             await promisify(writeFile)(fileA, 'a');
 
-            const res = await new Self(dirPath).findDirectories();
+            const res = await new Self(ioFactory, dirPath).findDirectories();
             await promisify(rmdir)(childDirA);
             await promisify(rmdir)(childDirB);
             await promisify(unlink)(fileA);
@@ -113,7 +116,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             const fileA = join(dirPath, 'f-a.txt');
             await promisify(writeFile)(fileA, 'a');
 
-            const res = await new Self(dirPath).findFiles();
+            const res = await new Self(ioFactory, dirPath).findFiles();
 
             await promisify(rmdir)(childDirA);
             await promisify(rmdir)(childDirB);
@@ -138,7 +141,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             await promisify(mkdir)(join(srcPath, 'dir'));
 
             const dstPath = join(__dirname, 'directory-mv-src-path-ok-dst');
-            await new Self(srcPath).move(dstPath);
+            await new Self(ioFactory, srcPath).move(dstPath);
 
             const dstFilePath = join(dstPath, 'file.txt');
             let isExist = existsSync(dstFilePath);
@@ -150,7 +153,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             isExist = existsSync(join(dstPath, 'dir'));
             ok(isExist);
 
-            await new Self(dstPath).remove();
+            await new Self(ioFactory, dstPath).remove();
         });
     });
 
@@ -162,7 +165,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             const filePath = join(dirPath, 'file-a.txt');
             await promisify(writeFile)(filePath, '');
 
-            await new Self(dirPath).remove();
+            await new Self(ioFactory, dirPath).remove();
 
             let res = existsSync(filePath);
             strictEqual(res, false);
@@ -184,7 +187,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             const childFilePath = join(childDirPath, 'file-b.txt');
             await promisify(writeFile)(childFilePath, '');
 
-            await new Self(dirPath).remove();
+            await new Self(ioFactory, dirPath).remove();
 
             let res = existsSync(childFilePath);
             strictEqual(res, false);
@@ -203,7 +206,7 @@ describe('src/service/fs/io-directory.ts', (): void => {
             const dirPath = join(__dirname, 'directory-rm-not-exists');
             let err: Error;
             try {
-                await new Self(dirPath).remove();
+                await new Self(ioFactory, dirPath).remove();
             } catch (ex) {
                 err = ex;
             }

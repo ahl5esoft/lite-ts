@@ -8,7 +8,10 @@ export abstract class IONodeBase {
     }
 
     public constructor(...paths: string[]) {
-        this.path = join(...paths);
+        if (paths.length == 1)
+            this.path = paths[0];
+        else
+            this.path = join(...paths);
     }
 
     public abstract copyTo(dstPath: string): Promise<void>;

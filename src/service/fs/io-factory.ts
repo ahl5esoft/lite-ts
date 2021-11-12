@@ -16,17 +16,17 @@ export class FSIOFactory extends IOFactoryBase {
             const stats = await statFunc(nodePath);
             const isDir = stats.isDirectory();
             if (isDir)
-                return new IODirectory(nodePath);
+                return new IODirectory(this, nodePath);
         }
 
-        return new IOFile(nodePath);
+        return new IOFile(this, nodePath);
     }
 
     public buildDirectory(...paths: string[]): IODirectoryBase {
-        return new IODirectory(...paths);
+        return new IODirectory(this, ...paths);
     }
 
     public buildFile(...paths: string[]): IOFileBase {
-        return new IOFile(...paths);
+        return new IOFile(this, ...paths);
     }
 }

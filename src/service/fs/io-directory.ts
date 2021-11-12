@@ -1,23 +1,30 @@
-import { existsSync, mkdir, readdir, rmdir, stat, Stats } from 'fs';
+import { existsSync, mkdir, readdir, rmdir } from 'fs';
 import { dirname, join } from 'path';
 import { promisify } from 'util';
 
+import { FSIOFactory } from '.';
 import { IOFile } from './io-file';
-import { IODirectoryBase, IOFileBase, IONodeBase } from '../../contract';
+import { IODirectoryBase, IONodeBase } from '../../contract';
 
 const mkdirAction = promisify(mkdir);
 const readdirFunc = promisify(readdir);
 const rmdirAction = promisify(rmdir);
-const statFunc = promisify(stat);
 
 export class IODirectory extends IODirectoryBase {
+    public constructor(
+        private m_IOFactory: FSIOFactory,
+        ...paths: string[]
+    ) {
+        super(...paths);
+    }
+
     public async create() {
         const isExist = await this.exists();
         if (isExist)
             return;
 
-        await new IODirectory(
-            dirname(this.path)
+        await this.m_IOFactory.buildDirectory(
+            dirname(this.path),
         ).create();
 
         await mkdirAction(this.path);
@@ -27,22 +34,16 @@ export class IODirectory extends IODirectoryBase {
         return existsSync(this.path);
     }
 
-    public async findDirectories(): Promise<IODirectoryBase[]> {
-        return this.children(
-            (stat): boolean => stat.isDirectory(),
-            IODirectory
-        );
+    public async findDirectories() {
+        return this.findChildren(IODirectory);
     }
 
-    public async findFiles(): Promise<IOFileBase[]> {
-        return this.children(
-            (stat): boolean => stat.isFile(),
-            IOFile
-        );
+    public async findFiles() {
+        return this.findChildren(IOFile);
     }
 
     public async copyTo(dstDirPath: string) {
-        const dstDir = new IODirectory(dstDirPath);
+        const dstDir = this.m_IOFactory.buildDirectory(dstDirPath);
         let isExist = await dstDir.exists();
         if (isExist)
             throw new Error(`目录已经存在: ${dstDirPath}`);
@@ -90,10 +91,7 @@ export class IODirectory extends IODirectoryBase {
         await rmdirAction(this.path);
     }
 
-    private async children<T extends IONodeBase>(
-        checkFunc: (stat: Stats) => boolean,
-        Node: new (path: string) => T
-    ) {
+    private async findChildren<T extends IONodeBase>(ctor: new (...args: any[]) => T) {
         const isExist = await this.exists();
         if (!isExist)
             return [];
@@ -101,13 +99,9 @@ export class IODirectory extends IODirectoryBase {
         let children: T[] = [];
         const files = await readdirFunc(this.path);
         for (const r of files) {
-            const nodePath = join(this.path, r);
-            const nodeStat = await statFunc(nodePath);
-            if (checkFunc(nodeStat)) {
-                children.push(
-                    new Node(nodePath)
-                );
-            }
+            const node = await this.m_IOFactory.build(this.path, r);
+            if (node instanceof ctor)
+                children.push(node);
         }
         return children;
     }

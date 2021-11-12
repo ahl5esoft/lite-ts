@@ -2,4 +2,5 @@
 dist/
 log/
 node_modules/
+src/service/ssh2/io-driectory_test.ts
 src/service/ssh2/io-file_test.ts

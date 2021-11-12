@@ -24,15 +24,7 @@ export class IOFile extends IOFileBase {
     }
 
     public async exists() {
-        const sftp = await this.m_IOFactory.getSftp();
-        return new Promise<boolean>((s, f) => {
-            sftp.exists(this.path, res => {
-                if (res instanceof Error)
-                    return f(res);
-
-                s(res);
-            });
-        });
+        return this.m_IOFactory.exists(this.path);
     }
 
     public async move(dstPath: string) {
