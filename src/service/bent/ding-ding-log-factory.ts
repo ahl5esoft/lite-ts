@@ -1,6 +1,7 @@
 import bent from 'bent';
 
 import { LogFactoryBase } from '../..';
+import { DingDingLog } from './ding-ding-log';
 
 interface IResponse {
     errcode: number;
@@ -20,7 +21,7 @@ export class DingDingLogFactory extends LogFactoryBase {
     }
 
     public build() {
-        return null;
+        return new DingDingLog(this);
     }
 
     public async send(labels: [string, any][]) {
