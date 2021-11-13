@@ -25,6 +25,9 @@ export class DingDingLogFactory extends LogFactoryBase {
     }
 
     public async send(labels: [string, any][]) {
+        if (!labels.length)
+            return;
+
         const text = labels.map(r => {
             if (r[1] instanceof Error)
                 return `> ${r[1].message}`;
