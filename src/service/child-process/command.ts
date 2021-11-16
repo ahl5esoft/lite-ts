@@ -1,79 +1,73 @@
-import { CommonOptions, exec, spawn } from 'child_process';
-import { promisify } from 'util';
+import { ChildProcessWithoutNullStreams, CommonSpawnOptions, spawn } from 'child_process';
 
-import { ICommand } from '../../contract';
+import { ICommand, ICommandResult } from '../../contract';
 
-const execPromise = promisify(exec);
+class CommandResult implements ICommandResult {
+    public code: number;
+    public errBf: string[] = [];
+    public outBf: string[] = [];
+
+    public get err() {
+        return this.errBf.join('');
+    }
+
+    public get out() {
+        return this.outBf.join('');
+    }
+}
 
 export class Command implements ICommand {
     private m_Dir: string;
     private m_Extra: any;
     private m_Timeout: number;
 
-    public constructor(private m_Args: any[]) { }
+    public constructor(private m_Args: string[][]) { }
 
-    public async exec(): Promise<string> {
-        const opt: CommonOptions = {};
+    public async exec() {
+        const opt: CommonSpawnOptions = {};
         if (this.m_Dir)
             opt.cwd = this.m_Dir;
         if (this.m_Timeout)
             opt.timeout = this.m_Timeout;
 
-        const [name, ...args] = this.m_Args;
-        const isExec = args.some(r => {
-            return r == '|';
-        });
-        if (isExec) {
-            try {
-                const res = await execPromise(
-                    [name, ...args].join(' '),
-                    opt,
-                );
-                return this.m_Extra && this.m_Extra.ignoreReturn ? '' : res.stdout;
-            } catch {
-                return '';
+        const res = new CommandResult();
+        let child: ChildProcessWithoutNullStreams;
+        child = this.m_Args.reduce((memo, r) => {
+            const [name, ...args] = r;
+            let cp: ChildProcessWithoutNullStreams;
+            if (memo) {
+                cp = spawn(name, args, {
+                    stdio: ['pipe', 'pipe', 'pipe']
+                });
+                memo.stdout.pipe(cp.stdin);
+            } else {
+                cp = spawn(name, args);
             }
-        }
-
-        const child = spawn(name, args, opt);
-        let bf: string[] = [];
-
+            return cp;
+        }, child);
         child.stderr.setEncoding('utf8').on('data', chunk => {
-            if (this.m_Extra && this.m_Extra.ignoreReturn)
+            if (this.m_Extra?.ignoreReturn)
                 return;
 
-            bf.push(
+            res.errBf.push(
                 chunk.toString()
             );
         });
-
         child.stdout.setEncoding('utf8').on('data', chunk => {
-            if (this.m_Extra && this.m_Extra.ignoreReturn)
+            if (this.m_Extra?.ignoreReturn)
                 return;
 
-            bf.push(
+            res.outBf.push(
                 chunk.toString()
             );
         });
 
-        return new Promise((s, f) => {
+        return new Promise<ICommandResult>((s, f) => {
             child.on('error', f);
 
             child.on('exit', code => {
-                if (code === 0) {
-                    s(
-                        bf.join('')
-                    );
-                } else {
-                    const message = JSON.stringify({
-                        cmd: [name, ...args].join(' '),
-                        code: code,
-                        stderr: bf.join(''),
-                    });
-                    f(
-                        new Error(message)
-                    );
-                }
+                res.code = code;
+                s(res);
             });
         });
     }
