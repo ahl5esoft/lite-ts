@@ -30,7 +30,7 @@ export class DingDingLogFactory extends LogFactoryBase {
 
         const text = labels.map(r => {
             if (r[1] instanceof Error)
-                return `> ${r[1].message}`;
+                return `> ${r[1].message}\n> ${r[1].stack}`;
 
             return `- ${r[0]}: ${r[1]}`;
         }).join('\n');

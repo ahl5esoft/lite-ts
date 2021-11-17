@@ -1,22 +1,9 @@
 import { ChildProcessWithoutNullStreams, CommonSpawnOptions, spawn } from 'child_process';
 
+import { CommandResult } from '../command';
 import { ICommand, ICommandResult } from '../../contract';
 
-class CommandResult implements ICommandResult {
-    public code: number;
-    public errBf: string[] = [];
-    public outBf: string[] = [];
-
-    public get err() {
-        return this.errBf.join('');
-    }
-
-    public get out() {
-        return this.outBf.join('');
-    }
-}
-
-export class Command implements ICommand {
+export class ChildProcessCommand implements ICommand {
     private m_Dir: string;
     private m_Extra: any;
     private m_Timeout: number;

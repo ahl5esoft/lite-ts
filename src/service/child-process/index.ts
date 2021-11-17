@@ -1,1 +1,1 @@
-export * from './command-factory';
+export * from './command';

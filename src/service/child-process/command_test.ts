@@ -1,6 +1,6 @@
 import { notStrictEqual, strictEqual } from 'assert';
 
-import { Command as Self } from './command';
+import { ChildProcessCommand as Self } from './command';
 
 describe('src/service/child-process/command.ts', () => {
     describe('.exec(name: string, ...args: any[])', () => {

@@ -70,7 +70,7 @@ export class Ssh2IOFactory extends IOFactoryBase {
         if (!this.m_Client) {
             this.m_Client = new Client();
             await new Promise<void>(s => {
-                this.m_Client.on('ready', s).connect(this.m_Config)
+                this.m_Client.on('ready', s).connect(this.m_Config);
             });
         }
 
