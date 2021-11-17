@@ -4,6 +4,7 @@ export * from './bcrypt';
 export * from './bent';
 export * from './body-parser';
 export * from './child-process';
+export * from './command';
 export * from './console';
 export * from './cors';
 export * from './date';
