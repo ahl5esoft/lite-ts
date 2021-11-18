@@ -1,4 +1,4 @@
-import { strictEqual } from 'assert';
+import { deepStrictEqual } from 'assert';
 
 import { YamlConfigFactory as Self } from './config-factory';
 import { Mock } from '../assert';
@@ -18,8 +18,10 @@ describe('src/service/js-yaml/config-factory.ts', () => {
     k: v`
             );
 
-            const res = await new Self(mockFile.actual).build(Default).get("k");
-            strictEqual(res, 'v')
+            const res = await new Self(mockFile.actual).build(Default).get();
+            deepStrictEqual(res, {
+                k: 'v'
+            });
         });
     });
 });

@@ -10,8 +10,8 @@ export class YamlConfigFactory extends ConfigFactoryBase {
         super();
     }
 
-    public build(model: Function) {
-        return new Config(this, model.name);
+    public build<T>(ctor: new () => T) {
+        return new Config<T>(ctor.name, this);
     }
 
     public async getDoc() {
