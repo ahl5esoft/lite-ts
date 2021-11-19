@@ -1,7 +1,6 @@
 import { IEnumItem } from './i-enum-item';
-import { global } from '../model';
 
-export interface IEnum {
-    all(): Promise<IEnumItem[]>;
-    get(predicate: (data: global.IEnumItemData) => boolean): Promise<IEnumItem>;
+export interface IEnum<T> {
+    all(): Promise<IEnumItem<T>[]>;
+    get(predicate: (data: T) => boolean): Promise<IEnumItem<T>>;
 }

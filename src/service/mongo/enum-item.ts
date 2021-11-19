@@ -1,14 +1,13 @@
 import { IEnumItem } from '../..';
-import { global } from '../../model';
 
-export class EnumItem implements IEnumItem {
+export class EnumItem<T extends { value: number }> implements IEnumItem<T> {
     private m_EncodingKey: string;
     public get encodingKey() {
         return this.m_EncodingKey;
     }
 
     public constructor(
-        public data: global.IEnumItemData,
+        public data: T,
         private m_Name: string
     ) {
         this.m_EncodingKey = `enum-${m_Name}-${data.value}`;

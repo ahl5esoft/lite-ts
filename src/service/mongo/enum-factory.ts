@@ -9,6 +9,6 @@ export class EnumFactory extends EnumFacatoryBase {
     }
 
     public build<T>(model: new () => T) {
-        return new Enum(this.m_DbFactory, model.name);
+        return new Enum<T>(this.m_DbFactory, model.name);
     }
 }

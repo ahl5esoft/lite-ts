@@ -28,13 +28,17 @@ export class Ssh2Command extends CommandBase {
                         res.code = code;
                         s();
                     }).on('data', (bf: Buffer) => {
-                        res.outBf.push(
-                            bf.toString('utf8')
-                        );
+                        const line = bf.toString('utf8');
+                        if ('console' in this.extra)
+                            console.log('out >> ', line);
+
+                        res.outBf.push(line);
                     }).stderr.on('data', (bf: Buffer) => {
-                        res.errBf.push(
-                            bf.toString('utf8')
-                        );
+                        const line = bf.toString('utf8');
+                        if ('console' in this.extra)
+                            console.log('err >> ', line);
+
+                        res.errBf.push(line);
                     });
                 }
             );

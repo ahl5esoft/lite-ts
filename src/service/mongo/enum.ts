@@ -1,18 +1,17 @@
-import { DbFactoryBase, IEnum, IEnumItem } from '../..';
-import { global } from '../../model';
 import { EnumItem } from './enum-item';
+import { DbFactoryBase, IEnum, IEnumItem, model } from '../..';
 
-export class Enum implements IEnum {
-    private m_Items: IEnumItem[];
+export class Enum<T> implements IEnum<T> {
+    private m_Items: IEnumItem<T>[];
 
     public constructor(
         private m_DbFactory: DbFactoryBase,
         private m_Name: string
     ) { }
 
-    public async all(): Promise<IEnumItem[]> {
+    public async all() {
         if (!this.m_Items) {
-            const rows = await this.m_DbFactory.db(global.Enum).query().where({
+            const rows = await this.m_DbFactory.db(model.global.Enum).query().where({
                 id: this.m_Name
             }).toArray();
             if (rows.length) {
@@ -27,7 +26,7 @@ export class Enum implements IEnum {
         return this.m_Items;
     }
 
-    public async get(predicate: (data: global.IEnumItemData) => boolean) {
+    public async get(predicate: (data: T) => boolean) {
         const items = await this.all();
         return items.find(r => {
             return predicate(r.data);
