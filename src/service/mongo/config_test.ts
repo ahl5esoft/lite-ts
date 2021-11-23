@@ -1,6 +1,9 @@
-import { Config } from './config';
-import { DbFactoryBase, DbRepositoryBase, IDbQuery, model, service } from '../..';
 import { deepStrictEqual } from 'assert';
+
+import { Config } from './config';
+import { Mock } from '..';
+import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../..';
+import { global } from '../../model';
 
 class ConfigData {
     public str: string;
@@ -9,16 +12,16 @@ class ConfigData {
 describe('src/service/mongo/config.ts', () => {
     describe('.get()', () => {
         it('ok', async () => {
-            const mockDbFactory = new service.Mock<DbFactoryBase>();
+            const mockDbFactory = new Mock<DbFactoryBase>();
             const self = new Config(mockDbFactory.actual, ConfigData);
 
-            const mockDbRepo = new service.Mock<DbRepositoryBase<ConfigData>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<ConfigData>>();
             mockDbFactory.expectReturn(
-                r => r.db(model.global.Config),
+                r => r.db(global.Config),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new service.Mock<IDbQuery<model.global.Config>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Config>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
@@ -31,7 +34,7 @@ describe('src/service/mongo/config.ts', () => {
                 mockDbQuery.actual
             );
 
-            const data: model.global.Config = {
+            const data: global.Config = {
                 id: '',
                 items: {
                     str: 's'

@@ -1,4 +1,5 @@
-import { DbFactoryBase, IConfig, model } from '../..';
+import { DbFactoryBase, IConfig } from '../..';
+import { global } from '../../model';
 
 export class Config<T> implements IConfig<T> {
     public constructor(
@@ -7,7 +8,7 @@ export class Config<T> implements IConfig<T> {
     ) { }
 
     public async get() {
-        const rows = await this.m_DbFactory.db(model.global.Config).query().where({
+        const rows = await this.m_DbFactory.db(global.Config).query().where({
             id: this.m_Ctor.name
         }).toArray();
         return rows[0]?.items as T;

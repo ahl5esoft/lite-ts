@@ -1,7 +1,6 @@
 import { strictEqual } from 'assert';
 
 import { EnumItem as Self } from './enum-item';
-import { global } from '../../model';
 
 describe('src/service/mongo/enum-item.ts', () => {
     describe('.encodingKey', () => {
@@ -9,7 +8,7 @@ describe('src/service/mongo/enum-item.ts', () => {
             const data = {
                 key: 'k',
                 value: 1
-            } as global.IEnumItemData;
+            };
             const enumName = 'test';
             const res = new Self(data, enumName).encodingKey;
             strictEqual(res, `enum-${enumName}-${data.value}`);
@@ -21,7 +20,7 @@ describe('src/service/mongo/enum-item.ts', () => {
             const data = {
                 key: 'k',
                 value: 1
-            } as global.IEnumItemData;
+            };
             const enumName = 'test';
             const attr = 'att';
             const res = new Self(data, enumName).getCustomEncodingKey(attr);

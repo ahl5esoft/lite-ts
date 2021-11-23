@@ -2,23 +2,28 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { Enum as Self } from './enum';
 import { EnumItem } from './enum-item';
-import { DbFactoryBase, DbRepositoryBase, IDbQuery, service } from '../..';
+import { Mock } from '..';
+import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../..';
 import { global } from '../../model';
+
+interface IEnumItemData {
+    key: string;
+}
 
 describe('src/service/mongo/enum.ts', () => {
     describe('.all(): Promise<IEnumItem[]>', () => {
         it('ok', async () => {
-            const mockDbFactory = new service.Mock<DbFactoryBase>();
+            const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
             const self = new Self(mockDbFactory.actual, name);
 
-            const mockDbRepo = new service.Mock<DbRepositoryBase<global.Enum>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
                 r => r.db(global.Enum),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new service.Mock<IDbQuery<global.Enum>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
@@ -34,7 +39,7 @@ describe('src/service/mongo/enum.ts', () => {
             const data = {
                 key: 'k',
                 value: 1
-            } as global.IEnumItemData;
+            };
             mockDbQuery.expectReturn(
                 r => r.toArray(),
                 [{
@@ -52,17 +57,17 @@ describe('src/service/mongo/enum.ts', () => {
         });
 
         it('不存在', async () => {
-            const mockDbFactory = new service.Mock<DbFactoryBase>();
+            const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
             const self = new Self(mockDbFactory.actual, name);
 
-            const mockDbRepo = new service.Mock<DbRepositoryBase<global.Enum>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
                 r => r.db(global.Enum),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new service.Mock<IDbQuery<global.Enum>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
@@ -87,17 +92,17 @@ describe('src/service/mongo/enum.ts', () => {
 
     describe('.get(predicate: (data: global.IEnumItemData) => boolean)', () => {
         it('ok', async () => {
-            const mockDbFactory = new service.Mock<DbFactoryBase>();
+            const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
-            const self = new Self(mockDbFactory.actual, name);
+            const self = new Self<IEnumItemData>(mockDbFactory.actual, name);
 
-            const mockDbRepo = new service.Mock<DbRepositoryBase<global.Enum>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
                 r => r.db(global.Enum),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new service.Mock<IDbQuery<global.Enum>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
@@ -113,7 +118,7 @@ describe('src/service/mongo/enum.ts', () => {
             const data = {
                 key: 'k',
                 value: 1
-            } as global.IEnumItemData;
+            };
             mockDbQuery.expectReturn(
                 r => r.toArray(),
                 [{
@@ -129,17 +134,17 @@ describe('src/service/mongo/enum.ts', () => {
         });
 
         it('不存在', async () => {
-            const mockDbFactory = new service.Mock<DbFactoryBase>();
+            const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
-            const self = new Self(mockDbFactory.actual, name);
+            const self = new Self<IEnumItemData>(mockDbFactory.actual, name);
 
-            const mockDbRepo = new service.Mock<DbRepositoryBase<global.Enum>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
                 r => r.db(global.Enum),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new service.Mock<IDbQuery<global.Enum>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual

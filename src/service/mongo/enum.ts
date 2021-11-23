@@ -1,5 +1,6 @@
 import { EnumItem } from './enum-item';
-import { DbFactoryBase, IEnum, IEnumItem, model } from '../..';
+import { DbFactoryBase, IEnum, IEnumItem } from '../..';
+import { global } from '../../model';
 
 export class Enum<T> implements IEnum<T> {
     private m_Items: IEnumItem<T>[];
@@ -11,7 +12,7 @@ export class Enum<T> implements IEnum<T> {
 
     public async all() {
         if (!this.m_Items) {
-            const rows = await this.m_DbFactory.db(model.global.Enum).query().where({
+            const rows = await this.m_DbFactory.db(global.Enum).query().where({
                 id: this.m_Name
             }).toArray();
             if (rows.length) {

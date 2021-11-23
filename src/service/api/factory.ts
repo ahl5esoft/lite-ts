@@ -1,8 +1,10 @@
 import Container from 'typedi';
 
-import { IApi, IODirectoryBase, model, service } from '../..';
+import { CustomError } from '../error';
+import { IApi, IODirectoryBase } from '../..';
+import { enum_ } from '../../model';
 
-const invalidAPIError = new service.CustomError(model.enum_.ErrorCode.api);
+const invalidAPIError = new CustomError(enum_.ErrorCode.api);
 const invalidAPI: IApi = {
     call: async () => {
         throw invalidAPIError;

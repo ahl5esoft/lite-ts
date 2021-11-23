@@ -1,10 +1,11 @@
 import express from 'express';
 
-import { IApiPort, service } from '../..';
+import { ExpressOption } from '.';
+import { IApiPort } from '../..';
 
 export class ExpressApiPort implements IApiPort {
     public constructor(
-        private m_Options: service.ExpressOption[]
+        private m_Options: ExpressOption[]
     ) { }
 
     public async listen() {

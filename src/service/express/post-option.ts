@@ -1,13 +1,16 @@
 import { validate } from 'class-validator';
 import { Express } from 'express';
 
-import { IApi, IApiResponse, ILog, model, service } from '../..';
+import { ExpressOption } from '.';
+import { CustomError } from '..';
+import { IApi, IApiResponse, ILog } from '../..';
+import { enum_ } from '../../model';
 
 export function buildPostExpressOption(
     routeRule: string,
     buildLogFunc: () => ILog,
     getApiFunc: (log: ILog, req: any) => Promise<IApi>,
-): service.ExpressOption {
+): ExpressOption {
     return function (app: Express) {
         app.post(routeRule, async (req: any, resp: any) => {
             const log = buildLogFunc();
@@ -29,16 +32,16 @@ export function buildPostExpressOption(
                 const validationErrors = await validate(api);
                 if (validationErrors.length) {
                     log.addLabel('validate', validationErrors);
-                    throw new service.CustomError(model.enum_.ErrorCode.verify);
+                    throw new CustomError(enum_.ErrorCode.verify);
                 }
 
                 res.data = await api.call();
             } catch (ex) {
-                if (ex instanceof service.CustomError) {
+                if (ex instanceof CustomError) {
                     res.data = ex.data;
                     res.err = ex.code;
                 } else {
-                    res.err = model.enum_.ErrorCode.panic;
+                    res.err = enum_.ErrorCode.panic;
                     log.error(ex);
                 }
             }
