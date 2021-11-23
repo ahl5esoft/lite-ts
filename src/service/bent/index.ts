@@ -1,1 +1,1 @@
-export * from './ding-ding-log-factory';
+export * from './ding-ding-log';

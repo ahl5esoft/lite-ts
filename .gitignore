@@ -1,6 +1,6 @@
 .vscode/
+./log/
 dist/
-log/
 node_modules/
 src/service/ssh2/command_test.ts
 src/service/ssh2/io-driectory_test.ts

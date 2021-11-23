@@ -1,1 +1,1 @@
-export * from './log-factory';
+export * from './log';

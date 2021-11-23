@@ -13,6 +13,7 @@ export * from './express';
 export * from './fs';
 export * from './ioredis';
 export * from './js-yaml';
+export * from './log';
 export * from './math';
 export * from './mongo';
 export * from './promise';

@@ -1,16 +1,13 @@
 import Container from 'typedi';
 
-import { CustomError } from '../error';
-import { IODirectoryBase, IApi } from '../../contract';
-import { ErrorCode } from '../../model/enum';
+import { IApi, IODirectoryBase, model, service } from '../..';
 
-const invalidAPIError = new CustomError(ErrorCode.api);
+const invalidAPIError = new service.CustomError(model.enum_.ErrorCode.api);
 const invalidAPI: IApi = {
     call: async () => {
         throw invalidAPIError;
     }
 };
-
 
 export class APIFactory {
     private constructor(private m_APICtors: { [key: string]: { [key: string]: Function; }; }) { }
@@ -38,11 +35,11 @@ export class APIFactory {
                 if (cr.name.includes('_env-test') || cr.name.includes('_test'))
                     return memo;
 
-                const name = cr.name.split('.')[0];
                 const api = require(cr.path);
                 if (!api.default)
                     throw new Error(`未导出default: ${cr.path}`);
 
+                const name = cr.name.split('.')[0];
                 memo[name] = api.default;
                 return memo;
             }, {});

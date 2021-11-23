@@ -1,6 +1,6 @@
 import { ILog } from '../..';
 
-export class Log implements ILog {
+export class ConsoleLog implements ILog {
     private m_Labels: { [key: string]: any } = {};
 
     public addLabel(k: string, v: any): this {
