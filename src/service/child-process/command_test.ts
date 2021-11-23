@@ -43,4 +43,17 @@ describe('src/service/child-process/command.ts', () => {
             strictEqual(res.out, '');
         });
     });
+
+    describe('.setDir(v: string)', () => {
+        it('ok', async () => {
+            const res = await new Self([
+                ['more', 'README.md']
+            ]).setDir(
+                process.cwd()
+            ).exec();
+            strictEqual(res.code, 0);
+            strictEqual(res.err, '');
+            notStrictEqual(res.out, '');
+        });
+    });
 });

@@ -24,11 +24,12 @@ export class ChildProcessCommand implements ICommand {
             let cp: ChildProcessWithoutNullStreams;
             if (memo) {
                 cp = spawn(name, args, {
+                    ...opt,
                     stdio: ['pipe', 'pipe', 'pipe']
                 });
                 memo.stdout.pipe(cp.stdin);
             } else {
-                cp = spawn(name, args);
+                cp = spawn(name, args, opt);
             }
             return cp;
         }, child);
@@ -59,17 +60,17 @@ export class ChildProcessCommand implements ICommand {
         });
     }
 
-    public setDir(v: string): this {
+    public setDir(v: string) {
         this.m_Dir = v;
         return this;
     }
 
-    public setExtra(v: any): this {
+    public setExtra(v: any) {
         this.m_Extra = v;
         return this;
     }
 
-    public setTimeout(v: number): this {
+    public setTimeout(v: number) {
         this.m_Timeout = v;
         return this;
     }
