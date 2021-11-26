@@ -36,10 +36,10 @@ describe('src/service/child-process/command.ts', () => {
 
         it('timeout', async () => {
             const res = await new Self([
-                ['timeout', '5']
-            ]).setTimeout(10).exec();
-            strictEqual(res.code, 1);
-            notStrictEqual(res.err, '');
+                ['node']
+            ]).setTimeout(1000).exec();
+            strictEqual(res.code, -1);
+            strictEqual(res.err, '');
             strictEqual(res.out, '');
         });
     });

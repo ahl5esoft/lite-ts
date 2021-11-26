@@ -49,12 +49,19 @@ export class ChildProcessCommand implements ICommand {
                 chunk.toString()
             );
         });
+        if (this.m_Timeout > 0) {
+            setTimeout(() => {
+                res.code = -1;
+                child.kill('SIGKILL');
+            }, this.m_Timeout);
+        }
 
         return new Promise<ICommandResult>((s, f) => {
             child.on('error', f);
 
             child.on('exit', code => {
-                res.code = code;
+                if (typeof code == 'number')
+                    res.code = code;
                 s(res);
             });
         });
