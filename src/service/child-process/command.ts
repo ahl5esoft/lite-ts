@@ -49,8 +49,10 @@ export class ChildProcessCommand implements ICommand {
                 chunk.toString()
             );
         });
+
+        let timeout: NodeJS.Timeout;
         if (this.m_Timeout > 0) {
-            setTimeout(() => {
+            timeout = setTimeout(() => {
                 res.code = -1;
                 child.kill('SIGKILL');
             }, this.m_Timeout);
@@ -60,8 +62,12 @@ export class ChildProcessCommand implements ICommand {
             child.on('error', f);
 
             child.on('exit', code => {
-                if (typeof code == 'number')
+                if (timeout)
+                    clearTimeout(timeout);
+
+                if (!res.code && code)
                     res.code = code;
+
                 s(res);
             });
         });
