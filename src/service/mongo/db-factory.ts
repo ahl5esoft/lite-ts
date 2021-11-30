@@ -1,15 +1,15 @@
-import { Pool } from './pool';
+import { DbPool } from './db-pool';
 import { DbRepository } from './db-repository';
 import { UnitOfWork } from './unit-of-work';
 import { DbFactoryBase, IUnitOfWork, IUnitOfWorkRepository } from '../../contract';
 
 export class MongoDbFactory extends DbFactoryBase {
-    private m_Pool: Pool;
+    private m_Pool: DbPool;
 
     public constructor(name: string, url: string) {
         super();
 
-        this.m_Pool = new Pool(name, url);
+        this.m_Pool = new DbPool(name, url);
     }
 
     public async close() {

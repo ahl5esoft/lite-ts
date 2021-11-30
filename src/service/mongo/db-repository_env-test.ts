@@ -1,13 +1,13 @@
 import { deepStrictEqual } from 'assert';
 
 import { MongoDbFactory } from './db-factory';
-import { toEntries } from './helper';
-import { Pool } from './pool';
+import { DbPool } from './db-pool';
 import { DbRepository as Self } from './db-repository';
+import { toEntries } from './helper';
 import { UnitOfWork } from './unit-of-work';
 
 const dbFactory = new MongoDbFactory('test-repository', 'mongodb://localhost:27017');
-const pool = new Pool('test-repository', 'mongodb://localhost:27017');
+const pool = new DbPool('test-repository', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/db-repository.ts', () => {
     after(async () => {

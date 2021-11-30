@@ -1,10 +1,10 @@
-import { Pool } from './pool';
+import { DbPool } from './db-pool';
 import { DbQuery } from './db-query';
 import { DbFactoryBase, DbRepositoryBase, IUnitOfWorkRepository } from '../../contract';
 
 export class DbRepository<T> extends DbRepositoryBase<T> {
     public constructor(
-        private m_Pool: Pool,
+        private m_Pool: DbPool,
         uow: IUnitOfWorkRepository,
         dbFactory: DbFactoryBase,
         tableName: string,

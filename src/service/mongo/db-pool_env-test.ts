@@ -1,11 +1,11 @@
 import { ok } from 'assert';
 
-import { Pool as Self } from './pool';
+import { DbPool as Self } from './db-pool';
 
 const dbName = 'test-db-pool';
 const url = 'mongodb://localhost:27017';
 
-describe('src/service/mongo/pool.ts', () => {
+describe('src/service/mongo/db-pool.ts', () => {
     describe('.getClient(): Promise<MongoClient>', () => {
         it('ok', async () => {
             const client = await new Self(dbName, url).getClient();

@@ -1,7 +1,7 @@
 import { FilterQuery } from 'mongodb';
 
+import { DbPool } from './db-pool';
 import { toEntries } from './helper';
-import { Pool } from './pool';
 import { IDbQuery } from '../../contract';
 
 export class DbQuery<T> implements IDbQuery<T> {
@@ -11,7 +11,7 @@ export class DbQuery<T> implements IDbQuery<T> {
     private m_Where: FilterQuery<any>;
 
     public constructor(
-        private m_Pool: Pool,
+        private m_Pool: DbPool,
         private m_TableName: string
     ) { }
 

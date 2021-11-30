@@ -1,10 +1,10 @@
 import { deepStrictEqual } from 'assert';
 
+import { DbPool } from './db-pool';
 import { toEntries } from './helper';
-import { Pool } from './pool';
 import { UnitOfWork as Self } from './unit-of-work';
 
-const pool = new Pool('test-uow', 'mongodb://localhost:27017');
+const pool = new DbPool('test-uow', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/unit-of-work.ts', () => {
     after(async () => {

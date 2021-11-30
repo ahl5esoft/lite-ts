@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-export class Pool {
+export class DbPool {
     private m_Client: MongoClient;
 
     public constructor(private m_Name: string, private m_Url: string) { }

@@ -1,10 +1,10 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { toEntries } from './helper';
-import { Pool } from './pool';
+import { DbPool } from './db-pool';
 import { DbQuery as Self } from './db-query';
+import { toEntries } from './helper';
 
-const pool = new Pool('test-query', 'mongodb://localhost:27017');
+const pool = new DbPool('test-query', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/db-query.ts', () => {
     after(async () => {
