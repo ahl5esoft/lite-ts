@@ -2,11 +2,11 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { toEntries } from './helper';
 import { Pool } from './pool';
-import { Query as Self } from './query';
+import { DbQuery as Self } from './db-query';
 
 const pool = new Pool('test-query', 'mongodb://localhost:27017');
 
-describe('src/service/mongo/query.ts', () => {
+describe('src/service/mongo/db-query.ts', () => {
     after(async () => {
         const db = await pool.getDb();
         await db.dropDatabase();

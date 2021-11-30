@@ -5,15 +5,15 @@ export class MongoTargetStorageService implements ITargetStorageService {
 
     public constructor(
         private m_DbFactory: DbFactoryBase,
-        private m_TaskIDs: string[]
+        private m_TargetIDs: string[]
     ) {
-        if (!this.m_TaskIDs?.length)
+        if (!this.m_TargetIDs?.length)
             return;
 
-        this.m_TaskIDs = this.m_TaskIDs.filter(r => {
+        this.m_TargetIDs = this.m_TargetIDs.filter(r => {
             return r;
         });
-        this.m_TaskIDs = [...new Set(this.m_TaskIDs)];
+        this.m_TargetIDs = [...new Set(this.m_TargetIDs)];
     }
 
     public addAssociate<T>(model: new () => T, column: string, entry: T) {
@@ -36,7 +36,7 @@ export class MongoTargetStorageService implements ITargetStorageService {
         if (!this.m_Associates[model.name]) {
             const rows = await this.m_DbFactory.db(model).query().where({
                 [column]: {
-                    $in: this.m_TaskIDs
+                    $in: this.m_TargetIDs
                 }
             }).toArray();
             this.m_Associates[model.name] = rows.reduce((memo, r) => {

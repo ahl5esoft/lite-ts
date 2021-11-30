@@ -4,7 +4,7 @@ import { toEntries } from './helper';
 import { Pool } from './pool';
 import { IDbQuery } from '../../contract';
 
-export class Query<T> implements IDbQuery<T> {
+export class DbQuery<T> implements IDbQuery<T> {
     private m_Skip: number;
     private m_Sorts: [string, 1 | -1][] = [];
     private m_Take: number;

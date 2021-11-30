@@ -1,15 +1,15 @@
 import { deepStrictEqual } from 'assert';
 
-import { MongoFactory } from './factory';
+import { MongoDbFactory } from './db-factory';
 import { toEntries } from './helper';
 import { Pool } from './pool';
-import { Repository as Self } from './repository';
+import { DbRepository as Self } from './db-repository';
 import { UnitOfWork } from './unit-of-work';
 
-const dbFactory = new MongoFactory('test-repository', 'mongodb://localhost:27017');
+const dbFactory = new MongoDbFactory('test-repository', 'mongodb://localhost:27017');
 const pool = new Pool('test-repository', 'mongodb://localhost:27017');
 
-describe('src/service/mongo/repository.ts', () => {
+describe('src/service/mongo/db-repository.ts', () => {
     after(async () => {
         const db = await pool.getDb();
         await db.dropDatabase();

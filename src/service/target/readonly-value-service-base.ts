@@ -9,7 +9,9 @@ import {
     StringGeneratorBase
 } from '../..';
 
-export abstract class TargetReadonlyValueServiceBase<T extends ITargetValueData, TChange extends ITargetValueChangeData> implements ITargetValueService {
+export abstract class TargetReadonlyValueServiceBase<
+    T extends ITargetValueData,
+    TChange extends ITargetValueChangeData> implements ITargetValueService {
     public constructor(
         protected storageService: ITargetStorageService,
         protected dbFactory: DbFactoryBase,
