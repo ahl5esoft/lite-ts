@@ -1,1 +1,1 @@
-export * from './ding-ding-log';
+export * from './ding-ding-markdown-push';
