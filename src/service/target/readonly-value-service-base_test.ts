@@ -2,7 +2,7 @@ import { strictEqual } from 'assert';
 
 import { TargetReadonlyValueServiceBase } from './readonly-value-service-base';
 import { Mock } from '..';
-import { DbFactoryBase, DbRepositoryBase, ITargetStorageService, ITargetValueChangeData, ITargetValueData, StringGeneratorBase } from '../..';
+import { DbFactoryBase, DbRepositoryBase, IAssociateStorageService, ITargetValueChangeData, ITargetValueData, StringGeneratorBase } from '../..';
 
 class TargetValue implements ITargetValueData {
     public id: string;
@@ -27,12 +27,15 @@ class Self extends TargetReadonlyValueServiceBase<TargetValue, TargetValueChange
 describe('src/service/target/readonly-value-service-base.ts', () => {
     describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
-            const mockStorageService = new Mock<ITargetStorageService>();
-            const targetID = 't-id';
-            const self = new Self(mockStorageService.actual, null, null, targetID, TargetValue, TargetValueChange);
+            const self = new Self();
+            self.model = TargetValue;
+            self.targetID = 't-id';
+
+            const mockStorageService = new Mock<IAssociateStorageService>();
+            self.associateStorageService = mockStorageService.actual;
 
             mockStorageService.expectReturn(
-                r => r.findAssociates(TargetValue, 'id', targetID),
+                r => r.find(TargetValue, 'id', self.targetID),
                 [{
                     values: {
                         1: 11
@@ -45,12 +48,15 @@ describe('src/service/target/readonly-value-service-base.ts', () => {
         });
 
         it('不存在', async () => {
-            const mockStorageService = new Mock<ITargetStorageService>();
-            const targetID = 't-id';
-            const self = new Self(mockStorageService.actual, null, null, targetID, TargetValue, TargetValueChange);
+            const self = new Self();
+            self.model = TargetValue;
+            self.targetID = 't-id';
+
+            const mockStorageService = new Mock<IAssociateStorageService>();
+            self.associateStorageService = mockStorageService.actual;
 
             mockStorageService.expectReturn(
-                r => r.findAssociates(TargetValue, 'id', targetID),
+                r => r.find(TargetValue, 'id', self.targetID),
                 []
             );
 
@@ -61,16 +67,25 @@ describe('src/service/target/readonly-value-service-base.ts', () => {
 
     describe('.update(uow: IUnitOfWork, ...values: IValueData[])', () => {
         it('ok', async () => {
+            const self = new Self();
+            self.changeModel = TargetValueChange;
+            self.model = TargetValue;
+            self.targetID = 't-id';
+
+            const mockStorageService = new Mock<IAssociateStorageService>();
+            self.associateStorageService = mockStorageService.actual;
+
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const mockStringGenerator = new Mock<StringGeneratorBase>();
-            const targetID = 't-id';
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, targetID, TargetValue, TargetValueChange,);
+            self.dbFactory = mockDbFactory.actual;
 
             const mockDbRepo = new Mock<DbRepositoryBase<TargetValueChange>>();
             mockDbFactory.expectReturn(
                 r => r.db(TargetValueChange, null),
                 mockDbRepo.actual
             );
+
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            self.stringGenerator = mockStringGenerator.actual;
 
             const changeID = 'change-id';
             mockStringGenerator.expectReturn(
@@ -81,7 +96,7 @@ describe('src/service/target/readonly-value-service-base.ts', () => {
             mockDbRepo.expected.add({
                 count: 11,
                 id: changeID,
-                targetID: targetID,
+                targetID: self.targetID,
                 valueType: 1,
             });
 

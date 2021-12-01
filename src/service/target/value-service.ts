@@ -1,60 +1,68 @@
 import moment from 'moment';
+import { Inject, Service } from 'typedi';
 
-import { TargetReadonlyValueServiceBase } from '.';
+import { TargetReadonlyValueServiceBase } from './readonly-value-service-base';
 import {
-    DbFactoryBase,
     IEnum,
-    ITargetStorageService,
     ITargetValueChangeData,
     ITargetValueData,
     ITargetValueLogData,
     IUnitOfWork,
     IValueTypeData,
+    MissionSubjectBase,
     NowTimeBase,
-    StringGeneratorBase
+    ValueInterceptorFactoryBase,
 } from '../..';
 
+@Service()
 export abstract class TargetValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData,
     TLog extends ITargetValueLogData,
     TValueType extends IValueTypeData> extends TargetReadonlyValueServiceBase<T, TChange> {
-    public constructor(
-        private m_ValueTypeEnum: IEnum<TValueType>,
-        private m_NowTime: NowTimeBase,
-        private m_ChangeAssociateColumn: string,
-        private m_LogModel: new () => TLog,
-        storageService: ITargetStorageService,
-        dbFactory: DbFactoryBase,
-        stringGenerator: StringGeneratorBase,
-        targetID: string,
-        model: new () => T,
-        changeModel: new () => TChange,
-    ) {
-        super(storageService, dbFactory, stringGenerator, targetID, model, changeModel);
-    }
+    @Inject()
+    public missionSubject: MissionSubjectBase;
+
+    @Inject()
+    public nowTime: NowTimeBase;
+
+    @Inject()
+    public valueInterceptorFactory: ValueInterceptorFactoryBase;
+
+    public valueTypeEnum: IEnum<TValueType>;
+
+    public targetType: number;
+
+    public changeAssociateColumn: string;
+
+    public logModel: new () => TLog;
 
     public override async getCount(uow: IUnitOfWork, valueType: number) {
         const db = this.dbFactory.db(this.model, uow);
-        const rows = await this.storageService.findAssociates(this.model, 'id', this.targetID);
+        const rows = await this.associateStorageService.find(this.model, 'id', this.targetID);
         if (!rows.length) {
             const entry = this.createEntry();
             entry.id = this.targetID;
             entry.values = {};
             await db.add(entry);
 
-            this.storageService.addAssociate(this.model, 'id', entry);
+            this.associateStorageService.add(this.model, 'id', entry);
             rows.push(entry);
         }
 
-        let changeRows = await this.storageService.findAssociates(this.changeModel, this.m_ChangeAssociateColumn, this.targetID);
+        let changeRows = await this.associateStorageService.find(this.changeModel, this.changeAssociateColumn, this.targetID);
         const changeDb = this.dbFactory.db(this.changeModel, uow);
-        const logDb = this.dbFactory.db(this.m_LogModel, uow);
+        const logDb = this.dbFactory.db(this.logModel, uow);
         for (const r of changeRows) {
             await changeDb.remove(r);
 
+            const interceptor = this.valueInterceptorFactory.build(this.targetType, r.valueType);
+            const isIntercepted = await interceptor.before(uow, this, r);
+            if (isIntercepted)
+                continue;
+
             const logEntry = this.createLogEntry();
-            logEntry.createdOn = await this.m_NowTime.unix();
+            logEntry.createdOn = await this.nowTime.unix();
             logEntry.id = await this.stringGenerator.generate();
             logEntry.oldCount = await super.getCount(uow, valueType);
             logEntry.valueType = r.valueType;
@@ -62,7 +70,7 @@ export abstract class TargetValueServiceBase<
             if (!(r.valueType in rows[0].values))
                 rows[0].values[r.valueType] = 0;
 
-            const valueTypeItem = await this.m_ValueTypeEnum.get(cr => {
+            const valueTypeItem = await this.valueTypeEnum.get(cr => {
                 return cr.value == r.valueType;
             });
             if (valueTypeItem) {
@@ -88,9 +96,13 @@ export abstract class TargetValueServiceBase<
 
             logEntry.count = rows[0].values[r.valueType];
             await logDb.add(logEntry);
+
+            await interceptor.after(uow, this, r);
+
+            await this.missionSubject.notify(uow, this, r.valueType);
         }
 
-        this.storageService.clear(this.changeModel, this.targetID);
+        this.associateStorageService.clear(this.changeModel, this.targetID);
 
         if (changeRows.length)
             await db.save(rows[0]);

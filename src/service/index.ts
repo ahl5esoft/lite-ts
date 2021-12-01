@@ -22,3 +22,4 @@ export * from './redis';
 export * from './set-timeout';
 export * from './ssh2';
 export * from './target';
+export * from './value';

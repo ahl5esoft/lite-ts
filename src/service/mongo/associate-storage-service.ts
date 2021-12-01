@@ -1,22 +1,23 @@
-import { DbFactoryBase, ITargetStorageService } from '../..';
+import { Inject, Service } from 'typedi';
 
-export class MongoTargetStorageService implements ITargetStorageService {
+import { DbFactoryBase, IAssociateStorageService } from '../../contract';
+
+@Service()
+export class MongoAssociateStorageService implements IAssociateStorageService {
     private m_Associates: { [key: string]: any } = {};
 
-    public constructor(
-        private m_DbFactory: DbFactoryBase,
-        private m_TargetIDs: string[]
-    ) {
-        if (!this.m_TargetIDs?.length)
-            return;
+    @Inject()
+    public dbFactory: DbFactoryBase;
 
-        this.m_TargetIDs = this.m_TargetIDs.filter(r => {
+    private m_TargetIDs: string[]
+    public set targetIDs(v: string[]) {
+        v = v.filter(r => {
             return r;
         });
-        this.m_TargetIDs = [...new Set(this.m_TargetIDs)];
+        this.m_TargetIDs = [...new Set(v)];;
     }
 
-    public addAssociate<T>(model: new () => T, column: string, entry: T) {
+    public add<T>(model: new () => T, column: string, entry: T) {
         if (!this.m_Associates[model.name])
             this.m_Associates[model.name] = {};
 
@@ -32,9 +33,9 @@ export class MongoTargetStorageService implements ITargetStorageService {
             this.m_Associates[model.name][associateID] = [];
     }
 
-    public async findAssociates<T>(model: new () => T, column: string, associateID: string) {
+    public async find<T>(model: new () => T, column: string, associateID: string) {
         if (!this.m_Associates[model.name]) {
-            const rows = await this.m_DbFactory.db(model).query().where({
+            const rows = await this.dbFactory.db(model).query().where({
                 [column]: {
                     $in: this.m_TargetIDs
                 }

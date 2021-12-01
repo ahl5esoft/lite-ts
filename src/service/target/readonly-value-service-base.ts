@@ -1,28 +1,36 @@
+import { Inject, Service } from 'typedi';
+
 import {
     DbFactoryBase,
-    ITargetStorageService,
+    IAssociateStorageService,
     ITargetValueChangeData,
     ITargetValueData,
     ITargetValueService,
     IUnitOfWork,
     IValueData,
     StringGeneratorBase
-} from '../..';
+} from '../../contract';
 
+@Service()
 export abstract class TargetReadonlyValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData> implements ITargetValueService {
-    public constructor(
-        protected storageService: ITargetStorageService,
-        protected dbFactory: DbFactoryBase,
-        protected stringGenerator: StringGeneratorBase,
-        protected targetID: string,
-        protected model: new () => T,
-        protected changeModel: new () => TChange,
-    ) { }
+    @Inject()
+    public dbFactory: DbFactoryBase;
+
+    @Inject()
+    public stringGenerator: StringGeneratorBase;
+
+    public associateStorageService: IAssociateStorageService;
+
+    public targetID: string;
+
+    public model: new () => T;
+
+    public changeModel: new () => TChange;
 
     public async getCount(_: IUnitOfWork, valueType: number) {
-        const rows = await this.storageService.findAssociates(this.model, 'id', this.targetID);
+        const rows = await this.associateStorageService.find(this.model, 'id', this.targetID);
         return rows.length && rows[0].values[valueType] || 0;
     }
 
