@@ -1,8 +1,9 @@
 import moment from 'moment';
-import { Inject, Service } from 'typedi';
 
 import { TargetReadonlyValueServiceBase } from './readonly-value-service-base';
 import {
+    DbFactoryBase,
+    IAssociateStorageService,
     IEnum,
     ITargetValueChangeData,
     ITargetValueData,
@@ -11,31 +12,32 @@ import {
     IValueTypeData,
     MissionSubjectBase,
     NowTimeBase,
+    StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../..';
 
-@Service()
 export abstract class TargetValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData,
     TLog extends ITargetValueLogData,
     TValueType extends IValueTypeData> extends TargetReadonlyValueServiceBase<T, TChange> {
-    @Inject()
-    public missionSubject: MissionSubjectBase;
-
-    @Inject()
-    public nowTime: NowTimeBase;
-
-    @Inject()
-    public valueInterceptorFactory: ValueInterceptorFactoryBase;
-
-    public valueTypeEnum: IEnum<TValueType>;
-
-    public targetType: number;
-
-    public changeAssociateColumn: string;
-
-    public logModel: new () => TLog;
+    public constructor(
+        protected valueTypeEnum: IEnum<TValueType>,
+        protected missionSubject: MissionSubjectBase,
+        protected nowTime: NowTimeBase,
+        protected valueInterceptorFactory: ValueInterceptorFactoryBase,
+        protected targetType: number,
+        protected changeAssociateColumn: string,
+        protected logModel: new () => TLog,
+        associateStorageService: IAssociateStorageService,
+        dbFactory: DbFactoryBase,
+        stringGenerator: StringGeneratorBase,
+        targetID: string,
+        model: new () => T,
+        changeModel: new () => TChange,
+    ) {
+        super(associateStorageService, dbFactory, stringGenerator, targetID, model, changeModel);
+    }
 
     public override async getCount(uow: IUnitOfWork, valueType: number) {
         const db = this.dbFactory.db(this.model, uow);

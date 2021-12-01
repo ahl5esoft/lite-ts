@@ -68,15 +68,11 @@ class Self extends TargetValueServiceBase<TargetValue, TargetValueChange, Target
 describe('src/service/target/value-service.ts', () => {
     describe('.getCount(uow: IUnitOfWork, valueType: number)', () => {
         it('ITargetValueData不存在', async () => {
-            const self = new Self();
-            self.changeAssociateColumn = 'target-id';
-            self.changeModel = TargetValueChange;
-            self.logModel = TargetValueLog;
-            self.model = TargetValue;
-            self.targetID = 't-id';
-
+            const mockStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
-            self.dbFactory = mockDbFactory.actual;
+            const targetID = 't-id';
+            const changeAssociateColumn = 'target-id';
+            const self = new Self(null, null, null, null, 0, changeAssociateColumn, TargetValueLog, mockStorageService.actual, mockDbFactory.actual, null, targetID, TargetValue, TargetValueChange);
 
             const mockValueDbRepo = new Mock<DbRepositoryBase<TargetValue>>();
             mockDbFactory.expectReturn(
@@ -84,16 +80,13 @@ describe('src/service/target/value-service.ts', () => {
                 mockValueDbRepo.actual
             );
 
-            const mockStorageService = new Mock<IAssociateStorageService>();
-            self.associateStorageService = mockStorageService.actual;
-
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
             const targetValueEntry = {
-                id: self.targetID,
+                id: targetID,
                 values: {}
             };
             mockValueDbRepo.expected.add(targetValueEntry);
@@ -101,7 +94,7 @@ describe('src/service/target/value-service.ts', () => {
             mockStorageService.expected.add(TargetValue, 'id', targetValueEntry);
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValueChange, self.changeAssociateColumn, self.targetID),
+                r => r.find(TargetValueChange, changeAssociateColumn, targetID),
                 []
             );
 
@@ -117,10 +110,10 @@ describe('src/service/target/value-service.ts', () => {
                 mockLogDbRepo.actual
             );
 
-            mockStorageService.expected.clear(TargetValueChange, self.targetID);
+            mockStorageService.expected.clear(TargetValueChange, targetID);
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
@@ -129,16 +122,30 @@ describe('src/service/target/value-service.ts', () => {
         });
 
         it('IValueTypeData.isReplace = true', async () => {
-            const self = new Self();
-            self.changeAssociateColumn = 'target-id';
-            self.changeModel = TargetValueChange;
-            self.logModel = TargetValueLog;
-            self.model = TargetValue;
-            self.targetType = 0;
-            self.targetID = 't-id';
-
+            const mockStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
-            self.dbFactory = mockDbFactory.actual;
+            const mockMissionSubject = new Mock<MissionSubjectBase>();
+            const mockNowTime = new Mock<NowTimeBase>();
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
+            const mockValueType = new Mock<IEnum<ValueTypeData>>();
+            const targetID = 't-id';
+            const changeAssociateColumn = 'target-id';
+            const self = new Self(
+                mockValueType.actual,
+                mockMissionSubject.actual,
+                mockNowTime.actual,
+                mockValueInterceptorFactory.actual,
+                0,
+                changeAssociateColumn,
+                TargetValueLog,
+                mockStorageService.actual,
+                mockDbFactory.actual,
+                mockStringGenerator.actual,
+                targetID,
+                TargetValue,
+                TargetValueChange
+            );
 
             const mockValueDbRepo = new Mock<DbRepositoryBase<TargetValue>>();
             mockDbFactory.expectReturn(
@@ -146,16 +153,13 @@ describe('src/service/target/value-service.ts', () => {
                 mockValueDbRepo.actual
             );
 
-            const mockStorageService = new Mock<IAssociateStorageService>();
-            self.associateStorageService = mockStorageService.actual;
-
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
             const targetValueEntry = {
-                id: self.targetID,
+                id: targetID,
                 values: {}
             };
             mockValueDbRepo.expected.add(targetValueEntry);
@@ -167,7 +171,7 @@ describe('src/service/target/value-service.ts', () => {
                 valueType: 1
             } as TargetValueChange;
             mockStorageService.expectReturn(
-                r => r.find(TargetValueChange, self.changeAssociateColumn, self.targetID),
+                r => r.find(TargetValueChange, changeAssociateColumn, targetID),
                 [changeEntry]
             );
 
@@ -185,9 +189,6 @@ describe('src/service/target/value-service.ts', () => {
 
             mockChangeDbRepo.expected.remove(changeEntry);
 
-            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            self.valueInterceptorFactory = mockValueInterceptorFactory.actual;
-
             const mockValueInterceptorService = new Mock<IValueInterceptorService>();
             mockValueInterceptorFactory.expectReturn(
                 r => r.build(0, changeEntry.valueType),
@@ -199,17 +200,11 @@ describe('src/service/target/value-service.ts', () => {
                 false
             );
 
-            const mockNowTime = new Mock<NowTimeBase>();
-            self.nowTime = mockNowTime.actual;
-
             const nowUnix = moment().unix();
             mockNowTime.expectReturn(
                 r => r.unix(),
                 nowUnix
             );
-
-            const mockStringGenerator = new Mock<StringGeneratorBase>();
-            self.stringGenerator = mockStringGenerator.actual;
 
             const logID = 'log-id';
             mockStringGenerator.expectReturn(
@@ -218,16 +213,13 @@ describe('src/service/target/value-service.ts', () => {
             );
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 [{
                     values: {
                         1: 10
                     }
                 }]
             );
-
-            const mockValueType = new Mock<IEnum<ValueTypeData>>();
-            self.valueTypeEnum = mockValueType.actual;
 
             const mockValueTypeItem = new Mock<IEnumItem<ValueTypeData>>({
                 data: {
@@ -244,12 +236,12 @@ describe('src/service/target/value-service.ts', () => {
                 createdOn: nowUnix,
                 id: logID,
                 oldCount: 10,
-                targetID: self.targetID,
+                targetID: targetID,
                 valueType: 1
             });
 
             mockValueDbRepo.expected.save({
-                id: self.targetID,
+                id: targetID,
                 values: {
                     1: 11
                 }
@@ -257,15 +249,12 @@ describe('src/service/target/value-service.ts', () => {
 
             mockValueInterceptorService.expected.after(null, self, changeEntry);
 
-            const mockMissionSubject = new Mock<MissionSubjectBase>();
-            self.missionSubject = mockMissionSubject.actual;
-
             mockMissionSubject.expected.notify(null, self, changeEntry.valueType);
 
-            mockStorageService.expected.clear(TargetValueChange, self.targetID);
+            mockStorageService.expected.clear(TargetValueChange, targetID);
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
@@ -274,16 +263,30 @@ describe('src/service/target/value-service.ts', () => {
         });
 
         it('IValueTypeData.todayTime', async () => {
-            const self = new Self();
-            self.changeAssociateColumn = 'target-id';
-            self.changeModel = TargetValueChange;
-            self.logModel = TargetValueLog;
-            self.model = TargetValue;
-            self.targetType = 0;
-            self.targetID = 't-id';
-
+            const mockStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
-            self.dbFactory = mockDbFactory.actual;
+            const mockNowTime = new Mock<NowTimeBase>();
+            const mockMissionSubject = new Mock<MissionSubjectBase>();
+            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            const mockValueType = new Mock<IEnum<ValueTypeData>>();
+            const targetID = 't-id';
+            const changeAssociateColumn = 'target-id';
+            const self = new Self(
+                mockValueType.actual,
+                mockMissionSubject.actual,
+                mockNowTime.actual,
+                mockValueInterceptorFactory.actual,
+                0,
+                changeAssociateColumn,
+                TargetValueLog,
+                mockStorageService.actual,
+                mockDbFactory.actual,
+                mockStringGenerator.actual,
+                targetID,
+                TargetValue,
+                TargetValueChange
+            );
 
             const mockValueDbRepo = new Mock<DbRepositoryBase<TargetValue>>();
             mockDbFactory.expectReturn(
@@ -291,16 +294,13 @@ describe('src/service/target/value-service.ts', () => {
                 mockValueDbRepo.actual
             );
 
-            const mockStorageService = new Mock<IAssociateStorageService>();
-            self.associateStorageService = mockStorageService.actual;
-
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
             const targetValueEntry = {
-                id: self.targetID,
+                id: targetID,
                 values: {}
             };
             mockValueDbRepo.expected.add(targetValueEntry);
@@ -312,7 +312,7 @@ describe('src/service/target/value-service.ts', () => {
                 valueType: 1
             } as TargetValueChange;
             mockStorageService.expectReturn(
-                r => r.find(TargetValueChange, self.changeAssociateColumn, self.targetID),
+                r => r.find(TargetValueChange, changeAssociateColumn, targetID),
                 [changeEntry]
             );
 
@@ -330,9 +330,6 @@ describe('src/service/target/value-service.ts', () => {
 
             mockChangeDbRepo.expected.remove(changeEntry);
 
-            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            self.valueInterceptorFactory = mockValueInterceptorFactory.actual;
-
             const mockValueInterceptorService = new Mock<IValueInterceptorService>();
             mockValueInterceptorFactory.expectReturn(
                 r => r.build(0, changeEntry.valueType),
@@ -344,17 +341,11 @@ describe('src/service/target/value-service.ts', () => {
                 false
             );
 
-            const mockNowTime = new Mock<NowTimeBase>();
-            self.nowTime = mockNowTime.actual;
-
             const nowUnix = moment().unix();
             mockNowTime.expectReturn(
                 r => r.unix(),
                 nowUnix
             );
-
-            const mockStringGenerator = new Mock<StringGeneratorBase>();
-            self.stringGenerator = mockStringGenerator.actual;
 
             const logID = 'log-id';
             mockStringGenerator.expectReturn(
@@ -363,16 +354,13 @@ describe('src/service/target/value-service.ts', () => {
             );
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 [{
                     values: {
                         1: 10
                     }
                 }]
             );
-
-            const mockValueType = new Mock<IEnum<ValueTypeData>>();
-            self.valueTypeEnum = mockValueType.actual;
 
             const mockValueTypeItem = new Mock<IEnumItem<ValueTypeData>>({
                 data: {
@@ -385,7 +373,7 @@ describe('src/service/target/value-service.ts', () => {
             );
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 [{
                     values: {
                         2: nowUnix - 1
@@ -398,12 +386,12 @@ describe('src/service/target/value-service.ts', () => {
                 createdOn: nowUnix,
                 id: logID,
                 oldCount: 10,
-                targetID: self.targetID,
+                targetID: targetID,
                 valueType: 1
             });
 
             mockValueDbRepo.expected.save({
-                id: self.targetID,
+                id: targetID,
                 values: {
                     1: 11,
                     2: nowUnix
@@ -412,15 +400,12 @@ describe('src/service/target/value-service.ts', () => {
 
             mockValueInterceptorService.expected.after(null, self, changeEntry);
 
-            const mockMissionSubject = new Mock<MissionSubjectBase>();
-            self.missionSubject = mockMissionSubject.actual;
-
             mockMissionSubject.expected.notify(null, self, changeEntry.valueType);
 
-            mockStorageService.expected.clear(TargetValueChange, self.targetID);
+            mockStorageService.expected.clear(TargetValueChange, targetID);
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
@@ -429,16 +414,30 @@ describe('src/service/target/value-service.ts', () => {
         });
 
         it('IValueTypeData不存在', async () => {
-            const self = new Self();
-            self.changeAssociateColumn = 'target-id';
-            self.changeModel = TargetValueChange;
-            self.logModel = TargetValueLog;
-            self.model = TargetValue;
-            self.targetType = 0;
-            self.targetID = 't-id';
-
+            const mockStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
-            self.dbFactory = mockDbFactory.actual;
+            const mockMissionSubject = new Mock<MissionSubjectBase>();
+            const mockNowTime = new Mock<NowTimeBase>();
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
+            const mockValueType = new Mock<IEnum<ValueTypeData>>();
+            const targetID = 't-id';
+            const changeAssociateColumn = 'target-id';
+            const self = new Self(
+                mockValueType.actual,
+                mockMissionSubject.actual,
+                mockNowTime.actual,
+                mockValueInterceptorFactory.actual,
+                0,
+                changeAssociateColumn,
+                TargetValueLog,
+                mockStorageService.actual,
+                mockDbFactory.actual,
+                mockStringGenerator.actual,
+                targetID,
+                TargetValue,
+                TargetValueChange
+            );
 
             const mockValueDbRepo = new Mock<DbRepositoryBase<TargetValue>>();
             mockDbFactory.expectReturn(
@@ -446,16 +445,13 @@ describe('src/service/target/value-service.ts', () => {
                 mockValueDbRepo.actual
             );
 
-            const mockStorageService = new Mock<IAssociateStorageService>();
-            self.associateStorageService = mockStorageService.actual;
-
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
             const targetValueEntry = {
-                id: self.targetID,
+                id: targetID,
                 values: {}
             };
             mockValueDbRepo.expected.add(targetValueEntry);
@@ -467,7 +463,7 @@ describe('src/service/target/value-service.ts', () => {
                 valueType: 1
             } as TargetValueChange;
             mockStorageService.expectReturn(
-                r => r.find(TargetValueChange, self.changeAssociateColumn, self.targetID),
+                r => r.find(TargetValueChange, changeAssociateColumn, targetID),
                 [changeEntry]
             );
 
@@ -485,9 +481,6 @@ describe('src/service/target/value-service.ts', () => {
 
             mockChangeDbRepo.expected.remove(changeEntry);
 
-            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            self.valueInterceptorFactory = mockValueInterceptorFactory.actual;
-
             const mockValueInterceptorService = new Mock<IValueInterceptorService>();
             mockValueInterceptorFactory.expectReturn(
                 r => r.build(0, changeEntry.valueType),
@@ -499,17 +492,11 @@ describe('src/service/target/value-service.ts', () => {
                 false
             );
 
-            const mockNowTime = new Mock<NowTimeBase>();
-            self.nowTime = mockNowTime.actual;
-
             const nowUnix = moment().unix();
             mockNowTime.expectReturn(
                 r => r.unix(),
                 nowUnix
             );
-
-            const mockStringGenerator = new Mock<StringGeneratorBase>();
-            self.stringGenerator = mockStringGenerator.actual;
 
             const logID = 'log-id';
             mockStringGenerator.expectReturn(
@@ -518,16 +505,13 @@ describe('src/service/target/value-service.ts', () => {
             );
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 [{
                     values: {
                         1: 10
                     }
                 }]
             );
-
-            const mockValueType = new Mock<IEnum<ValueTypeData>>();
-            self.valueTypeEnum = mockValueType.actual;
 
             mockValueType.expectReturn(
                 r => r.get(mockAny),
@@ -539,12 +523,12 @@ describe('src/service/target/value-service.ts', () => {
                 createdOn: nowUnix,
                 id: logID,
                 oldCount: 10,
-                targetID: self.targetID,
+                targetID: targetID,
                 valueType: 1
             });
 
             mockValueDbRepo.expected.save({
-                id: self.targetID,
+                id: targetID,
                 values: {
                     1: 11
                 }
@@ -552,15 +536,12 @@ describe('src/service/target/value-service.ts', () => {
 
             mockValueInterceptorService.expected.after(null, self, changeEntry);
 
-            const mockMissionSubject = new Mock<MissionSubjectBase>();
-            self.missionSubject = mockMissionSubject.actual;
-
             mockMissionSubject.expected.notify(null, self, changeEntry.valueType);
 
-            mockStorageService.expected.clear(TargetValueChange, self.targetID);
+            mockStorageService.expected.clear(TargetValueChange, targetID);
 
             mockStorageService.expectReturn(
-                r => r.find(TargetValue, 'id', self.targetID),
+                r => r.find(TargetValue, 'id', targetID),
                 []
             );
 
