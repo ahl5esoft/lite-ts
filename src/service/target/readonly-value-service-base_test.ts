@@ -1,8 +1,8 @@
-import { strictEqual } from 'assert';
+import { deepStrictEqual, strictEqual } from 'assert';
 
 import { TargetReadonlyValueServiceBase } from './readonly-value-service-base';
 import { Mock } from '..';
-import { DbFactoryBase, DbRepositoryBase, IAssociateStorageService, ITargetValueChangeData, ITargetValueData, IUnitOfWork, StringGeneratorBase } from '../..';
+import { DbFactoryBase, DbRepositoryBase, IAssociateStorageService, ITargetValueChangeData, ITargetValueData, IUnitOfWork, IValueConditionData, StringGeneratorBase } from '../..';
 import { enum_ } from '../../model';
 
 class TargetValue implements ITargetValueData {
@@ -161,6 +161,32 @@ describe('src/service/target/readonly-value-service-base.ts', () => {
                 valueType: 3
             }]);
             strictEqual(res, false);
+        });
+    });
+
+    describe('.enough(uow: IUnitOfWork, values: IValueData[])', () => {
+        it('ok', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            Reflect.set(self, 'checkConditions', (_: IUnitOfWork, res: IValueConditionData[]) => {
+                deepStrictEqual(res, [{
+                    count: 11,
+                    op: enum_.RelationOperator.ge,
+                    valueType: 1
+                }, {
+                    count: 22,
+                    op: enum_.RelationOperator.ge,
+                    valueType: 2
+                }]);
+            });
+
+            await self.enough(null, [{
+                count: -11,
+                valueType: 1
+            }, {
+                count: 22,
+                valueType: 2
+            }]);
         });
     });
 

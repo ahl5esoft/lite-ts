@@ -40,6 +40,19 @@ export abstract class TargetReadonlyValueServiceBase<
         return true;
     }
 
+    public async enough(uow: IUnitOfWork, values: IValueData[]) {
+        return this.checkConditions(
+            uow,
+            values.map(r => {
+                return {
+                    count: Math.abs(r.count),
+                    op: enum_.RelationOperator.ge,
+                    valueType: r.valueType
+                };
+            })
+        );
+    }
+
     public async getCount(_: IUnitOfWork, valueType: number) {
         const rows = await this.associateStorageService.find(this.model, 'id', this.targetID);
         return rows.length && rows[0].values[valueType] || 0;
