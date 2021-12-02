@@ -59,9 +59,12 @@ export class ChildProcessCommand implements ICommand {
         }
 
         return new Promise<ICommandResult>((s, f) => {
-            child.on('error', f);
+            child.on('error', err => {
+                if (timeout)
+                    clearTimeout(timeout);
 
-            child.on('exit', code => {
+                f(err);
+            }).on('exit', code => {
                 if (timeout)
                     clearTimeout(timeout);
 

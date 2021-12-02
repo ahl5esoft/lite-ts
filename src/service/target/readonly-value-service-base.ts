@@ -5,9 +5,11 @@ import {
     ITargetValueData,
     ITargetValueService,
     IUnitOfWork,
+    IValueConditionData,
     IValueData,
     StringGeneratorBase
-} from '../../contract';
+} from '../..';
+import { enum_ } from '../../model';
 
 export abstract class TargetReadonlyValueServiceBase<
     T extends ITargetValueData,
@@ -21,12 +23,29 @@ export abstract class TargetReadonlyValueServiceBase<
         protected changeModel: new () => TChange,
     ) { }
 
+    public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[]) {
+        for (const r of conditions) {
+            const count = await this.getCount(uow, r.valueType);
+            const ok = (r.op == enum_.RelationOperator.eq && count == r.count) ||
+                (r.op == enum_.RelationOperator.ge && count >= r.count) ||
+                (r.op == enum_.RelationOperator.gt && count > r.count) ||
+                (r.op == enum_.RelationOperator.le && count <= r.count) ||
+                (r.op == enum_.RelationOperator.lt && count < r.count);
+            if (ok)
+                continue;
+
+            return false;
+        }
+
+        return true;
+    }
+
     public async getCount(_: IUnitOfWork, valueType: number) {
         const rows = await this.associateStorageService.find(this.model, 'id', this.targetID);
         return rows.length && rows[0].values[valueType] || 0;
     }
 
-    public async update(uow: IUnitOfWork, ...values: IValueData[]) {
+    public async update(uow: IUnitOfWork, values: IValueData[]) {
         const db = this.dbFactory.db(this.changeModel, uow);
         for (const r of values) {
             const entry = this.createChangeEntry(r);

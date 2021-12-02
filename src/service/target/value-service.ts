@@ -101,7 +101,8 @@ export abstract class TargetValueServiceBase<
 
             await interceptor.after(uow, this, r);
 
-            await this.missionSubject.notify(uow, this, r.valueType);
+            if (this.missionSubject)
+                await this.missionSubject.notify(uow, this, r.valueType);
         }
 
         this.associateStorageService.clear(this.changeModel, this.targetID);

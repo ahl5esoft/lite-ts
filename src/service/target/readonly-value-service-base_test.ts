@@ -2,7 +2,8 @@ import { strictEqual } from 'assert';
 
 import { TargetReadonlyValueServiceBase } from './readonly-value-service-base';
 import { Mock } from '..';
-import { DbFactoryBase, DbRepositoryBase, IAssociateStorageService, ITargetValueChangeData, ITargetValueData, StringGeneratorBase } from '../..';
+import { DbFactoryBase, DbRepositoryBase, IAssociateStorageService, ITargetValueChangeData, ITargetValueData, IUnitOfWork, StringGeneratorBase } from '../..';
+import { enum_ } from '../../model';
 
 class TargetValue implements ITargetValueData {
     public id: string;
@@ -25,6 +26,144 @@ class Self extends TargetReadonlyValueServiceBase<TargetValue, TargetValueChange
 }
 
 describe('src/service/target/readonly-value-service-base.ts', () => {
+    describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[])', () => {
+        it('=', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                strictEqual(valueType, 1);
+                return 11;
+            });
+
+            const res = await self.checkConditions(null, [{
+                count: 11,
+                op: enum_.RelationOperator.eq,
+                valueType: 1
+            }]);
+            strictEqual(res, true);
+        });
+
+        it('>=', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                strictEqual(valueType, 1);
+                return 11;
+            });
+
+            const res = await self.checkConditions(null, [{
+                count: 11,
+                op: enum_.RelationOperator.ge,
+                valueType: 1
+            }]);
+            strictEqual(res, true);
+        });
+
+        it('>', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                strictEqual(valueType, 1);
+                return 12;
+            });
+
+            const res = await self.checkConditions(null, [{
+                count: 11,
+                op: enum_.RelationOperator.gt,
+                valueType: 1
+            }]);
+            strictEqual(res, true);
+        });
+
+        it('<=', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                strictEqual(valueType, 1);
+                return 11;
+            });
+
+            const res = await self.checkConditions(null, [{
+                count: 11,
+                op: enum_.RelationOperator.le,
+                valueType: 1
+            }]);
+            strictEqual(res, true);
+        });
+
+        it('<', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                strictEqual(valueType, 1);
+                return 10;
+            });
+
+            const res = await self.checkConditions(null, [{
+                count: 11,
+                op: enum_.RelationOperator.lt,
+                valueType: 1
+            }]);
+            strictEqual(res, true);
+        });
+
+        it('all', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            const counts = {
+                1: 11,
+                2: 22,
+                3: 33
+            }
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                return counts[valueType];
+            });
+
+            const res = await self.checkConditions(null, [{
+                count: 11,
+                op: enum_.RelationOperator.eq,
+                valueType: 1
+            }, {
+                count: 20,
+                op: enum_.RelationOperator.gt,
+                valueType: 2
+            }, {
+                count: 35,
+                op: enum_.RelationOperator.lt,
+                valueType: 3
+            }]);
+            strictEqual(res, true);
+        });
+
+        it('some', async () => {
+            const self = new Self(null, null, null, null, null, null);
+
+            const counts = {
+                1: 11,
+                2: 22,
+                3: 33
+            }
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                return counts[valueType];
+            });
+
+            const res = await self.checkConditions(null, [{
+                count: 9,
+                op: enum_.RelationOperator.eq,
+                valueType: 1
+            }, {
+                count: 20,
+                op: enum_.RelationOperator.gt,
+                valueType: 2
+            }, {
+                count: 35,
+                op: enum_.RelationOperator.lt,
+                valueType: 3
+            }]);
+            strictEqual(res, false);
+        });
+    });
+
     describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
             const mockStorageService = new Mock<IAssociateStorageService>();
@@ -86,10 +225,10 @@ describe('src/service/target/readonly-value-service-base.ts', () => {
                 valueType: 1,
             });
 
-            await self.update(null, {
+            await self.update(null, [{
                 count: 11,
                 valueType: 1
-            });
+            }]);
         });
     });
 });
