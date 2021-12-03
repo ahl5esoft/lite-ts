@@ -18,8 +18,6 @@ export abstract class TargetReadonlyValueServiceBase<
         protected associateStorageService: IAssociateStorageService,
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
-        protected targetID: string,
-        protected model: new () => T,
         protected changeModel: new () => TChange,
     ) { }
 
@@ -54,8 +52,8 @@ export abstract class TargetReadonlyValueServiceBase<
     }
 
     public async getCount(_: IUnitOfWork, valueType: number) {
-        const rows = await this.associateStorageService.find(this.model, 'id', this.targetID);
-        return rows.length && rows[0].values[valueType] || 0;
+        const data = await this.getEntry();
+        return data?.values[valueType] || 0;
     }
 
     public async update(uow: IUnitOfWork, values: IValueData[]) {
@@ -66,8 +64,11 @@ export abstract class TargetReadonlyValueServiceBase<
             entry.id = await this.stringGenerator.generate();
             entry.valueType = r.valueType;
             await db.add(entry);
+
+            this.associateStorageService.add(this.changeModel, entry);
         }
     }
 
     protected abstract createChangeEntry(value: IValueData): TChange;
+    protected abstract getEntry(): Promise<T>;
 }

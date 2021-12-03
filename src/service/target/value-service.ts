@@ -27,35 +27,30 @@ export abstract class TargetValueServiceBase<
         protected nowTime: NowTimeBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected targetType: number,
-        protected changeAssociateColumn: string,
+        protected model: new () => T,
         protected logModel: new () => TLog,
         associateStorageService: IAssociateStorageService,
         dbFactory: DbFactoryBase,
         stringGenerator: StringGeneratorBase,
-        targetID: string,
-        model: new () => T,
         changeModel: new () => TChange,
     ) {
-        super(associateStorageService, dbFactory, stringGenerator, targetID, model, changeModel);
+        super(associateStorageService, dbFactory, stringGenerator, changeModel);
     }
 
     public override async getCount(uow: IUnitOfWork, valueType: number) {
+        let entry = await this.getEntry();
         const db = this.dbFactory.db(this.model, uow);
-        const rows = await this.associateStorageService.find(this.model, 'id', this.targetID);
-        if (!rows.length) {
-            const entry = this.createEntry();
-            entry.id = this.targetID;
-            entry.values = {};
+        if (!entry) {
+            entry = this.createEntry();
             await db.add(entry);
 
-            this.associateStorageService.add(this.model, 'id', entry);
-            rows.push(entry);
+            this.associateStorageService.add(this.model, entry);
         }
 
-        let changeRows = await this.associateStorageService.find(this.changeModel, this.changeAssociateColumn, this.targetID);
+        let changeEntries = await this.findChangeEntries();
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         const logDb = this.dbFactory.db(this.logModel, uow);
-        for (const r of changeRows) {
+        for (const r of changeEntries) {
             await changeDb.remove(r);
 
             const interceptor = this.valueInterceptorFactory.build(this.targetType, r.valueType);
@@ -69,15 +64,15 @@ export abstract class TargetValueServiceBase<
             logEntry.oldCount = await super.getCount(uow, valueType);
             logEntry.valueType = r.valueType;
 
-            if (!(r.valueType in rows[0].values))
-                rows[0].values[r.valueType] = 0;
+            if (!(r.valueType in entry.values))
+                entry.values[r.valueType] = 0;
 
             const valueTypeItem = await this.valueTypeEnum.get(cr => {
                 return cr.value == r.valueType;
             });
             if (valueTypeItem) {
                 if (valueTypeItem.data.isReplace) {
-                    rows[0].values[r.valueType] = r.count;
+                    entry.values[r.valueType] = r.count;
                 } else if (valueTypeItem.data.todayTime != 0) {
                     const oldUnix = await super.getCount(uow, valueTypeItem.data.todayTime);
                     const isSameDay = moment.unix(logEntry.createdOn).isSame(
@@ -85,18 +80,18 @@ export abstract class TargetValueServiceBase<
                         'day'
                     );
                     if (!isSameDay)
-                        rows[0].values[r.valueType] = 0;
+                        entry.values[r.valueType] = 0;
 
-                    rows[0].values[valueTypeItem.data.todayTime] = logEntry.createdOn;
-                    rows[0].values[r.valueType] += r.count;
+                    entry.values[valueTypeItem.data.todayTime] = logEntry.createdOn;
+                    entry.values[r.valueType] += r.count;
                 } else {
-                    rows[0].values[r.valueType] += r.count;
+                    entry.values[r.valueType] += r.count;
                 }
             } else {
-                rows[0].values[r.valueType] += r.count;
+                entry.values[r.valueType] += r.count;
             }
 
-            logEntry.count = rows[0].values[r.valueType];
+            logEntry.count = entry.values[r.valueType];
             await logDb.add(logEntry);
 
             await interceptor.after(uow, this, r);
@@ -105,14 +100,17 @@ export abstract class TargetValueServiceBase<
                 await this.missionSubject.notify(uow, this, r.valueType);
         }
 
-        this.associateStorageService.clear(this.changeModel, this.targetID);
+        if (changeEntries.length) {
+            this.clearChangeEntries();
 
-        if (changeRows.length)
-            await db.save(rows[0]);
+            await db.save(entry);
+        }
 
         return super.getCount(uow, valueType);
     }
 
+    protected abstract clearChangeEntries(): void;
     protected abstract createEntry(): T;
     protected abstract createLogEntry(): TLog;
+    protected abstract findChangeEntries(): Promise<TChange[]>;
 }

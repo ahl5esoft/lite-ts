@@ -1,4 +1,3 @@
-export * from './associate-storage-service';
 export * from './config-factory';
 export * from './enum-factory';
 export * from './db-factory';
