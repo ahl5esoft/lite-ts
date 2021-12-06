@@ -1,8 +1,8 @@
-import { EnumItem } from './enum-item';
-import { DbFactoryBase, IEnum, IEnumItem } from '../..';
+import { EnumItem } from '../enum';
+import { DbFactoryBase, IEnum, IEnumItem, IEnumItemData } from '../..';
 import { global } from '../../model';
 
-export class Enum<T> implements IEnum<T> {
+export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
     private m_Items: IEnumItem<T>[];
 
     public constructor(

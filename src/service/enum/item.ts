@@ -1,6 +1,6 @@
-import { IEnumItem } from '../..';
+import { IEnumItem, IEnumItemData } from '../..';
 
-export class EnumItem<T extends { value: number }> implements IEnumItem<T> {
+export class EnumItem<T extends IEnumItemData> implements IEnumItem<T> {
     private m_EncodingKey: string;
     public get encodingKey() {
         return this.m_EncodingKey;

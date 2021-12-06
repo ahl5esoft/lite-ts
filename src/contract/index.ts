@@ -15,6 +15,7 @@ export * from './i-config';
 export * from './i-db-query';
 export * from './i-enum';
 export * from './i-enum-item';
+export * from './i-enum-item-data';
 export * from './i-log';
 export * from './i-mission-observer';
 export * from './i-push';
