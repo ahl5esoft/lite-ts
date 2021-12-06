@@ -34,7 +34,6 @@ class TargetValueChange implements ITargetValueChangeData {
 
 class TargetValueLog implements ITargetValueLogData {
     public count: number;
-    public createdOn: number;
     public id: string;
     public oldCount: number;
     public targetID: string;
@@ -196,12 +195,6 @@ describe('src/service/target/value-service.ts', () => {
                 false
             );
 
-            const nowUnix = moment().unix();
-            mockNowTime.expectReturn(
-                r => r.unix(),
-                nowUnix
-            );
-
             const logID = 'log-id';
             mockStringGenerator.expectReturn(
                 r => r.generate(),
@@ -220,7 +213,6 @@ describe('src/service/target/value-service.ts', () => {
 
             mockLogDbRepo.expected.add({
                 count: 11,
-                createdOn: nowUnix,
                 id: logID,
                 oldCount: 10,
                 targetID: targetValueEntry.id,
@@ -337,7 +329,6 @@ describe('src/service/target/value-service.ts', () => {
 
             mockLogDbRepo.expected.add({
                 count: 11,
-                createdOn: nowUnix,
                 id: logID,
                 oldCount: 10,
                 targetID: targetValueEntry.id,
@@ -431,12 +422,6 @@ describe('src/service/target/value-service.ts', () => {
                 false
             );
 
-            const nowUnix = moment().unix();
-            mockNowTime.expectReturn(
-                r => r.unix(),
-                nowUnix
-            );
-
             const logID = 'log-id';
             mockStringGenerator.expectReturn(
                 r => r.generate(),
@@ -450,7 +435,6 @@ describe('src/service/target/value-service.ts', () => {
 
             mockLogDbRepo.expected.add({
                 count: 21,
-                createdOn: nowUnix,
                 id: logID,
                 oldCount: 10,
                 targetID: targetValueEntry.id,

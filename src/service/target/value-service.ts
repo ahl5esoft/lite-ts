@@ -59,7 +59,6 @@ export abstract class TargetValueServiceBase<
                 continue;
 
             const logEntry = this.createLogEntry();
-            logEntry.createdOn = await this.nowTime.unix();
             logEntry.id = await this.stringGenerator.generate();
             logEntry.oldCount = await super.getCount(uow, valueType);
             logEntry.valueType = r.valueType;
@@ -74,15 +73,16 @@ export abstract class TargetValueServiceBase<
                 if (valueTypeItem.data.isReplace) {
                     entry.values[r.valueType] = r.count;
                 } else if (valueTypeItem.data.todayTime != 0) {
+                    const nowUnix = await this.nowTime.unix();
                     const oldUnix = await super.getCount(uow, valueTypeItem.data.todayTime);
-                    const isSameDay = moment.unix(logEntry.createdOn).isSame(
+                    const isSameDay = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
                         'day'
                     );
                     if (!isSameDay)
                         entry.values[r.valueType] = 0;
 
-                    entry.values[valueTypeItem.data.todayTime] = logEntry.createdOn;
+                    entry.values[valueTypeItem.data.todayTime] = nowUnix;
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;
