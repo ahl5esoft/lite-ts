@@ -1,5 +1,5 @@
-import { IValueInterceptorService } from './i-value-interceptor-service';
+import { IValueInterceptor } from './i-value-interceptor';
 
 export abstract class ValueInterceptorFactoryBase {
-    public abstract build(targetType: number, valueType: number): IValueInterceptorService;
+    public abstract build(targetType: number, valueType: number): IValueInterceptor;
 }

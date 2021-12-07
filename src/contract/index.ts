@@ -29,7 +29,7 @@ export * from './i-unit-of-work';
 export * from './i-unit-of-work-repository';
 export * from './i-value-condition-data';
 export * from './i-value-data';
-export * from './i-value-interceptor-service';
+export * from './i-value-interceptor';
 export * from './i-value-type-data';
 export * from './io-directory-base';
 export * from './io-factory-base';

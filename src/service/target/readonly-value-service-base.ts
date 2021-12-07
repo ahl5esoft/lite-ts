@@ -3,52 +3,22 @@ import {
     IAssociateStorageService,
     ITargetValueChangeData,
     ITargetValueData,
-    ITargetValueService,
     IUnitOfWork,
-    IValueConditionData,
     IValueData,
     StringGeneratorBase
 } from '../..';
-import { enum_ } from '../../model';
+import { TargetValueServiceBase } from './value-service-base';
 
 export abstract class TargetReadonlyValueServiceBase<
     T extends ITargetValueData,
-    TChange extends ITargetValueChangeData> implements ITargetValueService {
+    TChange extends ITargetValueChangeData> extends TargetValueServiceBase {
     public constructor(
         protected associateStorageService: IAssociateStorageService,
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
         protected changeModel: new () => TChange,
-    ) { }
-
-    public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[]) {
-        for (const r of conditions) {
-            const count = await this.getCount(uow, r.valueType);
-            const ok = (r.op == enum_.RelationOperator.eq && count == r.count) ||
-                (r.op == enum_.RelationOperator.ge && count >= r.count) ||
-                (r.op == enum_.RelationOperator.gt && count > r.count) ||
-                (r.op == enum_.RelationOperator.le && count <= r.count) ||
-                (r.op == enum_.RelationOperator.lt && count < r.count);
-            if (ok)
-                continue;
-
-            return false;
-        }
-
-        return true;
-    }
-
-    public async enough(uow: IUnitOfWork, values: IValueData[]) {
-        return this.checkConditions(
-            uow,
-            values.map(r => {
-                return {
-                    count: Math.abs(r.count),
-                    op: enum_.RelationOperator.ge,
-                    valueType: r.valueType
-                };
-            })
-        );
+    ) {
+        super();
     }
 
     public async getCount(_: IUnitOfWork, valueType: number) {

@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { TargetReadonlyValueServiceBase } from './readonly-value-service-base';
+import { TargetValueServiceBase } from './value-service-base';
 import {
     DbFactoryBase,
     IAssociateStorageService,
@@ -9,49 +9,61 @@ import {
     ITargetValueData,
     ITargetValueLogData,
     IUnitOfWork,
+    IValueData,
     IValueTypeData,
-    MissionSubjectBase,
     NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../..';
 
-export abstract class TargetValueServiceBase<
+export abstract class TargetRealTimeValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData,
     TLog extends ITargetValueLogData,
-    TValueType extends IValueTypeData> extends TargetReadonlyValueServiceBase<T, TChange> {
+    TValueType extends IValueTypeData> extends TargetValueServiceBase {
     public constructor(
+        protected associateStorageService: IAssociateStorageService,
         protected valueTypeEnum: IEnum<TValueType>,
-        protected missionSubject: MissionSubjectBase,
+        protected dbFactory: DbFactoryBase,
         protected nowTime: NowTimeBase,
+        protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected targetType: number,
         protected model: new () => T,
+        protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
-        associateStorageService: IAssociateStorageService,
-        dbFactory: DbFactoryBase,
-        stringGenerator: StringGeneratorBase,
-        changeModel: new () => TChange,
     ) {
-        super(associateStorageService, dbFactory, stringGenerator, changeModel);
+        super();
     }
 
     public override async getCount(uow: IUnitOfWork, valueType: number) {
+        let changeEntries = await this.findChangeEntries();
+        const changeDb = this.dbFactory.db(this.changeModel, uow);
+        for (const r of changeEntries) {
+            await changeDb.remove(r);
+
+            await this.update(uow, [r]);
+        }
+
+        const entry = await this.getEntry();
+        return entry?.values[valueType] || 0;
+    }
+
+    public async update(uow: IUnitOfWork, values: IValueData[]) {
         let entry = await this.getEntry();
         const db = this.dbFactory.db(this.model, uow);
         if (!entry) {
             entry = this.createEntry();
+            entry.values = {};
             await db.add(entry);
 
             this.associateStorageService.add(this.model, entry);
         }
 
-        let changeEntries = await this.findChangeEntries();
-        const changeDb = this.dbFactory.db(this.changeModel, uow);
         const logDb = this.dbFactory.db(this.logModel, uow);
-        for (const r of changeEntries) {
-            await changeDb.remove(r);
+        for (const r of values) {
+            if (!(r.valueType in entry.values))
+                entry.values[r.valueType] = 0;
 
             const interceptor = this.valueInterceptorFactory.build(this.targetType, r.valueType);
             const isIntercepted = await interceptor.before(uow, this, r);
@@ -60,11 +72,8 @@ export abstract class TargetValueServiceBase<
 
             const logEntry = this.createLogEntry();
             logEntry.id = await this.stringGenerator.generate();
-            logEntry.oldCount = await super.getCount(uow, valueType);
+            logEntry.oldCount = entry.values[r.valueType];
             logEntry.valueType = r.valueType;
-
-            if (!(r.valueType in entry.values))
-                entry.values[r.valueType] = 0;
 
             const valueTypeItem = await this.valueTypeEnum.get(cr => {
                 return cr.value == r.valueType;
@@ -74,7 +83,7 @@ export abstract class TargetValueServiceBase<
                     entry.values[r.valueType] = r.count;
                 } else if (valueTypeItem.data.todayTime != 0) {
                     const nowUnix = await this.nowTime.unix();
-                    const oldUnix = await super.getCount(uow, valueTypeItem.data.todayTime);
+                    const oldUnix = entry.values[valueTypeItem.data.todayTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
                         'day'
@@ -95,22 +104,14 @@ export abstract class TargetValueServiceBase<
             await logDb.add(logEntry);
 
             await interceptor.after(uow, this, r);
-
-            if (this.missionSubject)
-                await this.missionSubject.notify(uow, this, r.valueType);
         }
 
-        if (changeEntries.length) {
-            this.clearChangeEntries();
-
-            await db.save(entry);
-        }
-
-        return super.getCount(uow, valueType);
+        await db.save(entry);
     }
 
     protected abstract clearChangeEntries(): void;
     protected abstract createEntry(): T;
     protected abstract createLogEntry(): TLog;
     protected abstract findChangeEntries(): Promise<TChange[]>;
+    protected abstract getEntry(): Promise<T>;
 }

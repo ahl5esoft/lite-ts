@@ -1,17 +1,17 @@
 import Container from 'typedi';
 
-import { IValueInterceptorService, ValueInterceptorFactoryBase } from '../..';
+import { IValueInterceptor, ValueInterceptorFactoryBase } from '../..';
 
-const nullValueInterceptorService: IValueInterceptorService = {
+const nullValueInterceptor: IValueInterceptor = {
     after: async () => { },
     before: async () => {
         return false;
     }
 };
-const valueInterceptorCtors: { [key: number]: { [key: number]: new () => IValueInterceptorService } } = {};
+const valueInterceptorCtors: { [key: number]: { [key: number]: new () => IValueInterceptor } } = {};
 
 export class ValueInterceptorFactory extends ValueInterceptorFactoryBase {
-    public build(targetType: number, valueType: number): IValueInterceptorService {
+    public build(targetType: number, valueType: number): IValueInterceptor {
         const valueTypeCtors = valueInterceptorCtors[targetType];
         if (valueTypeCtors) {
             const ctor = valueTypeCtors[valueType];
@@ -19,11 +19,11 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase {
                 return Container.get(ctor);
         }
 
-        return nullValueInterceptorService;
+        return nullValueInterceptor;
     }
 
-    public static register(targetType: number, valueType: number, ctor: new () => IValueInterceptorService) {
-        if (!(targetType in valueInterceptorCtors[targetType]))
+    public static register(targetType: number, valueType: number, ctor: new () => IValueInterceptor) {
+        if (!(targetType in valueInterceptorCtors))
             valueInterceptorCtors[targetType] = {};
 
         valueInterceptorCtors[targetType][valueType] = ctor;
