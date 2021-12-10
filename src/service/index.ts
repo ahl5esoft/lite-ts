@@ -22,6 +22,7 @@ export * from './promise';
 export * from './push';
 export * from './redis';
 export * from './set-timeout';
+export * from './simple-git';
 export * from './ssh2';
 export * from './target';
 export * from './value';
