@@ -1,26 +1,39 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
 import { TargetValueServiceBase } from './value-service-base';
-import { IUnitOfWork, IValueConditionData, IValueData } from '../..';
+import { Mock, mockAny } from '..';
+import { IEnum, IEnumItem, ITargetValueData, IUnitOfWork, IValueConditionData, IValueData, IValueTypeData, NowTimeBase } from '../..';
 import { enum_ } from '../../model';
+import moment from 'moment';
 
-class Self extends TargetValueServiceBase {
-    public constructor(private m_Values: { [key: number]: number }) {
-        super();
-    }
+class TargetValue implements ITargetValueData {
+    public id: string;
+    public values: { [key: number]: number };
+}
 
-    public async getCount(_: IUnitOfWork, valueType: number) {
-        return this.m_Values[valueType] || 0;
-    }
+class ValueTypeData implements IValueTypeData {
+    public value: number;
+    public isReplace?: boolean;
+    public todayTime?: number;
+}
+
+class Self extends TargetValueServiceBase<TargetValue, ValueTypeData> {
+    public entry: TargetValue;
 
     public async update(_: IUnitOfWork, __: IValueData[]) { }
+
+    protected async getEntry() {
+        return this.entry;
+    }
 }
 
 describe('src/service/target/value-service-base.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[])', () => {
         it('=', async () => {
-            const self = new Self({
-                1: 11
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', () => {
+                return 11;
             });
 
             const res = await self.checkConditions(null, [{
@@ -32,8 +45,10 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('>=', async () => {
-            const self = new Self({
-                1: 11
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', () => {
+                return 11;
             });
 
             const res = await self.checkConditions(null, [{
@@ -45,8 +60,10 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('>', async () => {
-            const self = new Self({
-                1: 12
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', () => {
+                return 12;
             });
 
             const res = await self.checkConditions(null, [{
@@ -58,8 +75,10 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('<=', async () => {
-            const self = new Self({
-                1: 11
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', () => {
+                return 11;
             });
 
             const res = await self.checkConditions(null, [{
@@ -71,8 +90,10 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('<', async () => {
-            const self = new Self({
-                1: 10
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', () => {
+                return 10;
             });
 
             const res = await self.checkConditions(null, [{
@@ -84,10 +105,14 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('all', async () => {
-            const self = new Self({
-                1: 11,
-                2: 22,
-                3: 33
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                return {
+                    1: 11,
+                    2: 22,
+                    3: 33
+                }[valueType];
             });
 
             const res = await self.checkConditions(null, [{
@@ -107,10 +132,14 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('some', async () => {
-            const self = new Self({
-                1: 11,
-                2: 22,
-                3: 33
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                return {
+                    1: 11,
+                    2: 22,
+                    3: 33
+                }[valueType];
             });
 
             const res = await self.checkConditions(null, [{
@@ -132,7 +161,7 @@ describe('src/service/target/value-service-base.ts', () => {
 
     describe('.enough(uow: IUnitOfWork, values: IValueData[])', () => {
         it('ok', async () => {
-            const self = new Self({});
+            const self = new Self(null, null);
 
             Reflect.set(self, 'checkConditions', (_: IUnitOfWork, res: IValueConditionData[]) => {
                 deepStrictEqual(res, [{
@@ -153,6 +182,103 @@ describe('src/service/target/value-service-base.ts', () => {
                 count: 22,
                 valueType: 2
             }]);
+        });
+    });
+
+    describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
+        it('entry = null', async () => {
+            const mockValueTypeEnum = new Mock<IEnum<ValueTypeData>>();
+            const self = new Self(mockValueTypeEnum.actual, null);
+
+            mockValueTypeEnum.expectReturn(
+                r => r.get(mockAny),
+                null
+            );
+
+            const res = await self.getCount(null, 1);
+            strictEqual(res, 0);
+        });
+
+        it('entry.value[valueType] = null', async () => {
+            const mockValueTypeEnum = new Mock<IEnum<ValueTypeData>>();
+            const self = new Self(mockValueTypeEnum.actual, null);
+
+            self.entry = {
+                id: '',
+                values: {}
+            };
+
+            mockValueTypeEnum.expectReturn(
+                r => r.get(mockAny),
+                null
+            );
+
+            const res = await self.getCount(null, 1);
+            strictEqual(res, 0);
+        });
+
+        it('dailyTime(重置)', async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const self = new Self(mockEnum.actual, mockNowTime.actual);
+
+            self.entry = {
+                id: '',
+                values: {
+                    1: 11,
+                    2: 22
+                }
+            };
+
+            const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
+                data: {
+                    dailyTime: 2
+                }
+            });
+            mockEnum.expectReturn(
+                r => r.get(mockAny),
+                mockEnumItem.actual
+            );
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                moment().unix()
+            );
+
+            const res = await self.getCount(null, 1);
+            strictEqual(res, 0);
+        });
+
+        it('dailyTime(不重置)', async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const self = new Self(mockEnum.actual, mockNowTime.actual);
+
+            self.entry = {
+                id: '',
+                values: {
+                    1: 11,
+                    2: moment().unix()
+                }
+            };
+
+            const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
+                data: {
+                    dailyTime: 2
+                }
+            });
+            mockEnum.expectReturn(
+                r => r.get(mockAny),
+                mockEnumItem.actual
+            );
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                moment().unix()
+            );
+
+            const res = await self.getCount(null, 1);
+            strictEqual(res, 11);
         });
     });
 });

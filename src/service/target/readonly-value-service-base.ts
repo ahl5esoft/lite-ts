@@ -1,29 +1,27 @@
+import { TargetValueServiceBase } from './value-service-base';
 import {
     DbFactoryBase,
     IAssociateStorageService,
+    IEnum,
     ITargetValueChangeData,
     ITargetValueData,
     IUnitOfWork,
     IValueData,
+    IValueTypeData,
+    NowTimeBase,
     StringGeneratorBase
 } from '../..';
-import { TargetValueServiceBase } from './value-service-base';
 
-export abstract class TargetReadonlyValueServiceBase<
-    T extends ITargetValueData,
-    TChange extends ITargetValueChangeData> extends TargetValueServiceBase {
+export abstract class TargetReadonlyValueServiceBase<T extends ITargetValueData, TChange extends ITargetValueChangeData, TValueType extends IValueTypeData> extends TargetValueServiceBase<T, TValueType> {
     public constructor(
         protected associateStorageService: IAssociateStorageService,
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
         protected changeModel: new () => TChange,
+        valueTypeEnum: IEnum<TValueType>,
+        nowTime: NowTimeBase
     ) {
-        super();
-    }
-
-    public async getCount(_: IUnitOfWork, valueType: number) {
-        const data = await this.getEntry();
-        return data?.values[valueType] || 0;
+        super(valueTypeEnum, nowTime);
     }
 
     public async update(uow: IUnitOfWork, values: IValueData[]) {
@@ -40,5 +38,4 @@ export abstract class TargetReadonlyValueServiceBase<
     }
 
     protected abstract createChangeEntry(value: IValueData): TChange;
-    protected abstract getEntry(): Promise<T>;
 }

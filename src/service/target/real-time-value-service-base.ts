@@ -20,20 +20,20 @@ export abstract class TargetRealTimeValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData,
     TLog extends ITargetValueLogData,
-    TValueType extends IValueTypeData> extends TargetValueServiceBase {
+    TValueType extends IValueTypeData> extends TargetValueServiceBase<T, TValueType> {
     public constructor(
         protected associateStorageService: IAssociateStorageService,
-        protected valueTypeEnum: IEnum<TValueType>,
         protected dbFactory: DbFactoryBase,
-        protected nowTime: NowTimeBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected targetType: number,
         protected model: new () => T,
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
+        valueTypeEnum: IEnum<TValueType>,
+        nowTime: NowTimeBase,
     ) {
-        super();
+        super(valueTypeEnum, nowTime);
     }
 
     public override async getCount(uow: IUnitOfWork, valueType: number) {
@@ -45,8 +45,7 @@ export abstract class TargetRealTimeValueServiceBase<
             await this.update(uow, [r]);
         }
 
-        const entry = await this.getEntry();
-        return entry?.values[valueType] || 0;
+        return super.getCount(uow, valueType);
     }
 
     public async update(uow: IUnitOfWork, values: IValueData[]) {
@@ -81,9 +80,9 @@ export abstract class TargetRealTimeValueServiceBase<
             if (valueTypeItem) {
                 if (valueTypeItem.data.isReplace) {
                     entry.values[r.valueType] = r.count;
-                } else if (valueTypeItem.data.todayTime != 0) {
+                } else if (valueTypeItem.data.dailyTime != 0) {
                     const nowUnix = await this.nowTime.unix();
-                    const oldUnix = entry.values[valueTypeItem.data.todayTime] || 0;
+                    const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
                         'day'
@@ -91,7 +90,7 @@ export abstract class TargetRealTimeValueServiceBase<
                     if (!isSameDay)
                         entry.values[r.valueType] = 0;
 
-                    entry.values[valueTypeItem.data.todayTime] = nowUnix;
+                    entry.values[valueTypeItem.data.dailyTime] = nowUnix;
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;

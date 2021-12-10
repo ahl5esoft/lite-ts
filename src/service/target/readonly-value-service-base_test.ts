@@ -1,8 +1,14 @@
-import { strictEqual } from 'assert';
-
 import { TargetReadonlyValueServiceBase } from './readonly-value-service-base';
 import { Mock } from '..';
-import { DbFactoryBase, DbRepositoryBase, IAssociateStorageService, ITargetValueChangeData, ITargetValueData, StringGeneratorBase } from '../..';
+import {
+    DbFactoryBase,
+    DbRepositoryBase,
+    IAssociateStorageService,
+    ITargetValueChangeData,
+    ITargetValueData,
+    IValueTypeData,
+    StringGeneratorBase
+} from '../..';
 
 class TargetValue implements ITargetValueData {
     public id: string;
@@ -16,7 +22,13 @@ class TargetValueChange implements ITargetValueChangeData {
     public valueType: number;
 }
 
-class Self extends TargetReadonlyValueServiceBase<TargetValue, TargetValueChange> {
+class ValueTypeData implements IValueTypeData {
+    public value: number;
+    public dailyTime?: number;
+    public isReplace?: boolean;
+}
+
+class Self extends TargetReadonlyValueServiceBase<TargetValue, TargetValueChange, ValueTypeData> {
     private m_Data: TargetValue;
     public set data(v: TargetValue) {
         this.m_Data = v;
@@ -39,38 +51,12 @@ class Self extends TargetReadonlyValueServiceBase<TargetValue, TargetValueChange
 }
 
 describe('src/service/target/readonly-value-service-base.ts', () => {
-    describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
-        it('ok', async () => {
-            const self = new Self(null, null, null, TargetValueChange);
-
-            const targetID = 't-id';
-            self.targetID = targetID;
-
-            self.data = {
-                id: targetID,
-                values: {
-                    1: 11
-                }
-            };
-
-            const res = await self.getCount(null, 1);
-            strictEqual(res, 11);
-        });
-
-        it('不存在', async () => {
-            const self = new Self(null, null, null, TargetValueChange);
-
-            const res = await self.getCount(null, 1);
-            strictEqual(res, 0);
-        });
-    });
-
     describe('.update(uow: IUnitOfWork, ...values: IValueData[])', () => {
         it('ok', async () => {
             const mockStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
             const mockStringGenerator = new Mock<StringGeneratorBase>();
-            const self = new Self(mockStorageService.actual, mockDbFactory.actual, mockStringGenerator.actual, TargetValueChange);
+            const self = new Self(mockStorageService.actual, mockDbFactory.actual, mockStringGenerator.actual, TargetValueChange, null, null);
 
             const targetID = 't-id';
             self.targetID = targetID;
