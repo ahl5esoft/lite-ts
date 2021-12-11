@@ -27,8 +27,6 @@ export class GitStorage implements IGitStorage {
 
             const repo = this.createRepository(dir, data);
             this.m_Repos[data.httpUrl] = repo;
-
-            await repo.clone('master');
         }
 
         return this.m_Repos[data.httpUrl];
