@@ -9,7 +9,7 @@ export abstract class DbRepositoryBase<T> {
 
     protected get uow(): IUnitOfWorkRepository {
         if (!this.m_Uow) {
-            this.m_Uow = this.m_DBFactory.uow() as IUnitOfWorkRepository;
+            this.m_Uow = this.m_DbFactory.uow() as IUnitOfWorkRepository;
             this.m_IsTx = false;
         }
 
@@ -19,7 +19,7 @@ export abstract class DbRepositoryBase<T> {
     public constructor(
         protected tableName: string,
         private m_Uow: IUnitOfWorkRepository,
-        private m_DBFactory: DbFactoryBase,
+        private m_DbFactory: DbFactoryBase,
     ) { }
 
     public async add(entry: T) {
