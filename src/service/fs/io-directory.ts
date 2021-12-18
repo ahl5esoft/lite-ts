@@ -13,9 +13,9 @@ const rmdirAction = promisify(rmdir);
 export class IODirectory extends IODirectoryBase {
     public constructor(
         private m_IOFactory: FSIOFactory,
-        ...paths: string[]
+        paths: string[]
     ) {
-        super(...paths);
+        super(paths);
     }
 
     public async create() {

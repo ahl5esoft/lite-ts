@@ -1,14 +1,18 @@
-import { Ssh2IOFactory } from '.';
-import { IOFile } from './io-file';
+import { SftpIOFile } from './sftp-io-file';
+import { SftpInvoker } from './sftp-invoker';
+import { Ssh2SftpIOFactory } from './sftp-io-factory';
 import { IODirectoryBase, IOFactoryBase, IONodeBase } from '../..';
 
-export class IODirectory extends IODirectoryBase {
+export class SftpIODirectory extends IODirectoryBase {
     public constructor(
         private m_FsIOFactory: IOFactoryBase,
-        private m_IOFactory: Ssh2IOFactory,
-        ...paths: string[]
+        private m_IOFactory: Ssh2SftpIOFactory,
+        private m_SftpInvoker: SftpInvoker,
+        private m_Paths: string[]
     ) {
-        super(...paths);
+        super([
+            m_Paths.join('/')
+        ]);
     }
 
     public async copyTo(dstPath: string) {
@@ -39,27 +43,24 @@ export class IODirectory extends IODirectoryBase {
         if (isExist)
             return;
 
-        const sftp = await this.m_IOFactory.getSftp();
-        return new Promise<void>((s, f) => {
-            sftp.mkdir(this.path, err => {
-                if (err instanceof Error)
-                    return f(err);
+        const paths = [...this.m_Paths];
+        paths.pop();
+        const parent = this.m_IOFactory.buildDirectory(...paths);
+        await parent.create();
 
-                s();
-            });
-        });
+        await this.m_SftpInvoker.call<void>(r => r.mkdir, this.path);
     }
 
     public async exists() {
-        return this.m_IOFactory.exists(this.path);
+        return this.m_SftpInvoker.call<boolean>(r => r.exists, this.path);
     }
 
     public async findDirectories() {
-        return this.findChildren(IODirectory);
+        return this.findChildren(SftpIODirectory);
     }
 
     public async findFiles() {
-        return this.findChildren(IOFile);
+        return this.findChildren(SftpIOFile);
     }
 
     public async move(dstPath: string) {
@@ -80,15 +81,7 @@ export class IODirectory extends IODirectoryBase {
         for (const r of childFiles)
             await r.remove();
 
-        const sftp = await this.m_IOFactory.getSftp();
-        return new Promise<void>((s, f) => {
-            sftp.rmdir(this.path, err => {
-                if (err instanceof Error)
-                    return f(err);
-
-                s();
-            });
-        });
+        await this.m_SftpInvoker.call<void>(r => r.rmdir, this.path);
     }
 
     private async findChildren<T extends IONodeBase>(ctor: new (...args: any[]) => T) {
@@ -96,23 +89,12 @@ export class IODirectory extends IODirectoryBase {
         if (!isExist)
             return [];
 
-        const sftp = await this.m_IOFactory.getSftp();
-        const filenames = await new Promise<string[]>((s, f) => {
-            sftp.readdir(this.path, (err, res) => {
-                if (err)
-                    return f(err);
-
-                s(
-                    res.map(r => {
-                        return r.filename
-                    })
-                );
-            });
-        });
-
+        const files = await this.m_SftpInvoker.call<{
+            filename: string
+        }[]>(r => r.readdir, this.path);
         const nodes: T[] = [];
-        for (const r of filenames) {
-            const node = await this.m_IOFactory.build(this.path, r);
+        for (const r of files) {
+            const node = await this.m_IOFactory.build(this.path, r.filename);
             if (node instanceof ctor)
                 nodes.push(node);
         }

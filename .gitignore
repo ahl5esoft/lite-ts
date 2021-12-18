@@ -3,5 +3,5 @@
 dist/
 node_modules/
 src/service/ssh2/command_test.ts
-src/service/ssh2/io-driectory_test.ts
-src/service/ssh2/io-file_test.ts
+src/service/ssh2/sftp-invoker_it.ts
+src/service/ssh2/sftp-io-directory_it.ts

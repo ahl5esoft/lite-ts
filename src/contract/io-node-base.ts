@@ -7,7 +7,7 @@ export abstract class IONodeBase {
         return basename(this.path);
     }
 
-    public constructor(...paths: string[]) {
+    public constructor(paths: string[]) {
         if (paths.length == 1)
             this.path = paths[0];
         else

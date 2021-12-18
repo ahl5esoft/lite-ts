@@ -12,9 +12,9 @@ const writeFileAction = promisify(writeFile);
 export class IOFile extends IOFileBase {
     public constructor(
         private m_IOFactory: FSIOFactory,
-        ...paths: string[]
+        paths: string[]
     ) {
-        super(...paths);
+        super(paths);
     }
 
     public async exists() {

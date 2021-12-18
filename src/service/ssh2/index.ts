@@ -1,2 +1,2 @@
 export * from './command';
-export * from './io-factory';
+export * from './sftp-io-factory';
