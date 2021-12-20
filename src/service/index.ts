@@ -9,6 +9,7 @@ export * from './command';
 export * from './console';
 export * from './cors';
 export * from './date';
+export * from './db';
 export * from './enum';
 export * from './error';
 export * from './express';
