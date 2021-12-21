@@ -217,6 +217,35 @@ describe('src/service/target/value-service-base.ts', () => {
             strictEqual(res, 0);
         });
 
+        it('枚举存在但dailyTime无效', async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const self = new Self(mockEnum.actual, mockNowTime.actual);
+
+            self.entry = {
+                id: '',
+                values: {
+                    1: 11
+                }
+            };
+
+            const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
+                data: {}
+            });
+            mockEnum.expectReturn(
+                r => r.get(mockAny),
+                mockEnumItem.actual
+            );
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                moment().unix()
+            );
+
+            const res = await self.getCount(null, 1);
+            strictEqual(res, 11);
+        });
+
         it('dailyTime(重置)', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const mockEnum = new Mock<IEnum<ValueTypeData>>();

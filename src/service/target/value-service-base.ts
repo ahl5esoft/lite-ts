@@ -62,7 +62,7 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
         const valueTypeItem = await this.valueTypeEnum.get(cr => {
             return cr.value == valueType;
         });
-        if (valueTypeItem && valueTypeItem.data.dailyTime != 0) {
+        if (valueTypeItem && valueTypeItem.data.dailyTime > 0) {
             const nowUnix = await this.nowTime.unix();
             const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
             const isSameDay = moment.unix(nowUnix).isSame(

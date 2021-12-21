@@ -80,7 +80,7 @@ export abstract class TargetRealTimeValueServiceBase<
             if (valueTypeItem) {
                 if (valueTypeItem.data.isReplace) {
                     entry.values[r.valueType] = r.count;
-                } else if (valueTypeItem.data.dailyTime != 0) {
+                } else if (valueTypeItem.data.dailyTime > 0) {
                     const nowUnix = await this.nowTime.unix();
                     const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
