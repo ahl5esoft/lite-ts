@@ -25,7 +25,6 @@ export * from './i-mission-observer';
 export * from './i-parser';
 export * from './i-push';
 export * from './i-redis-geo';
-export * from './i-session';
 export * from './i-target-value-change-data';
 export * from './i-target-value-log-data';
 export * from './i-target-value-data';

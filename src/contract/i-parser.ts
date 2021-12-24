@@ -1,3 +1,3 @@
 export interface IParser {
-    parse<T>(text: string): Promise<T>;
+    parse(text: string): Promise<any>;
 }
