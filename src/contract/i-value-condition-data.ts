@@ -1,5 +1,5 @@
 export interface IValueConditionData {
     count: number;
-    op: number;
+    op: string;
     valueType: number;
 }

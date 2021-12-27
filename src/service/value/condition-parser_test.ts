@@ -1,19 +1,19 @@
 import { deepStrictEqual } from 'assert';
 
-import { ValueConsumeParser as Self } from './consume-parser';
+import { ValueConditionParser as Self } from './condition-parser';
 import { Mock, mockAny } from '..';
-import { EnumFacatoryBase, IEnum, IEnumItem } from '../..';
+import { EnumFacatoryBase, IEnum, IEnumItem, model } from '../..';
 
 class ValueTypeData {
     public text: string;
     public value: number;
 }
 
-describe('src/service/value/consume-parser.ts', () => {
+describe('src/service/value/condition-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFacatoryBase>();
-            const self = new Self(mockEnumFactory.actual, /^(.+)\*-(\d+)$/, ValueTypeData);
+            const self = new Self(mockEnumFactory.actual, ValueTypeData);
 
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
             mockEnumFactory.expectReturn(
@@ -43,13 +43,15 @@ describe('src/service/value/consume-parser.ts', () => {
                 mockBItem.actual
             );
 
-            const res = await self.parse(`A*-15
-B*-5`);
+            const res = await self.parse(`A=-15
+B>=-5`);
             deepStrictEqual(res, [{
                 count: -15,
+                op: model.enum_.RelationOperator.eq,
                 valueType: 11,
             }, {
                 count: -5,
+                op: model.enum_.RelationOperator.ge,
                 valueType: 22,
             }]);
         });

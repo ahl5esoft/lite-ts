@@ -4,17 +4,17 @@ export class ValueConsumeParser<T extends { text: string, value: number }> imple
     public constructor(
         private m_EnumFactory: EnumFacatoryBase,
         private m_Reg: RegExp,
-        private m_Model: new () => T
+        private m_ValueTypeModel: new () => T
     ) { }
 
     public async parse(text: string) {
-        const lines = text.split(/(\r|\n)+/g);
+        const lines = text.split(/[\r\n]/g);
         const res: IValueData[] = [];
-        const valueTypeEnum = this.m_EnumFactory.build(this.m_Model);
+        const valueTypeEnum = this.m_EnumFactory.build(this.m_ValueTypeModel);
         for (const r of lines) {
             const match = r.match(this.m_Reg);
             if (!match)
-                continue;
+                throw new Error(`无效数值消费格式: ${r}`);
 
             const enumItem = await valueTypeEnum.get(cr => {
                 return cr.text == match[1];
