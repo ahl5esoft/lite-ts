@@ -10,10 +10,10 @@ export class EnumItem<T extends IEnumItemData> implements IEnumItem<T> {
         public data: T,
         private m_Name: string
     ) {
-        this.m_EncodingKey = `enum-${m_Name}-${data.value}`;
+        this.m_EncodingKey = `${m_Name}_${data.value}`;
     }
 
     public getCustomEncodingKey(attr: string) {
-        return `enum-${this.m_Name}-${attr}-${this.data.value}`;
+        return `${this.m_Name}_${this.data.value}_${attr}`;
     }
 }
