@@ -35,8 +35,8 @@ export class SftpInvoker implements ISftpInvoker {
     private async getClient() {
         if (!this.m_Client) {
             this.m_Client = new Client();
-            await new Promise<void>(s => {
-                this.m_Client.on('ready', s).connect(this.m_Config);
+            await new Promise<void>((s, f) => {
+                this.m_Client.on('error', f).on('ready', s).connect(this.m_Config);
             });
         }
 
