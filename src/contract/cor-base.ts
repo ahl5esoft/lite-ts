@@ -11,11 +11,66 @@ export abstract class CORBase {
 
     /**
      * 是否停止调用下一个处理器
+     * @example
+     * ```typescript
+     *  class TestHandler extends CORBase {
+     *      public constructor(private m_Action: (handler: CORBase) => void) {
+     *          super();
+     *      }
+     * 
+     *      public async handle(): Promise<void> {
+     *          this.m_Action(this);
+     *          return super.handle();
+     *      }
+     *  }
+     *  
+     *  let count = 0;
+     *  await new TestHandler((self: CORBase): void => {
+     *      count++;
+     *      self.break = true;
+     *  }).setNext(
+     *      new TestHandler((): void => {
+     *          count += 2;
+     *      })
+     *  ).setNext(
+     *      new TestHandler((): void => {
+     *          count += 3;
+     *      })
+     *  ).handle();
+     *  strictEqual(count, 1);
      */
     public break = false;
 
     /**
      * 处理
+     * 
+     * @example
+     * ```typescript
+     *  class TestHandler extends CORBase {
+     *      public constructor(private m_Action: (handler: CORBase) => void) {
+     *          super();
+     *      }
+     * 
+     *      public async handle(): Promise<void> {
+     *          this.m_Action(this);
+     *          return super.handle();
+     *      }
+     *  }
+     *  
+     *  let count = 0;
+     *  await new TestHandler((self: CORBase): void => {
+     *      count++;
+     *  }).setNext(
+     *      new TestHandler((): void => {
+     *          count += 2;
+     *      })
+     *  ).setNext(
+     *      new TestHandler((): void => {
+     *          count += 3;
+     *      })
+     *  ).handle();
+     *  strictEqual(count, 6);
+     * ```
      */
     public async handle(): Promise<void> {
         if (this.break)

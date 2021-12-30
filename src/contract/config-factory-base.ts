@@ -5,7 +5,7 @@ import { IConfig } from './i-config';
  */
 export abstract class ConfigFactoryBase {
     /**
-     * 创建IConfig<T>
+     * 创建配置对象
      * 
      * @param ctor 配置类构造函数
      */

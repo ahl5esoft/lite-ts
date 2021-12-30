@@ -9,14 +9,6 @@ export abstract class CommandFactoryBase {
      * 
      * @param type 命令类型
      * @param cmdArgs 命令
-     * 
-     * @example
-     * ```typescript
-     *  const cmdFactory: CommandFactoryBase;
-     * 
-     *  // 获取node版本命令
-     *  const cmd = cmdFactory.build(命令类型, ['node', '-v']);
-     * ```
      */
     public abstract build(type: number, ...cmdArgs: string[][]): ICommand;
 }
