@@ -8,7 +8,7 @@ describe('src/service/fs/io-factory.ts', () => {
     describe('.build(...pathArgs: string[]): Promise<IONodeBase>', () => {
         it('dir', async () => {
             const ioFactory = new FSIOFactory();
-            const dir = new IODirectory(ioFactory, 'build-test-dir');
+            const dir = new IODirectory(ioFactory, ['build-test-dir']);
             await dir.create();
 
             const res = await ioFactory.build(dir.path);
@@ -20,7 +20,7 @@ describe('src/service/fs/io-factory.ts', () => {
 
         it('file', async () => {
             const ioFactory = new FSIOFactory();
-            const file = new IOFile(ioFactory, 'test-build-file.txt');
+            const file = new IOFile(ioFactory, ['test-build-file.txt']);
             await file.write('xxx');
 
             const res = await ioFactory.build(file.path);
