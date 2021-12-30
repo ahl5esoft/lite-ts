@@ -1,12 +1,11 @@
-import { SftpIOFile } from './sftp-io-file';
 import { SftpInvoker } from './sftp-invoker';
-import { Ssh2SftpIOFactory } from './sftp-io-factory';
+import { SftpIOFile } from './sftp-io-file';
 import { IODirectoryBase, IOFactoryBase, IONodeBase } from '../..';
 
 export class SftpIODirectory extends IODirectoryBase {
     public constructor(
         private m_FsIOFactory: IOFactoryBase,
-        private m_IOFactory: Ssh2SftpIOFactory,
+        private m_IOFactory: IOFactoryBase,
         private m_SftpInvoker: SftpInvoker,
         private m_Paths: string[]
     ) {
@@ -39,14 +38,18 @@ export class SftpIODirectory extends IODirectoryBase {
     }
 
     public async create() {
+        if (!this.path)
+            return;
+
         const isExist = await this.exists();
         if (isExist)
             return;
 
-        const paths = [...this.m_Paths];
-        paths.pop();
-        const parent = this.m_IOFactory.buildDirectory(...paths);
-        await parent.create();
+        if (this.m_Paths.length > 1) {
+            const paths = [...this.m_Paths];
+            paths.pop();
+            await this.m_IOFactory.buildDirectory(...paths).create();
+        }
 
         await this.m_SftpInvoker.call<void>(r => r.mkdir, this.path);
     }

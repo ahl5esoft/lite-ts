@@ -1,10 +1,11 @@
+import { strictEqual } from 'assert';
+import { existsSync } from 'fs';
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
+
 import { ISftpInvoker } from './sftp-invoker';
 import { SftpIOFile as Self } from './sftp-io-file';
 import { Mock, mockAny } from '../assert';
-import { strictEqual } from 'assert';
-import { join } from 'path';
-import { writeFile } from 'fs/promises';
-import { existsSync } from 'fs';
 
 describe('src/service/ssh2/sftp-io-file.ts', () => {
     describe('.copyTo(dstPath: string)', () => {
