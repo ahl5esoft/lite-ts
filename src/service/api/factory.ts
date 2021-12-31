@@ -11,9 +11,32 @@ const invalidAPI: IApi = {
     }
 };
 
+/**
+ * api工厂
+ */
 export class APIFactory {
-    private constructor(private m_APICtors: { [key: string]: { [key: string]: Function; }; }) { }
+    /**
+     * 构造函数
+     * 
+     * @param m_APICtors api构造函数
+     */
+    private constructor(
+        private m_APICtors: { [key: string]: { [key: string]: Function; }; }
+    ) { }
 
+    /**
+     * 创建api实例
+     * 
+     * @param endpoint 端
+     * @param apiName api名
+     * 
+     * @example
+     * ```typescript
+     *  const apiFactory: ApiFactory;
+     *  const res = apiFactory.build('endpoint', 'api');
+     *  // res = IApi实例, src/api/endpoint/api.ts
+     * ```
+     */
     public build(endpoint: string, apiName: string) {
         const apiCtors = this.m_APICtors[endpoint];
         if (!apiCtors)
@@ -28,6 +51,11 @@ export class APIFactory {
         return api;
     }
 
+    /**
+     * 创建APIFactory实例
+     * 
+     * @param dir api所在目录, 默认src/api
+     */
     public static async create(dir: IODirectoryBase) {
         let apiCtors = {};
         const dirs = await dir.findDirectories();
