@@ -1,4 +1,14 @@
+/**
+ * 目标数值结构
+ */
 export interface ITargetValueData {
+    /**
+     * 标识
+     */
     id: string;
-    values: { [key: number]: number };
+
+    /**
+     * 已有数值
+     */
+    values: { [valueType: number]: number };
 }

@@ -6,7 +6,7 @@ import { IUnitOfWork } from './i-unit-of-work';
  */
 export abstract class DbFactoryBase {
     /**
-     * 创建模型仓储
+     * 创建表数据仓储
      * 
      * @param model 表模型函数
      * @param extra 其他参数,工作单元或数据库类型

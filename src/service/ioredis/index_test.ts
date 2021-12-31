@@ -3,7 +3,7 @@ import Ioredis from 'ioredis';
 
 import { IoredisAdapter as Self } from './index';
 import { sleep } from '../set-timeout';
-import { IRedisGeo } from '../../contract';
+import { IRedisGeoData } from '../../contract';
 
 const cfg = {
     host: '127.0.0.1',
@@ -117,7 +117,7 @@ describe('src/service/ioredis/index.ts', () => {
     describe('.geoadd(key: string, ...entries: IRedisGeo[]): Promise<number>', () => {
         it('ok', async () => {
             const key = 'test-geoadd';
-            const message: IRedisGeo = {
+            const message: IRedisGeoData = {
                 longitude: 0.10000079870223999,
                 latitude: 0.20000090571705442,
                 member: 'a',
@@ -134,7 +134,7 @@ describe('src/service/ioredis/index.ts', () => {
     describe('.geopos(key: string, ...members: string[]): Promise<[number, number][]>', () => {
         it('ok', async () => {
             const key = 'test-geopos';
-            const entry: IRedisGeo = {
+            const entry: IRedisGeoData = {
                 longitude: 0.10000079870223999,
                 latitude: 0.20000090571705442,
                 member: 'c',

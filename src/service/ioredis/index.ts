@@ -1,6 +1,6 @@
 import Ioredis from 'ioredis';
 
-import { IRedisGeo, RedisBase } from '../../contract';
+import { IRedisGeoData, RedisBase } from '../..';
 
 type RedisType = Ioredis.Cluster | Ioredis.Redis;
 
@@ -76,7 +76,7 @@ export class IoredisAdapter extends RedisBase {
         return this.client.get(key);
     }
 
-    public async geoadd(key: string, ...values: IRedisGeo[]) {
+    public async geoadd(key: string, ...values: IRedisGeoData[]) {
         let args = values.reduce((memo: any[], r): any[] => {
             memo.push(r.longitude, r.latitude, r.member);
             return memo;

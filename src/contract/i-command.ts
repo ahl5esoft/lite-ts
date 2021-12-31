@@ -6,13 +6,6 @@ import { ICommandResult } from './i-command-result';
 export interface ICommand {
     /**
      * 执行命令
-     * 
-     * @example
-     * ```typescript
-     *  const cmdFactory: CommandFactoryBase;
-     *  const res = await cmdFactory.build(命令类型, ['node', '-v']).exec();
-     *  // res = node版本号
-     * ```
      */
     exec(): Promise<ICommandResult>;
 
@@ -20,13 +13,6 @@ export interface ICommand {
      * 设置命令执行时的路径
      * 
      * @param path 路径
-     * 
-     * @example
-     * ```typescript
-     *  const cmdFactory: CommandFactoryBase
-     *  const res = await cmdFactory.build(命令类型, ['ls']).setDir('/usr/local').exec();
-     *  // res = /usr/local下所有文件
-     * ```
      */
     setDir(path: string): this;
 

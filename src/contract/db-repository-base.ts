@@ -4,9 +4,18 @@ import { IUnitOfWorkRepository } from './i-unit-of-work-repository';
 
 type regiterAction = (table: string, entry: any) => void;
 
+/**
+ * 表数据仓储
+ */
 export abstract class DbRepositoryBase<T> {
+    /**
+     * 是否有事务
+     */
     private m_IsTx = true;
 
+    /**
+     * 工作单元
+     */
     protected get uow(): IUnitOfWorkRepository {
         if (!this.m_Uow) {
             this.m_Uow = this.m_DbFactory.uow() as IUnitOfWorkRepository;
@@ -16,28 +25,59 @@ export abstract class DbRepositoryBase<T> {
         return this.m_Uow;
     }
 
+    /**
+     * 构造函数
+     * 
+     * @param table 表名
+     * @param m_Uow 工作单元
+     * @param m_DbFactory 数据库工厂
+     */
     public constructor(
-        protected tableName: string,
+        protected table: string,
         private m_Uow: IUnitOfWorkRepository,
         private m_DbFactory: DbFactoryBase,
     ) { }
 
+    /**
+     * 新增
+     * 
+     * @param entry 实体
+     */
     public async add(entry: T) {
         await this.exec(this.uow.registerAdd, entry);
     }
 
+    /**
+     * 删除
+     * 
+     * @param entry 实体
+     */
     public async remove(entry: T) {
         await this.exec(this.uow.registerRemove, entry);
     }
 
+    /**
+     * 更新
+     * 
+     * @param entry 实体
+     */
     public async save(entry: T) {
         await this.exec(this.uow.registerSave, entry);
     }
 
+    /**
+     * 创建表查询对象
+     */
     public abstract query(): IDbQuery<T>;
 
+    /**
+     * 执行方法, 如果不存在事务则直接提交
+     * 
+     * @param action 方法
+     * @param entry 实体
+     */
     private async exec(action: regiterAction, entry: any) {
-        action.bind(this.uow)(this.tableName, entry);
+        action.bind(this.uow)(this.table, entry);
         if (this.m_IsTx)
             return;
 
