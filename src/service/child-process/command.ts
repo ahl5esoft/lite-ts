@@ -3,13 +3,40 @@ import { ChildProcessWithoutNullStreams, CommonSpawnOptions, spawn } from 'child
 import { CommandResult } from '../command';
 import { ICommand, ICommandResult } from '../../contract';
 
+/**
+ * 命令对象(基于child_process实现)
+ */
 export class ChildProcessCommand implements ICommand {
+    /**
+     * 命令执行的目录路径
+     */
     private m_Dir: string;
+    /**
+     * 扩展参数
+     */
     private m_Extra: any;
+    /**
+     * 执行超时时间
+     */
     private m_Timeout: number;
 
+    /**
+     * 构造函数
+     * 
+     * @param m_Args 命令参数
+     */
     public constructor(private m_Args: string[][]) { }
 
+    /**
+     * 执行命令
+     * 
+     * @example
+     * ```typescript
+     *  const cmdFactory: CommandFactoryBase;
+     *  const res = await cmdFactory.build(类型, ['node', '-v']).setTimeout(1000).exec();
+     *  // res = { code: 0, out: 'node版本号', err: '系统未安装node时报错内容' }
+     * ```
+     */
     public async exec() {
         const opt: CommonSpawnOptions = {};
         if (this.m_Dir)
@@ -76,16 +103,51 @@ export class ChildProcessCommand implements ICommand {
         });
     }
 
+    /**
+     * 设置目录路径
+     * 
+     * @param v 目录路径
+     * 
+     * @returns 命令对象
+     * 
+     * @example
+     * ```typescript
+     *  const cmdFactory: CommandFactoryBase;
+     *  const res = await cmdFactory.build(类型, ['ls']).setDir('/usr/local').exec();
+     *  // res = { code: 0, out: '/usr/local下文件列表' }
+     * ```
+     */
     public setDir(v: string) {
         this.m_Dir = v;
         return this;
     }
 
+    /**
+     * 设置扩展对象
+     * 
+     * @param v 扩展对象
+     * 
+     * @returns 命令对象
+     */
     public setExtra(v: any) {
         this.m_Extra = v;
         return this;
     }
 
+    /**
+     * 设置超时时间
+     * 
+     * @param v 超时时间, 单位: ms
+     * 
+     * @returns 命令对象
+     * 
+     * @example
+     * ```typescript
+     *  const cmdFactory: CommandFactoryBase;
+     *  const res = await cmdFactory.build(类型, ['node']).setTimeout(1000).exec();
+     *  // 1秒后完成, res = { code: -1 }
+     * ```
+     */
     public setTimeout(v: number) {
         this.m_Timeout = v;
         return this;

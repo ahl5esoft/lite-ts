@@ -1,6 +1,11 @@
 import { json, OptionsJson } from 'body-parser';
 import { Express } from 'express';
 
+/**
+ * 创建body-parser组件选项
+ * 
+ * @param option boay-parser选项
+ */
 export function buildBodyParserJsonExpressOption(option: OptionsJson) {
     return (app: Express) => {
         app.use(
