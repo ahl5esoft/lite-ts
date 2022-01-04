@@ -19,6 +19,7 @@ export * from './js-yaml';
 export * from './log';
 export * from './math';
 export * from './mongo';
+export * from './parser';
 export * from './promise';
 export * from './push';
 export * from './redis';
