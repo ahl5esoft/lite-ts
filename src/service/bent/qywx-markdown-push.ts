@@ -38,7 +38,7 @@ interface IResponse {
 /**
  * 企业微信Markdown推送(基于bent实现)
  */
-export class QYWXMarkdownPush implements IPush {
+export class BentQYWXMarkdownPush implements IPush {
     /**
      * post请求函数
      */
@@ -62,7 +62,7 @@ export class QYWXMarkdownPush implements IPush {
      * 
      * @example
      * ```typescript
-     *  await new service.QYWXMarkdownPush('webhook地址').push(markdown内容);
+     *  await new service.BentQYWXMarkdownPush('webhook地址').push(markdown内容);
      * ```
      */
     public async push(content: string) {
