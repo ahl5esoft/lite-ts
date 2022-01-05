@@ -38,6 +38,8 @@ export abstract class TargetRealTimeValueServiceBase<
 
     public override async getCount(uow: IUnitOfWork, valueType: number) {
         let changeEntries = await this.findChangeEntries();
+        this.clearChangeEntries();
+
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         for (const r of changeEntries) {
             await changeDb.remove(r);
