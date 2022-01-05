@@ -2,23 +2,43 @@ import bent from 'bent';
 
 import { IPush } from '../..';
 
+/**
+ * 请求数据
+ */
 interface IRequest {
+    /**
+     * 消息类型
+     */
     msgtype: 'markdown';
+    /**
+     * markdown结构
+     */
     markdown: {
-        text: string;
-        title: string;
+        /**
+         * 内容
+         */
+        content: string;
     }
 }
 
+/**
+ * 响应数据
+ */
 interface IResponse {
+    /**
+     * 错误码
+     */
     errcode: number;
+    /**
+     * 错误消息
+     */
     errmsg: string;
 }
 
 /**
- * 钉钉Markdown推送(基于bent实现)
+ * 企业微信Markdown推送(基于bent实现)
  */
-export class BentDingDingMarkdownPush implements IPush {
+export class QYWXMarkdownPush implements IPush {
     /**
      * post请求函数
      */
@@ -27,11 +47,9 @@ export class BentDingDingMarkdownPush implements IPush {
     /**
      * 构造函数
      * 
-     * @param m_Keyword 关键字
      * @param url 推送地址
      */
     public constructor(
-        private m_Keyword: string,
         url: string
     ) {
         this.m_PostFunc = bent(url, 'json', 'POST', 200);
@@ -44,15 +62,14 @@ export class BentDingDingMarkdownPush implements IPush {
      * 
      * @example
      * ```typescript
-     *  await new service.BentDingDingMarkdownPush('关键字', 'webhook地址').push(markdown内容);
+     *  await new service.QYWXMarkdownPush('webhook地址').push(markdown内容);
      * ```
      */
-    public async push(text: string) {
+    public async push(content: string) {
         const req: IRequest = {
             msgtype: 'markdown',
             markdown: {
-                text: text,
-                title: this.m_Keyword
+                content: content
             }
         };
         const res = await this.m_PostFunc('', req);
