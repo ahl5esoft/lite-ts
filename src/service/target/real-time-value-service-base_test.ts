@@ -58,12 +58,6 @@ class Self extends TargetRealTimeValueServiceBase<TargetValue, TargetValueChange
         this.m_Entry = v;
     }
 
-    protected clearChangeEntries() {
-        this.associateStorageService.clear(TargetValueChange, r => {
-            return r.targetID == this.m_Entry.id;
-        });
-    }
-
     protected createEntry() {
         return {} as TargetValue;
     }
@@ -80,8 +74,10 @@ class Self extends TargetRealTimeValueServiceBase<TargetValue, TargetValueChange
         } as TargetValueLog;
     }
 
-    protected async findChangeEntries() {
-        return this.m_ChagneEntries;
+    protected async findAndClearChangeEntries() {
+        const changeEntries = this.m_ChagneEntries;
+        this.changeEntries = [];
+        return changeEntries;
     }
 
     protected async getEntry() {

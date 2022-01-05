@@ -16,11 +16,29 @@ import {
     ValueInterceptorFactoryBase,
 } from '../..';
 
+/**
+ * 目标试试数值服务
+ */
 export abstract class TargetRealTimeValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData,
     TLog extends ITargetValueLogData,
     TValueType extends IValueTypeData> extends TargetValueServiceBase<T, TValueType> {
+
+    /**
+     * 构造函数
+     * 
+     * @param associateStorageService 关联存储服务
+     * @param dbFactory 数据库工厂
+     * @param stringGenerator 字符串生成器
+     * @param valueInterceptorFactory 数值拦截器工厂
+     * @param targetType 目标类型
+     * @param model 数值模型
+     * @param changeModel 数值变更模型
+     * @param logModel 数值日志模型
+     * @param valueTypeEnum 数值类型枚举接口
+     * @param nowTime 当前时间接口
+     */
     public constructor(
         protected associateStorageService: IAssociateStorageService,
         protected dbFactory: DbFactoryBase,
@@ -36,10 +54,16 @@ export abstract class TargetRealTimeValueServiceBase<
         super(valueTypeEnum, nowTime);
     }
 
+    /**
+     * 获取数值数量
+     * 获取数值变更数据并清理缓存
+     * 
+     * 
+     * @param uow 工作单元
+     * @param valueType 数值类型
+     */
     public override async getCount(uow: IUnitOfWork, valueType: number) {
-        let changeEntries = await this.findChangeEntries();
-        this.clearChangeEntries();
-
+        let changeEntries = await this.findAndClearChangeEntries();
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         for (const r of changeEntries) {
             await changeDb.remove(r);
@@ -110,9 +134,8 @@ export abstract class TargetRealTimeValueServiceBase<
         await db.save(entry);
     }
 
-    protected abstract clearChangeEntries(): void;
     protected abstract createEntry(): T;
     protected abstract createLogEntry(): TLog;
-    protected abstract findChangeEntries(): Promise<TChange[]>;
+    protected abstract findAndClearChangeEntries(): Promise<TChange[]>;
     protected abstract getEntry(): Promise<T>;
 }
