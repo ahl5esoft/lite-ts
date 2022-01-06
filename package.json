@@ -53,5 +53,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "8.44.22"
+	"version": "8.45.22"
 }

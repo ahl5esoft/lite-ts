@@ -7,5 +7,5 @@ export interface IRewardData extends IValueData {
     /**
      * 权重
      */
-    weight: number;
+    weight?: number;
 }
