@@ -11,7 +11,7 @@ describe('src/service/mongo/enum-item.ts', () => {
             };
             const enumName = 'test';
             const res = new Self(data, enumName).encodingKey;
-            strictEqual(res, `enum-${enumName}-${data.value}`);
+            strictEqual(res, `${enumName}_${data.value}`);
         });
     });
 
@@ -24,7 +24,7 @@ describe('src/service/mongo/enum-item.ts', () => {
             const enumName = 'test';
             const attr = 'att';
             const res = new Self(data, enumName).getCustomEncodingKey(attr);
-            strictEqual(res, `enum-${enumName}-${attr}-${data.value}`);
+            strictEqual(res, `${enumName}_${data.value}_${attr}`);
         });
     });
 });

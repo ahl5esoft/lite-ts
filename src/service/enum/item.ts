@@ -8,12 +8,20 @@ export class EnumItem<T extends IEnumItemData> implements IEnumItem<T> {
 
     public constructor(
         public data: T,
-        private m_Name: string
+        private m_Name: string,
+        private m_Sep?: string,
     ) {
-        this.m_EncodingKey = `${m_Name}_${data.value}`;
+        if (!this.m_Sep)
+            this.m_Sep = '_';
+
+        this.m_EncodingKey = this.join(this.m_Name, data.value);
     }
 
     public getCustomEncodingKey(attr: string) {
-        return `${this.m_Name}_${this.data.value}_${attr}`;
+        return this.join(this.m_Name, this.data.value, attr);
+    }
+
+    private join(...keys: any[]) {
+        return keys.join(this.m_Sep);
     }
 }
