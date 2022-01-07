@@ -1,7 +1,8 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
 import { MongoEnum as Self } from './enum';
-import { EnumItem, Mock } from '..';
+import { Mock } from '../assert';
+import { EnumItem } from '../enum';
 import { DbFactoryBase, DbRepositoryBase, IDbQuery, IEnumItemData } from '../..';
 import { global } from '../../model';
 
@@ -14,7 +15,7 @@ describe('src/service/mongo/enum.ts', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
-            const self = new Self(mockDbFactory.actual, name);
+            const self = new Self(mockDbFactory.actual, name, '-');
 
             const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
@@ -48,7 +49,7 @@ describe('src/service/mongo/enum.ts', () => {
 
             const res = await self.all();
             deepStrictEqual(res, [
-                new EnumItem(data, name)
+                new EnumItem(data, name, '-')
             ]);
 
             const items = Reflect.get(self, 'm_Items');
@@ -58,7 +59,7 @@ describe('src/service/mongo/enum.ts', () => {
         it('不存在', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
-            const self = new Self(mockDbFactory.actual, name);
+            const self = new Self(mockDbFactory.actual, name, '-');
 
             const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
@@ -93,7 +94,7 @@ describe('src/service/mongo/enum.ts', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
-            const self = new Self<ITestGetEnumItemData>(mockDbFactory.actual, name);
+            const self = new Self<ITestGetEnumItemData>(mockDbFactory.actual, name, '-');
 
             const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
@@ -135,7 +136,7 @@ describe('src/service/mongo/enum.ts', () => {
         it('不存在', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
-            const self = new Self<ITestGetEnumItemData>(mockDbFactory.actual, name);
+            const self = new Self<ITestGetEnumItemData>(mockDbFactory.actual, name, '-');
 
             const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
