@@ -29,82 +29,82 @@ class Self extends TargetValueServiceBase<TargetValue, ValueTypeData> {
 
 describe('src/service/target/value-service-base.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[])', () => {
-        it('=', async () => {
+        it('=(单组)', async () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
             });
 
-            const res = await self.checkConditions(null, [{
+            const res = await self.checkConditions(null, [[{
                 count: 11,
                 op: enum_.RelationOperator.eq,
                 valueType: 1
-            }]);
+            }]]);
             strictEqual(res, true);
         });
 
-        it('>=', async () => {
+        it('>=(单组)', async () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
             });
 
-            const res = await self.checkConditions(null, [{
+            const res = await self.checkConditions(null, [[{
                 count: 11,
                 op: enum_.RelationOperator.ge,
                 valueType: 1
-            }]);
+            }]]);
             strictEqual(res, true);
         });
 
-        it('>', async () => {
+        it('>(单组)', async () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 12;
             });
 
-            const res = await self.checkConditions(null, [{
+            const res = await self.checkConditions(null, [[{
                 count: 11,
                 op: enum_.RelationOperator.gt,
                 valueType: 1
-            }]);
+            }]]);
             strictEqual(res, true);
         });
 
-        it('<=', async () => {
+        it('<=(单组)', async () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
             });
 
-            const res = await self.checkConditions(null, [{
+            const res = await self.checkConditions(null, [[{
                 count: 11,
                 op: enum_.RelationOperator.le,
                 valueType: 1
-            }]);
+            }]]);
             strictEqual(res, true);
         });
 
-        it('<', async () => {
+        it('<(单组)', async () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
             });
 
-            const res = await self.checkConditions(null, [{
+            const res = await self.checkConditions(null, [[{
                 count: 11,
                 op: enum_.RelationOperator.lt,
                 valueType: 1
-            }]);
+            }]]);
             strictEqual(res, true);
         });
 
-        it('all', async () => {
+        it('all(单组)', async () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
@@ -115,7 +115,7 @@ describe('src/service/target/value-service-base.ts', () => {
                 }[valueType];
             });
 
-            const res = await self.checkConditions(null, [{
+            const res = await self.checkConditions(null, [[{
                 count: 11,
                 op: enum_.RelationOperator.eq,
                 valueType: 1
@@ -127,11 +127,11 @@ describe('src/service/target/value-service-base.ts', () => {
                 count: 35,
                 op: enum_.RelationOperator.lt,
                 valueType: 3
-            }]);
+            }]]);
             strictEqual(res, true);
         });
 
-        it('some', async () => {
+        it('some(单组)', async () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
@@ -142,7 +142,7 @@ describe('src/service/target/value-service-base.ts', () => {
                 }[valueType];
             });
 
-            const res = await self.checkConditions(null, [{
+            const res = await self.checkConditions(null, [[{
                 count: 9,
                 op: enum_.RelationOperator.eq,
                 valueType: 1
@@ -154,8 +154,50 @@ describe('src/service/target/value-service-base.ts', () => {
                 count: 35,
                 op: enum_.RelationOperator.lt,
                 valueType: 3
-            }]);
+            }]]);
             strictEqual(res, false);
+        });
+
+        it('多组', async () => {
+            const self = new Self(null, null);
+
+            Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
+                return {
+                    1: 11,
+                    2: 22,
+                    3: 33
+                }[valueType];
+            });
+
+            const res = await self.checkConditions(null, [
+                [{
+                    count: 11,
+                    op: enum_.RelationOperator.eq,
+                    valueType: 1
+                }, {
+                    count: 20,
+                    op: enum_.RelationOperator.gt,
+                    valueType: 2
+                }, {
+                    count: 35,
+                    op: enum_.RelationOperator.lt,
+                    valueType: 3
+                }],
+                [{
+                    count: 9,
+                    op: enum_.RelationOperator.eq,
+                    valueType: 1
+                }, {
+                    count: 20,
+                    op: enum_.RelationOperator.gt,
+                    valueType: 2
+                }, {
+                    count: 35,
+                    op: enum_.RelationOperator.lt,
+                    valueType: 3
+                }]
+            ]);
+            strictEqual(res, true);
         });
     });
 
@@ -164,7 +206,7 @@ describe('src/service/target/value-service-base.ts', () => {
             const self = new Self(null, null);
 
             Reflect.set(self, 'checkConditions', (_: IUnitOfWork, res: IValueConditionData[]) => {
-                deepStrictEqual(res, [{
+                deepStrictEqual(res, [[{
                     count: 11,
                     op: enum_.RelationOperator.ge,
                     valueType: 1
@@ -172,7 +214,7 @@ describe('src/service/target/value-service-base.ts', () => {
                     count: 22,
                     op: enum_.RelationOperator.ge,
                     valueType: 2
-                }]);
+                }]]);
             });
 
             await self.enough(null, [{

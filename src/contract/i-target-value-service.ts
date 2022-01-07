@@ -12,7 +12,7 @@ export interface ITargetValueService {
      * @param uow 工作单元
      * @param conditions 数值条件
      */
-    checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[]): Promise<boolean>;
+    checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]): Promise<boolean>;
 
     /**
      * 是否足够

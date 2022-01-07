@@ -18,33 +18,35 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
         protected nowTime: NowTimeBase,
     ) { }
 
-    public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[]) {
+    public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]) {
         for (const r of conditions) {
-            const count = await this.getCount(uow, r.valueType);
-            const ok = (r.op == enum_.RelationOperator.eq && count == r.count) ||
-                (r.op == enum_.RelationOperator.ge && count >= r.count) ||
-                (r.op == enum_.RelationOperator.gt && count > r.count) ||
-                (r.op == enum_.RelationOperator.le && count <= r.count) ||
-                (r.op == enum_.RelationOperator.lt && count < r.count);
+            const tasks = r.map(async cr => {
+                const count = await this.getCount(uow, cr.valueType);
+                return (cr.op == enum_.RelationOperator.ge && count >= cr.count) ||
+                    (cr.op == enum_.RelationOperator.gt && count > cr.count) ||
+                    (cr.op == enum_.RelationOperator.le && count <= cr.count) ||
+                    (cr.op == enum_.RelationOperator.lt && count < cr.count) ||
+                    (count == cr.count);
+            });
+            const res = await Promise.all(tasks);
+            const ok = res.every(cr => cr);
             if (ok)
-                continue;
-
-            return false;
+                return ok;
         }
 
-        return true;
+        return false;
     }
 
     public async enough(uow: IUnitOfWork, values: IValueData[]) {
         return this.checkConditions(
             uow,
-            values.map(r => {
+            [values.map(r => {
                 return {
                     count: Math.abs(r.count),
                     op: enum_.RelationOperator.ge,
                     valueType: r.valueType
                 };
-            })
+            })]
         );
     }
 
