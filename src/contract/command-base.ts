@@ -1,34 +1,32 @@
 import { ICommandResult } from './i-command-result';
 
 /**
- * 命令接口
- * 
- * @deprecated CommandBase
+ * 命令行基类
  */
-export interface ICommand {
+export abstract class CommandBase {
     /**
      * 执行命令
      */
-    exec(): Promise<ICommandResult>;
+    public abstract exec(): Promise<ICommandResult>;
 
     /**
      * 设置命令执行时的路径
      * 
      * @param path 路径
      */
-    setDir(path: string): this;
+    public abstract setDir(path: string): CommandBase;
 
     /**
      * 设置扩展值(不同类型命令的扩展参数)
      * 
      * @param v 扩展值
      */
-    setExtra(v: any): this;
+    public abstract setExtra(v: any): CommandBase;
 
     /**
      * 设置执行超时时间
      * 
      * @param ms 毫秒数
      */
-    setTimeout(ms: number): this;
+    public abstract setTimeout(ms: number): CommandBase;
 }

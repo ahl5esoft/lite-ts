@@ -13,7 +13,7 @@ describe('src/service/value/consume-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFacatoryBase>();
-            const self = new Self(mockEnumFactory.actual, /^(.+)\*-(\d+)$/, ValueTypeData);
+            const self = new Self(mockEnumFactory.actual, ValueTypeData);
 
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
             mockEnumFactory.expectReturn(

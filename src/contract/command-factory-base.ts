@@ -2,6 +2,8 @@ import { ICommand } from './i-command';
 
 /**
  * 命令工厂
+ * 
+ * @deprecated CommandBase
  */
 export abstract class CommandFactoryBase {
     /**

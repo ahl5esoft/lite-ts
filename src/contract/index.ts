@@ -1,3 +1,4 @@
+export * from './command-base';
 export * from './command-factory-base';
 export * from './config-factory-base';
 export * from './cor-base';
@@ -41,6 +42,7 @@ export * from './io-factory-base';
 export * from './io-file-base';
 export * from './io-node-base';
 export * from './lock-base';
+export * from './log-base';
 export * from './log-factory-base';
 export * from './mission-subject-base';
 export * from './now-time-base';

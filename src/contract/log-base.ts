@@ -1,36 +1,34 @@
 /**
  * 日志接口
- * 
- * @deprecated LogBase
  */
-export interface ILog {
+export abstract class LogBase {
     /**
      * 增加标签
      * 
      * @param k 键
      * @param v 值
      */
-    addLabel(k: string, v: any): this;
+    public abstract addLabel(k: string, v: any): LogBase;
 
     /**
      * 以debug输出
      */
-    debug(): void;
+    public abstract debug(): void;
 
     /**
      * 以error输出
      * 
      * @param err 错误对象
      */
-    error(err: Error): void;
+    public abstract error(err: Error): void;
 
     /**
      * 以info输出
      */
-    info(): void;
+    public abstract info(): void;
 
     /**
      * 以warning输出
      */
-    warning(): void;
+    public abstract warning(): void;
 }

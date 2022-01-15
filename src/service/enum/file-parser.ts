@@ -1,4 +1,4 @@
-import { IOFactoryBase, IParser, IValueTypeData } from '../..';
+import { IEnumItemData, IOFactoryBase, IParser } from '../..';
 
 const boolAttrReg = /^\[(\w+)\]$/
 const intAttrReg = /^\[(\w+)=(\d+)\]$/;
@@ -15,7 +15,7 @@ export class EnumFileParser implements IParser {
         const file = this.m_IOFactory.buildFile(filePath);
         const content = await file.readString();
         const lines = content.split(/[\r\n]+/g);
-        const res: IValueTypeData[] = [];
+        const res: IEnumItemData[] = [];
         let isBegin = false;
         for (const r of lines) {
             if (!isBegin) {
@@ -44,7 +44,7 @@ export class EnumFileParser implements IParser {
         return res;
     }
 
-    private setAttr(entry: IValueTypeData, attr: string) {
+    private setAttr(entry: IEnumItemData, attr: string) {
         if (!attr)
             return;
 

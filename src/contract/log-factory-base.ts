@@ -2,6 +2,8 @@ import { ILog } from './i-log';
 
 /**
  * 日志工厂
+ * 
+ * @deprecated LogBase
  */
 export abstract class LogFactoryBase {
     /**

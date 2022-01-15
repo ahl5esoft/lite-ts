@@ -1,5 +1,9 @@
 import { IApiResponse } from './i-api-response';
 
+interface IRpcResponse<T> extends IApiResponse {
+    data: T;
+}
+
 /**
  * 远程调用接口
  */
@@ -9,7 +13,7 @@ export abstract class RpcBase {
      * 
      * @param route 路由
      */
-    public abstract call(route: string): Promise<IApiResponse>;
+    public abstract call<T>(route: string): Promise<IRpcResponse<T>>;
 
     /**
      * 设置body

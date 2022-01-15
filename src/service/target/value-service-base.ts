@@ -13,6 +13,8 @@ import {
 import { enum_ } from '../../model';
 
 export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueType extends IValueTypeData> implements ITargetValueService {
+    protected abstract get entry(): Promise<T>;
+
     public constructor(
         protected valueTypeEnum: IEnum<TValueType>,
         protected nowTime: NowTimeBase,
@@ -51,7 +53,7 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
     }
 
     public async getCount(_: IUnitOfWork, valueType: number) {
-        let entry = await this.getEntry();
+        let entry = await this.entry;
         if (!entry) {
             entry = {
                 values: {}
@@ -79,5 +81,4 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
     }
 
     public abstract update(uow: IUnitOfWork, values: IValueData[]): Promise<void>;
-    protected abstract getEntry(): Promise<T>;
 }

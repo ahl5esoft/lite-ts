@@ -4,13 +4,48 @@ interface IReward extends IValueData {
     weight: number;
 }
 
+/**
+ * 数值奖励解析器
+ */
 export class ValueRewardParser<T extends { text: string, value: number }> implements IParser {
+    /**
+     * 构造函数
+     * 
+     * @param m_EnumFactory 枚举工厂
+     * @param m_ValueTypeModel 枚举模型
+     * @param m_Reg 匹配规则
+     */
     public constructor(
         private m_EnumFactory: EnumFacatoryBase,
-        private m_Reg: RegExp,
-        private m_ValueTypeModel: new () => T
+        private m_ValueTypeModel: new () => T,
+        private m_Reg = /^([^*]+)\*(-?\d+)(\*?(\d+))?$/,
     ) { }
 
+    /**
+     * 解析
+     * 
+     * @param text 奖励文本
+     * 
+     * @returns IReward[][]
+     *
+     * @example
+     * ```typescript
+     *  const enumFactory: EnumFactoryBase;
+     *  const res = new ValueRewardParser(enumFactory, 数值类型枚举模型).parse(`A*-1
+     * 
+     *  A*2*99
+     *  B*3*1`);
+     *  // res = [
+     *      [
+     *          { count: -1, valueType: 11, weight: 0}
+     *      ],
+     *      [
+     *          { count: 2, valueType: 11, weight: 99 },
+     *          { count: 3, valueType: 22, weight: 1 }
+     *      ]
+     *  ];
+     * ```
+     */
     public async parse(text: string) {
         const lines = text.split(/[\r\n]/g);
         const res: IReward[][] = [[]];
