@@ -62,7 +62,7 @@ export abstract class TargetRealTimeValueServiceBase<
      * @param uow 工作单元
      * @param valueType 数值类型
      */
-    public override async getCount(uow: IUnitOfWork, valueType: number) {
+    public async getCount(uow: IUnitOfWork, valueType: number) {
         let changeEntries = await this.findAndClearChangeEntries();
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         for (const r of changeEntries) {
@@ -75,7 +75,7 @@ export abstract class TargetRealTimeValueServiceBase<
     }
 
     public async update(uow: IUnitOfWork, values: IValueData[]) {
-        let entry = await this.getEntry();
+        let entry = await this.entry;
         const db = this.dbFactory.db(this.model, uow);
         if (!entry) {
             entry = this.createEntry();
@@ -137,5 +137,4 @@ export abstract class TargetRealTimeValueServiceBase<
     protected abstract createEntry(): T;
     protected abstract createLogEntry(): TLog;
     protected abstract findAndClearChangeEntries(): Promise<TChange[]>;
-    protected abstract getEntry(): Promise<T>;
 }

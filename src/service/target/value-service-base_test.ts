@@ -18,7 +18,7 @@ class ValueTypeData implements IValueTypeData {
 }
 
 class Self extends TargetValueServiceBase<TargetValue, ValueTypeData> {
-    public entry: TargetValue;
+    public entry: Promise<TargetValue>;
 
     public async update(_: IUnitOfWork, __: IValueData[]) { }
 
@@ -245,10 +245,10 @@ describe('src/service/target/value-service-base.ts', () => {
             const mockValueTypeEnum = new Mock<IEnum<ValueTypeData>>();
             const self = new Self(mockValueTypeEnum.actual, null);
 
-            self.entry = {
+            Reflect.set(self, 'entry', {
                 id: '',
                 values: {}
-            };
+            });
 
             mockValueTypeEnum.expectReturn(
                 r => r.get(mockAny),
@@ -264,12 +264,12 @@ describe('src/service/target/value-service-base.ts', () => {
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
             const self = new Self(mockEnum.actual, mockNowTime.actual);
 
-            self.entry = {
+            Reflect.set(self, 'entry', {
                 id: '',
                 values: {
                     1: 11
                 }
-            };
+            });
 
             const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
                 data: {}
@@ -293,13 +293,13 @@ describe('src/service/target/value-service-base.ts', () => {
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
             const self = new Self(mockEnum.actual, mockNowTime.actual);
 
-            self.entry = {
+            Reflect.set(self, 'entry', {
                 id: '',
                 values: {
                     1: 11,
                     2: 22
                 }
-            };
+            });
 
             const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
                 data: {
@@ -325,13 +325,13 @@ describe('src/service/target/value-service-base.ts', () => {
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
             const self = new Self(mockEnum.actual, mockNowTime.actual);
 
-            self.entry = {
+            Reflect.set(self, 'entry', {
                 id: '',
                 values: {
                     1: 11,
                     2: moment().unix()
                 }
-            };
+            });
 
             const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
                 data: {
