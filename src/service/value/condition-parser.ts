@@ -46,7 +46,7 @@ export class ValueConditionParser<T extends { text: string, value: number }> imp
      * ```
      */
     public async parse(text: string) {
-        const lines = text.split(/[\r\n]/g);
+        const lines = text.split(/\r\n|\n|\r/g);
         let res: IValueConditionData[][] = [[]];
         const valueTypeEnum = this.m_EnumFactory.build(this.m_ValueTypeModel);
         for (const r of lines) {

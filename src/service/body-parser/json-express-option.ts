@@ -4,7 +4,7 @@ import { Express } from 'express';
 /**
  * 创建body-parser组件选项
  * 
- * @param option boay-parser选项
+ * @param option json选项
  */
 export function buildBodyParserJsonExpressOption(option: OptionsJson) {
     return (app: Express) => {
