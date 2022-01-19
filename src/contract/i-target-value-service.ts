@@ -1,3 +1,4 @@
+import { ITargetValueData } from './i-target-value-data';
 import { IUnitOfWork } from './i-unit-of-work';
 import { IValueData } from './i-value-data';
 import { IValueConditionData } from './i-value-condition-data';
@@ -6,6 +7,11 @@ import { IValueConditionData } from './i-value-condition-data';
  * 目标数值服务接口
  */
 export interface ITargetValueService {
+    /**
+     * 数据
+     */
+    readonly entry: Promise<ITargetValueData>;
+
     /**
      * 判断条件是否满足
      * 

@@ -13,7 +13,7 @@ import {
 import { enum_ } from '../../model';
 
 export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueType extends IValueTypeData> implements ITargetValueService {
-    protected abstract get entry(): Promise<T>;
+    public abstract get entry(): Promise<T>;
 
     public constructor(
         protected valueTypeEnum: IEnum<TValueType>,
