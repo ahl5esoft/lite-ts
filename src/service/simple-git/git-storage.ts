@@ -1,4 +1,4 @@
-import { GitRepository } from './git-repository';
+import { SimpleGitRepository } from './repository';
 import { IGitRepository, IGitRepositoryData, IGitStorage, IODirectoryBase, IOFactoryBase, StringGeneratorBase } from '../..';
 
 export class GitStorage implements IGitStorage {
@@ -33,6 +33,6 @@ export class GitStorage implements IGitStorage {
     }
 
     private createRepository(dir: IODirectoryBase, data: IGitRepositoryData) {
-        return new GitRepository(dir, data);
+        return new SimpleGitRepository(dir, data);
     }
 }

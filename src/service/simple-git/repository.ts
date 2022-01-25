@@ -2,7 +2,10 @@ import buildGit from 'simple-git';
 
 import { IGitRepository, IGitRepositoryData, IODirectoryBase } from '../..';
 
-export class SampleGitRepository implements IGitRepository {
+/**
+ * simple-git
+ */
+export class SimpleGitRepository implements IGitRepository {
     private m_Branch: string;
     private m_Git = buildGit();
 
@@ -23,11 +26,11 @@ export class SampleGitRepository implements IGitRepository {
         await this.m_Git.add(files);
     }
 
-    public async checkoutBranch(branch: string) {
+    public async checkout(branch: string) {
         if (this.m_Branch == branch)
             return;
 
-        await this.m_Git.checkoutBranch(branch, `remotes/origin/${branch}`);
+        await this.m_Git.checkout(branch);
         this.m_Branch = branch;
     }
 
@@ -48,8 +51,11 @@ export class SampleGitRepository implements IGitRepository {
         await this.m_Git.addRemote('origin', this.fullHttpUrl);
     }
 
-    public async pull(branch: string) {
-        await this.m_Git.pull('origin', branch);
+    public async pull(branch?: string) {
+        if (branch)
+            await this.m_Git.pull('origin', branch);
+        else
+            await this.m_Git.pull();
     }
 
     public async push(remote: string, branch: string) {

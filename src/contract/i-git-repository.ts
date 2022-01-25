@@ -21,7 +21,7 @@ export interface IGitRepository {
      * 
      * @param branch 分支
      */
-    checkoutBranch(branch: string): Promise<void>;
+    checkout(branch: string): Promise<void>;
 
     /**
      * 克隆
@@ -47,7 +47,7 @@ export interface IGitRepository {
      * 
      * @param branch 分支
      */
-    pull(branch: string): Promise<void>;
+    pull(branch?: string): Promise<void>;
 
     /**
      * 推送

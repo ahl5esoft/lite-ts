@@ -1,5 +1,6 @@
 import { strictEqual } from 'assert';
-import { SampleGitRepository as Self } from './repository';
+
+import { SimpleGitRepository as Self } from './repository';
 
 describe('src/service/simple-git/repository.ts', () => {
     describe('.fullHttpUrl[proctected]', () => {
