@@ -2,7 +2,7 @@ import { deepStrictEqual, ifError, ok, strictEqual } from 'assert';
 import Ioredis from 'ioredis';
 
 import { IoredisAdapter as Self } from './index';
-import { sleep } from '../set-timeout';
+import { SetTimeoutThread } from '../set-timeout';
 import { IRedisGeoData } from '../../contract';
 
 const cfg = {
@@ -10,6 +10,7 @@ const cfg = {
     port: 6379,
 };
 let client: Ioredis.Redis, self: Self, sub: Ioredis.Redis;
+const thread = new SetTimeoutThread();
 
 describe('src/service/ioredis/index.ts', () => {
     after(() => {
@@ -414,7 +415,7 @@ describe('src/service/ioredis/index.ts', () => {
                 if (sChannel && sMessage)
                     break;
 
-                await sleep(10);
+                await thread.sleep(10);
             }
 
             strictEqual(sChannel, pChannel);
@@ -440,7 +441,7 @@ describe('src/service/ioredis/index.ts', () => {
             let value = await client.get(key);
             strictEqual(key, value);
 
-            await sleep(1100);
+            await thread.sleep(1100);
 
             value = await client.get(key);
             ifError(value);

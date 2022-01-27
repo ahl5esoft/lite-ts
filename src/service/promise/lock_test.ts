@@ -1,7 +1,9 @@
 import { strictEqual } from 'assert';
 
 import { lock as self } from './lock';
-import { sleep } from '../set-timeout';
+import { SetTimeoutThread } from '../set-timeout';
+
+const thread = new SetTimeoutThread();
 
 describe('src/service/promise/lock.ts', () => {
     describe('.lock(): Promise<() => Promise<void>>', () => {
@@ -15,7 +17,7 @@ describe('src/service/promise/lock.ts', () => {
                 })();
             }
 
-            await sleep(1000);
+            await thread.sleep(1000);
             strictEqual(count, 10);
         });
     });
