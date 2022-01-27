@@ -8,6 +8,7 @@ export abstract class ThreadBase {
      * @param ms 时间
      */
     public abstract sleep(ms: number): Promise<void>;
+
     /**
      * 休眠(区间)
      * 
