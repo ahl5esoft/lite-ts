@@ -36,7 +36,7 @@ export class SimpleGitRepository implements IGitRepository {
 
     public async clone(branch: string) {
         await this.m_Git.clone(this.fullHttpUrl, this.dir.path, ['-b', branch]);
-        this.m_Git.cwd(this.dir.path);
+        await this.m_Git.cwd(this.dir.path);
         this.m_Branch = branch;
     }
 
@@ -45,7 +45,7 @@ export class SimpleGitRepository implements IGitRepository {
     }
 
     public async initRemote() {
-        this.m_Git.cwd(this.dir.path);
+        await this.m_Git.cwd(this.dir.path);
 
         const isExist = await this.dir.exists();
         if (isExist)
