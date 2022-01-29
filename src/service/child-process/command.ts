@@ -1,43 +1,14 @@
 import { ChildProcessWithoutNullStreams, CommonSpawnOptions, spawn } from 'child_process';
 
 import { CommandResult } from '../command';
-import { ICommand, ICommandResult } from '../../contract';
+import { CommandBase, ICommandResult } from '../../contract';
 
-/**
- * 命令对象(基于child_process实现)
- */
-export class ChildProcessCommand implements ICommand {
-    /**
-     * 命令执行的目录路径
-     */
+class CommandWrapper implements CommandBase {
     private m_Dir: string;
-    /**
-     * 扩展参数
-     */
     private m_Extra: any;
-    /**
-     * 执行超时时间
-     */
     private m_Timeout: number;
 
-    /**
-     * 构造函数
-     * 
-     * @param m_Args 命令参数
-     */
-    public constructor(private m_Args: string[][]) { }
-
-    /**
-     * 执行命令
-     * 
-     * @example
-     * ```typescript
-     *  const cmdFactory: CommandFactoryBase;
-     *  const res = await cmdFactory.build(类型, ['node', '-v']).setTimeout(1000).exec();
-     *  // res = { code: 0, out: 'node版本号', err: '系统未安装node时报错内容' }
-     * ```
-     */
-    public async exec() {
+    public async exec(...args: string[][]) {
         const opt: CommonSpawnOptions = {};
         if (this.m_Dir)
             opt.cwd = this.m_Dir;
@@ -46,17 +17,17 @@ export class ChildProcessCommand implements ICommand {
 
         const res = new CommandResult();
         let child: ChildProcessWithoutNullStreams;
-        child = this.m_Args.reduce((memo, r) => {
-            const [name, ...args] = r;
+        child = args.reduce((memo, r) => {
+            const [name, ...tempArgs] = r;
             let cp: ChildProcessWithoutNullStreams;
             if (memo) {
-                cp = spawn(name, args, {
+                cp = spawn(name, tempArgs, {
                     ...opt,
                     stdio: ['pipe', 'pipe', 'pipe']
                 });
                 memo.stdout.pipe(cp.stdin);
             } else {
-                cp = spawn(name, args, opt);
+                cp = spawn(name, tempArgs, opt);
             }
             return cp;
         }, child);
@@ -95,7 +66,7 @@ export class ChildProcessCommand implements ICommand {
                 if (timeout)
                     clearTimeout(timeout);
 
-                if (!res.code && code)
+                if (!res.code)
                     res.code = code;
 
                 s(res);
@@ -103,12 +74,44 @@ export class ChildProcessCommand implements ICommand {
         });
     }
 
+    public setDir(v: string) {
+        this.m_Dir = v;
+        return this;
+    }
+
+    public setExtra(v: any) {
+        this.m_Extra = v;
+        return this;
+    }
+
+    public setTimeout(v: number) {
+        this.m_Timeout = v;
+        return this;
+    }
+}
+
+/**
+ * 命令对象(基于child_process实现)
+ */
+export class ChildProcessCommand extends CommandBase {
+    /**
+     * 执行命令
+     * 
+     * @example
+     * ```typescript
+     *  const cmdFactory: CommandFactoryBase;
+     *  const res = await cmdFactory.build(类型, ['node', '-v']).setTimeout(1000).exec();
+     *  // res = { code: 0, out: 'node版本号', err: '系统未安装node时报错内容' }
+     * ```
+     */
+    public async exec(...args: string[][]) {
+        return await new CommandWrapper().exec(...args);
+    }
+
     /**
      * 设置目录路径
      * 
      * @param v 目录路径
-     * 
-     * @returns 命令对象
      * 
      * @example
      * ```typescript
@@ -118,28 +121,26 @@ export class ChildProcessCommand implements ICommand {
      * ```
      */
     public setDir(v: string) {
-        this.m_Dir = v;
-        return this;
+        const wrapper = new CommandWrapper();
+        wrapper.setDir(v);
+        return wrapper;
     }
 
     /**
      * 设置扩展对象
      * 
      * @param v 扩展对象
-     * 
-     * @returns 命令对象
      */
     public setExtra(v: any) {
-        this.m_Extra = v;
-        return this;
+        const wrapper = new CommandWrapper();
+        wrapper.setExtra(v);
+        return wrapper;
     }
 
     /**
      * 设置超时时间
      * 
      * @param v 超时时间, 单位: ms
-     * 
-     * @returns 命令对象
      * 
      * @example
      * ```typescript
@@ -149,7 +150,8 @@ export class ChildProcessCommand implements ICommand {
      * ```
      */
     public setTimeout(v: number) {
-        this.m_Timeout = v;
-        return this;
+        const wrapper = new CommandWrapper();
+        wrapper.setTimeout(v);
+        return wrapper;
     }
 }

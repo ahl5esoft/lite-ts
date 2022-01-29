@@ -45,14 +45,15 @@ export class SimpleGitRepository implements IGitRepository {
     }
 
     public async initRemote() {
-        await this.m_Git.cwd(this.dir.path);
-
         const isExist = await this.dir.exists();
-        if (isExist)
-            return;
-
-        await this.m_Git.init();
-        await this.m_Git.addRemote('origin', this.fullHttpUrl);
+        if (isExist) {
+            await this.m_Git.cwd(this.dir.path);
+        } else {
+            await this.dir.create();
+            await this.m_Git.cwd(this.dir.path);
+            await this.m_Git.init();
+            await this.m_Git.addRemote('origin', this.fullHttpUrl);
+        }
     }
 
     public async pull(branch?: string) {

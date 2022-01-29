@@ -1,5 +1,4 @@
 export * from './command-base';
-export * from './command-factory-base';
 export * from './config-factory-base';
 export * from './cor-base';
 export * from './crypt-base';
@@ -10,7 +9,6 @@ export * from './i-api';
 export * from './i-api-port';
 export * from './i-api-response';
 export * from './i-associate-storage-service';
-export * from './i-command';
 export * from './i-command-result';
 export * from './i-config';
 export * from './i-db-query';
