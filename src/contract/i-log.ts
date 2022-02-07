@@ -1,7 +1,5 @@
 /**
  * 日志接口
- * 
- * @deprecated LogBase
  */
 export interface ILog {
     /**

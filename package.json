@@ -9,7 +9,7 @@
 		"express": "^4.17.1",
 		"ioredis": "^4.27.3",
 		"js-yaml": "^4.1.0",
-		"log4js": "^6.3.0",
+		"log4js": "^6.4.1",
 		"moment": "^2.29.1",
 		"mongodb": "^3.6.9",
 		"reflect-metadata": "^0.1.13",
@@ -53,5 +53,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "9.58.24"
+	"version": "9.59.24"
 }
