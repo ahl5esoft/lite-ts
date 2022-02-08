@@ -29,6 +29,7 @@ export * from './i-target-value-data';
 export * from './i-target-value-service';
 export * from './i-unit-of-work';
 export * from './i-unit-of-work-repository';
+export * from './i-user-auth-data';
 export * from './i-value-condition-data';
 export * from './i-value-data';
 export * from './i-value-interceptor';

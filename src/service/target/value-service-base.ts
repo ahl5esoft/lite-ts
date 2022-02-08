@@ -12,23 +12,48 @@ import {
 } from '../..';
 import { enum_ } from '../../model';
 
+/**
+ * 目标数值服务基类
+ */
 export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueType extends IValueTypeData> implements ITargetValueService {
+    /**
+     * 目标数值数据
+     */
     public abstract get entry(): Promise<T>;
 
+    /**
+     * 构造函数
+     * 
+     * @param valueTypeEnum 数值枚举
+     * @param nowTime 当前时间
+     */
     public constructor(
         protected valueTypeEnum: IEnum<TValueType>,
         protected nowTime: NowTimeBase,
     ) { }
 
+    /**
+     * 验证条件
+     * 
+     * @param uow 工作单元
+     * @param conditions 条件
+     */
     public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]) {
+        const now = await this.nowTime.unix();
         for (const r of conditions) {
             const tasks = r.map(async cr => {
-                const count = await this.getCount(uow, cr.valueType);
-                return (cr.op == enum_.RelationOperator.ge && count >= cr.count) ||
-                    (cr.op == enum_.RelationOperator.gt && count > cr.count) ||
-                    (cr.op == enum_.RelationOperator.le && count <= cr.count) ||
-                    (cr.op == enum_.RelationOperator.lt && count < cr.count) ||
-                    (count == cr.count);
+                const aCount = await this.getCount(uow, cr.valueType);
+                let bCount = cr.count;
+                let op = cr.op;
+                if (cr.op.endsWith('now-diff')) {
+                    bCount += now;
+                    op = cr.op.replace('now-diff', '') as enum_.RelationOperator;
+                }
+                return (op == enum_.RelationOperator.ge && aCount >= bCount) ||
+                    (op == enum_.RelationOperator.gt && aCount > bCount) ||
+                    (op == enum_.RelationOperator.le && aCount <= bCount) ||
+                    (op == enum_.RelationOperator.lt && aCount < bCount) ||
+                    (aCount == bCount);
             });
             const res = await Promise.all(tasks);
             const ok = res.every(cr => cr);
@@ -39,6 +64,12 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
         return false;
     }
 
+    /**
+     * 是否足够
+     * 
+     * @param uow 工作单元
+     * @param values 数值数据
+     */
     public async enough(uow: IUnitOfWork, values: IValueData[]) {
         return this.checkConditions(
             uow,
@@ -52,6 +83,13 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
         );
     }
 
+    /**
+     * 获取数量
+     * 
+     * @param _ 工作单元(忽略)
+     * @param valueType 数值类型
+     * @returns 
+     */
     public async getCount(_: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
         if (!entry) {
@@ -80,5 +118,11 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
         return entry.values[valueType];
     }
 
+    /**
+     * 更新
+     * 
+     * @param uow 工作单元
+     * @param values 数值数据
+     */
     public abstract update(uow: IUnitOfWork, values: IValueData[]): Promise<void>;
 }

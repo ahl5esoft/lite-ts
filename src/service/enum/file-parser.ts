@@ -1,11 +1,29 @@
 import { IEnumItemData, IOFactoryBase, IParser } from '../..';
 
-const boolAttrReg = /^\[(\w+)\]$/
-const intAttrReg = /^\[(\w+)=(\d+)\]$/;
-const stringAttrReg = /^\[(\w+)='(\w+)'\]$/;
-const textReg = /^\s+\*\s+(\[.+\])?(.+)$/;
+/**
+ * bool特性正则
+ */
+const boolAttrReg = /^\[(\w+)\]/
+/**
+ * int特性正则
+ */
+const intAttrReg = /^\[(\w+)=(\d+)\]/;
+/**
+ * string特性正则
+ */
+const stringAttrReg = /^\[(\w+)='(\w+)'\]/;
+/**
+ * 枚举文本正则
+ */
+const textReg = /^\s+\*\s+(\[.+\])*(.+)$/;
+/**
+ * 枚举值正则
+ */
 const valueReg = /^\s+\w+\s=\s(\d+),?$/;
 
+/**
+ * 枚举文件解析器
+ */
 export class EnumFileParser implements IParser {
     public constructor(
         private m_IOFactory: IOFactoryBase
@@ -48,20 +66,30 @@ export class EnumFileParser implements IParser {
         if (!attr)
             return;
 
-        let match = attr.match(boolAttrReg);
-        if (match) {
-            entry[match[1]] = true;
-            return;
-        }
+        let match: RegExpMatchArray;
+        while (true) {
+            try {
+                match = attr.match(boolAttrReg);
+                if (match) {
+                    entry[match[1]] = true;
+                    continue;
+                }
 
-        match = attr.match(intAttrReg);
-        if (match) {
-            entry[match[1]] = parseInt(match[2]);
-            return;
-        }
+                match = attr.match(intAttrReg);
+                if (match) {
+                    entry[match[1]] = parseInt(match[2]);
+                    continue;
+                }
 
-        match = attr.match(stringAttrReg);
-        if (match)
-            entry[match[1]] = match[2];
+                match = attr.match(stringAttrReg);
+                if (match)
+                    entry[match[1]] = match[2];
+            } finally {
+                if (match && match[0].length != attr.length)
+                    attr = attr.substring(match[0].length);
+                else
+                    break;
+            }
+        }
     }
 }

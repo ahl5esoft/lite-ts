@@ -1,4 +1,5 @@
 import { EnumFacatoryBase, IParser, IValueConditionData } from '../..';
+import { enum_ } from '../../model';
 
 /**
  * 数值条件解析器
@@ -72,7 +73,7 @@ export class ValueConditionParser<T extends { text: string, value: number }> imp
 
             res[res.length - 1].push({
                 count: count,
-                op: match[2],
+                op: match[2] as enum_.RelationOperator,
                 valueType: enumItem.data.value
             });
         }
