@@ -7,7 +7,7 @@ export abstract class CommandBase {
     /**
      * 执行命令
      */
-    public abstract exec(...args: string[][]): Promise<ICommandResult>;
+    public abstract exec(...args: string[]): Promise<ICommandResult>;
 
     /**
      * 设置命令执行时的路径

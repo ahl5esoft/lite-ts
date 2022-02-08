@@ -8,7 +8,7 @@ class CommandWrapper implements CommandBase {
     private m_Extra: any;
     private m_Timeout: number;
 
-    public async exec(...args: string[][]) {
+    public async exec(...args: string[]) {
         const opt: CommonSpawnOptions = {};
         if (this.m_Dir)
             opt.cwd = this.m_Dir;
@@ -18,6 +18,12 @@ class CommandWrapper implements CommandBase {
         const res = new CommandResult();
         let child: ChildProcessWithoutNullStreams;
         child = args.reduce((memo, r) => {
+            if (r == '|')
+                memo.push([]);
+            else
+                memo[memo.length - 1].push(r);
+            return memo;
+        }, [[]]).reduce((memo, r) => {
             const [name, ...tempArgs] = r;
             let cp: ChildProcessWithoutNullStreams;
             if (memo) {
@@ -104,7 +110,7 @@ export class ChildProcessCommand extends CommandBase {
      *  // res = { code: 0, out: 'node版本号', err: '系统未安装node时报错内容' }
      * ```
      */
-    public async exec(...args: string[][]) {
+    public async exec(...args: string[]) {
         return await new CommandWrapper().exec(...args);
     }
 

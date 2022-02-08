@@ -5,7 +5,7 @@ import { ChildProcessCommand as Self } from './command';
 describe('src/service/child-process/command.ts', () => {
     describe('.exec(name: string, ...args: any[])', () => {
         it('ok', async () => {
-            const res = await new Self().exec(['node', '-v']);
+            const res = await new Self().exec('node', '-v');
             strictEqual(res.code, 0);
             strictEqual(res.err, '');
             notStrictEqual(res.out, '');
@@ -14,26 +14,21 @@ describe('src/service/child-process/command.ts', () => {
         it('ignore return', async () => {
             const res = await new Self().setExtra({
                 ignoreReturn: true
-            }).exec(['node', '-v']);
+            }).exec('node', '-v');
             strictEqual(res.code, 0);
             strictEqual(res.err, '');
             strictEqual(res.out, '');
         });
 
         it('pipe', async () => {
-            const res = await new Self().exec(
-                ['tasklist'],
-                ['find', '']
-            );
+            const res = await new Self().exec('tasklist', '|', 'find', '');
             strictEqual(res.code, 1);
             strictEqual(res.err, '');
             strictEqual(res.out, '');
         });
 
         it('timeout', async () => {
-            const res = await new Self().setTimeout(1000).exec(
-                ['node']
-            );
+            const res = await new Self().setTimeout(1000).exec('node');
             strictEqual(res.code, -1);
             strictEqual(res.err, '');
             strictEqual(res.out, '');
@@ -44,7 +39,7 @@ describe('src/service/child-process/command.ts', () => {
         it('ok', async () => {
             const res = await new Self().setDir(
                 process.cwd()
-            ).exec(['more', 'README.md']);
+            ).exec('more', 'README.md');
             strictEqual(res.code, 0);
             strictEqual(res.err, '');
             notStrictEqual(res.out, '');

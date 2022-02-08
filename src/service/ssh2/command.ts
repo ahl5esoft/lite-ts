@@ -12,7 +12,7 @@ class CommandWrapper extends CommandBase {
         super();
     }
 
-    public async exec(...args: string[][]) {
+    public async exec(...args: string[]) {
         const client = new Client();
         await new Promise<void>(s => {
             client.on('ready', s).connect(this.m_Config);
@@ -80,7 +80,7 @@ export class Ssh2Command extends CommandBase {
      *  // res = { code: 0, out: 'node版本号', err: '系统未安装node时报错内容' }
      * ```
      */
-    public async exec(...args: string[][]) {
+    public async exec(...args: string[]) {
         return await new CommandWrapper(this.m_Config).exec(...args);
     }
 
