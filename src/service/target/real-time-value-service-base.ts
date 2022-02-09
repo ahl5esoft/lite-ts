@@ -74,6 +74,12 @@ export abstract class TargetRealTimeValueServiceBase<
         return super.getCount(uow, valueType);
     }
 
+    /**
+     * 更新数值
+     * 
+     * @param uow 工作单元
+     * @param values 数值数据
+     */
     public async update(uow: IUnitOfWork, values: IValueData[]) {
         let entry = await this.entry;
         const db = this.dbFactory.db(this.model, uow);
@@ -98,6 +104,7 @@ export abstract class TargetRealTimeValueServiceBase<
             const logEntry = this.createLogEntry();
             logEntry.id = await this.stringGenerator.generate();
             logEntry.oldCount = entry.values[r.valueType];
+            logEntry.source = r.source;
             logEntry.valueType = r.valueType;
 
             const valueTypeItem = await this.valueTypeEnum.get(cr => {
@@ -134,7 +141,16 @@ export abstract class TargetRealTimeValueServiceBase<
         await db.save(entry);
     }
 
+    /**
+     * 创建T
+     */
     protected abstract createEntry(): T;
+    /**
+     * 创建TLog
+     */
     protected abstract createLogEntry(): TLog;
+    /**
+     * 获取并清除变更数据
+     */
     protected abstract findAndClearChangeEntries(): Promise<TChange[]>;
 }

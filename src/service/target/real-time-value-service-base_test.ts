@@ -29,6 +29,7 @@ class TargetValue implements ITargetValueData {
 class TargetValueChange implements ITargetValueChangeData {
     public count: number;
     public id: string;
+    public source: string;
     public targetID: string;
     public valueType: number;
 }
@@ -37,6 +38,7 @@ class TargetValueLog implements ITargetValueLogData {
     public count: number;
     public id: string;
     public oldCount: number;
+    public source: string;
     public targetID: string;
     public valueType: number;
 }
@@ -48,14 +50,11 @@ class ValueTypeData implements IValueTypeData {
 }
 
 class Self extends TargetRealTimeValueServiceBase<TargetValue, TargetValueChange, TargetValueLog, ValueTypeData> {
+    public entry: any;
+
     private m_ChagneEntries: TargetValueChange[];
     public set changeEntries(v: TargetValueChange[]) {
         this.changeEntries = v;
-    }
-
-    private m_Entry: TargetValue;
-    public set entry(v: TargetValue) {
-        this.m_Entry = v;
     }
 
     protected createEntry() {
@@ -64,13 +63,13 @@ class Self extends TargetRealTimeValueServiceBase<TargetValue, TargetValueChange
 
     protected createChangeEntry() {
         return {
-            targetID: this.m_Entry.id
+            targetID: this.entry.id
         } as TargetValueChange;
     }
 
     protected createLogEntry() {
         return {
-            targetID: this.m_Entry.id
+            targetID: this.entry.id
         } as TargetValueLog;
     }
 
@@ -78,10 +77,6 @@ class Self extends TargetRealTimeValueServiceBase<TargetValue, TargetValueChange
         const changeEntries = this.m_ChagneEntries;
         this.changeEntries = [];
         return changeEntries;
-    }
-
-    protected async getEntry() {
-        return this.m_Entry;
     }
 }
 
@@ -172,9 +167,7 @@ describe('src/service/target/real-time-value-service-base.ts', () => {
                     1: 10
                 }
             } as TargetValue;
-            Reflect.set(self, 'getEntry', () => {
-                return entry;
-            });
+            self.entry = entry;
 
             const mockValueDbRepo = new Mock<DbRepositoryBase<TargetValue>>();
             mockDbFactory.expectReturn(
@@ -190,6 +183,7 @@ describe('src/service/target/real-time-value-service-base.ts', () => {
 
             const valueChange = {
                 count: 11,
+                source: 'test',
                 valueType: 1
             } as TargetValueChange;
 
@@ -228,6 +222,7 @@ describe('src/service/target/real-time-value-service-base.ts', () => {
                 count: 11,
                 id: logID,
                 oldCount: 10,
+                source: valueChange.source,
                 valueType: 1
             } as TargetValueLog);
 
@@ -258,9 +253,7 @@ describe('src/service/target/real-time-value-service-base.ts', () => {
                     1: 10
                 }
             } as TargetValue;
-            Reflect.set(self, 'getEntry', () => {
-                return entry;
-            });
+            self.entry = entry;
 
             const mockValueDbRepo = new Mock<DbRepositoryBase<TargetValue>>();
             mockDbFactory.expectReturn(
@@ -276,6 +269,7 @@ describe('src/service/target/real-time-value-service-base.ts', () => {
 
             const valueChange = {
                 count: 11,
+                source: 'test',
                 valueType: 1
             } as TargetValueChange;
 
@@ -320,6 +314,7 @@ describe('src/service/target/real-time-value-service-base.ts', () => {
                 count: 11,
                 id: logID,
                 oldCount: 10,
+                source: valueChange.source,
                 valueType: 1
             } as TargetValueLog);
 

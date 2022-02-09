@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 /**
  * 当前时间接口
  */
@@ -7,7 +9,13 @@ export abstract class NowTimeBase {
      * 
      * @param unixTime 其他unix时间
      */
-    public abstract isSameDayUnix(unixTime: number): Promise<boolean>;
+    public async isSameDayUnix(unixTime: number) {
+        const nowUnix = await this.unix();
+        return moment.unix(nowUnix).isSame(
+            moment.unix(unixTime),
+            'day'
+        );
+    }
 
     /**
      * 时间戳, 单位: 秒

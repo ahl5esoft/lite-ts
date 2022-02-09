@@ -6,6 +6,7 @@ import {
     IAssociateStorageService,
     ITargetValueChangeData,
     ITargetValueData,
+    IValueData,
     IValueTypeData,
     StringGeneratorBase
 } from '../..';
@@ -18,6 +19,7 @@ class TargetValue implements ITargetValueData {
 class TargetValueChange implements ITargetValueChangeData {
     public count: number;
     public id: string;
+    public source: string;
     public targetID: string;
     public valueType: number;
 }
@@ -29,10 +31,7 @@ class ValueTypeData implements IValueTypeData {
 }
 
 class Self extends TargetReadonlyValueServiceBase<TargetValue, TargetValueChange, ValueTypeData> {
-    private m_Data: TargetValue;
-    public set data(v: TargetValue) {
-        this.m_Data = v;
-    }
+    public entry: any;
 
     private m_TargetID: string;
     public set targetID(v: string) {
@@ -44,14 +43,10 @@ class Self extends TargetReadonlyValueServiceBase<TargetValue, TargetValueChange
             targetID: this.m_TargetID
         } as TargetValueChange;
     }
-
-    protected async getEntry() {
-        return this.m_Data;
-    }
 }
 
 describe('src/service/target/readonly-value-service-base.ts', () => {
-    describe('.update(uow: IUnitOfWork, ...values: IValueData[])', () => {
+    describe('.update(uow: IUnitOfWork, values: IValueData[])', () => {
         it('ok', async () => {
             const mockStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
@@ -73,24 +68,28 @@ describe('src/service/target/readonly-value-service-base.ts', () => {
                 changeID
             );
 
-            mockDbRepo.expected.add({
+            const valueData = {
                 count: 11,
+                source: 'test',
+                valueType: 1
+            } as IValueData;
+            mockDbRepo.expected.add({
+                count: valueData.count,
                 id: changeID,
+                source: valueData.source,
                 targetID: targetID,
-                valueType: 1,
+                valueType: valueData.valueType,
             });
 
             mockStorageService.expected.add(TargetValueChange, {
-                count: 11,
+                count: valueData.count,
                 id: changeID,
+                source: valueData.source,
                 targetID: targetID,
-                valueType: 1,
+                valueType: valueData.valueType,
             });
 
-            await self.update(null, [{
-                count: 11,
-                valueType: 1
-            }]);
+            await self.update(null, [valueData]);
         });
     });
 });

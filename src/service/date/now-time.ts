@@ -1,25 +1,21 @@
-import moment from 'moment';
-
 import { NowTimeBase } from '../../contract';
 
 /**
  * Date实现
  */
 export class DateNowTime extends NowTimeBase {
-    public async isSameDayUnix(unixTime: number) {
-        const nowUnix = await this.unix();
-        return moment.unix(nowUnix).isSame(
-            moment.unix(unixTime),
-            'day'
-        );
-    }
-
+    /**
+     * @returns 时间戳(单位: s)
+     */
     public async unix() {
         return Math.floor(
             Date.now() / 1000
         );
     }
 
+    /**
+     * @returns 时间戳(单位: 纳秒)
+     */
     public async unixNano() {
         return Date.now() * 1000000;
     }
