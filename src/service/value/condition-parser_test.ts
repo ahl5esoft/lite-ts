@@ -54,10 +54,23 @@ describe('src/service/value/condition-parser.ts', () => {
                 }
             );
 
+            const itemD = {
+                text: 'D',
+                value: 44
+            };
+            mockEnum.expectReturn(
+                r => r.get(mockAny),
+                {
+                    data: itemD
+                }
+            );
+
             const res = await self.parse(`A=-15
 B>=-5
 
-C<=20`);
+C<=20
+D>=0.99`);
+            console.log(res);
             deepStrictEqual(res, [
                 [{
                     count: -15,
@@ -72,6 +85,10 @@ C<=20`);
                     count: 20,
                     op: model.enum_.RelationOperator.le,
                     valueType: 33,
+                }, {
+                    count: 0.99,
+                    op: model.enum_.RelationOperator.ge,
+                    valueType: 44,
                 }]
             ]);
         });
