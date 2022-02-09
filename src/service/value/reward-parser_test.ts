@@ -51,7 +51,7 @@ describe('src/service/value/reward-parser.ts', () => {
                 mockBItem.actual
             );
 
-            const res = await self.parse(`金币*500*999\r\n金币*5000*1\r\n\r\n宝石*3*999\r\n宝石*30*1`);
+            const res = await self.parse(`金币:500*999\r\n金币:5000*1\r\n\r\n宝石:3*999\r\n宝石：30*1`);
             deepStrictEqual(res, [
                 [{
                     count: 500,

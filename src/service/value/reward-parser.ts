@@ -18,7 +18,7 @@ export class ValueRewardParser<T extends { text: string, value: number }> implem
     public constructor(
         private m_EnumFactory: EnumFacatoryBase,
         private m_ValueTypeModel: new () => T,
-        private m_Reg = /^([^*]+)\*(-?\d+)(\*?(\d+))?$/,
+        private m_Reg = /^([^*]+)[:：\*](-?\d+)(\*?(\d+))?$/,
     ) { }
 
     /**
