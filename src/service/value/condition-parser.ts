@@ -8,7 +8,7 @@ export class ValueConditionParser<T extends { text: string, value: number }> imp
     /**
      * 匹配规则
      */
-    public static reg = /^([^=><]+)([=><]+)(-?\d+)$/;
+    public static reg = /^([^=><]+)([=><]+)(-?\d+(\.?\d+)?)$/;
 
     /**
      * 构造函数
@@ -67,7 +67,7 @@ export class ValueConditionParser<T extends { text: string, value: number }> imp
             if (!enumItem)
                 throw new Error(`无效数值条件名: ${r}`);
 
-            const count = parseInt(match[3]);
+            const count = Number(match[3]);
             if (isNaN(count))
                 throw new Error(`无效数值条件数量: ${r}`);
 
