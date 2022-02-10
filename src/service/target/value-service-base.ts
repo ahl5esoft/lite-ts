@@ -49,11 +49,18 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
                     bCount += now;
                     op = cr.op.replace('now-diff', '') as enum_.RelationOperator;
                 }
-                return (op == enum_.RelationOperator.ge && aCount >= bCount) ||
-                    (op == enum_.RelationOperator.gt && aCount > bCount) ||
-                    (op == enum_.RelationOperator.le && aCount <= bCount) ||
-                    (op == enum_.RelationOperator.lt && aCount < bCount) ||
-                    (aCount == bCount);
+                switch (op) {
+                    case enum_.RelationOperator.ge:
+                        return aCount >= bCount;
+                    case enum_.RelationOperator.gt:
+                        return aCount > bCount;
+                    case enum_.RelationOperator.le:
+                        return aCount <= bCount;
+                    case enum_.RelationOperator.lt:
+                        return aCount < bCount;
+                    default:
+                        return aCount == bCount;
+                }
             });
             const res = await Promise.all(tasks);
             const ok = res.every(cr => cr);

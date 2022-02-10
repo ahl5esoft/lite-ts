@@ -50,6 +50,27 @@ describe('src/service/target/value-service-base.ts', () => {
             strictEqual(res, true);
         });
 
+        it(`${enum_.RelationOperator.eq}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 1;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 11,
+                op: enum_.RelationOperator.eq,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
+        });
+
         it(`${enum_.RelationOperator.eqNowDiff}(单组)`, async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new Self(null, mockNowTime.actual);
@@ -69,6 +90,27 @@ describe('src/service/target/value-service-base.ts', () => {
                 valueType: 1
             }]]);
             strictEqual(res, true);
+        });
+
+        it(`${enum_.RelationOperator.eqNowDiff}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 10;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 1,
+                op: enum_.RelationOperator.eqNowDiff,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
         });
 
         it(`${enum_.RelationOperator.ge}(单组)`, async () => {
@@ -92,6 +134,27 @@ describe('src/service/target/value-service-base.ts', () => {
             strictEqual(res, true);
         });
 
+        it(`${enum_.RelationOperator.ge}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 10;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 11,
+                op: enum_.RelationOperator.ge,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
+        });
+
         it(`${enum_.RelationOperator.geNowDiff}(单组)`, async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new Self(null, mockNowTime.actual);
@@ -111,6 +174,27 @@ describe('src/service/target/value-service-base.ts', () => {
                 valueType: 1
             }]]);
             strictEqual(res, true);
+        });
+
+        it(`${enum_.RelationOperator.geNowDiff}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 10;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 1,
+                op: enum_.RelationOperator.geNowDiff,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
         });
 
         it(`${enum_.RelationOperator.gt}(单组)`, async () => {
@@ -134,6 +218,27 @@ describe('src/service/target/value-service-base.ts', () => {
             strictEqual(res, true);
         });
 
+        it(`${enum_.RelationOperator.gt}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 11;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 11,
+                op: enum_.RelationOperator.gt,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
+        });
+
         it(`${enum_.RelationOperator.gtNowDiff}(单组)`, async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new Self(null, mockNowTime.actual);
@@ -153,6 +258,27 @@ describe('src/service/target/value-service-base.ts', () => {
                 valueType: 1
             }]]);
             strictEqual(res, true);
+        });
+
+        it(`${enum_.RelationOperator.gtNowDiff}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 11;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 1,
+                op: enum_.RelationOperator.gtNowDiff,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
         });
 
         it(`${enum_.RelationOperator.le}(单组)`, async () => {
@@ -176,6 +302,27 @@ describe('src/service/target/value-service-base.ts', () => {
             strictEqual(res, true);
         });
 
+        it(`${enum_.RelationOperator.le}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 12;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 11,
+                op: enum_.RelationOperator.le,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
+        });
+
         it(`${enum_.RelationOperator.leNowDiff}(单组)`, async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new Self(null, mockNowTime.actual);
@@ -195,6 +342,27 @@ describe('src/service/target/value-service-base.ts', () => {
                 valueType: 1
             }]]);
             strictEqual(res, true);
+        });
+
+        it(`${enum_.RelationOperator.leNowDiff}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 12;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 1,
+                op: enum_.RelationOperator.leNowDiff,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
         });
 
         it(`${enum_.RelationOperator.lt}(单组)`, async () => {
@@ -218,6 +386,27 @@ describe('src/service/target/value-service-base.ts', () => {
             strictEqual(res, true);
         });
 
+        it(`${enum_.RelationOperator.lt}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 11;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 11,
+                op: enum_.RelationOperator.lt,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
+        });
+
         it(`${enum_.RelationOperator.ltNowDiff}(单组)`, async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new Self(null, mockNowTime.actual);
@@ -237,6 +426,27 @@ describe('src/service/target/value-service-base.ts', () => {
                 valueType: 1
             }]]);
             strictEqual(res, true);
+        });
+
+        it(`${enum_.RelationOperator.ltNowDiff}(单组)不通过`, async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, mockNowTime.actual);
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                10
+            );
+
+            Reflect.set(self, 'getCount', () => {
+                return 11;
+            });
+
+            const res = await self.checkConditions(null, [[{
+                count: 1,
+                op: enum_.RelationOperator.ltNowDiff,
+                valueType: 1
+            }]]);
+            strictEqual(res, false);
         });
 
         it('all(单组)', async () => {
