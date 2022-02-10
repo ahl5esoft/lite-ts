@@ -1,9 +1,9 @@
 import { EnumFacatoryBase, IParser, IValueData } from '../..';
 
 /**
- * 数值消耗解析器
+ * 数值数据解析器
  */
-export class ValueConsumeParser<T extends { text: string, value: number }> implements IParser {
+export class ValueDataParser<T extends { text: string, value: number }> implements IParser {
     /**
      * 构造函数
      * 
@@ -14,7 +14,7 @@ export class ValueConsumeParser<T extends { text: string, value: number }> imple
     public constructor(
         private m_EnumFactory: EnumFacatoryBase,
         private m_ValueTypeModel: new () => T,
-        private m_Reg = /^(.+)\*-(\d+)$/,
+        private m_Reg = /^(.+)\*(-?\d+)$/,
     ) { }
 
     /**
@@ -55,7 +55,7 @@ export class ValueConsumeParser<T extends { text: string, value: number }> imple
                 throw new Error(`无效数值消费数量: ${r}`);
 
             res.push({
-                count: count > 0 ? -count : count,
+                count: count,
                 valueType: enumItem.data.value
             });
         }
