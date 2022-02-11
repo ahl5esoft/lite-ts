@@ -1,6 +1,7 @@
 import moment from 'moment';
 
 import { TargetValueServiceBase } from './value-service-base';
+import { CustomError } from '..';
 import {
     DbFactoryBase,
     IAssociateStorageService,
@@ -15,6 +16,7 @@ import {
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../..';
+import { enum_ } from '../../model';
 
 /**
  * 目标试试数值服务
@@ -127,6 +129,14 @@ export abstract class TargetRealTimeValueServiceBase<
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;
+                }
+
+                if (valueTypeItem.data.isPositive && entry.values[r.valueType] < 0) {
+                    throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
+                        consume: Math.abs(r.count),
+                        count: logEntry.oldCount,
+                        valueType: r.valueType,
+                    });
                 }
             } else {
                 entry.values[r.valueType] += r.count;

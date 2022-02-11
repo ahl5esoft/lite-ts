@@ -36,7 +36,37 @@ export interface IValueTypeData extends IEnumItemData {
      * ```
      */
     dailyTime?: number;
-
+    /**
+     * 数值类型更新之后的值必须为正数
+     * 
+     * @example
+     * ```typescript
+     *  const valueTypeDatas: IValueTypeData[] = [{
+     *      value: 1,
+     *      text: '金币',
+     *      isPositive: true
+     *  }];
+     * 
+     *  const valueService: ITargetValueService;
+     *  valueService.data = {
+     *      id: '目标ID',
+     *      values: [{
+     *          1: 10
+     *      }]
+     *  };
+     * 
+     *  let err: Error;
+     *  try {
+     *      wait valueService.update(工作单元, [{
+     *         count: -100,
+     *         valueType: 1
+     *      ]);
+     *  } catch (ex) {
+     *      err = ex;
+     *  }
+     *  // err = new CustomError(ErrorCode.valueTypeNotEnough, { valueType: 1, count: 10, consume: -100 })
+     */
+    isPositive?: boolean;
     /**
      * 数值类型每次更新时都是替换, 默认为累积
      * 

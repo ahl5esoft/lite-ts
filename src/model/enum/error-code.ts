@@ -19,6 +19,10 @@ export enum ErrorCode {
      */
     timeout,
     /**
+     * 数值类型不足
+     */
+    valueTypeNotEnough,
+    /**
      * 服务端异常
      */
     panic = 599,

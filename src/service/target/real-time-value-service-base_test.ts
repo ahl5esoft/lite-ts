@@ -1,7 +1,9 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import moment from 'moment';
 
 import { TargetRealTimeValueServiceBase } from './real-time-value-service-base';
-import { Mock, mockAny } from '..';
+import { CustomError, Mock, mockAny } from '..';
+import { enum_ } from '../../model';
 import {
     DbFactoryBase,
     DbRepositoryBase,
@@ -19,7 +21,6 @@ import {
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../..';
-import moment from 'moment';
 
 class TargetValue implements ITargetValueData {
     public id: string;
@@ -151,6 +152,85 @@ describe('src/service/target/real-time-value-service-base.ts', () => {
             await self.update(null, []);
 
             strictEqual(isCalledCreateEntry, true);
+        });
+
+        it('IValueTypeData.isPositive = true', async () => {
+            const mockAssociateStorageService = new Mock<IAssociateStorageService>();
+            const mockDbFactory = new Mock<DbFactoryBase>();
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            const mockValueType = new Mock<IEnum<ValueTypeData>>();
+            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
+            const self = new Self(mockAssociateStorageService.actual, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, TargetValue, TargetValueChange, TargetValueLog, mockValueType.actual, null);
+
+            const entry = {
+                id: 'uid',
+                values: {
+                    1: 10
+                }
+            } as TargetValue;
+            self.entry = entry;
+
+            const mockValueDbRepo = new Mock<DbRepositoryBase<TargetValue>>();
+            mockDbFactory.expectReturn(
+                r => r.db(TargetValue, null),
+                mockValueDbRepo.actual
+            );
+
+            const mockLogDbRepo = new Mock<DbRepositoryBase<TargetValueLog>>();
+            mockDbFactory.expectReturn(
+                r => r.db(TargetValueLog, null),
+                mockLogDbRepo.actual
+            );
+
+            const valueChange = {
+                count: -11,
+                source: 'test',
+                valueType: 1
+            } as TargetValueChange;
+
+            const mockValueInterceptor = new Mock<IValueInterceptor>();
+            mockValueInterceptorFactory.expectReturn(
+                r => r.build(1, valueChange.valueType),
+                mockValueInterceptor.actual
+            );
+
+            mockValueInterceptor.expectReturn(
+                r => r.before(null, self, valueChange),
+                false
+            );
+
+            Reflect.set(self, 'createLogEntry', () => {
+                return {};
+            });
+
+            const logID = 'log-id';
+            mockStringGenerator.expectReturn(
+                r => r.generate(),
+                logID
+            );
+
+            const mockValueTypeItem = new Mock<IEnumItem<ValueTypeData>>({
+                data: {
+                    isPositive: true
+                }
+            });
+            mockValueType.expectReturn(
+                r => r.get(mockAny),
+                mockValueTypeItem.actual
+            );
+
+            let err: CustomError;
+            try {
+                await self.update(null, [valueChange]);
+            } catch (ex) {
+                err = ex;
+            }
+            strictEqual(err.code, enum_.ErrorCode.valueTypeNotEnough);
+            deepStrictEqual(err.data, {
+                consume: 11,
+                count: 10,
+                valueType: 1
+            });
         });
 
         it('IValueTypeData.isReplace = true', async () => {
