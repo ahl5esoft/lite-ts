@@ -1,11 +1,10 @@
 import { EnumItem } from '../enum';
-import { DbFactoryBase, IEnum, IEnumItem, IEnumItemData } from '../..';
-import { global } from '../../model';
+import { DbFactoryBase, IEnum, IEnumItem, IEnumItemData, ITraceable, model } from '../..';
 
 /**
  * mongo枚举
  */
-export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
+export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable {
     /**
      * 所有项
      */
@@ -16,7 +15,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
      * 
      * @param m_DbFactory 数据库工厂
      * @param m_Name 枚举名
-     * @param m_Sep 分隔符
+     * @param m_Sep 分隔符(default: -)
      */
     public constructor(
         private m_DbFactory: DbFactoryBase,
@@ -30,7 +29,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
      */
     public async all() {
         if (!this.m_Items) {
-            const rows = await this.m_DbFactory.db(global.Enum).query().where({
+            const rows = await this.m_DbFactory.db(model.global.Enum).query().where({
                 id: this.m_Name
             }).toArray();
             if (rows.length) {
@@ -55,5 +54,18 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
         return items.find(r => {
             return predicate(r.data);
         });
+    }
+
+    /**
+     * 跟踪
+     * 
+     * @param parentSpan 父跟踪范围
+     */
+    public withTrace(parentSpan: any) {
+        let dbFactory = this.m_DbFactory;
+        const dbFactoryTracer = dbFactory as any as ITraceable;
+        if (dbFactoryTracer.withTrace)
+            dbFactory = dbFactoryTracer.withTrace(parentSpan);
+        return new MongoEnum(dbFactory, this.m_Name, this.m_Sep);
     }
 }

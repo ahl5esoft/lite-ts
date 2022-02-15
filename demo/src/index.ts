@@ -3,7 +3,10 @@ import 'reflect-metadata';
 import { Express, Request, Response } from 'express';
 import Container from 'typedi';
 
+import { enum_ } from './model';
 import {
+    DbFactoryBase,
+    EnumFacatoryBase,
     IApiResponse,
     ILog,
     IOFactoryBase,
@@ -14,6 +17,18 @@ import {
 
 (async () => {
     const cfg = await service.initIoC(__dirname);
+
+    Container.set(
+        EnumFacatoryBase,
+        new service.EnumFactory({
+            [enum_.CityData.name]: () => {
+                return new service.MongoEnum(
+                    Container.get<DbFactoryBase>(DbFactoryBase as any),
+                    enum_.CityData.name,
+                );
+            }
+        })
+    );
 
     const ioFactory = Container.get<IOFactoryBase>(IOFactoryBase as any);
     const apiFactory = await service.APIFactory.create(
