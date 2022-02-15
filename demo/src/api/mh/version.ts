@@ -1,4 +1,4 @@
-import { IApi } from '../../../src';
+import { IApi } from '../../../../src';
 
 /**
  * 获取版本

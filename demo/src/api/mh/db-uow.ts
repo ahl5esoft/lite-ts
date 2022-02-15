@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 
-import { DbFactoryBase, IApi, model } from '../../../src';
+import { DbFactoryBase, IApi, model } from '../../../../src';
 
 /**
  * 数据库事务

@@ -10,11 +10,10 @@ import {
     LogFactoryBase,
     model,
     service
-} from '../src';
-import { initIoC } from '../src/service';
+} from '../../src';
 
 (async () => {
-    const cfg = await initIoC(__dirname);
+    const cfg = await service.initIoC(__dirname);
 
     const ioFactory = Container.get<IOFactoryBase>(IOFactoryBase as any);
     const apiFactory = await service.APIFactory.create(

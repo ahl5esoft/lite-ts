@@ -39,7 +39,7 @@ export async function initIoC(rootDirPath: string) {
         return r.endsWith('mocha');
     });
     const configFactory = new YamlConfigFactory(
-        ioFactory.buildFile(rootDirPath, `config${isTest ? '-it' : ''}.yaml`)
+        ioFactory.buildFile(rootDirPath, '..', `config${isTest ? '-it' : ''}.yaml`)
     );
     Container.set(ConfigFactoryBase, configFactory);
 
