@@ -1,18 +1,38 @@
 import { validate } from 'class-validator';
-import { Express } from 'express';
+import { Express, Request, Response } from 'express';
+import { opentracing } from 'jaeger-client';
 
 import { ExpressOption } from '.';
 import { CustomError } from '..';
-import { IApi, IApiResponse, ILog } from '../..';
+import { IApi, IApiResponse, ILog, ITraceable } from '../..';
 import { enum_ } from '../../model';
 
+/**
+ * 创建post ExpressOption
+ * 
+ * @param routeRule 路由规则
+ * @param buildLogFunc 创建log函数
+ * @param getApiFunc 获取api函数
+ */
 export function buildPostExpressOption(
     routeRule: string,
     buildLogFunc: () => ILog,
     getApiFunc: (log: ILog, req: any) => Promise<IApi>,
 ): ExpressOption {
     return function (app: Express) {
-        app.post(routeRule, async (req: any, resp: any) => {
+        app.post(routeRule, async (req: Request, resp: Response) => {
+            const tracer = opentracing.globalTracer();
+            const span = tracer.startSpan(req.path, {
+                childOf: tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers),
+                tags: {
+                    [opentracing.Tags.SPAN_KIND]: opentracing.Tags.SPAN_KIND_RPC_SERVER,
+                    [opentracing.Tags.HTTP_METHOD]: req.method,
+                }
+            });
+            span.log({
+                headers: req.headers
+            });
+
             const log = buildLogFunc();
             let res: IApiResponse = {
                 data: null,
@@ -20,7 +40,16 @@ export function buildPostExpressOption(
             };
             try {
                 let api = await getApiFunc(log, req);
+                for (const r of Object.keys(api)) {
+                    const childTracer = api[r] as ITraceable;
+                    if (childTracer.withTrace)
+                        api[r] = childTracer.withTrace(span);
+                }
+
                 if (req.body) {
+                    span.log({
+                        body: req.body
+                    });
                     Object.keys(req.body).forEach(r => {
                         if (r in api)
                             return;
@@ -31,7 +60,14 @@ export function buildPostExpressOption(
 
                 const validationErrors = await validate(api);
                 if (validationErrors.length) {
-                    log.addLabel('validate', validationErrors);
+                    span.log({
+                        validate: validationErrors.map(r => {
+                            return {
+                                arg: r.property,
+                                rules: r.constraints
+                            };
+                        })
+                    });
                     throw new CustomError(enum_.ErrorCode.verify);
                 }
 
@@ -44,8 +80,14 @@ export function buildPostExpressOption(
                     res.err = enum_.ErrorCode.panic;
                     log.error(ex);
                 }
+                span.setTag(opentracing.Tags.ERROR, true);
             }
-            resp.json(res);
+            finally {
+                resp.json(res);
+                span.log({
+                    result: res
+                }).finish();
+            }
         });
     }
 }

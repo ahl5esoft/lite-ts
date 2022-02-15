@@ -21,7 +21,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
     public constructor(
         private m_DbFactory: DbFactoryBase,
         private m_Name: string,
-        private m_Sep: string
+        private m_Sep = '-'
     ) { }
 
     /**

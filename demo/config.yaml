@@ -1,0 +1,11 @@
+Default:
+  mongo: mongodb://localhost:27017
+  name: lite-ts
+  openTracing:
+    config:
+      reporter:
+        collectorEndpoint: http://10.10.0.66:14268/api/traces
+      sampler:
+        type: const
+        param: 1
+  port: 9999

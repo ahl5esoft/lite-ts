@@ -1,6 +1,6 @@
 import { DbFactoryBase } from './db-factory-base';
 import { IDbQuery } from './i-db-query';
-import { IUnitOfWorkRepository } from './i-unit-of-work-repository';
+import { UnitOfWorkRepositoryBase } from './unit-of-work-repository-base';
 
 type regiterAction = (table: string, entry: any) => void;
 
@@ -16,9 +16,9 @@ export abstract class DbRepositoryBase<T> {
     /**
      * 工作单元
      */
-    protected get uow(): IUnitOfWorkRepository {
+    protected get uow() {
         if (!this.m_Uow) {
-            this.m_Uow = this.m_DbFactory.uow() as IUnitOfWorkRepository;
+            this.m_Uow = this.m_DbFactory.uow() as UnitOfWorkRepositoryBase;
             this.m_IsTx = false;
         }
 
@@ -33,8 +33,8 @@ export abstract class DbRepositoryBase<T> {
      * @param m_DbFactory 数据库工厂
      */
     public constructor(
-        protected table: string,
-        private m_Uow: IUnitOfWorkRepository,
+        protected model: new () => T,
+        private m_Uow: UnitOfWorkRepositoryBase,
         private m_DbFactory: DbFactoryBase,
     ) { }
 
@@ -77,7 +77,7 @@ export abstract class DbRepositoryBase<T> {
      * @param entry 实体
      */
     private async exec(action: regiterAction, entry: any) {
-        action.bind(this.uow)(this.table, entry);
+        action.bind(this.uow)(this.model.name, entry);
         if (this.m_IsTx)
             return;
 

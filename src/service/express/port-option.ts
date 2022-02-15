@@ -3,6 +3,13 @@ import moment from 'moment';
 
 import { ExpressOption } from '.';
 
+/**
+ * 创建端口ExpressOption
+ * 
+ * @param project 项目名
+ * @param port 项目端口号
+ * @param version 项目版本
+ */
 export function buildPortExpressOption(project: string, port: number, version: string): ExpressOption {
     return function (app: Express) {
         const args: any[] = [port, () => {
