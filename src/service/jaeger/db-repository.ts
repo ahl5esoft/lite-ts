@@ -1,6 +1,7 @@
+import { opentracing } from 'jaeger-client';
+
 import { JaegerDbQuery } from './db-query';
 import { DbFactoryBase, DbRepositoryBase, UnitOfWorkRepositoryBase } from '../..';
-import { opentracing } from 'jaeger-client';
 
 /**
  * jaeger数据库仓储

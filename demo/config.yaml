@@ -1,4 +1,5 @@
 Default:
+  gatewayUrl: http://127.0.0.1:30202
   mongo: mongodb://localhost:27017
   name: lite-ts
   openTracing:
