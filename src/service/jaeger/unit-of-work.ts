@@ -17,7 +17,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      */
     protected get span() {
         if (!this.m_Span) {
-            this.m_Span = this.m_Tracer.startSpan('uow', {
+            this.m_Span = this.m_Tracer.startSpan('db.uow', {
                 childOf: this.m_ParentSpan
             });
         }

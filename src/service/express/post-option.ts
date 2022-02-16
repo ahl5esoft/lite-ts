@@ -2,10 +2,8 @@ import { validate } from 'class-validator';
 import { Express, Request, Response } from 'express';
 import { opentracing } from 'jaeger-client';
 
-import { ExpressOption } from '.';
 import { CustomError } from '..';
-import { IApi, IApiResponse, ILog, ITraceable } from '../..';
-import { enum_ } from '../../model';
+import { IApi, IApiResponse, ILog, ITraceable, model } from '../..';
 
 /**
  * 创建post ExpressOption
@@ -18,7 +16,7 @@ export function buildPostExpressOption(
     routeRule: string,
     buildLogFunc: () => ILog,
     getApiFunc: (log: ILog, req: any) => Promise<IApi>,
-): ExpressOption {
+) {
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
             const tracer = opentracing.globalTracer();
@@ -68,7 +66,7 @@ export function buildPostExpressOption(
                             };
                         })
                     });
-                    throw new CustomError(enum_.ErrorCode.verify);
+                    throw new CustomError(model.enum_.ErrorCode.verify);
                 }
 
                 res.data = await api.call();
@@ -77,7 +75,7 @@ export function buildPostExpressOption(
                     res.data = ex.data;
                     res.err = ex.code;
                 } else {
-                    res.err = enum_.ErrorCode.panic;
+                    res.err = model.enum_.ErrorCode.panic;
                     log.error(ex);
                 }
                 span.setTag(opentracing.Tags.ERROR, true);

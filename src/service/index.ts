@@ -18,6 +18,7 @@ export * from './ioredis';
 export * from './jaeger';
 export * from './js-yaml';
 export * from './log';
+export * from './log4js';
 export * from './math';
 export * from './mongo';
 export * from './parser';

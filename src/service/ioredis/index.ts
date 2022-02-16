@@ -5,27 +5,12 @@ import { IRedisGeoData, RedisBase } from '../..';
 type RedisType = Ioredis.Cluster | Ioredis.Redis;
 
 export class IoredisAdapter extends RedisBase {
-    private m_SubCallbacks: { [key: string]: (message: string) => Promise<void>; } = {};
-
     private m_Client: RedisType;
     protected get client(): RedisType {
         if (this.m_Client == null)
             this.m_Client = this.m_Opt instanceof Array ? new Ioredis.Cluster(this.m_Opt) : new Ioredis(this.m_Opt);
 
         return this.m_Client;
-    }
-
-    private m_Sub: RedisType;
-    protected get sub(): RedisType {
-        if (this.m_Sub == null) {
-            this.m_Sub = this.m_Opt instanceof Array ? new Ioredis.Cluster(this.m_Opt) : new Ioredis(this.m_Opt);
-            this.m_Sub.on('message', (channel: string, message: string) => {
-                if (this.m_SubCallbacks[channel])
-                    this.m_SubCallbacks[channel](message).catch(console.log);
-            });
-        }
-
-        return this.m_Sub;
     }
 
     public constructor(
@@ -56,7 +41,6 @@ export class IoredisAdapter extends RedisBase {
 
     public close() {
         this.client?.disconnect();
-        this.sub?.disconnect();
     }
 
     public async del(key: string) {
@@ -72,7 +56,7 @@ export class IoredisAdapter extends RedisBase {
         await this.client.expire(key, seconds);
     }
 
-    public async get(key: string): Promise<string> {
+    public async get(key: string) {
         return this.client.get(key);
     }
 
@@ -144,12 +128,6 @@ export class IoredisAdapter extends RedisBase {
         return this.client.mget(...keys);
     }
 
-    public async publish(channel: string, message: any) {
-        if (typeof message != 'string')
-            message = JSON.stringify(message);
-        await this.client.publish(channel, message);
-    }
-
     public async rpop(key: string) {
         return this.client.rpop(key);
     }
@@ -169,12 +147,5 @@ export class IoredisAdapter extends RedisBase {
 
     public async ttl(key: string) {
         return this.client.ttl(key);
-    }
-
-    public async unsubscribe(...channels: string[]) {
-        channels.forEach(r => {
-            delete this.m_SubCallbacks[r];
-        });
-        await this.sub.unsubscribe(channels);
     }
 }

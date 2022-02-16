@@ -17,7 +17,7 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      */
     protected get span() {
         if (!this.m_Span) {
-            this.m_Span = this.m_Tracer.startSpan('db', {
+            this.m_Span = this.m_Tracer.startSpan('db.query', {
                 childOf: this.m_ParentSpan,
                 tags: {
                     table: this.m_Table
