@@ -8,6 +8,7 @@ import {
     FSIOFactory,
     IoredisAdapter,
     JaegerDbFactory,
+    JeagerRedis,
     LogFactory,
     MongoDbFactory,
     MongoStringGenerator,
@@ -76,7 +77,10 @@ export async function initIoC(rootDirPath: string) {
 
     if (cfg.redis) {
         const redis = new IoredisAdapter(cfg.redis);
-        Container.set(RedisBase, redis);
+        Container.set(
+            RedisBase,
+            new JeagerRedis(redis)
+        );
 
         Container.set(
             NowTimeBase,

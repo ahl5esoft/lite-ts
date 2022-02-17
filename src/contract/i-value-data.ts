@@ -14,4 +14,12 @@ export interface IValueData {
      * 来源
      */
     source?: string;
+    /**
+     * 目标类型
+     */
+    targetType?: number;
+    /**
+     * 目标值
+     */
+    targetValue?: number;
 }

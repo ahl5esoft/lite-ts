@@ -58,7 +58,7 @@ class Wrapper extends RpcBase {
         const header = this.m_Header || {};
         this.tracer.inject(this.span, opentracing.FORMAT_HTTP_HEADERS, header);
         const res = await this.m_PostFunc(route, this.m_Body, header);
-        this.span.log({
+        this.span.setTag('route', route).log({
             result: res
         }).finish();
         return res as IApiResponse;
