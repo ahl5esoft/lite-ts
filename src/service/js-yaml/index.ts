@@ -1,1 +1,1 @@
-export * from './config-factory';
+export * from './config-loader';

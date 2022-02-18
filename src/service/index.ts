@@ -22,7 +22,6 @@ export * from './log4js';
 export * from './math';
 export * from './mongo';
 export * from './parser';
-export * from './promise';
 export * from './push';
 export * from './redis';
 export * from './set-timeout';

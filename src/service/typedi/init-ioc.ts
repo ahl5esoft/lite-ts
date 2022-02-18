@@ -9,15 +9,15 @@ import {
     IoredisAdapter,
     JaegerDbFactory,
     JeagerRedis,
+    JsYamlConfigLoader,
     LogFactory,
     MongoDbFactory,
     MongoStringGenerator,
     RedisNowTime,
     SetTimeoutThread,
-    YamlConfigFactory
 } from '..';
 import {
-    ConfigFactoryBase,
+    ConfigLoaderBase,
     DbFactoryBase,
     IOFactoryBase,
     LogFactoryBase,
@@ -39,12 +39,12 @@ export async function initIoC(rootDirPath: string) {
     const isTest = process.argv.some(r => {
         return r.endsWith('mocha');
     });
-    const configFactory = new YamlConfigFactory(
+    const configLaoder = new JsYamlConfigLoader(
         ioFactory.buildFile(rootDirPath, '..', `config${isTest ? '-it' : ''}.yaml`)
     );
-    Container.set(ConfigFactoryBase, configFactory);
+    Container.set(ConfigLoaderBase, configLaoder);
 
-    const cfg = await configFactory.build(model.config.Default).get();
+    const cfg = await configLaoder.load(model.config.Default);
 
     const pkg = await ioFactory.buildFile(rootDirPath, '..', 'package.json').readJSON<{ version: string }>();
     cfg.version = pkg.version;
@@ -106,6 +106,7 @@ export async function initIoC(rootDirPath: string) {
         StringGeneratorBase,
         new MongoStringGenerator()
     );
+
     Container.set(
         ThreadBase,
         new SetTimeoutThread()
