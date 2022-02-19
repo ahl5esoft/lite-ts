@@ -4,6 +4,8 @@ import { JaegerUnitOfWork as Self } from './unit-of-work';
 import { Mock } from '..';
 import { UnitOfWorkRepositoryBase } from '../..';
 
+class TestUnitOfWorkModel { }
+
 describe('src/service/jaeger/unit-of-work.ts', () => {
     describe('.commit()', () => {
         it('ok', async () => {
@@ -30,9 +32,9 @@ describe('src/service/jaeger/unit-of-work.ts', () => {
             const mockUow = new Mock<UnitOfWorkRepositoryBase>();
             const self = new Self(mockUow.actual, null);
 
-            mockUow.expected.registerAdd('table', {});
+            mockUow.expected.registerAdd(TestUnitOfWorkModel, {});
 
-            self.registerAdd('table', {});
+            self.registerAdd(TestUnitOfWorkModel, {});
         });
     });
 
@@ -41,9 +43,9 @@ describe('src/service/jaeger/unit-of-work.ts', () => {
             const mockUow = new Mock<UnitOfWorkRepositoryBase>();
             const self = new Self(mockUow.actual, null);
 
-            mockUow.expected.registerRemove('table', {});
+            mockUow.expected.registerRemove(TestUnitOfWorkModel, {});
 
-            self.registerRemove('table', {});
+            self.registerRemove(TestUnitOfWorkModel, {});
         });
     });
 
@@ -52,9 +54,9 @@ describe('src/service/jaeger/unit-of-work.ts', () => {
             const mockUow = new Mock<UnitOfWorkRepositoryBase>();
             const self = new Self(mockUow.actual, null);
 
-            mockUow.expected.registerSave('table', {});
+            mockUow.expected.registerSave(TestUnitOfWorkModel, {});
 
-            self.registerSave('table', {});
+            self.registerSave(TestUnitOfWorkModel, {});
         });
     });
 });

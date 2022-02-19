@@ -15,6 +15,14 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
     public abstract commit(): Promise<void>;
 
     /**
+     * 注册新增
+     * 
+     * @param model 模型
+     * @param entry 实体
+     */
+    public abstract registerAdd(model: Function, entry: any): void;
+
+    /**
      * 注册提交后函数
      * 
      * @param action 函数
@@ -24,26 +32,18 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
     }
 
     /**
-     * 注册新增
-     * 
-     * @param table 表
-     * @param entry 实体
-     */
-    public abstract registerAdd(table: string, entry: any): void;
-
-    /**
      * 注册删除
      * 
-     * @param table 表
+     * @param model 模型
      * @param entry 实体
      */
-    public abstract registerRemove(table: string, entry: any): void;
+    public abstract registerRemove(model: Function, entry: any): void;
 
     /**
      * 注册更新
      * 
-     * @param table 表
+     * @param model 模型
      * @param entry 实体
      */
-    public abstract registerSave(table: string, entry: any): void;
+    public abstract registerSave(model: Function, entry: any): void;
 }

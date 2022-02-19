@@ -44,13 +44,13 @@ export class UnitOfWork extends UnitOfWorkRepositoryBase {
     /**
      * 注册新增
      * 
-     * @param table 表
+     * @param model 模型
      * @param entry 实体
      */
-    public registerAdd(table: string, entry: any) {
+    public registerAdd(model: Function, entry: any) {
         this.m_Queue.push(async session => {
             const db = await this.m_Pool.getDb();
-            await db.collection(table, {
+            await db.collection(model.name, {
                 session: session,
             }).insertOne(toDoc(entry));
         });
@@ -59,13 +59,13 @@ export class UnitOfWork extends UnitOfWorkRepositoryBase {
     /**
      * 注册删除
      * 
-     * @param table 表
+     * @param model 模型
      * @param entry 实体
      */
-    public registerRemove(table: string, entry: any) {
+    public registerRemove(model: Function, entry: any) {
         this.m_Queue.push(async session => {
             const db = await this.m_Pool.getDb();
-            await db.collection(table, {
+            await db.collection(model.name, {
                 session: session,
             }).deleteOne({
                 _id: entry.id,
@@ -76,13 +76,13 @@ export class UnitOfWork extends UnitOfWorkRepositoryBase {
     /**
      * 注册更新
      * 
-     * @param table 表
+     * @param model 模型
      * @param entry 实体
      */
-    public registerSave(table: string, entry: any) {
+    public registerSave(model: Function, entry: any) {
         this.m_Queue.push(async session => {
             const db = await this.m_Pool.getDb();
-            await db.collection(table, {
+            await db.collection(model.name, {
                 session: session,
             }).updateOne({
                 _id: entry.id,

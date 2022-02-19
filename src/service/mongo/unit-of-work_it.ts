@@ -15,19 +15,22 @@ describe('src/service/mongo/unit-of-work.ts', () => {
         await client.close();
     });
 
-    describe('.registerAdd(table: string, entry: any): void', () => {
-        const table = 'registerAdd';
+    describe('.registerAdd(model: Function, entry: any): void', () => {
+        class RegisterAdd {
+            public id: string;
+            public name: string;
+        }
         it('ok', async () => {
             const self = new Self(pool);
             const entry = {
-                id: `${table}-1`,
+                id: `${RegisterAdd.name}-1`,
                 name: 'test',
             };
-            self.registerAdd(table, entry);
+            self.registerAdd(RegisterAdd, entry);
             await self.commit();
 
             const db = await pool.getDb();
-            const res = await db.collection(table).find().toArray();
+            const res = await db.collection(RegisterAdd.name).find().toArray();
             deepStrictEqual(
                 toEntries(res),
                 [entry]
@@ -35,59 +38,53 @@ describe('src/service/mongo/unit-of-work.ts', () => {
         });
     });
 
-    describe('.registerAfter(action: () => Promise<void>)', () => {
-        it('ok', () => {
-            const self = new Self(null);
-            const action = async () => { };
-            self.registerAfter(action);
-
-            const actions = Reflect.get(self, 'm_AfterActions');
-            deepStrictEqual(actions, [action]);
-        });
-    });
-
-    describe('.registerRemove(table: string, entry: any): void', () => {
-        const table = 'registerRemove';
+    describe('.registerRemove(model: Function, entry: any): void', () => {
+        class RegisterRemove {
+            public id: string;
+        }
         it('ok', async () => {
             const rows = [{
-                _id: `${table}-1`,
+                _id: `${RegisterRemove.name}-1`,
             }, {
-                _id: `${table}-2`,
+                _id: `${RegisterRemove.name}-2`,
             }];
             const db = await pool.getDb();
-            const collection = db.collection(table);
+            const collection = db.collection(RegisterRemove.name);
             await collection.insertMany(rows);
 
             const self = new Self(pool);
             self.registerRemove(
-                table,
+                RegisterRemove,
                 toEntries(rows)[0],
             );
             await self.commit();
 
-            const res = await db.collection(table).find().toArray();
+            const res = await db.collection(RegisterRemove.name).find().toArray();
             deepStrictEqual(res, [rows[1]]);
         });
     });
 
-    describe('.registerSave(table: string, entry: any): void', () => {
-        const table = 'registerSave';
+    describe('.registerSave(model: Function, entry: any): void', () => {
+        class RegisterSave {
+            public id: string;
+            public name: string;
+        }
         it('ok', async () => {
             const rows = [{
-                _id: `${table}-1`,
+                _id: `${RegisterSave.name}-1`,
                 name: 'one',
             }];
             const db = await pool.getDb();
-            const collection = db.collection(table);
+            const collection = db.collection(RegisterSave.name);
             await collection.insertMany(rows);
 
             const self = new Self(pool);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
-            self.registerSave(table, entry);
+            self.registerSave(RegisterSave, entry);
             await self.commit();
 
-            const res = await db.collection(table).find().toArray();
+            const res = await db.collection(RegisterSave.name).find().toArray();
             deepStrictEqual(res, [{
                 _id: rows[0]._id,
                 name: entry.name,

@@ -56,45 +56,45 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
     /**
      * 注册新增
      * 
-     * @param table 模型名
+     * @param model 模型
      * @param entry 实体
      */
-    public registerAdd(table: string, entry: any) {
-        this.m_Uow.registerAdd(table, entry);
+    public registerAdd(model: Function, entry: any) {
+        this.m_Uow.registerAdd(model, entry);
         this.span.log({
             action: 'add',
             entry: entry,
-            table: table
+            table: model.name
         });
     }
 
     /**
      * 注册删除
      * 
-     * @param table 模型名
+     * @param model 模型
      * @param entry 实体
      */
-    public registerRemove(table: string, entry: any) {
-        this.m_Uow.registerRemove(table, entry);
+    public registerRemove(model: Function, entry: any) {
+        this.m_Uow.registerRemove(model, entry);
         this.span.log({
             action: 'remove',
             entry: entry,
-            table: table
+            table: model.name
         });
     }
 
     /**
      * 注册更新
      * 
-     * @param table 模型名
+     * @param model 模型
      * @param entry 实体
      */
-    public registerSave(table: string, entry: any) {
-        this.m_Uow.registerSave(table, entry);
+    public registerSave(model: Function, entry: any) {
+        this.m_Uow.registerSave(model, entry);
         this.span.log({
             action: 'save',
             entry: entry,
-            table: table
+            table: model.name
         });
     }
 

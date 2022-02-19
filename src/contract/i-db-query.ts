@@ -43,7 +43,7 @@ export interface IDbQuery<T> {
     /**
      * 设置查询条件
      * 
-     * @param selecor 条件
+     * @param selector 条件
      */
-    where(selecor: any): this;
+    where(selector: any): this;
 }

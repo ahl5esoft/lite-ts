@@ -2,7 +2,7 @@ import { DbFactoryBase } from './db-factory-base';
 import { IDbQuery } from './i-db-query';
 import { UnitOfWorkRepositoryBase } from './unit-of-work-repository-base';
 
-type regiterAction = (table: string, entry: any) => void;
+type regiterAction = (model: Function, entry: any) => void;
 
 /**
  * 表数据仓储
@@ -77,7 +77,7 @@ export abstract class DbRepositoryBase<T> {
      * @param entry 实体
      */
     private async exec(action: regiterAction, entry: any) {
-        action.bind(this.uow)(this.model.name, entry);
+        action.bind(this.uow)(this.model, entry);
         if (this.m_IsTx)
             return;
 
