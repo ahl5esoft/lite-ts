@@ -398,31 +398,6 @@ describe('src/service/ioredis/index.ts', () => {
         });
     });
 
-    describe('.publish(channel: string, message: any): Promise<number>', () => {
-        it('ok', async () => {
-            let pChannel = 'p-c';
-            let pMessage = 'p-m';
-            let sChannel: string, sMessage: string;
-            await sub.subscribe(pChannel);
-            sub.on('message', (channel: string, message: string): void => {
-                sChannel = channel;
-                sMessage = message;
-            });
-
-            await self.publish(pChannel, pMessage);
-
-            for (let i = 0; i < 5; i++) {
-                if (sChannel && sMessage)
-                    break;
-
-                await thread.sleep(10);
-            }
-
-            strictEqual(sChannel, pChannel);
-            strictEqual(sMessage, pMessage);
-        });
-    });
-
     describe('.set(k: string, v: string, ...args: any[])', () => {
         it('only key, value', async () => {
             const key = 'set.keyAndValue';

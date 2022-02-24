@@ -1,6 +1,7 @@
 import bent from 'bent';
 import { opentracing } from 'jaeger-client';
 
+import { CustomError } from '..';
 import { IApiResponse, ITraceable, RpcBase } from '../..';
 
 /**
@@ -58,10 +59,18 @@ class Wrapper extends RpcBase {
         const header = this.m_Header || {};
         this.tracer.inject(this.span, opentracing.FORMAT_HTTP_HEADERS, header);
         const res = await this.m_PostFunc(route, this.m_Body, header);
+        const resp = res as IApiResponse;
         this.span.setTag('route', route).log({
-            result: res
-        }).finish();
-        return res as IApiResponse;
+            result: resp
+        });
+        if (resp.err)
+            this.span.setTag(opentracing.Tags.ERROR, true);
+        this.span.finish();
+
+        if (resp.err)
+            throw new CustomError(resp.err, resp.data);
+
+        return resp;
     }
 
     public setBody(v: any) {

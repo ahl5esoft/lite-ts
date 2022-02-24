@@ -77,6 +77,9 @@ export function buildPostExpressOption(
                 } else {
                     res.err = model.enum_.ErrorCode.panic;
                     log.error(ex);
+                    span.log({
+                        err: ex
+                    });
                 }
                 span.setTag(opentracing.Tags.ERROR, true);
             }

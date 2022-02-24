@@ -4,6 +4,9 @@ dist/
 docs/
 node_modules/
 src/service/bent/qywx-markdown-push_test.ts
+src/service/sequelize/db-factory_it.ts
+src/service/sequelize/db-query_it.ts
+src/service/sequelize/unit-of-work_it.ts
 src/service/ssh2/command_test.ts
 src/service/ssh2/sftp-invoker_it.ts
 src/service/ssh2/sftp-io-directory_it.ts

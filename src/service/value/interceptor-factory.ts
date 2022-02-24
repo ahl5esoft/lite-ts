@@ -43,11 +43,11 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
         if (valueTypeCtors) {
             const ctor = valueTypeCtors[valueType];
             if (ctor) {
-                let interceptor = Container.get(ctor);
+                const interceptor = Container.get(ctor);
+                Container.remove(ctor);
+
                 const tracer = interceptor as any as ITraceable;
-                if (tracer.withTrace)
-                    interceptor = tracer.withTrace(this.m_ParentSpan);
-                return interceptor;
+                return tracer.withTrace ? tracer.withTrace(this.m_ParentSpan) : interceptor;
             }
         }
 

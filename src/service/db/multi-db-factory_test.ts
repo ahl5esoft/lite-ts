@@ -8,7 +8,9 @@ class Test { }
 
 describe('src/service/db/multi-db-factory.ts', () => {
     it('.db<T>(model: new () => T, ...extra: any[])', () => {
-        const mockDbFactory = new Mock<DbFactoryBase>();
+        const mockDbFactory = new Mock<DbFactoryBase>({
+            withTrace: null
+        });
         const self = new Self({
             'a': mockDbFactory.actual
         });

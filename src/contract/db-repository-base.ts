@@ -28,7 +28,7 @@ export abstract class DbRepositoryBase<T> {
     /**
      * 构造函数
      * 
-     * @param table 表名
+     * @param model 模型
      * @param m_Uow 工作单元
      * @param m_DbFactory 数据库工厂
      */

@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"@elastic/elasticsearch": "^8.0.0",
 		"@types/ssh2": "^0.5.48",
 		"bcryptjs": "^2.4.3",
 		"bent": "^7.3.12",
@@ -13,7 +14,9 @@
 		"log4js": "^6.4.1",
 		"moment": "^2.29.1",
 		"mongodb": "^3.6.9",
+		"mysql2": "^2.3.3",
 		"reflect-metadata": "^0.1.13",
+		"sequelize": "^6.16.2",
 		"simple-git": "^2.48.0",
 		"ssh2": "^1.5.0",
 		"typedi": "^0.8.0"
@@ -55,5 +58,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "10.72.27"
+	"version": "10.73.27"
 }

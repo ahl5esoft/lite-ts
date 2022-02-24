@@ -37,7 +37,7 @@ export interface IValueTypeData extends IEnumItemData {
      */
     dailyTime?: number;
     /**
-     * 数值类型更新之后的值必须为正数
+     * 数值类型更新之后的值可为负数
      * 
      * @example
      * ```typescript
@@ -66,7 +66,7 @@ export interface IValueTypeData extends IEnumItemData {
      *  }
      *  // err = new CustomError(ErrorCode.valueTypeNotEnough, { valueType: 1, count: 10, consume: -100 })
      */
-    isPositive?: boolean;
+    isNegative?: boolean;
     /**
      * 数值类型每次更新时都是替换, 默认为累积
      * 

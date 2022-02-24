@@ -131,7 +131,7 @@ export abstract class TargetRealTimeValueServiceBase<
                     entry.values[r.valueType] += r.count;
                 }
 
-                if (valueTypeItem.data.isPositive && entry.values[r.valueType] < 0) {
+                if (entry.values[r.valueType] < 0 && !valueTypeItem.data.isNegative) {
                     throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
                         consume: Math.abs(r.count),
                         count: logEntry.oldCount,
