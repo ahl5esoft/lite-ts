@@ -6,15 +6,6 @@ import { IEnum, ITargetValueData, model, RpcBase } from '../..';
 
 describe('src/service/user/service.ts', () => {
     describe('.getTargetValueService(targetType: number, targetValue: number)', () => {
-        it('targetType = 0', async () => {
-            const self = new Self(null, null, null, null, null, null, null, null, null);
-
-            Reflect.set(self, 'm_ValueService', 'user.vs');
-
-            const res = await self.getTargetValueService(0, 1);
-            strictEqual(res, 'user.vs');
-        });
-
         it('无效目标类型', async () => {
             const mockTargetTypeEnum = new Mock<IEnum<model.enum_.TargetTypeData>>();
             const self = new Self(null, null, null, mockTargetTypeEnum.actual, null, null, null, null, null);

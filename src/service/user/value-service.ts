@@ -98,8 +98,12 @@ export class UserValueService extends TargetRealTimeValueServiceBase<
                 targetType: number,
                 targetValue: number
             }[]).map(async cr => {
-                const targetValueService = await this.userService.getTargetValueService(cr.targetType, cr.targetValue);
-                return targetValueService.checkConditions(uow, [cr.conditions]);
+                if (cr.targetType) {
+                    const targetValueService = await this.userService.getTargetValueService(cr.targetType, cr.targetValue);
+                    return targetValueService.checkConditions(uow, [cr.conditions]);
+                } else {
+                    return super.checkConditions(uow, [cr.conditions]);
+                }
             });
             const taskResults = await Promise.all(tasks);
             return taskResults.every(cr => cr);
@@ -135,8 +139,12 @@ export class UserValueService extends TargetRealTimeValueServiceBase<
             targetType: number,
             targetValue: number
         }[]).map(async r => {
-            const targetValueService = await this.userService.getTargetValueService(r.targetType, r.targetValue);
-            return targetValueService.update(uow, r.values);
+            if (r.targetType) {
+                const targetValueService = await this.userService.getTargetValueService(r.targetType, r.targetValue);
+                return targetValueService.update(uow, r.values);
+            } else {
+                await super.update(uow, r.values);
+            }
         });
         await Promise.all(tasks);
     }
