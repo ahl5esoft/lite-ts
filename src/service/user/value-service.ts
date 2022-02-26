@@ -2,6 +2,7 @@ import { TargetRealTimeValueServiceBase } from '..';
 import {
     DbFactoryBase,
     IEnum,
+    IRewardData,
     IUnitOfWork,
     IUserService,
     IUserValueService,
@@ -17,12 +18,12 @@ import {
 /**
  * 用户数值服务
  */
-export class UserValueService<T extends IUserService> extends TargetRealTimeValueServiceBase<
+export class UserValueService extends TargetRealTimeValueServiceBase<
     model.global.UserValue,
     model.global.UserValueChange,
     model.global.UserValueLog,
     IValueTypeData
-> implements IUserValueService<T> {
+> implements IUserValueService {
     /**
      * 获取用户数值实体
      */
@@ -49,7 +50,7 @@ export class UserValueService<T extends IUserService> extends TargetRealTimeValu
      * @param valueInterceptorFactory 数值拦截器工厂
      */
     public constructor(
-        public userService: T,
+        public userService: IUserService,
         valueTypeEnum: IEnum<IValueTypeData>,
         dbFactory: DbFactoryBase,
         nowTime: NowTimeBase,
@@ -138,6 +139,43 @@ export class UserValueService<T extends IUserService> extends TargetRealTimeValu
             return targetValueService.update(uow, r.values);
         });
         await Promise.all(tasks);
+    }
+
+    /**
+     * 根据奖励更新数值
+     * 
+     * @param uow 工作单元
+     * @param rewards 奖励
+     * @param source 来源
+     */
+    public async updateByRewards(uow: IUnitOfWork, source: string, rewards: IRewardData[][]) {
+        let res: IValueData[] = [];
+        for (const r of rewards) {
+            let rewardData: IRewardData;
+            if (r.length == 1) {
+                rewardData = r[0];
+            } else {
+                const total = r.reduce((memo, r) => {
+                    return memo + r.weight * 1;
+                }, 0);
+                let rand = Math.floor(
+                    Math.random() * total
+                );
+                rewardData = r.find(cr => {
+                    rand -= cr.weight;
+                    return rand <= 0;
+                });
+            }
+            res.push({
+                count: rewardData.count,
+                source: source,
+                valueType: rewardData.valueType
+            });
+        }
+
+        await this.update(uow, res);
+
+        return res;
     }
 
     /**

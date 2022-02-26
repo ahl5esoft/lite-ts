@@ -25,7 +25,7 @@ export class UserService implements IUserService {
      */
     private m_TargetValueServices: { [targetType: number]: ITargetValueService[] } = {};
 
-    private m_ValueService: IUserValueService<IUserService>;
+    private m_ValueService: IUserValueService;
     /**
      * 用户数值服务
      */
@@ -33,11 +33,11 @@ export class UserService implements IUserService {
         if (!this.m_ValueService) {
             this.m_ValueService = new UserValueService(
                 this,
-                this.m_ValueTypeEnum,
-                this.m_DbFactory,
-                this.m_NowTime,
-                this.m_StringGenerator,
-                this.m_ValueInterceptorFactory
+                this.valueTypeEnum,
+                this.dbFactory,
+                this.nowTime,
+                this.stringGenerator,
+                this.valueInterceptorFactory
             );
         }
 
@@ -48,24 +48,24 @@ export class UserService implements IUserService {
      * 
      * @param associateStorageService 关联存储服务
      * @param userID 用户ID
-     * @param m_ValueTypeEnum 数值类型枚举
-     * @param m_TargetTypeEnum 目标类型枚举
-     * @param m_DbFactory 数据库工厂
-     * @param m_NowTime 当前时间
-     * @param m_Rpc 远程过程调用
-     * @param m_StringGenerator 字符串生成器
-     * @param m_ValueInterceptorFactory 数值拦截器工厂
+     * @param valueTypeEnum 数值类型枚举
+     * @param targetTypeEnum 目标类型枚举
+     * @param dbFactory 数据库工厂
+     * @param nowTime 当前时间
+     * @param rpc 远程过程调用
+     * @param stringGenerator 字符串生成器
+     * @param valueInterceptorFactory 数值拦截器工厂
      */
     public constructor(
         public associateStorageService: IAssociateStorageService,
         public userID: string,
-        private m_ValueTypeEnum: IEnum<IValueTypeData>,
-        private m_TargetTypeEnum: IEnum<model.enum_.TargetTypeData>,
-        private m_DbFactory: DbFactoryBase,
-        private m_NowTime: NowTimeBase,
-        private m_Rpc: RpcBase,
-        private m_StringGenerator: StringGeneratorBase,
-        private m_ValueInterceptorFactory: ValueInterceptorFactoryBase,
+        protected valueTypeEnum: IEnum<IValueTypeData>,
+        protected targetTypeEnum: IEnum<model.enum_.TargetTypeData>,
+        protected dbFactory: DbFactoryBase,
+        protected nowTime: NowTimeBase,
+        protected rpc: RpcBase,
+        protected stringGenerator: StringGeneratorBase,
+        protected valueInterceptorFactory: ValueInterceptorFactoryBase,
     ) { }
 
     /**
@@ -78,14 +78,14 @@ export class UserService implements IUserService {
         if (!targetType)
             return this.valueService;
 
-        const targetTypeItem = await this.m_TargetTypeEnum.get(r => {
+        const targetTypeItem = await this.targetTypeEnum.get(r => {
             return r.value == targetValue;
         });
         if (!targetTypeItem)
             throw new Error(`无效目标类型: ${targetType}`);
 
         if (!this.m_TargetValueServices[targetType]) {
-            const resp = await this.m_Rpc.setBody({
+            const resp = await this.rpc.setBody({
                 userID: this.userID
             }).call(`/${targetTypeItem.data.app}/ih/find-values-by-user-id`);
             if (resp.err)
@@ -112,6 +112,6 @@ export class UserService implements IUserService {
      * @param targetEntry 目标实体 
      */
     private createTargetValueService(targetTypeData: model.enum_.TargetTypeData, targetEntry: ITargetValueData) {
-        return new TargetRemoteValueService(targetEntry, this.m_Rpc, targetTypeData, this.userID, this.m_ValueTypeEnum, this.m_NowTime);
+        return new TargetRemoteValueService(targetEntry, this.rpc, targetTypeData, this.userID, this.valueTypeEnum, this.nowTime);
     }
 }

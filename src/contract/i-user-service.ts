@@ -1,4 +1,6 @@
-import { IAssociateStorageService, ITargetValueService, IUserValueService } from '.';
+import { IAssociateStorageService } from './i-associate-storage-service';
+import { ITargetValueService } from './i-target-value-service';
+import { IUserValueService } from './i-user-value-service';
 
 /**
  * 用户服务
@@ -11,7 +13,7 @@ export interface IUserService {
     /**
      * 数值服务
      */
-    readonly valueService: IUserValueService<IUserService>;
+    readonly valueService: IUserValueService;
     /**
      * 用户ID
      */

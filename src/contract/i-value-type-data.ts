@@ -42,9 +42,9 @@ export interface IValueTypeData extends IEnumItemData {
      * @example
      * ```typescript
      *  const valueTypeDatas: IValueTypeData[] = [{
+     *      isNegative: true, // 如果该值未false, 更新后为负数则会报错: new CustomError(ErrorCode.valueTypeNotEnough, { valueType: 1, count: 10, consume: -100 })
+     *      text: '相对横坐标',
      *      value: 1,
-     *      text: '金币',
-     *      isPositive: true
      *  }];
      * 
      *  const valueService: ITargetValueService;
@@ -55,16 +55,10 @@ export interface IValueTypeData extends IEnumItemData {
      *      }]
      *  };
      * 
-     *  let err: Error;
-     *  try {
-     *      wait valueService.update(工作单元, [{
-     *         count: -100,
-     *         valueType: 1
-     *      ]);
-     *  } catch (ex) {
-     *      err = ex;
-     *  }
-     *  // err = new CustomError(ErrorCode.valueTypeNotEnough, { valueType: 1, count: 10, consume: -100 })
+     *  wait valueService.update(工作单元, [{
+     *      count: -100,
+     *      valueType: 1
+     *  ]);
      */
     isNegative?: boolean;
     /**

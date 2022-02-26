@@ -1,8 +1,8 @@
-import { strictEqual } from 'assert';
+import { deepStrictEqual, strictEqual } from 'assert';
 
 import { UserValueService as Self } from './value-service';
 import { Mock } from '..';
-import { ITargetValueService, IUserService, model } from '../..';
+import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData, model } from '../..';
 
 describe('src/service/user/value-service.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][])', () => {
@@ -141,6 +141,53 @@ describe('src/service/user/value-service.ts', () => {
                 targetValue: 4,
                 valueType: 6
             }]);
+        });
+    });
+
+    describe('.updateByRewards(uow: IUnitOfWork, rewards: IRewardData[][], source: string)', () => {
+        it('', async () => {
+            const userID = 'user-id';
+            const self = new Self({
+                userID: userID
+            } as IUserService, null, null, null, null, null);
+
+            const source = 'test';
+            const rewards = [
+                [{
+                    count: 11,
+                    valueType: 1
+                }],
+                [{
+                    count: 22,
+                    valueType: 2,
+                    weight: 999
+                }, {
+                    count: 222,
+                    valueType: 2,
+                    weight: 1
+                }]
+            ] as IRewardData[][];
+            const expectRes = [{
+                count: 11,
+                source: source,
+                valueType: 1
+            }, {
+                count: 22,
+                source: source,
+                valueType: 2
+            }];
+            Reflect.set(self, 'update', (arg: IUnitOfWork, arg1: IValueData[]) => {
+                deepStrictEqual(
+                    [arg, arg1],
+                    [
+                        null,
+                        expectRes
+                    ]
+                )
+            });
+
+            const res = await self.updateByRewards(null, source, rewards);
+            deepStrictEqual(res, expectRes);
         });
     });
 });
