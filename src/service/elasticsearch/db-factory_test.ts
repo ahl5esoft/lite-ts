@@ -13,16 +13,14 @@ class TestDbFactoryModel {
 const clientOpts = {
     node: 'http://10.10.0.66:9200'
 } as ClientOptions;
-const self: DbFactoryBase = new Self(clientOpts, 'test');
 
 describe('src/service/elasticsearch/db-factory.ts', () => {
     afterEach(async () => {
-        try {
-            const pool = Reflect.get(self, 'm_Pool') as ElasticSearchPool;
-            await pool.client.indices.delete({
-                index: await pool.getIndex(TestDbFactoryModel)
-            });
-        } catch { }
+        const self = new Self(clientOpts, 'test');
+        const pool = Reflect.get(self, 'm_Pool') as ElasticSearchPool;
+        await pool.client.indices.delete({
+            index: await pool.getIndex(TestDbFactoryModel)
+        });
     });
 
     describe('.db<T>(model: new () => T, uow: ElasticSearchUnitOfWork)', () => {
@@ -34,6 +32,7 @@ describe('src/service/elasticsearch/db-factory.ts', () => {
                     no: i
                 });
             }
+            const self: DbFactoryBase = new Self(clientOpts, 'test');
             const pool = Reflect.get(self, 'm_Pool') as ElasticSearchPool;
             const index = await pool.getIndex(TestDbFactoryModel);
             await pool.client.bulk({
@@ -60,6 +59,7 @@ describe('src/service/elasticsearch/db-factory.ts', () => {
                     no: i
                 });
             }
+            const self: DbFactoryBase = new Self(clientOpts, 'test');
             const pool = Reflect.get(self, 'm_Pool') as ElasticSearchPool;
             const index = await pool.getIndex(TestDbFactoryModel);
             await pool.client.bulk({
@@ -82,6 +82,7 @@ describe('src/service/elasticsearch/db-factory.ts', () => {
 
     describe('.uow()', () => {
         it('ok', async () => {
+            const self: DbFactoryBase = new Self(clientOpts, 'test');
             const uow = self.uow();
             const db = self.db(TestDbFactoryModel, uow);
             db.add({

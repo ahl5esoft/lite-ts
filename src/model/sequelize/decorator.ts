@@ -12,6 +12,15 @@ export function Field(define: DataType | ModelAttributeColumnOptions<any>): Prop
         if (!defines[target.constructor.name])
             defines[target.constructor.name] = {};
 
+        if (typeof define == 'function') {
+            define = {
+                allowNull: false,
+                type: define,
+            };
+        } else {
+            (define as ModelAttributeColumnOptions<any>).allowNull = false;
+        }
+
         defines[target.constructor.name][field] = define;
     };
 }
