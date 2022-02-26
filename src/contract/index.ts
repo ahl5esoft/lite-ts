@@ -22,7 +22,6 @@ export * from './i-parser';
 export * from './i-push';
 export * from './i-redis-geo-data';
 export * from './i-reward-data';
-export * from './i-target-type-data';
 export * from './i-target-value-change-data';
 export * from './i-target-value-log-data';
 export * from './i-target-value-data';

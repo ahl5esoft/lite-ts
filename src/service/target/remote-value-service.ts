@@ -2,11 +2,11 @@ import { TargetValueServiceBase } from './value-service-base';
 import { CustomError } from '..';
 import {
     IEnum,
-    ITargetTypeData,
     ITargetValueData,
     IUnitOfWork,
     IValueData,
     IValueTypeData,
+    model,
     NowTimeBase,
     RpcBase
 } from '../..';
@@ -35,7 +35,7 @@ export class TargetRemoteValueService extends TargetValueServiceBase<ITargetValu
     public constructor(
         private m_Entry: ITargetValueData,
         private m_Rpc: RpcBase,
-        private m_TargetTypeData: ITargetTypeData,
+        private m_TargetTypeData: model.enum_.TargetTypeData,
         private m_userID: string,
         valueTypeEnum: IEnum<IValueTypeData>,
         nowTime: NowTimeBase,

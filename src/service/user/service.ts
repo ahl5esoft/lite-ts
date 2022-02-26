@@ -5,12 +5,12 @@ import {
     EnumFacatoryBase,
     IAssociateStorageService,
     IEnum,
-    ITargetTypeData,
     ITargetValueData,
     ITargetValueService,
     IUserService,
     IUserValueService,
     IValueTypeData,
+    model,
     NowTimeBase,
     RpcBase,
     StringGeneratorBase,
@@ -45,13 +45,13 @@ export class UserService implements IUserService {
         return this.m_ValueService;
     }
 
-    private m_TargetTypeEnum: IEnum<ITargetTypeData>;
+    private m_TargetTypeEnum: IEnum<model.enum_.TargetTypeData>;
     /**
      * 目标类型枚举
      */
     protected get targetTypeEnum() {
         if (!this.m_TargetTypeEnum)
-            this.m_TargetTypeEnum = this.m_EnumFactory.build(this.m_TargetTypeModel);
+            this.m_TargetTypeEnum = this.m_EnumFactory.build(model.enum_.TargetTypeData);
 
         return this.m_TargetTypeEnum;
     }
@@ -77,7 +77,6 @@ export class UserService implements IUserService {
      * @param m_Rpc 远程过程调用
      * @param m_StringGenerator 字符串生成器
      * @param m_ValueInterceptorFactory 数值拦截器工厂
-     * @param m_TargetTypeModel 目标类型模型
      * @param m_ValueTypeModel 数值类型模型
      */
     public constructor(
@@ -89,7 +88,6 @@ export class UserService implements IUserService {
         private m_Rpc: RpcBase,
         private m_StringGenerator: StringGeneratorBase,
         private m_ValueInterceptorFactory: ValueInterceptorFactoryBase,
-        private m_TargetTypeModel: new () => ITargetTypeData,
         private m_ValueTypeModel: new () => IValueTypeData,
     ) { }
 
@@ -136,7 +134,7 @@ export class UserService implements IUserService {
      * @param targetTypeData 目标类型数据
      * @param targetEntry 目标实体 
      */
-    private createTargetValueService(targetTypeData: ITargetTypeData, targetEntry: ITargetValueData) {
+    private createTargetValueService(targetTypeData: model.enum_.TargetTypeData, targetEntry: ITargetValueData) {
         return new TargetRemoteValueService(targetEntry, this.m_Rpc, targetTypeData, this.userID, this.valueTypeEnum, this.m_NowTime);
     }
 }
