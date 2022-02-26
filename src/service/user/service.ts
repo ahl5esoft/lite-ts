@@ -2,7 +2,6 @@ import { UserValueService } from './value-service';
 import { CustomError, TargetRemoteValueService } from '..';
 import {
     DbFactoryBase,
-    EnumFacatoryBase,
     IAssociateStorageService,
     IEnum,
     ITargetValueData,
@@ -34,7 +33,7 @@ export class UserService implements IUserService {
         if (!this.m_ValueService) {
             this.m_ValueService = new UserValueService(
                 this,
-                this.valueTypeEnum,
+                this.m_ValueTypeEnum,
                 this.m_DbFactory,
                 this.m_NowTime,
                 this.m_StringGenerator,
@@ -45,50 +44,28 @@ export class UserService implements IUserService {
         return this.m_ValueService;
     }
 
-    private m_TargetTypeEnum: IEnum<model.enum_.TargetTypeData>;
-    /**
-     * 目标类型枚举
-     */
-    protected get targetTypeEnum() {
-        if (!this.m_TargetTypeEnum)
-            this.m_TargetTypeEnum = this.m_EnumFactory.build(model.enum_.TargetTypeData);
-
-        return this.m_TargetTypeEnum;
-    }
-
-    private m_ValueTypeEnum: IEnum<IValueTypeData>;
-    /**
-     * 数值枚举
-     */
-    protected get valueTypeEnum() {
-        if (!this.m_ValueTypeEnum)
-            this.m_ValueTypeEnum = this.m_EnumFactory.build(this.m_ValueTypeModel);
-
-        return this.m_ValueTypeEnum;
-    }
-
     /**
      * 
      * @param associateStorageService 关联存储服务
      * @param userID 用户ID
+     * @param m_ValueTypeEnum 数值类型枚举
+     * @param m_TargetTypeEnum 目标类型枚举
      * @param m_DbFactory 数据库工厂
-     * @param m_EnumFactory 枚举工厂
      * @param m_NowTime 当前时间
      * @param m_Rpc 远程过程调用
      * @param m_StringGenerator 字符串生成器
      * @param m_ValueInterceptorFactory 数值拦截器工厂
-     * @param m_ValueTypeModel 数值类型模型
      */
     public constructor(
         public associateStorageService: IAssociateStorageService,
         public userID: string,
+        private m_ValueTypeEnum: IEnum<IValueTypeData>,
+        private m_TargetTypeEnum: IEnum<model.enum_.TargetTypeData>,
         private m_DbFactory: DbFactoryBase,
-        private m_EnumFactory: EnumFacatoryBase,
         private m_NowTime: NowTimeBase,
         private m_Rpc: RpcBase,
         private m_StringGenerator: StringGeneratorBase,
         private m_ValueInterceptorFactory: ValueInterceptorFactoryBase,
-        private m_ValueTypeModel: new () => IValueTypeData,
     ) { }
 
     /**
@@ -135,6 +112,6 @@ export class UserService implements IUserService {
      * @param targetEntry 目标实体 
      */
     private createTargetValueService(targetTypeData: model.enum_.TargetTypeData, targetEntry: ITargetValueData) {
-        return new TargetRemoteValueService(targetEntry, this.m_Rpc, targetTypeData, this.userID, this.valueTypeEnum, this.m_NowTime);
+        return new TargetRemoteValueService(targetEntry, this.m_Rpc, targetTypeData, this.userID, this.m_ValueTypeEnum, this.m_NowTime);
     }
 }

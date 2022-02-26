@@ -16,10 +16,8 @@ describe('src/service/user/service.ts', () => {
         });
 
         it('无效目标类型', async () => {
-            const self = new Self(null, null, null, null, null, null, null, null, null);
-
             const mockTargetTypeEnum = new Mock<IEnum<model.enum_.TargetTypeData>>();
-            Reflect.set(self, 'm_TargetTypeEnum', mockTargetTypeEnum.actual);
+            const self = new Self(null, null, null, mockTargetTypeEnum.actual, null, null, null, null, null);
 
             mockTargetTypeEnum.expectReturn(
                 r => r.get(mockAny),
@@ -37,12 +35,10 @@ describe('src/service/user/service.ts', () => {
         });
 
         it('目标数值服务没有缓存', async () => {
+            const mockTargetTypeEnum = new Mock<IEnum<model.enum_.TargetTypeData>>();
             const mockRpc = new Mock<RpcBase>();
             const userID = 'uid';
-            const self = new Self(null, userID, null, null, null, mockRpc.actual, null, null, null);
-
-            const mockTargetTypeEnum = new Mock<IEnum<model.enum_.TargetTypeData>>();
-            Reflect.set(self, 'm_TargetTypeEnum', mockTargetTypeEnum.actual);
+            const self = new Self(null, userID, null, mockTargetTypeEnum.actual, null, null, mockRpc.actual, null, null);
 
             const targetTypeData = {
                 app: 'test',
@@ -104,12 +100,10 @@ describe('src/service/user/service.ts', () => {
         });
 
         it('目标数值服务不存在', async () => {
+            const mockTargetTypeEnum = new Mock<IEnum<model.enum_.TargetTypeData>>();
             const mockRpc = new Mock<RpcBase>();
             const userID = 'uid';
-            const self = new Self(null, userID, null, null, null, mockRpc.actual, null, null, null);
-
-            const mockTargetTypeEnum = new Mock<IEnum<model.enum_.TargetTypeData>>();
-            Reflect.set(self, 'm_TargetTypeEnum', mockTargetTypeEnum.actual);
+            const self = new Self(null, userID, null, mockTargetTypeEnum.actual, null, null, mockRpc.actual, null, null);
 
             const targetTypeData = {
                 app: 'test',
