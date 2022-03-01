@@ -28,7 +28,7 @@ export interface IGitRepository {
      * 
      * @param branch 分支
      */
-    clone(branch: string): Promise<void>;
+    clone(branch: string, ...args: string[]): Promise<void>;
 
     /**
      * 提交
