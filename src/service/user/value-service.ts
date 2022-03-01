@@ -187,28 +187,6 @@ export class UserValueService extends TargetRealTimeValueServiceBase<
     }
 
     /**
-     * 查找并清除关联用户数值变更数据
-     */
-    protected async findAndClearChangeEntries() {
-        const changeEntries = await this.associateStorageService.find(model.global.UserValueChange, r => {
-            return r.userID == this.userService.userID;
-        });
-        this.associateStorageService.clear(model.global.UserValueChange, r => {
-            return r.userID == this.userService.userID;
-        });
-        return changeEntries;
-    }
-
-    /**
-     * 创建用户数值变更实体
-     */
-    protected createChangeEntry() {
-        return {
-            userID: this.userService.userID
-        } as model.global.UserValueChange;
-    }
-
-    /**
      * 创建用户数值实体
      */
     protected createEntry() {
@@ -224,5 +202,18 @@ export class UserValueService extends TargetRealTimeValueServiceBase<
         return {
             userID: this.userService.userID
         } as model.global.UserValueLog;
+    }
+
+    /**
+     * 查找并清除关联用户数值变更数据
+     */
+    protected async findAndClearChangeEntries() {
+        const changeEntries = await this.associateStorageService.find(model.global.UserValueChange, r => {
+            return r.userID == this.userService.userID;
+        });
+        this.associateStorageService.clear(model.global.UserValueChange, r => {
+            return r.userID == this.userService.userID;
+        });
+        return changeEntries;
     }
 }
