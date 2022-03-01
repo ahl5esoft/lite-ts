@@ -1,3 +1,5 @@
+import { TaskOptions } from 'simple-git';
+
 import { IODirectoryBase } from './io-directory-base';
 
 /**
@@ -56,4 +58,11 @@ export interface IGitRepository {
      * @param branch 分支
      */
     push(remote: string, branch: string): Promise<void>;
+
+    /**
+     * 更新子模块
+     * 
+     * @param options 参数
+     */
+    subModule(options: TaskOptions): Promise<void>;
 }
