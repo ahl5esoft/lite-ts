@@ -1,4 +1,4 @@
-import buildGit from 'simple-git';
+import buildGit, { TaskOptions } from 'simple-git';
 
 import { IGitRepository, IGitRepositoryData, IODirectoryBase } from '../..';
 
@@ -65,5 +65,9 @@ export class SimpleGitRepository implements IGitRepository {
 
     public async push(remote: string, branch: string) {
         await this.m_Git.push(remote, branch);
+    }
+
+    public async subModule(options: TaskOptions) {
+        await this.m_Git.subModule(options);
     }
 }
