@@ -34,8 +34,8 @@ export class SimpleGitRepository implements IGitRepository {
         this.m_Branch = branch;
     }
 
-    public async clone(branch: string) {
-        await this.m_Git.clone(this.fullHttpUrl, this.dir.path, ['-b', branch]);
+    public async clone(branch: string, ...args: string[]) {
+        await this.m_Git.clone(this.fullHttpUrl, this.dir.path, ['-b', branch, ...args]);
         await this.m_Git.cwd(this.dir.path);
         this.m_Branch = branch;
     }
