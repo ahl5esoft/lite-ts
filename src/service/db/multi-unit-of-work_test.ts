@@ -1,7 +1,7 @@
 import { notStrictEqual } from 'assert';
 
 import { MultiUnitOfWork as Self } from './multi-unit-of-work';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IUnitOfWork } from '../..';
 
 describe('src/service/db/multi-unit-of-work.ts', () => {

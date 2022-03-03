@@ -1,4 +1,4 @@
-import { ICommandResult } from '../../contract';
+import { ICommandResult } from '../..';
 
 export class CommandResult implements ICommandResult {
     public code: number;

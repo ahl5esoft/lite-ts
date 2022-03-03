@@ -1,8 +1,9 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 import moment from 'moment';
 
-import { TargetRealTimeValueServiceBase } from './real-time-value-service-base';
-import { CustomError, Mock, mockAny } from '..';
+import { TargetLocalValueServiceBase } from './local-value-service-base';
+import { Mock, mockAny } from '../assert';
+import { CustomError } from '../error';
 import { enum_ } from '../../model';
 import {
     DbFactoryBase,
@@ -50,7 +51,7 @@ class ValueTypeData implements IValueTypeData {
     public todayTime?: number;
 }
 
-class Self extends TargetRealTimeValueServiceBase<TargetValue, TargetValueChange, TargetValueLog, ValueTypeData> {
+class Self extends TargetLocalValueServiceBase<TargetValue, TargetValueChange, TargetValueLog, ValueTypeData> {
     public entry: any;
 
     private m_ChagneEntries: TargetValueChange[];
@@ -81,7 +82,7 @@ class Self extends TargetRealTimeValueServiceBase<TargetValue, TargetValueChange
     }
 }
 
-describe('src/service/target/real-time-value-service-base.ts', () => {
+describe('src/service/target/local-value-service-base.ts', () => {
     describe('.getCount(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();

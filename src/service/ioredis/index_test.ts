@@ -3,7 +3,7 @@ import Ioredis from 'ioredis';
 
 import { IoredisAdapter as Self } from './index';
 import { SetTimeoutThread } from '../set-timeout';
-import { IRedisGeoData } from '../../contract';
+import { IRedisGeoData } from '../..';
 
 const cfg = {
     host: '127.0.0.1',

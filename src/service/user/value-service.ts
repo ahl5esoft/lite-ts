@@ -1,4 +1,4 @@
-import { TargetRealTimeValueServiceBase } from '..';
+import { TargetLocalValueServiceBase } from '../target';
 import {
     DbFactoryBase,
     IEnum,
@@ -18,7 +18,7 @@ import {
 /**
  * 用户数值服务
  */
-export class UserValueService extends TargetRealTimeValueServiceBase<
+export class UserValueService extends TargetLocalValueServiceBase<
     model.global.UserValue,
     model.global.UserValueChange,
     model.global.UserValueLog,

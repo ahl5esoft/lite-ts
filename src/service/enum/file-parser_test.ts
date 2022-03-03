@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
 
 import { EnumFileParser as Self } from './file-parser';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IOFactoryBase, IOFileBase } from '../..';
 
 describe('src/service/enum/parser.ts', () => {

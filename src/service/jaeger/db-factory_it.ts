@@ -2,7 +2,7 @@ import { strictEqual } from 'assert';
 import { initTracer, opentracing } from 'jaeger-client';
 
 import { JaegerDbFactory as Self } from './db-factory';
-import { MongoDbFactory } from '..';
+import { MongoDbFactory } from '../mongo';
 import { DbFactoryBase } from '../..';
 
 class TestJaeger {

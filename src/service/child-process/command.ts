@@ -1,7 +1,7 @@
 import { ChildProcessWithoutNullStreams, CommonSpawnOptions, spawn } from 'child_process';
 
 import { CommandResult } from '../command';
-import { CommandBase, ICommandResult } from '../../contract';
+import { CommandBase, ICommandResult } from '../..';
 
 class CommandWrapper implements CommandBase {
     private m_Dir: string;

@@ -3,7 +3,7 @@ import express from 'express';
 import supertest from 'supertest';
 
 import { buildPostExpressOption as self } from './post-option';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IApi, ILog } from '../..';
 
 describe('src/service/express/post-option.ts', () => {

@@ -4,7 +4,7 @@ import { promisify } from 'util';
 
 import { FSIOFactory } from '.';
 import { IOFile } from './io-file';
-import { IODirectoryBase, IONodeBase } from '../../contract';
+import { IODirectoryBase, IONodeBase } from '../..';
 
 const mkdirAction = promisify(mkdir);
 const readdirFunc = promisify(readdir);

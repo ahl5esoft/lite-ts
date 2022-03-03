@@ -1,7 +1,8 @@
 import { notStrictEqual, strictEqual } from 'assert';
 
 import { TargetRemoteValueService as Self } from './remote-value-service';
-import { CustomError, Mock } from '..';
+import { Mock } from '../assert';
+import { CustomError } from '../error';
 import { model, RpcBase } from '../..';
 
 describe('src/service/target/remote-value-service.ts', () => {

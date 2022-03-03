@@ -3,7 +3,7 @@ import { dirname } from 'path';
 import { promisify } from 'util';
 
 import { FSIOFactory } from '.';
-import { IOFileBase } from '../../contract';
+import { IOFileBase } from '../..';
 
 const readFileFunc = promisify(readFile);
 const unlinkAction = promisify(unlink);

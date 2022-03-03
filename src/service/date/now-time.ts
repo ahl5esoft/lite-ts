@@ -1,4 +1,4 @@
-import { NowTimeBase } from '../../contract';
+import { NowTimeBase } from '../..';
 
 /**
  * Date实现

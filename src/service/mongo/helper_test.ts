@@ -1,6 +1,6 @@
 import { deepStrictEqual } from 'assert';
 
-import { toDoc, toEntries } from '../../../src/service/mongo/helper';
+import { toDoc, toEntries } from './helper';
 
 describe('src/service/mongo/helper.ts', () => {
     describe('.toDoc(entry: any): any', () => {

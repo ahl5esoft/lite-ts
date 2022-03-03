@@ -3,7 +3,7 @@ import { existsSync, mkdir, readFile, rmdir, unlink, writeFile } from 'fs';
 import { dirname, extname, join } from 'path';
 import { promisify } from 'util';
 
-import { FSIOFactory } from '.';
+import { FSIOFactory } from './io-factory';
 import { IOFile as Self } from './io-file';
 
 const ioFactory = new FSIOFactory();

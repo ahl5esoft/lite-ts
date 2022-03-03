@@ -4,7 +4,8 @@ import { initTracer, opentracing } from 'jaeger-client';
 import supertest from 'supertest';
 
 import { buildPostExpressOption as self } from './post-option';
-import { buildBodyParserJsonExpressOption, Mock } from '..';
+import { Mock } from '../assert';
+import { buildBodyParserJsonExpressOption } from '../body-parser';
 import { IApi, ILog } from '../..';
 
 const tracer = initTracer({

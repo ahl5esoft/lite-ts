@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
 import { MongoConfigLoader as Self } from './config-loader';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, IDbQuery, model } from '../..';
 
 class Test { }

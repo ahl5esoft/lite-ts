@@ -1,7 +1,7 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
 
 import { UserService as Self } from './service';
-import { Mock, mockAny } from '..';
+import { Mock, mockAny } from '../assert';
 import { IEnum, ITargetValueData, model, RpcBase } from '../..';
 
 describe('src/service/user/service.ts', () => {

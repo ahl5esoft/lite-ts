@@ -1,5 +1,5 @@
 import { TargetValueServiceBase } from './value-service-base';
-import { CustomError } from '..';
+import { CustomError } from '../error';
 import {
     IEnum,
     ITargetValueData,

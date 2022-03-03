@@ -1,4 +1,4 @@
-import { LockBase, RedisBase } from '../../contract';
+import { LockBase, RedisBase } from '../..';
 
 export class RedisLock extends LockBase {
     public constructor(private m_Redis: RedisBase) {

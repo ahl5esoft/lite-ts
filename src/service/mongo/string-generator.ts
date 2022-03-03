@@ -1,6 +1,6 @@
 import { ObjectID } from 'mongodb';
 
-import { StringGeneratorBase } from '../../contract';
+import { StringGeneratorBase } from '../..';
 
 /**
  * mongo字符串生成器

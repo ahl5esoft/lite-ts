@@ -1,5 +1,5 @@
 import { PushSms as Self } from './sms';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IPush } from '../..';
 
 describe('src/service/push/sms.ts', () => {

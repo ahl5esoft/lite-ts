@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 import { opentracing } from 'jaeger-client';
 
 import { JaegerDbQuery as Self } from './db-query';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IDbQuery } from '../..';
 
 class TestDbQuery { }

@@ -2,7 +2,7 @@ import { ok, strictEqual } from 'assert';
 import { compare, hash } from 'bcryptjs';
 
 import { BCrypt as Self } from './index';
-import { CryptBase } from '../../contract';
+import { CryptBase } from '../..';
 
 describe('src/service/bcrypt/index.ts', () => {
     describe('.decrypt(): Promise<string>', () => {

@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
 import { UserValueService as Self } from './value-service';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData, model } from '../..';
 
 describe('src/service/user/value-service.ts', () => {

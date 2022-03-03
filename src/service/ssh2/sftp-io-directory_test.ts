@@ -1,6 +1,6 @@
 import { SftpInvoker } from './sftp-invoker';
 import { SftpIODirectory as Self } from './sftp-io-directory';
-import { Mock, mockAny } from '..';
+import { Mock, mockAny } from '../assert';
 import { IODirectoryBase, IOFactoryBase } from '../..';
 
 describe('src/service/ssh2/sftp-io-directory.ts', () => {

@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { TargetValueServiceBase } from './value-service-base';
-import { CustomError } from '..';
+import { CustomError } from '../error';
 import {
     DbFactoryBase,
     IAssociateStorageService,
@@ -19,9 +19,9 @@ import {
 import { enum_ } from '../../model';
 
 /**
- * 目标试试数值服务
+ * 目标本地数值服务
  */
-export abstract class TargetRealTimeValueServiceBase<
+export abstract class TargetLocalValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData,
     TLog extends ITargetValueLogData,

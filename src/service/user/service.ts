@@ -1,5 +1,6 @@
 import { UserValueService } from './value-service';
-import { CustomError, TargetRemoteValueService } from '..';
+import { CustomError } from '../error';
+import { TargetRemoteValueService } from '../target';
 import {
     DbFactoryBase,
     IAssociateStorageService,

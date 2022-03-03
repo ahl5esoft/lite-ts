@@ -1,7 +1,7 @@
 import { notStrictEqual } from 'assert';
 
 import { APIFactory as Self } from './factory';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IODirectoryBase } from '../..';
 
 describe('src/service/api/factory.ts', () => {

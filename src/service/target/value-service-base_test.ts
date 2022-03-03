@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 import moment from 'moment';
 
 import { TargetValueServiceBase } from './value-service-base';
-import { Mock, mockAny } from '..';
+import { Mock, mockAny } from '../assert';
 import { IEnum, IEnumItem, ITargetValueData, IUnitOfWork, IValueConditionData, IValueData, IValueTypeData, NowTimeBase } from '../..';
 import { enum_ } from '../../model';
 

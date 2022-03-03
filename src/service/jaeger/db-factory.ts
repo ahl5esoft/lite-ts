@@ -1,7 +1,8 @@
+import { opentracing } from 'jaeger-client';
+
 import { JaegerDbRepository } from './db-repository';
 import { JaegerUnitOfWork } from './unit-of-work';
 import { DbFactoryBase, ITraceable, UnitOfWorkRepositoryBase } from '../..';
-import { opentracing } from 'jaeger-client';
 
 /**
  * jaeger数据库工厂

@@ -1,4 +1,4 @@
-import { StringGeneratorBase } from '../../contract';
+import { StringGeneratorBase } from '../..';
 
 export class MathStringGenerator extends StringGeneratorBase {
     public constructor(private m_Length: number) {

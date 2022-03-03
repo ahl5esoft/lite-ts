@@ -2,7 +2,7 @@ import { FilterQuery } from 'mongodb';
 
 import { DbPool } from './db-pool';
 import { toEntries } from './helper';
-import { IDbQuery } from '../../contract';
+import { IDbQuery } from '../..';
 
 export class DbQuery<T> implements IDbQuery<T> {
     private m_Skip: number;

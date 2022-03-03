@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
 
 import { ValueConditionParser as Self } from './condition-parser';
-import { Mock, mockAny } from '..';
+import { Mock, mockAny } from '../assert';
 import { EnumFacatoryBase, IEnum, model } from '../..';
 
 class ValueTypeData {
@@ -70,7 +70,6 @@ B>=-5
 
 C<=20
 D>=0.99`);
-            console.log(res);
             deepStrictEqual(res, [
                 [{
                     count: -15,

@@ -1,4 +1,4 @@
-import { NowTimeBase, RedisBase } from '../../contract';
+import { NowTimeBase, RedisBase } from '../..';
 
 /**
  * redis实现

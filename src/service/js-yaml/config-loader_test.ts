@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
 import { JsYamlConfigLoader as Self } from './config-loader';
-import { Mock } from '..';
+import { Mock } from '../assert';
 import { IOFileBase } from '../..';
 
 class Test { }

@@ -1,7 +1,7 @@
 import bent from 'bent';
 import { opentracing } from 'jaeger-client';
 
-import { CustomError } from '..';
+import { CustomError } from '../error';
 import { IApiResponse, ITraceable, RpcBase } from '../..';
 
 /**

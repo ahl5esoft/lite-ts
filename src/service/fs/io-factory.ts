@@ -4,7 +4,7 @@ import { promisify } from 'util';
 
 import { IODirectory } from './io-directory';
 import { IOFile } from './io-file';
-import { IODirectoryBase, IOFactoryBase, IOFileBase, IONodeBase } from '../../contract';
+import { IODirectoryBase, IOFactoryBase, IOFileBase, IONodeBase } from '../..';
 
 const statFunc = promisify(stat);
 

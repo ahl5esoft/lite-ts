@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
 
 import { ValueRewardParser as Self } from './reward-parser';
-import { Mock, mockAny } from '..';
+import { Mock, mockAny } from '../assert';
 import { EnumFacatoryBase, IEnum, IEnumItem } from '../..';
 
 class ValueTypeData {

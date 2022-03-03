@@ -1,6 +1,6 @@
 import { compare, genSalt, hash } from 'bcryptjs';
 
-import { CryptBase } from '../../contract';
+import { CryptBase } from '../..';
 
 /**
  * bcrypt加解密

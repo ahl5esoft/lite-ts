@@ -1,7 +1,7 @@
 import { Client, ConnectConfig } from 'ssh2';
 
 import { CommandResult } from '../command';
-import { CommandBase } from '../../contract';
+import { CommandBase } from '../..';
 
 class CommandWrapper extends CommandBase {
     private m_Extra: any;
