@@ -33,10 +33,31 @@ export class SetTimeoutThread extends ThreadBase {
         const ms = Math.floor(
             Math.random() * (maxMs - minMs)
         );
-        await new Promise<void>(s => {
-            setTimeout(() => {
-                s();
-            }, minMs + ms);
-        });
+        await this.sleep(minMs + ms);
+    }
+
+    /**
+     * 尝试一些次数
+     * 
+     * @param action 函数
+     * @param count 尝试次数
+     * @param interval 间隔, 默认: 5s
+     */
+    public async try(action: () => Promise<void>, count: number, interval = 5 * 1000) {
+        let err: Error;
+        for (let i = 0; i < count; i++) {
+            if (i)
+                await this.sleep(interval);
+
+            try {
+                await action();
+                err = null;
+                break;
+            } catch (ex) {
+                err = ex;
+            }
+        }
+        if (err)
+            throw err;
     }
 }
