@@ -13,7 +13,7 @@ export class SequelizeDbFactory extends DbFactoryBase {
     /**
      * 模型管理
      */
-    protected get modelPool() {
+    public get modelPool() {
         if (!this.m_ModelPool)
             this.m_ModelPool = new SequelizeModelPool(this.m_Seq);
 

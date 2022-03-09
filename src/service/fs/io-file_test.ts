@@ -1,4 +1,4 @@
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from 'assert';
+import { deepStrictEqual, ok, strictEqual } from 'assert';
 import { existsSync, mkdir, readFile, rmdir, unlink, writeFile } from 'fs';
 import { dirname, extname, join } from 'path';
 import { promisify } from 'util';
@@ -33,25 +33,6 @@ describe('src/service/fs/io-file.ts', () => {
                 err = ex;
             }
             strictEqual(err, undefined);
-        });
-
-        it('目标为文件已存在', async () => {
-            const srcPath = join(__dirname, 'file-copy-src-path-exists');
-            await promisify(writeFile)(srcPath, 'src');
-
-            const dstPath = join(__dirname, 'file-copy-dst-path-exists');
-            await promisify(writeFile)(dstPath, 'src');
-
-            let err: Error = undefined;
-            try {
-                await new Self(ioFactory, [srcPath]).copyTo(dstPath);
-            } catch (ex) {
-                err = ex;
-            } finally {
-                await promisify(unlink)(srcPath);
-                await promisify(unlink)(dstPath);
-            }
-            ok(err);
         });
 
         it('ok', async () => {
@@ -149,23 +130,6 @@ describe('src/service/fs/io-file.ts', () => {
 
             srcPath = dirname(srcPath);
             await promisify(rmdir)(srcPath);
-        });
-
-        it('dst path is exist', async () => {
-            const dstPath = join(__dirname, 'file-move-dst-path-is-exists-dst');
-            await promisify(writeFile)(dstPath, 'dst');
-
-            const self = new Self(ioFactory, [dstPath]);
-            let err: Error;
-            try {
-                await self.move(dstPath);
-            } catch (ex) {
-                err = ex;
-            }
-
-            notStrictEqual(err, undefined);
-
-            await promisify(unlink)(dstPath);
         });
     });
 

@@ -28,7 +28,7 @@ export class IOFile extends IOFileBase {
 
         isExist = await this.m_IOFactory.buildFile(dstFilePath).exists();
         if (isExist)
-            throw new Error(`文件已经存在: ${dstFilePath}`);
+            return;
 
         await this.m_IOFactory.buildDirectory(
             dirname(dstFilePath)
