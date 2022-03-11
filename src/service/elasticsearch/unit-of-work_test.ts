@@ -6,7 +6,7 @@ import { ElasticSearchUnitOfWork as Self } from './unit-of-work';
 
 class TestUnitOfWorkModel {
     public id: string;
-    public no: number;
+    public values: { [type: number]: number };
 }
 
 const clientOpts = {
@@ -29,11 +29,11 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
 
             self.registerAdd(TestUnitOfWorkModel, {
                 id: 'id-1',
-                no: 1
+                values: {}
             });
             self.registerAdd(TestUnitOfWorkModel, {
                 id: 'id-2',
-                no: 2
+                values: {}
             });
 
             await self.commit();
@@ -47,10 +47,10 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
                 }),
                 [{
                     id: 'id-1',
-                    no: 1
+                    values: {}
                 }, {
                     id: 'id-2',
-                    no: 2
+                    values: {}
                 }]
             );
         });
@@ -60,11 +60,16 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
 
             self.registerAdd(TestUnitOfWorkModel, {
                 id: 'id-1',
-                no: 1
+                values: {
+                    a: 1,
+                    b: 2
+                }
             });
             self.registerSave(TestUnitOfWorkModel, {
                 id: 'id-1',
-                no: 2
+                values: {
+                    a: 1
+                }
             });
 
             await self.commit();
@@ -78,7 +83,9 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
                 }),
                 [{
                     id: 'id-1',
-                    no: 2
+                    values: {
+                        a: 1
+                    }
                 }]
             )
         });
@@ -88,7 +95,7 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
 
             self.registerAdd(TestUnitOfWorkModel, {
                 id: 'id-1',
-                no: 1
+                values: {}
             });
             self.registerRemove(TestUnitOfWorkModel, {
                 id: 'id-1',
@@ -113,7 +120,7 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
             const self = new Self(null);
             const entry = {
                 id: 'id',
-                no: 11
+                values: {}
             };
             self.registerAdd(TestUnitOfWorkModel, entry);
             const res = Reflect.get(self, 'm_Items');
@@ -130,7 +137,7 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
             const self = new Self(null);
             const entry = {
                 id: 'id',
-                no: 11
+                values: {}
             };
             self.registerRemove(TestUnitOfWorkModel, entry);
             const res = Reflect.get(self, 'm_Items');
@@ -147,7 +154,7 @@ describe('src/service/elasticsearch/unit-of-work.ts', () => {
             const self = new Self(null);
             const entry = {
                 id: 'id',
-                no: 11
+                values: {}
             };
             self.registerSave(TestUnitOfWorkModel, entry);
             const res = Reflect.get(self, 'm_Items');

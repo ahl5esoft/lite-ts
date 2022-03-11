@@ -33,6 +33,12 @@ describe('src/service/child-process/command.ts', () => {
             strictEqual(res.err, '');
             strictEqual(res.out, '');
         });
+
+        it('npm', async () => {
+            await new Self().setDir(
+                process.cwd()
+            ).exec('npm.cmd', 'i');
+        });
     });
 
     describe('.setDir(v: string)', () => {

@@ -60,10 +60,10 @@ export class ElasticSearchUnitOfWork extends UnitOfWorkRepositoryBase {
                 });
             } else {
                 operations.push({
-                    [r.op]: opEntry
+                    delete: opEntry
                 }, {
-                    doc: r.entry
-                });
+                    index: opEntry
+                }, r.entry);
             }
         }
         this.m_Items = [];
