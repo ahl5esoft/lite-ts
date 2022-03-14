@@ -49,7 +49,7 @@ export class SequelizeUnitOfWork extends UnitOfWorkRepositoryBase {
      */
     public registerAdd(model: Function, entry: any) {
         this.m_Actons.push(async tx => {
-            await this.m_SeqModelPool.get(model).create(entry, {
+            await this.m_SeqModelPool.get(model.name).create(entry, {
                 transaction: tx
             });
         });
@@ -63,7 +63,7 @@ export class SequelizeUnitOfWork extends UnitOfWorkRepositoryBase {
      */
     public registerRemove(model: Function, entry: any): void {
         this.m_Actons.push(async tx => {
-            await this.m_SeqModelPool.get(model).destroy({
+            await this.m_SeqModelPool.get(model.name).destroy({
                 transaction: tx,
                 where: {
                     id: entry.id
@@ -80,7 +80,7 @@ export class SequelizeUnitOfWork extends UnitOfWorkRepositoryBase {
      */
     public registerSave(model: Function, entry: any): void {
         this.m_Actons.push(async tx => {
-            await this.m_SeqModelPool.get(model).update(entry, {
+            await this.m_SeqModelPool.get(model.name).update(entry, {
                 transaction: tx,
                 where: {
                     id: entry.id

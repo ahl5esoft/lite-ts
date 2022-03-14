@@ -23,19 +23,19 @@ export class SequelizeModelPool {
     /**
      * 获取Sequelize模型
      * 
-     * @param modelCtor 模型
+     * @param modelName 模型名
      */
-    public get(modelCtor: Function) {
-        if (!this.m_Models[modelCtor.name]) {
-            const fields = model.sequelize.defines[modelCtor.name];
+    public get(modelName: string) {
+        if (!this.m_Models[modelName]) {
+            const fields = model.sequelize.defines[modelName];
             if (!fields)
-                throw new Error(`缺少模型: ${modelCtor.name}`);
+                throw new Error(`缺少模型: ${modelName}`);
 
-            this.m_Models[modelCtor.name] = this.m_Seq.define(modelCtor.name, fields, {
+            this.m_Models[modelName] = this.m_Seq.define(modelName, fields, {
                 timestamps: false
             });
         }
 
-        return this.m_Models[modelCtor.name] as ModelStatic<any>;
+        return this.m_Models[modelName] as ModelStatic<any>;
     }
 }

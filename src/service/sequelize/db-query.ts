@@ -39,7 +39,7 @@ export class SequelizeDbQuery<T> implements IDbQuery<T> {
      * 查询数量
      */
     public async count() {
-        const res = await this.m_SeqModelPool.get(this.m_Model).count({
+        const res = await this.m_SeqModelPool.get(this.m_Model.name).count({
             where: this.m_Where
         });
         this.m_Where = null;
@@ -109,7 +109,7 @@ export class SequelizeDbQuery<T> implements IDbQuery<T> {
             opt.where = this.m_Where;
             this.m_Where = null;
         }
-        const res = await this.m_SeqModelPool.get(this.m_Model).findAll(opt);
+        const res = await this.m_SeqModelPool.get(this.m_Model.name).findAll(opt);
         return res.map((r: any) => {
             return r.dataValues;
         });
