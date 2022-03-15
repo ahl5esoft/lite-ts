@@ -9,6 +9,7 @@ describe('src/service/enum/parser.ts', () => {
         it('ok', async () => {
             const mockIOFactory = new Mock<IOFactoryBase>();
             const self = new Self(mockIOFactory.actual);
+            self.stringAttrReg = /^\[(\w+)='([\w-]+)'\]/;
 
             const mockFile = new Mock<IOFileBase>();
             const filePath = 'file-path';
@@ -38,7 +39,11 @@ enum ValueType {
     /**
     * [ex='str']字符串
     */
-    str = 4
+    str = 4,
+    /**
+    * [app='recharge-activity']累计充值
+    */
+    rechargeActivity = 5
 }`
             );
 
@@ -58,6 +63,10 @@ enum ValueType {
                 ex: 'str',
                 text: '字符串',
                 value: 4
+            }, {
+                app: 'recharge-activity',
+                text: '累计充值',
+                value: 5
             }]);
         });
 
