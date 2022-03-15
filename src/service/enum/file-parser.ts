@@ -1,30 +1,30 @@
 import { IEnumItemData, IOFactoryBase, IParser } from '../..';
 
 /**
- * bool特性正则
- */
-const boolAttrReg = /^\[(\w+)\]/
-/**
- * int特性正则
- */
-const intAttrReg = /^\[(\w+)=(\d+)\]/;
-/**
- * string特性正则
- */
-const stringAttrReg = /^\[(\w+)='(\w+)'\]/;
-/**
- * 枚举文本正则
- */
-const textReg = /^\s+\*\s+(\[.+\])*(.+)$/;
-/**
- * 枚举值正则
- */
-const valueReg = /^\s+\w+\s=\s(\d+),?$/;
-
-/**
  * 枚举文件解析器
  */
 export class EnumFileParser implements IParser {
+    /**
+     * bool特性正则
+     */
+    public boolAttrReg = /^\[(\w+)\]/;
+    /**
+     * int特性正则
+     */
+    public intAttrReg = /^\[(\w+)=(\d+)\]/;
+    /**
+     * string特性正则
+     */
+    public stringAttrReg = /^\[(\w+)='(\w+)'\]/;
+    /**
+     * 枚举文本正则
+     */
+    public textReg = /^\s+\*\s+(\[.+\])*(.+)$/;
+    /**
+     * 枚举值正则
+     */
+    public valueReg = /^\s+\w+\s=\s(\d+),?$/;
+
     public constructor(
         private m_IOFactory: IOFactoryBase
     ) { }
@@ -44,7 +44,7 @@ export class EnumFileParser implements IParser {
             if (r.includes('/*') || r.includes('*/'))
                 continue;
 
-            let match = r.match(textReg);
+            let match = r.match(this.textReg);
             if (match) {
                 res.push({
                     text: match[2],
@@ -55,7 +55,7 @@ export class EnumFileParser implements IParser {
                 continue;
             }
 
-            match = r.match(valueReg);
+            match = r.match(this.valueReg);
             if (match)
                 res[res.length - 1].value = parseInt(match[1]);
         }
@@ -69,19 +69,19 @@ export class EnumFileParser implements IParser {
         let match: RegExpMatchArray;
         while (true) {
             try {
-                match = attr.match(boolAttrReg);
+                match = attr.match(this.boolAttrReg);
                 if (match) {
                     entry[match[1]] = true;
                     continue;
                 }
 
-                match = attr.match(intAttrReg);
+                match = attr.match(this.intAttrReg);
                 if (match) {
                     entry[match[1]] = parseInt(match[2]);
                     continue;
                 }
 
-                match = attr.match(stringAttrReg);
+                match = attr.match(this.stringAttrReg);
                 if (match)
                     entry[match[1]] = match[2];
             } finally {
