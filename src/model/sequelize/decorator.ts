@@ -12,7 +12,7 @@ export function Field(define: DataType | ModelAttributeColumnOptions<any>): Prop
         if (!defines[target.constructor.name])
             defines[target.constructor.name] = {};
 
-        if (typeof define == 'function') {
+        if (typeof define == 'function' || typeof define == 'string') {
             define = {
                 allowNull: false,
                 type: define,
