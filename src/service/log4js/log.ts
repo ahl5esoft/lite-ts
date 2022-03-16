@@ -6,10 +6,28 @@ import { ILog } from '../..';
  * log4js日志
  */
 export class Log4jsLog implements ILog {
+    public constructor() {
+        if (!('toJSON' in Error.prototype)) {
+            Object.defineProperty(Error.prototype, 'toJSON', {
+                value: function () {
+                    var alt = {};
+
+                    Object.getOwnPropertyNames(this).forEach(function (key) {
+                        alt[key] = this[key];
+                    }, this);
+
+                    return alt;
+                },
+                configurable: true,
+                writable: true
+            });
+        }
+    }
+
     /**
      * 标签
      */
-    private m_Labels: { [key: string]: any } = {};
+    private m_Labels: { [key: string]: any; } = {};
 
     /**
      * 增加标签
