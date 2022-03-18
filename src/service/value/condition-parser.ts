@@ -1,4 +1,4 @@
-import { EnumFacatoryBase, IParser, IValueConditionData } from '../..';
+import { EnumFactoryBase, IParser, IValueConditionData } from '../..';
 import { enum_ } from '../../model';
 
 /**
@@ -17,7 +17,7 @@ export class ValueConditionParser<T extends { text: string, value: number }> imp
      * @param m_ValueTypeModel 枚举模型
      */
     public constructor(
-        private m_EnumFactory: EnumFacatoryBase,
+        private m_EnumFactory: EnumFactoryBase,
         private m_ValueTypeModel: new () => T
     ) { }
 

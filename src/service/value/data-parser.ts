@@ -1,4 +1,4 @@
-import { EnumFacatoryBase, IParser, IValueData } from '../..';
+import { EnumFactoryBase, IParser, IValueData } from '../..';
 
 /**
  * 数值数据解析器
@@ -12,7 +12,7 @@ export class ValueDataParser<T extends { text: string, value: number }> implemen
      * @param m_Reg 匹配规则
      */
     public constructor(
-        private m_EnumFactory: EnumFacatoryBase,
+        private m_EnumFactory: EnumFactoryBase,
         private m_ValueTypeModel: new () => T,
         private m_Reg = /^(.+)\*(-?\d+)$/,
     ) { }

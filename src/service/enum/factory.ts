@@ -1,10 +1,10 @@
 import { opentracing } from 'jaeger-client';
-import { EnumFacatoryBase, IEnumItemData, ITraceable } from '../..';
+import { EnumFactoryBase, IEnumItemData, ITraceable } from '../..';
 
 /**
  * 枚举工厂
  */
-export class EnumFactory extends EnumFacatoryBase implements ITraceable {
+export class EnumFactory extends EnumFactoryBase implements ITraceable {
     /**
      * 构造函数
      * 

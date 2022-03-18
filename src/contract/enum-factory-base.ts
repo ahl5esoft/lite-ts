@@ -4,7 +4,7 @@ import { IEnumItemData } from './i-enum-item-data';
 /**
  * 枚举工厂
  */
-export abstract class EnumFacatoryBase {
+export abstract class EnumFactoryBase {
     /**
      * 创建枚举对象
      * 

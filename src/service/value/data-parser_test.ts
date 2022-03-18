@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 
 import { ValueDataParser as Self } from './data-parser';
 import { Mock, mockAny } from '../assert';
-import { EnumFacatoryBase, IEnum, IEnumItem } from '../..';
+import { EnumFactoryBase, IEnum, IEnumItem } from '../..';
 
 class ValueTypeData {
     public text: string;
@@ -12,7 +12,7 @@ class ValueTypeData {
 describe('src/service/value/data-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('增加', async () => {
-            const mockEnumFactory = new Mock<EnumFacatoryBase>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, ValueTypeData, /^(.+)\*(\d+)$/);
 
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
@@ -55,7 +55,7 @@ B*22`);
         });
 
         it('减少', async () => {
-            const mockEnumFactory = new Mock<EnumFacatoryBase>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, ValueTypeData, /^(.+)\*(-\d+)$/);
 
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
@@ -98,7 +98,7 @@ B*-5`);
         });
 
         it('ok', async () => {
-            const mockEnumFactory = new Mock<EnumFacatoryBase>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, ValueTypeData);
 
             const mockEnum = new Mock<IEnum<ValueTypeData>>();
