@@ -6,7 +6,7 @@ import Container from 'typedi';
 import { enum_ } from './model';
 import {
     DbFactoryBase,
-    EnumFacatoryBase,
+    EnumFactoryBase,
     IApiResponse,
     ILog,
     IOFactoryBase,
@@ -19,7 +19,7 @@ import {
     const cfg = await service.initIoC(__dirname);
 
     Container.set(
-        EnumFacatoryBase,
+        EnumFactoryBase,
         new service.EnumFactory({
             [enum_.CityData.name]: () => {
                 return new service.MongoEnum(

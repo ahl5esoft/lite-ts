@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 
 import { enum_ } from '../../model';
-import { EnumFacatoryBase, IApi } from '../../../../src';
+import { EnumFactoryBase, IApi } from '../../../../src';
 
 /**
  * 枚举
@@ -12,7 +12,7 @@ export default class EnumApi implements IApi {
      * 枚举工厂
      */
     @Inject()
-    public enumFactory: EnumFacatoryBase;
+    public enumFactory: EnumFactoryBase;
 
     public async call() {
         const res = await this.enumFactory.build(enum_.CityData).all();

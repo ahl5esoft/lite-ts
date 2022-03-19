@@ -13,11 +13,11 @@ export class ValueConditionParser<T extends { text: string, value: number }> imp
     /**
      * 构造函数
      * 
-     * @param m_EnumFactory 枚举工厂
+     * @param enumFactory 枚举工厂
      * @param m_ValueTypeModel 枚举模型
      */
     public constructor(
-        private m_EnumFactory: EnumFactoryBase,
+        protected enumFactory: EnumFactoryBase,
         private m_ValueTypeModel: new () => T
     ) { }
 
@@ -49,7 +49,7 @@ export class ValueConditionParser<T extends { text: string, value: number }> imp
     public async parse(text: string) {
         const lines = text.split(/\r\n|\n|\r/g);
         let res: IValueConditionData[][] = [[]];
-        const valueTypeEnum = this.m_EnumFactory.build(this.m_ValueTypeModel);
+        const valueTypeEnum = this.enumFactory.build(this.m_ValueTypeModel);
         for (const r of lines) {
             const match = r.match(ValueConditionParser.reg);
             if (!match) {
