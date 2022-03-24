@@ -36,11 +36,18 @@ export async function initIoC(rootDirPath: string) {
     const ioFactory = new FSIOFactory();
     Container.set(IOFactoryBase, ioFactory);
 
-    const isTest = process.argv.some(r => {
-        return r.endsWith('mocha');
-    });
+    let yamlFilename = 'config.yaml';
+    for (const r of process.argv) {
+        if (r.includes('.yaml')) {
+            yamlFilename = r;
+            break;
+        } else if (r.endsWith('mocha')) {
+            yamlFilename = 'config-it.yaml';
+            break;
+        }
+    }
     const configLaoder = new JsYamlConfigLoader(
-        ioFactory.buildFile(rootDirPath, '..', `config${isTest ? '-it' : ''}.yaml`)
+        ioFactory.buildFile(rootDirPath, '..', yamlFilename)
     );
     Container.set(ConfigLoaderBase, configLaoder);
 
