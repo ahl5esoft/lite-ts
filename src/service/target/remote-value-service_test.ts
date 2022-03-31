@@ -3,7 +3,8 @@ import { notStrictEqual, strictEqual } from 'assert';
 import { TargetRemoteValueService as Self } from './remote-value-service';
 import { Mock } from '../assert';
 import { CustomError } from '../error';
-import { model, RpcBase } from '../..';
+import { RpcBase } from '../..';
+import { enum_ } from '../../model';
 
 describe('src/service/target/remote-value-service.ts', () => {
     describe('.update(_: IUnitOfWork, values: IValueData[])', () => {
@@ -11,7 +12,7 @@ describe('src/service/target/remote-value-service.ts', () => {
             const mockRpc = new Mock<RpcBase>();
             const targetTypeData = {
                 app: 'test'
-            } as model.enum_.TargetTypeData;
+            } as enum_.TargetTypeData;
             const userID = 'uid';
             const self = new Self(null, mockRpc.actual, targetTypeData, userID, null, null);
 
@@ -52,7 +53,7 @@ describe('src/service/target/remote-value-service.ts', () => {
             const mockRpc = new Mock<RpcBase>();
             const targetTypeData = {
                 app: 'test'
-            } as model.enum_.TargetTypeData;
+            } as enum_.TargetTypeData;
             const userID = 'uid';
             const self = new Self(null, mockRpc.actual, targetTypeData, userID, null, null);
 

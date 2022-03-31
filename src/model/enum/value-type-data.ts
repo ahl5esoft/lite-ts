@@ -1,9 +1,17 @@
-import { IEnumItemData } from './i-enum-item-data';
+import { IEnumItemData } from '../../contract';
 
 /**
- * 数值类型枚举结构
+ * 数值枚举模型
  */
-export interface IValueTypeData extends IEnumItemData {
+export class ValueTypeData implements IEnumItemData {
+    /**
+     * 文本
+     */
+    public text: string;
+    /**
+     * 枚举值
+     */
+    public value: number;
     /**
      * 每日数值类型, 值有效的情况下, 目标数值更新时会根据该值对应的目标数值是否与当前时间同一日,如果不同日则目标数值会重置为0
      * 
@@ -35,7 +43,7 @@ export interface IValueTypeData extends IEnumItemData {
      *  // res = 当上次更新登录次数的时间戳与今天时同一天则为6 如果不同天则为1
      * ```
      */
-    dailyTime?: number;
+    public dailyTime?: number;
     /**
      * 数值类型更新之后的值可为负数
      * 
@@ -60,7 +68,7 @@ export interface IValueTypeData extends IEnumItemData {
      *      valueType: 1
      *  ]);
      */
-    isNegative?: boolean;
+    public isNegative?: boolean;
     /**
      * 数值类型每次更新时都是替换, 默认为累积
      * 
@@ -88,5 +96,5 @@ export interface IValueTypeData extends IEnumItemData {
      *  const res = await valueService.getCount(工作单元, 1);
      *  // res = 22
      */
-    isReplace?: boolean;
+    public isReplace?: boolean;
 }

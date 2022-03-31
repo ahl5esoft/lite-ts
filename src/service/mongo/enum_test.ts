@@ -11,7 +11,7 @@ interface ITestGetEnumItemData extends IEnumItemData {
 }
 
 describe('src/service/mongo/enum.ts', () => {
-    describe('.all(): Promise<IEnumItem[]>', () => {
+    describe('.items', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const name = 'test';
@@ -47,7 +47,7 @@ describe('src/service/mongo/enum.ts', () => {
                 } as global.Enum]
             );
 
-            const res = await self.all();
+            const res = await self.items;
             deepStrictEqual(res, [
                 new EnumItem(data, name, '-')
             ]);
@@ -85,7 +85,7 @@ describe('src/service/mongo/enum.ts', () => {
                 []
             );
 
-            const res = await self.all();
+            const res = await self.items;
             deepStrictEqual(res, []);
         });
     });

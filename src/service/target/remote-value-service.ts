@@ -5,16 +5,15 @@ import {
     ITargetValueData,
     IUnitOfWork,
     IValueData,
-    IValueTypeData,
-    model,
     NowTimeBase,
     RpcBase
 } from '../..';
+import { enum_ } from '../../model';
 
 /**
  * 用户其他数值服务
  */
-export class TargetRemoteValueService extends TargetValueServiceBase<ITargetValueData, IValueTypeData> {
+export class TargetRemoteValueService extends TargetValueServiceBase<ITargetValueData> {
     /**
      * 实体数据
      */
@@ -35,9 +34,9 @@ export class TargetRemoteValueService extends TargetValueServiceBase<ITargetValu
     public constructor(
         private m_Entry: ITargetValueData,
         private m_Rpc: RpcBase,
-        private m_TargetTypeData: model.enum_.TargetTypeData,
+        private m_TargetTypeData: enum_.TargetTypeData,
         private m_userID: string,
-        valueTypeEnum: IEnum<IValueTypeData>,
+        valueTypeEnum: IEnum<enum_.ValueTypeData>,
         nowTime: NowTimeBase,
     ) {
         super(valueTypeEnum, nowTime);

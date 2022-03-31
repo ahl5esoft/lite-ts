@@ -3,7 +3,15 @@ import moment from 'moment';
 
 import { TargetValueServiceBase } from './value-service-base';
 import { Mock, mockAny } from '../assert';
-import { IEnum, IEnumItem, ITargetValueData, IUnitOfWork, IValueConditionData, IValueData, IValueTypeData, NowTimeBase } from '../..';
+import {
+    IEnum,
+    IEnumItem,
+    ITargetValueData,
+    IUnitOfWork,
+    IValueConditionData,
+    IValueData,
+    NowTimeBase
+} from '../..';
 import { enum_ } from '../../model';
 
 class TargetValue implements ITargetValueData {
@@ -11,13 +19,7 @@ class TargetValue implements ITargetValueData {
     public values: { [key: number]: number };
 }
 
-class ValueTypeData implements IValueTypeData {
-    public value: number;
-    public isReplace?: boolean;
-    public todayTime?: number;
-}
-
-class Self extends TargetValueServiceBase<TargetValue, ValueTypeData> {
+class Self extends TargetValueServiceBase<TargetValue> {
     public entry: Promise<TargetValue>;
 
     public async update(_: IUnitOfWork, __: IValueData[]) { }
@@ -592,7 +594,7 @@ describe('src/service/target/value-service-base.ts', () => {
 
     describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
         it('entry = null', async () => {
-            const mockValueTypeEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             const self = new Self(mockValueTypeEnum.actual, null);
 
             mockValueTypeEnum.expectReturn(
@@ -605,7 +607,7 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('entry.value[valueType] = null', async () => {
-            const mockValueTypeEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             const self = new Self(mockValueTypeEnum.actual, null);
 
             Reflect.set(self, 'entry', {
@@ -624,7 +626,7 @@ describe('src/service/target/value-service-base.ts', () => {
 
         it('枚举存在但dailyTime无效', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             const self = new Self(mockEnum.actual, mockNowTime.actual);
 
             Reflect.set(self, 'entry', {
@@ -634,7 +636,7 @@ describe('src/service/target/value-service-base.ts', () => {
                 }
             });
 
-            const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockEnumItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {}
             });
             mockEnum.expectReturn(
@@ -653,7 +655,7 @@ describe('src/service/target/value-service-base.ts', () => {
 
         it('dailyTime(重置)', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             const self = new Self(mockEnum.actual, mockNowTime.actual);
 
             Reflect.set(self, 'entry', {
@@ -664,7 +666,7 @@ describe('src/service/target/value-service-base.ts', () => {
                 }
             });
 
-            const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockEnumItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     dailyTime: 2
                 }
@@ -685,7 +687,7 @@ describe('src/service/target/value-service-base.ts', () => {
 
         it('dailyTime(不重置)', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             const self = new Self(mockEnum.actual, mockNowTime.actual);
 
             Reflect.set(self, 'entry', {
@@ -696,7 +698,7 @@ describe('src/service/target/value-service-base.ts', () => {
                 }
             });
 
-            const mockEnumItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockEnumItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     dailyTime: 2
                 }

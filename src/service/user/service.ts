@@ -9,13 +9,12 @@ import {
     ITargetValueService,
     IUserService,
     IUserValueService,
-    IValueTypeData,
-    model,
     NowTimeBase,
     RpcBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase
 } from '../..';
+import { enum_ } from '../../model';
 
 /**
  * 用户服务
@@ -60,8 +59,8 @@ export class UserService implements IUserService {
     public constructor(
         public associateStorageService: IAssociateStorageService,
         public userID: string,
-        protected valueTypeEnum: IEnum<IValueTypeData>,
-        protected targetTypeEnum: IEnum<model.enum_.TargetTypeData>,
+        protected valueTypeEnum: IEnum<enum_.ValueTypeData>,
+        protected targetTypeEnum: IEnum<enum_.TargetTypeData>,
         protected dbFactory: DbFactoryBase,
         protected nowTime: NowTimeBase,
         protected rpc: RpcBase,
@@ -112,7 +111,7 @@ export class UserService implements IUserService {
      * @param targetTypeData 目标类型数据
      * @param targetEntry 目标实体 
      */
-    private createTargetValueService(targetTypeData: model.enum_.TargetTypeData, targetEntry: ITargetValueData) {
+    private createTargetValueService(targetTypeData: enum_.TargetTypeData, targetEntry: ITargetValueData) {
         return new TargetRemoteValueService(targetEntry, this.rpc, targetTypeData, this.userID, this.valueTypeEnum, this.nowTime);
     }
 }

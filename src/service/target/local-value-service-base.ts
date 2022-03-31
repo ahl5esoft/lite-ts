@@ -11,7 +11,6 @@ import {
     ITargetValueLogData,
     IUnitOfWork,
     IValueData,
-    IValueTypeData,
     NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
@@ -25,7 +24,7 @@ export abstract class TargetLocalValueServiceBase<
     T extends ITargetValueData,
     TChange extends ITargetValueChangeData,
     TLog extends ITargetValueLogData,
-    TValueType extends IValueTypeData> extends TargetValueServiceBase<T, TValueType> {
+    > extends TargetValueServiceBase<T> {
 
     /**
      * 构造函数
@@ -50,7 +49,7 @@ export abstract class TargetLocalValueServiceBase<
         protected model: new () => T,
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
-        valueTypeEnum: IEnum<TValueType>,
+        valueTypeEnum: IEnum<enum_.ValueTypeData>,
         nowTime: NowTimeBase,
     ) {
         super(valueTypeEnum, nowTime);

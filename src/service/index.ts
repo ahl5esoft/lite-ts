@@ -25,6 +25,7 @@ export * from './mongo';
 export * from './parser';
 export * from './push';
 export * from './redis';
+export * from './rpc';
 export * from './sequelize';
 export * from './set-timeout';
 export * from './simple-git';

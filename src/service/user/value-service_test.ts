@@ -2,7 +2,8 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { UserValueService as Self } from './value-service';
 import { Mock } from '../assert';
-import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData, model } from '../..';
+import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData } from '../..';
+import { enum_ } from '../../model';
 
 describe('src/service/user/value-service.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][])', () => {
@@ -20,14 +21,14 @@ describe('src/service/user/value-service.ts', () => {
                 r => r.checkConditions(null, [
                     [{
                         count: 1,
-                        op: model.enum_.RelationOperator.eq,
+                        op: enum_.RelationOperator.eq,
                         targetType: 2,
                         targetValue: 3,
                         source: 'a',
                         valueType: 4
                     }, {
                         count: 1,
-                        op: model.enum_.RelationOperator.eq,
+                        op: enum_.RelationOperator.eq,
                         targetType: 2,
                         targetValue: 3,
                         source: 'b',
@@ -46,7 +47,7 @@ describe('src/service/user/value-service.ts', () => {
                 r => r.checkConditions(null, [
                     [{
                         count: 1,
-                        op: model.enum_.RelationOperator.eq,
+                        op: enum_.RelationOperator.eq,
                         targetType: 2,
                         targetValue: 6,
                         source: 'c',
@@ -59,21 +60,21 @@ describe('src/service/user/value-service.ts', () => {
             const res = await self.checkConditions(null, [
                 [{
                     count: 1,
-                    op: model.enum_.RelationOperator.eq,
+                    op: enum_.RelationOperator.eq,
                     targetType: 2,
                     targetValue: 3,
                     source: 'a',
                     valueType: 4
                 }, {
                     count: 1,
-                    op: model.enum_.RelationOperator.eq,
+                    op: enum_.RelationOperator.eq,
                     targetType: 2,
                     targetValue: 3,
                     source: 'b',
                     valueType: 4
                 }, {
                     count: 1,
-                    op: model.enum_.RelationOperator.eq,
+                    op: enum_.RelationOperator.eq,
                     targetType: 2,
                     targetValue: 6,
                     source: 'c',

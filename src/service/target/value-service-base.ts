@@ -7,7 +7,6 @@ import {
     IUnitOfWork,
     IValueConditionData,
     IValueData,
-    IValueTypeData,
     NowTimeBase
 } from '../..';
 import { enum_ } from '../../model';
@@ -15,7 +14,7 @@ import { enum_ } from '../../model';
 /**
  * 目标数值服务基类
  */
-export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueType extends IValueTypeData> implements ITargetValueService {
+export abstract class TargetValueServiceBase<T extends ITargetValueData> implements ITargetValueService {
     /**
      * 目标数值数据
      */
@@ -28,7 +27,7 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData, TValueT
      * @param nowTime 当前时间
      */
     public constructor(
-        protected valueTypeEnum: IEnum<TValueType>,
+        protected valueTypeEnum: IEnum<enum_.ValueTypeData>,
         protected nowTime: NowTimeBase,
     ) { }
 

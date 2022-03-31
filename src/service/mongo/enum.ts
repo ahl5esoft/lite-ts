@@ -1,14 +1,38 @@
 import { EnumItem } from '../enum';
-import { DbFactoryBase, IEnum, IEnumItem, IEnumItemData, ITraceable, model } from '../..';
+import { DbFactoryBase, IEnum, IEnumItem, IEnumItemData, ITraceable } from '../..';
+import { global } from '../../model';
 
 /**
  * mongo枚举
  */
 export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable {
-    /**
-     * 所有项
-     */
     private m_Items: IEnumItem<T>[];
+    /**
+     * 从数据库中Enum表中获取id为枚举名的数据
+     * 将global.Enum.items映射成IEnumItem<T>
+     */
+    public get items() {
+        return new Promise<IEnumItem<T>[]>(async (s, f) => {
+            if (!this.m_Items) {
+                try {
+                    const entries = await this.m_DbFactory.db(global.Enum).query().where({
+                        id: this.m_Name
+                    }).toArray();
+                    if (entries.length) {
+                        this.m_Items = entries[0].items.map(r => {
+                            return new EnumItem(r, this.m_Name, this.m_Sep);
+                        });
+                    } else {
+                        this.m_Items = [];
+                    }
+                } catch (ex) {
+                    return f(ex);
+                }
+            }
+
+            s(this.m_Items);
+        });
+    }
 
     /**
      * 构造函数
@@ -24,33 +48,12 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable 
     ) { }
 
     /**
-     * 从数据库中Enum表中获取id为枚举名的数据
-     * 将global.Enum.items映射成IEnumItem<T>
-     */
-    public async all() {
-        if (!this.m_Items) {
-            const rows = await this.m_DbFactory.db(model.global.Enum).query().where({
-                id: this.m_Name
-            }).toArray();
-            if (rows.length) {
-                this.m_Items = rows[0].items.map(r => {
-                    return new EnumItem(r, this.m_Name, this.m_Sep);
-                });
-            } else {
-                this.m_Items = [];
-            }
-        }
-
-        return this.m_Items;
-    }
-
-    /**
      * 获取第一个满足条件的项
      * 
      * @param predicate 断言
      */
     public async get(predicate: (data: T) => boolean) {
-        const items = await this.all();
+        const items = await this.items;
         return items.find(r => {
             return predicate(r.data);
         });
@@ -62,10 +65,10 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable 
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        let dbFactory = this.m_DbFactory;
-        const dbFactoryTracer = dbFactory as any as ITraceable;
-        if (dbFactoryTracer.withTrace)
-            dbFactory = dbFactoryTracer.withTrace(parentSpan);
-        return new MongoEnum(dbFactory, this.m_Name, this.m_Sep);
+        return new MongoEnum(
+            (this.m_DbFactory as any as ITraceable)?.withTrace(parentSpan) ?? this.m_DbFactory,
+            this.m_Name,
+            this.m_Sep
+        );
     }
 }

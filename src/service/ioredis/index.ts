@@ -108,6 +108,10 @@ export class IoredisAdapter extends RedisBase {
         return this.client.incr(key);
     }
 
+    public async incrBy(key: string, increment: number) {
+        return this.client.incrby(key, increment);
+    }
+
     public async keys(pattern: string) {
         return this.client.keys(pattern);
     }

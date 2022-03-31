@@ -133,6 +133,14 @@ export abstract class RedisBase {
     public abstract incr(key: string): Promise<number>;
 
     /**
+     * 自增(+n)
+     * 
+     * @param key 键
+     * @param increment 自增值
+     */
+    public abstract incrBy(key: string, increment: number): Promise<number>;
+
+    /**
      * 查询键
      * 
      * @param pattern 匹配模式

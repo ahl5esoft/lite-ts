@@ -34,7 +34,6 @@ export * from './i-user-value-service';
 export * from './i-value-condition-data';
 export * from './i-value-data';
 export * from './i-value-interceptor';
-export * from './i-value-type-data';
 export * from './io-directory-base';
 export * from './io-factory-base';
 export * from './io-file-base';

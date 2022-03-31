@@ -132,6 +132,13 @@ export class JeagerRedis extends RedisBase {
         });
     }
 
+    public async incrBy(key: string, increment: number) {
+        return this.exec('incrBy', [key, increment], {
+            key,
+            increment
+        });
+    }
+
     public async keys(pattern: string) {
         return await this.exec('keys', [pattern], {
             pattern

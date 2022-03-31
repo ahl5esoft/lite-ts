@@ -8,29 +8,27 @@ import {
     IUserValueService,
     IValueConditionData,
     IValueData,
-    IValueTypeData,
-    model,
     NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase
 } from '../..';
+import { enum_, global } from '../../model';
 
 /**
  * 用户数值服务
  */
 export class UserValueService extends TargetLocalValueServiceBase<
-    model.global.UserValue,
-    model.global.UserValueChange,
-    model.global.UserValueLog,
-    IValueTypeData
+    global.UserValue,
+    global.UserValueChange,
+    global.UserValueLog
 > implements IUserValueService {
     /**
      * 获取用户数值实体
      */
     public get entry() {
-        return new Promise<model.global.UserValue>(async (s, f) => {
+        return new Promise<global.UserValue>(async (s, f) => {
             try {
-                const rows = await this.associateStorageService.find(model.global.UserValue, r => {
+                const rows = await this.associateStorageService.find(global.UserValue, r => {
                     return r.id == this.userService.userID;
                 });
                 s(rows[0]);
@@ -51,7 +49,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
      */
     public constructor(
         public userService: IUserService,
-        valueTypeEnum: IEnum<IValueTypeData>,
+        valueTypeEnum: IEnum<enum_.ValueTypeData>,
         dbFactory: DbFactoryBase,
         nowTime: NowTimeBase,
         stringGenerator: StringGeneratorBase,
@@ -63,9 +61,9 @@ export class UserValueService extends TargetLocalValueServiceBase<
             stringGenerator,
             valueInterceptorFactory,
             0,
-            model.global.UserValue,
-            model.global.UserValueChange,
-            model.global.UserValueLog,
+            global.UserValue,
+            global.UserValueChange,
+            global.UserValueLog,
             valueTypeEnum,
             nowTime,
         );
@@ -192,7 +190,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
     protected createEntry() {
         return {
             id: this.userService.userID
-        } as model.global.UserValue;
+        } as global.UserValue;
     }
 
     /**
@@ -201,17 +199,17 @@ export class UserValueService extends TargetLocalValueServiceBase<
     protected createLogEntry() {
         return {
             userID: this.userService.userID
-        } as model.global.UserValueLog;
+        } as global.UserValueLog;
     }
 
     /**
      * 查找并清除关联用户数值变更数据
      */
     protected async findAndClearChangeEntries() {
-        const changeEntries = await this.associateStorageService.find(model.global.UserValueChange, r => {
+        const changeEntries = await this.associateStorageService.find(global.UserValueChange, r => {
             return r.userID == this.userService.userID;
         });
-        this.associateStorageService.clear(model.global.UserValueChange, r => {
+        this.associateStorageService.clear(global.UserValueChange, r => {
             return r.userID == this.userService.userID;
         });
         return changeEntries;

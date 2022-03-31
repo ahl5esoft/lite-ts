@@ -297,6 +297,19 @@ describe('src/service/ioredis/index.ts', () => {
         });
     });
 
+    describe('.incrBy(key: string, increment: number)', () => {
+        const key = 'incrby';
+        it('ok', async () => {
+            let res = await self.incrBy(key, 10);
+            strictEqual(res, 10);
+
+            res = await self.incrBy(key, 5);
+            strictEqual(res, 15);
+
+            await client.del(key);
+        });
+    });
+
     describe('.keys(pattern: string)', () => {
         const key = 'test-keys';
         it('all', async () => {
