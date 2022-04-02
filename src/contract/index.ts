@@ -9,6 +9,7 @@ export * from './i-api';
 export * from './i-api-port';
 export * from './i-api-response';
 export * from './i-associate-storage-service';
+export * from './i-cache';
 export * from './i-command-result';
 export * from './i-db-query';
 export * from './i-enum';

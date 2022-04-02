@@ -6,6 +6,7 @@ export * from './body-parser';
 export * from './cache';
 export * from './child-process';
 export * from './command';
+export * from './config';
 export * from './console';
 export * from './cors';
 export * from './date';

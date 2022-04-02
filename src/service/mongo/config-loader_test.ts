@@ -1,37 +1,46 @@
-import { deepStrictEqual, strictEqual } from 'assert';
+import { deepStrictEqual } from 'assert';
+import moment from 'moment';
 
 import { MongoConfigLoader as Self } from './config-loader';
 import { Mock } from '../assert';
-import { DbFactoryBase, DbRepositoryBase, IDbQuery, model } from '../..';
+import { DbFactoryBase, DbRepositoryBase, ICache, IDbQuery, NowTimeBase } from '../../contract';
+import { global } from '../../model';
 
 class Test { }
 
 describe('src/service/mongo/config-loader.ts', () => {
     describe('.load<T>(ctor: new () => T)', () => {
-        it('延迟加载', async () => {
+        it('默认缓存', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockDbFactory.actual);
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(mockDbFactory.actual, mockNowTime.actual);
 
-            const mockDbRepo = new Mock<DbRepositoryBase<model.global.Config>>();
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                moment().unix()
+            );
+
+            const mockDbRepo = new Mock<DbRepositoryBase<global.Config>>();
             mockDbFactory.expectReturn(
-                r => r.db(model.global.Config),
+                r => r.db(global.Config),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new Mock<IDbQuery<model.global.Config>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Config>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
             );
 
+            const entry = {
+                id: Test.name,
+                items: {
+                    a: 1
+                }
+            } as global.Config;
             mockDbQuery.expectReturn(
                 r => r.toArray(),
-                [{
-                    id: Test.name,
-                    items: {
-                        a: 1
-                    }
-                } as model.global.Config]
+                [entry]
             );
 
             const res = await self.load(Test);
@@ -40,13 +49,17 @@ describe('src/service/mongo/config-loader.ts', () => {
             });
         });
 
-        it('不存在', async () => {
-            const self = new Self(null);
+        it('ok', async () => {
+            const mockCache = new Mock<ICache>();
+            const self = new Self(null, null, mockCache.actual);
 
-            Reflect.set(self, 'm_Entries', []);
+            mockCache.expectReturn(
+                r => r.get(Test.name),
+                []
+            );
 
             const res = await self.load(Test);
-            strictEqual(res, undefined);
+            deepStrictEqual(res, []);
         });
     });
 });
