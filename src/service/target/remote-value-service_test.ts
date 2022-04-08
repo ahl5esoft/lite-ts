@@ -14,7 +14,7 @@ describe('src/service/target/remote-value-service.ts', () => {
                 app: 'test'
             } as enum_.TargetTypeData;
             const userID = 'uid';
-            const self = new Self(null, mockRpc.actual, targetTypeData, userID, null, null);
+            const self = new Self(mockRpc.actual, targetTypeData, userID, null, null);
 
             mockRpc.expectReturn(
                 r => r.setBody({
@@ -55,7 +55,7 @@ describe('src/service/target/remote-value-service.ts', () => {
                 app: 'test'
             } as enum_.TargetTypeData;
             const userID = 'uid';
-            const self = new Self(null, mockRpc.actual, targetTypeData, userID, null, null);
+            const self = new Self(mockRpc.actual, targetTypeData, userID, null, null);
 
             mockRpc.expectReturn(
                 r => r.setBody({

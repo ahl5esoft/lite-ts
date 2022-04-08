@@ -112,6 +112,6 @@ export class UserService implements IUserService {
      * @param targetEntry 目标实体 
      */
     private createTargetValueService(targetTypeData: enum_.TargetTypeData, targetEntry: ITargetValueData) {
-        return new TargetRemoteValueService(targetEntry, this.rpc, targetTypeData, this.userID, this.valueTypeEnum, this.nowTime);
+        return new TargetRemoteValueService(this.rpc, targetTypeData, this.userID, this.valueTypeEnum, this.nowTime, targetEntry);
     }
 }
