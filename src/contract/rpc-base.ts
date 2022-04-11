@@ -1,4 +1,4 @@
-import { IApiResponse } from './i-api-response';
+import { IApiDyanmicResponse } from './i-api-dynamic-response';
 
 /**
  * 远程调用接口
@@ -9,7 +9,7 @@ export abstract class RpcBase {
      * 
      * @param route 路由
      */
-    public abstract call(route: string): Promise<IApiResponse>;
+    public abstract call<T>(route: string): Promise<IApiDyanmicResponse<T>>;
 
     /**
      * 设置body

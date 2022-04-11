@@ -4,6 +4,7 @@ import { opentracing } from 'jaeger-client';
 
 import { CustomError } from '..';
 import { IApi, IApiResponse, ILog, ITraceable, model } from '../..';
+import { IApiSession } from '../../contract';
 
 /**
  * 创建post ExpressOption
@@ -37,11 +38,16 @@ export function buildPostExpressOption(
                 err: 0,
             };
             try {
-                let api = await getApiFunc(log, req);
+                const api = await getApiFunc(log, req);
+
+                const session = api as any as IApiSession;
+                if (session.initSession)
+                    await session.initSession(req);
+
                 for (const r of Object.keys(api)) {
-                    const childTracer = api[r] as ITraceable;
-                    if (childTracer.withTrace)
-                        api[r] = childTracer.withTrace(span);
+                    const tracer = api[r] as ITraceable;
+                    if (tracer.withTrace)
+                        api[r] = tracer.withTrace(span);
                 }
 
                 if (req.body) {

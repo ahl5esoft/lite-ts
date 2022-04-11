@@ -3,21 +3,17 @@ import { deepStrictEqual } from 'assert';
 import { ValueConditionParser as Self } from './condition-parser';
 import { Mock, mockAny } from '../assert';
 import { EnumFactoryBase, IEnum, model } from '../..';
-
-class ValueTypeData {
-    public text: string;
-    public value: number;
-}
+import { enum_ } from '../../model';
 
 describe('src/service/value/condition-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, ValueTypeData);
+            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
 
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
-                r => r.build(ValueTypeData),
+                r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
             );
 

@@ -3,25 +3,22 @@ import { deepStrictEqual } from 'assert';
 import { ValueRewardParser as Self } from './reward-parser';
 import { Mock, mockAny } from '../assert';
 import { EnumFactoryBase, IEnum, IEnumItem } from '../..';
+import { enum_ } from '../../model';
 
-class ValueTypeData {
-    public text: string;
-    public value: number;
-}
 
 describe('src/service/value/reward-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, ValueTypeData);
+            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
 
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
-                r => r.build(ValueTypeData),
+                r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
             );
 
-            const mockAItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockAItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: '金币',
                     value: 11
@@ -36,7 +33,7 @@ describe('src/service/value/reward-parser.ts', () => {
                 mockAItem.actual
             );
 
-            const mockBItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockBItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: '宝石',
                     value: 22

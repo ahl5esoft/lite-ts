@@ -5,6 +5,10 @@ import { IEnumItemData } from '../../contract';
  */
 export class ValueTypeData implements IEnumItemData {
     /**
+     * 键
+     */
+    public key: string;
+    /**
      * 文本
      */
     public text: string;

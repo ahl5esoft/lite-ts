@@ -23,7 +23,7 @@ export class TargetRemoteValueService extends TargetValueServiceBase<ITargetValu
                 try {
                     const resp = await this.m_Rpc.setBody({
                         userID: this.m_userID
-                    }).call(`${this.m_TargetTypeData.app}/ih/find-values-by-user-id`);
+                    }).call<ITargetValueData[]>(`${this.m_TargetTypeData.app}/ih/find-values-by-user-id`);
                     if (resp.err)
                         throw new CustomError(resp.err, resp.data);
 
@@ -68,7 +68,7 @@ export class TargetRemoteValueService extends TargetValueServiceBase<ITargetValu
         const resp = await this.m_Rpc.setBody({
             userID: this.m_userID,
             values: values
-        }).call(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
+        }).call<void>(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
         if (resp.err)
             throw new CustomError(resp.err, resp.data);
     }

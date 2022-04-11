@@ -27,7 +27,9 @@ opentracing.initGlobalTracer(tracer);
 describe('src/service/express/post-option.ts', () => {
     describe('.buildPostExpressOption', () => {
         it('ok', async () => {
-            const mockApi = new Mock<IApi>({});
+            const mockApi = new Mock<IApi>({
+                initSession: () => { }
+            });
             const mockLog = new Mock<ILog>();
             const app = express();
 

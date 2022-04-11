@@ -1,9 +1,10 @@
 import { EnumFactoryBase, IParser, IValueData } from '../..';
+import { enum_ } from '../../model';
 
 /**
  * 数值数据解析器
  */
-export class ValueDataParser<T extends { text: string, value: number }> implements IParser {
+export class ValueDataParser<T extends enum_.ValueTypeData> implements IParser {
     /**
      * 构造函数
      * 

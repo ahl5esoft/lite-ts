@@ -50,21 +50,26 @@ enum ValueType {
             const res = await self.parse(filePath);
             deepStrictEqual(res, [{
                 isReplace: true,
+                key: 'loginOn',
                 text: '登录时间',
                 value: 1
             }, {
                 dailyTime: 3,
+                key: 'dailyLoginCount',
                 text: '每日登录次数',
                 value: 2
             }, {
+                key: 'dailyLoginCountModifiedOn',
                 text: '每日登录次数更新时间',
                 value: 3
             }, {
                 ex: 'str',
+                key: 'str',
                 text: '字符串',
                 value: 4
             }, {
                 app: 'recharge-activity',
+                key: 'rechargeActivity',
                 text: '累计充值',
                 value: 5
             }]);
@@ -100,6 +105,7 @@ enum ValueType {
                 ex: 'str',
                 isGm: true,
                 isReplace: true,
+                key: 'loginOn',
                 text: '登录时间',
                 value: 1
             }]);

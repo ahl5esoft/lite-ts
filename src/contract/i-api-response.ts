@@ -1,5 +1,5 @@
 /**
- * api响应结构
+ * api响应
  */
 export interface IApiResponse {
     /**

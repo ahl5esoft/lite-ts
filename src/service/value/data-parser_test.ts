@@ -3,25 +3,22 @@ import { deepStrictEqual } from 'assert';
 import { ValueDataParser as Self } from './data-parser';
 import { Mock, mockAny } from '../assert';
 import { EnumFactoryBase, IEnum, IEnumItem } from '../..';
+import { enum_ } from '../../model';
 
-class ValueTypeData {
-    public text: string;
-    public value: number;
-}
 
 describe('src/service/value/data-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('增加', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, ValueTypeData, /^(.+)\*(\d+)$/);
+            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData, /^(.+)\*(\d+)$/);
 
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
-                r => r.build(ValueTypeData),
+                r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
             );
 
-            const mockAItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockAItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: 'A',
                     value: 11
@@ -32,7 +29,7 @@ describe('src/service/value/data-parser.ts', () => {
                 mockAItem.actual
             );
 
-            const mockBItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockBItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: 'B',
                     value: 22
@@ -56,15 +53,15 @@ B*22`);
 
         it('减少', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, ValueTypeData, /^(.+)\*(-\d+)$/);
+            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData, /^(.+)\*(-\d+)$/);
 
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
-                r => r.build(ValueTypeData),
+                r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
             );
 
-            const mockAItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockAItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: 'A',
                     value: 11
@@ -75,7 +72,7 @@ B*22`);
                 mockAItem.actual
             );
 
-            const mockBItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockBItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: 'B',
                     value: 22
@@ -99,15 +96,15 @@ B*-5`);
 
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, ValueTypeData);
+            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
 
-            const mockEnum = new Mock<IEnum<ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
-                r => r.build(ValueTypeData),
+                r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
             );
 
-            const mockAItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockAItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: 'A',
                     value: 11
@@ -118,7 +115,7 @@ B*-5`);
                 mockAItem.actual
             );
 
-            const mockBItem = new Mock<IEnumItem<ValueTypeData>>({
+            const mockBItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {
                     text: 'B',
                     value: 22

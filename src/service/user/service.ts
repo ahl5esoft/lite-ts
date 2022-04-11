@@ -87,11 +87,11 @@ export class UserService implements IUserService {
         if (!this.m_TargetValueServices[targetType]) {
             const resp = await this.rpc.setBody({
                 userID: this.userID
-            }).call(`/${targetTypeItem.data.app}/ih/find-values-by-user-id`);
+            }).call<ITargetValueData[]>(`/${targetTypeItem.data.app}/ih/find-values-by-user-id`);
             if (resp.err)
                 throw new CustomError(resp.err, resp.data);
 
-            this.m_TargetValueServices[targetType] = (resp.data as ITargetValueData[]).map(r => {
+            this.m_TargetValueServices[targetType] = resp.data.map(r => {
                 return this.createTargetValueService(targetTypeItem.data, r);
             });
         }

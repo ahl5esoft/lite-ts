@@ -20,6 +20,14 @@ export class EnumFileParser implements IParser {
         this.m_IntAttrReg = v;
     }
 
+    private m_KeyValueReg = /^\s+(\w+)\s=\s(\d+),?$/;
+    /**
+     * 枚举键值正则
+     */
+    public set keyValueReg(v: RegExp) {
+        this.m_KeyValueReg = v;
+    }
+
     private m_StringAttrReg = /^\[(\w+)='(\w+)'\]/;
     /**
      * string特性正则
@@ -34,14 +42,6 @@ export class EnumFileParser implements IParser {
      */
     public set textReg(v: RegExp) {
         this.m_TextReg = v;
-    }
-
-    private m_ValueReg = /^\s+\w+\s=\s(\d+),?$/;
-    /**
-     * 枚举值正则
-     */
-    public set valueReg(v: RegExp) {
-        this.m_ValueReg = v;
     }
 
     public constructor(
@@ -66,6 +66,7 @@ export class EnumFileParser implements IParser {
             let match = r.match(this.m_TextReg);
             if (match) {
                 res.push({
+                    key: '',
                     text: match[2],
                     value: 0
                 });
@@ -74,9 +75,11 @@ export class EnumFileParser implements IParser {
                 continue;
             }
 
-            match = r.match(this.m_ValueReg);
-            if (match)
-                res[res.length - 1].value = parseInt(match[1]);
+            match = r.match(this.m_KeyValueReg);
+            if (match) {
+                res[res.length - 1].key = match[1];
+                res[res.length - 1].value = parseInt(match[2]);
+            }
         }
         return res;
     }

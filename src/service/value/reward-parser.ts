@@ -1,4 +1,5 @@
 import { EnumFactoryBase, IParser, IValueData } from '../..';
+import { enum_ } from '../../model';
 
 interface IReward extends IValueData {
     weight: number;
@@ -7,7 +8,7 @@ interface IReward extends IValueData {
 /**
  * 数值奖励解析器
  */
-export class ValueRewardParser<T extends { text: string, value: number }> implements IParser {
+export class ValueRewardParser<T extends enum_.ValueTypeData> implements IParser {
     /**
      * 构造函数
      * 

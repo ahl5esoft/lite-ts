@@ -14,13 +14,13 @@ export class RpcEnum<T extends IEnumItemData> implements IEnum<T> {
         return new Promise<IEnumItem<T>[]>(async (s, f) => {
             if (!this.m_Items) {
                 try {
-                    const res = await this.m_Rpc.setBody({
+                    const resp = await this.m_Rpc.setBody({
                         name: this.m_Name
-                    }).call(this.m_Route);
-                    if (res.err)
-                        return new CustomError(res.err, res.data);
+                    }).call<T[]>(this.m_Route);
+                    if (resp.err)
+                        return new CustomError(resp.err, resp.data);
 
-                    this.m_Items = (res.data as T[]).map(r => {
+                    this.m_Items = resp.data.map(r => {
                         return new EnumItem<T>(r, this.m_Name, this.m_Sep);
                     });
                 } catch (ex) {

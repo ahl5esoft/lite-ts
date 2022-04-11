@@ -4,7 +4,7 @@ import { enum_ } from '../../model';
 /**
  * 数值条件解析器
  */
-export class ValueConditionParser<T extends { text: string, value: number }> implements IParser {
+export class ValueConditionParser<T extends enum_.ValueTypeData> implements IParser {
     /**
      * 匹配规则
      */
