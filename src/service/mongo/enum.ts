@@ -1,50 +1,32 @@
-import { EnumItem } from '../enum';
-import { DbFactoryBase, IEnum, IEnumItem, IEnumItemData, ITraceable } from '../..';
-import { global } from '../../model';
+import { ICache, IEnum, IEnumItem, IEnumItemData, ITraceable } from '../../contract';
 
 /**
  * mongo枚举
  */
 export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable {
-    private m_Items: IEnumItem<T>[];
     /**
-     * 从数据库中Enum表中获取id为枚举名的数据
-     * 将global.Enum.items映射成IEnumItem<T>
+     * 所有枚举项
      */
     public get items() {
         return new Promise<IEnumItem<T>[]>(async (s, f) => {
-            if (!this.m_Items) {
-                try {
-                    const entries = await this.m_DbFactory.db(global.Enum).query().where({
-                        id: this.m_Name
-                    }).toArray();
-                    if (entries.length) {
-                        this.m_Items = entries[0].items.map(r => {
-                            return new EnumItem(r, this.m_Name, this.m_Sep);
-                        });
-                    } else {
-                        this.m_Items = [];
-                    }
-                } catch (ex) {
-                    return f(ex);
-                }
+            try {
+                const res = await this.m_Cache.get<IEnumItem<T>[]>(this.m_Name);
+                s(res ?? []);
+            } catch (ex) {
+                f(ex);
             }
-
-            s(this.m_Items);
         });
     }
 
     /**
      * 构造函数
      * 
-     * @param m_DbFactory 数据库工厂
+     * @param m_Cache 缓存
      * @param m_Name 枚举名
-     * @param m_Sep 分隔符(default: -)
      */
     public constructor(
-        private m_DbFactory: DbFactoryBase,
+        private m_Cache: ICache,
         private m_Name: string,
-        private m_Sep = '-'
     ) { }
 
     /**
@@ -66,9 +48,8 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable 
      */
     public withTrace(parentSpan: any) {
         return new MongoEnum(
-            (this.m_DbFactory as any as ITraceable)?.withTrace(parentSpan) ?? this.m_DbFactory,
+            (this.m_Cache as any as ITraceable)?.withTrace(parentSpan) ?? this.m_Cache,
             this.m_Name,
-            this.m_Sep
         );
     }
 }

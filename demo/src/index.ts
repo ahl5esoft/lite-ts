@@ -12,20 +12,21 @@ import {
     IOFactoryBase,
     LogFactoryBase,
     model,
+    NowTimeBase,
     service
 } from '../../src';
 
 (async () => {
     const cfg = await service.initIoC(__dirname);
 
+    const dbFactory = Container.get<DbFactoryBase>(DbFactoryBase as any);
+    const nowTime = Container.get<NowTimeBase>(NowTimeBase as any);
+    const cache = new service.MongoEnumCache(dbFactory, nowTime);
     Container.set(
         EnumFactoryBase,
         new service.EnumFactory({
             [enum_.CityData.name]: () => {
-                return new service.MongoEnum(
-                    Container.get<DbFactoryBase>(DbFactoryBase as any),
-                    enum_.CityData.name,
-                );
+                return new service.MongoEnum(cache, enum_.CityData.name);
             }
         })
     );

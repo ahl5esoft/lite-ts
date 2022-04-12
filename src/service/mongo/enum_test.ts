@@ -2,86 +2,17 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { MongoEnum as Self } from './enum';
 import { Mock } from '../assert';
-import { EnumItem } from '../enum';
-import { DbFactoryBase, DbRepositoryBase, IDbQuery, IEnumItemData } from '../..';
-import { global } from '../../model';
-
-interface ITestGetEnumItemData extends IEnumItemData {
-    key: string;
-}
+import { ICache } from '../../contract';
+import { enum_ } from '../../model';
 
 describe('src/service/mongo/enum.ts', () => {
     describe('.items', () => {
         it('ok', async () => {
-            const mockDbFactory = new Mock<DbFactoryBase>();
-            const name = 'test';
-            const self = new Self(mockDbFactory.actual, name);
+            const mockCache = new Mock<ICache>();
+            const self = new Self(mockCache.actual, enum_.ValueTypeData.name);
 
-            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.Enum),
-                mockDbRepo.actual
-            );
-
-            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
-            mockDbRepo.expectReturn(
-                r => r.query(),
-                mockDbQuery.actual
-            );
-
-            mockDbQuery.expectReturn(
-                r => r.where({
-                    id: name
-                }),
-                mockDbQuery.actual
-            );
-
-            const data = {
-                key: 'k',
-                value: 1
-            };
-            mockDbQuery.expectReturn(
-                r => r.toArray(),
-                [{
-                    items: [data]
-                } as global.Enum]
-            );
-
-            const res = await self.items;
-            deepStrictEqual(res, [
-                new EnumItem(data, name, '-')
-            ]);
-
-            const items = Reflect.get(self, 'm_Items');
-            deepStrictEqual(res, items);
-        });
-
-        it('不存在', async () => {
-            const mockDbFactory = new Mock<DbFactoryBase>();
-            const name = 'test';
-            const self = new Self(mockDbFactory.actual, name);
-
-            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.Enum),
-                mockDbRepo.actual
-            );
-
-            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
-            mockDbRepo.expectReturn(
-                r => r.query(),
-                mockDbQuery.actual
-            );
-
-            mockDbQuery.expectReturn(
-                r => r.where({
-                    id: name
-                }),
-                mockDbQuery.actual
-            );
-
-            mockDbQuery.expectReturn(
-                r => r.toArray(),
+            mockCache.expectReturn(
+                r => r.get(enum_.ValueTypeData.name),
                 []
             );
 
@@ -92,83 +23,18 @@ describe('src/service/mongo/enum.ts', () => {
 
     describe('.get(predicate: (data: global.IEnumItemData) => boolean)', () => {
         it('ok', async () => {
-            const mockDbFactory = new Mock<DbFactoryBase>();
-            const name = 'test';
-            const self = new Self<ITestGetEnumItemData>(mockDbFactory.actual, name);
+            const mockCache = new Mock<ICache>();
+            const self = new Self(mockCache.actual, enum_.ValueTypeData.name);
 
-            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.Enum),
-                mockDbRepo.actual
-            );
-
-            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
-            mockDbRepo.expectReturn(
-                r => r.query(),
-                mockDbQuery.actual
-            );
-
-            mockDbQuery.expectReturn(
-                r => r.where({
-                    id: name
-                }),
-                mockDbQuery.actual
-            );
-
-            const data = {
-                key: 'k',
-                value: 1
-            };
-            mockDbQuery.expectReturn(
-                r => r.toArray(),
-                [{
-                    items: [data]
-                } as global.Enum]
-            );
-
-            const res = await self.get(r => {
-                return r.key == data.key;
-            });
-            const items = Reflect.get(self, 'm_Items');
-            strictEqual(res, items[0]);
-        });
-
-        it('不存在', async () => {
-            const mockDbFactory = new Mock<DbFactoryBase>();
-            const name = 'test';
-            const self = new Self<ITestGetEnumItemData>(mockDbFactory.actual, name);
-
-            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.Enum),
-                mockDbRepo.actual
-            );
-
-            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
-            mockDbRepo.expectReturn(
-                r => r.query(),
-                mockDbQuery.actual
-            );
-
-            mockDbQuery.expectReturn(
-                r => r.where({
-                    id: name
-                }),
-                mockDbQuery.actual
-            );
-
-            mockDbQuery.expectReturn(
-                r => r.toArray(),
+            mockCache.expectReturn(
+                r => r.get(enum_.ValueTypeData.name),
                 []
             );
 
             const res = await self.get(r => {
-                return r.key == 'not-exists';
+                return r.key == '';
             });
-            strictEqual(
-                res,
-                undefined,
-            );
+            strictEqual(res, undefined);
         });
     });
 });
