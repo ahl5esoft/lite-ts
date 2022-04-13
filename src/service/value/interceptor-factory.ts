@@ -1,7 +1,8 @@
 import { opentracing } from 'jaeger-client';
 import Container from 'typedi';
 
-import { ITraceable, IValueInterceptor, ValueInterceptorFactoryBase } from '../..';
+import { TracerStrategy } from '../tracer';
+import { ITraceable, IValueInterceptor, ValueInterceptorFactoryBase } from '../../contract';
 
 /**
  * null数值拦截器
@@ -15,12 +16,16 @@ const nullValueInterceptor: IValueInterceptor = {
 /**
  * 数值拦截器构造器
  */
-const valueInterceptorCtors: { [key: number]: { [key: number]: new () => IValueInterceptor } } = {};
+const valueInterceptorCtors: {
+    [targetType: number]: {
+        [valueType: number]: new () => IValueInterceptor
+    }
+} = {};
 
 /**
  * 数值拦截器工厂
  */
-export class ValueInterceptorFactory extends ValueInterceptorFactoryBase implements ITraceable {
+export class ValueInterceptorFactory extends ValueInterceptorFactoryBase implements ITraceable<ValueInterceptorFactoryBase> {
     /**
      * 构造函数
      * 
@@ -46,8 +51,7 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
                 const interceptor = Container.get(ctor);
                 Container.remove(ctor);
 
-                const tracer = interceptor as any as ITraceable;
-                return tracer.withTrace ? tracer.withTrace(this.m_ParentSpan) : interceptor;
+                return new TracerStrategy(interceptor).withTrace(this.m_ParentSpan);
             }
         }
 

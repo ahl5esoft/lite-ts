@@ -3,7 +3,7 @@ import { initTracer, opentracing } from 'jaeger-client';
 
 import { JaegerDbFactory as Self } from './db-factory';
 import { MongoDbFactory } from '../mongo';
-import { DbFactoryBase } from '../..';
+import { DbFactoryBase } from '../../contract';
 
 class TestJaeger {
     public age: number;

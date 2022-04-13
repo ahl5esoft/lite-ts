@@ -2,12 +2,12 @@ import { opentracing } from 'jaeger-client';
 
 import { JaegerDbRepository } from './db-repository';
 import { JaegerUnitOfWork } from './unit-of-work';
-import { DbFactoryBase, ITraceable, UnitOfWorkRepositoryBase } from '../..';
+import { DbFactoryBase, ITraceable, UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
  * jaeger数据库工厂
  */
-export class JaegerDbFactory extends DbFactoryBase implements ITraceable {
+export class JaegerDbFactory extends DbFactoryBase implements ITraceable<DbFactoryBase> {
     /**
      * 数据库工厂
      * 

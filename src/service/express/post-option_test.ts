@@ -4,7 +4,7 @@ import supertest from 'supertest';
 
 import { buildPostExpressOption as self } from './post-option';
 import { Mock } from '../assert';
-import { IApi, ILog } from '../..';
+import { IApi, ILog } from '../../contract';
 
 describe('src/service/express/post-option.ts', () => {
     describe('.buildPostExpressOption', () => {

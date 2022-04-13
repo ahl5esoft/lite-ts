@@ -1,12 +1,13 @@
 import { opentracing } from 'jaeger-client';
 
 import { MultiUnitOfWork } from './multi-unit-of-work';
-import { DbFactoryBase, ITraceable } from '../..';
+import { TracerStrategy } from '../tracer';
+import { DbFactoryBase, ITraceable } from '../../contract';
 
 /**
  * 多数据库工厂
  */
-export class MultiDbFactory extends DbFactoryBase implements ITraceable {
+export class MultiDbFactory extends DbFactoryBase implements ITraceable<DbFactoryBase> {
     /**
      * 
      * @param m_DbFactories 构造函数
@@ -38,11 +39,7 @@ export class MultiDbFactory extends DbFactoryBase implements ITraceable {
         if (!this.m_DbFactories[dbType])
             throw new Error(`无效数据库类型: ${dbType}`);
 
-        let dbFactory = this.m_DbFactories[dbType];
-        const tracer = dbFactory as any as ITraceable;
-        if (tracer.withTrace)
-            dbFactory = tracer.withTrace(this.m_ParentSpan);
-        return dbFactory.db(model, uow?.uows[dbType]);
+        return new TracerStrategy(this.m_DbFactories[dbType]).withTrace(this.m_ParentSpan).db(model, uow?.uows[dbType]);
     }
 
     /**
@@ -50,11 +47,9 @@ export class MultiDbFactory extends DbFactoryBase implements ITraceable {
      */
     public uow() {
         const uows = Object.keys(this.m_DbFactories).reduce((memo, r) => {
-            let uow = this.m_DbFactories[r].uow();
-            const tracer = uow as any as ITraceable;
-            if (tracer.withTrace)
-                uow = tracer.withTrace(this.m_ParentSpan);
-            memo[r] = uow;
+            memo[r] = new TracerStrategy(
+                this.m_DbFactories[r].uow()
+            ).withTrace(this.m_ParentSpan);
             return memo;
         }, {});
         return new MultiUnitOfWork(uows);

@@ -1,12 +1,13 @@
 import { MemoryCache } from '../cache';
 import { EnumItem } from '../enum';
+import { TracerStrategy } from '../tracer';
 import { DbFactoryBase, ICache, ITraceable, NowTimeBase } from '../../contract';
 import { global } from '../../model';
 
 /**
  * 枚举缓存
  */
-export class MongoEnumCache implements ICache, ITraceable {
+export class MongoEnumCache implements ICache, ITraceable<ICache> {
     private m_Cache: ICache;
     /**
      * 缓存
@@ -63,7 +64,7 @@ export class MongoEnumCache implements ICache, ITraceable {
      */
     public withTrace(parentSpan: any) {
         return new MongoEnumCache(
-            (this.m_DbFactory as any as ITraceable)?.withTrace(parentSpan) ?? this.m_DbFactory,
+            new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
             this.m_NowTime,
             this.m_Sep
         );

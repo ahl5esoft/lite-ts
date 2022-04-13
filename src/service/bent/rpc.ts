@@ -2,7 +2,7 @@ import bent from 'bent';
 import { opentracing } from 'jaeger-client';
 
 import { CustomError } from '../error';
-import { IApiResponse, ITraceable, RpcBase } from '../..';
+import { IApiResponse, ITraceable, RpcBase } from '../../contract';
 
 /**
  * 包装器
@@ -93,7 +93,7 @@ class Wrapper extends RpcBase {
 /**
  * 远程过程调用对象(基于bent实现)
  */
-export class BentRpc extends RpcBase implements ITraceable {
+export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
     /**
      * post请求函数
      */

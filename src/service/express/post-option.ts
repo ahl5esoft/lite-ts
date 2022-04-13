@@ -2,9 +2,10 @@ import { validate } from 'class-validator';
 import { Express, Request, Response } from 'express';
 import { opentracing } from 'jaeger-client';
 
-import { CustomError } from '..';
-import { IApi, IApiResponse, ILog, ITraceable, model } from '../..';
-import { IApiSession } from '../../contract';
+import { CustomError } from '../error';
+import { TracerStrategy } from '../tracer';
+import { IApi, IApiResponse, IApiSession, ILog } from '../../contract';
+import { enum_ } from '../../model';
 
 /**
  * 创建post ExpressOption
@@ -44,11 +45,9 @@ export function buildPostExpressOption(
                 if (session.initSession)
                     await session.initSession(req);
 
-                for (const r of Object.keys(api)) {
-                    const tracer = api[r] as ITraceable;
-                    if (tracer.withTrace)
-                        api[r] = tracer.withTrace(span);
-                }
+                Object.keys(api).forEach(r => {
+                    api[r] = new TracerStrategy(api[r]).withTrace(span);
+                });
 
                 if (req.body) {
                     span.log({
@@ -72,7 +71,7 @@ export function buildPostExpressOption(
                             };
                         })
                     });
-                    throw new CustomError(model.enum_.ErrorCode.verify);
+                    throw new CustomError(enum_.ErrorCode.verify);
                 }
 
                 res.data = await api.call();
@@ -81,7 +80,7 @@ export function buildPostExpressOption(
                     res.data = ex.data;
                     res.err = ex.code;
                 } else {
-                    res.err = model.enum_.ErrorCode.panic;
+                    res.err = enum_.ErrorCode.panic;
                     log.error(ex);
                     span.log({
                         err: ex

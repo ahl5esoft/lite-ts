@@ -32,6 +32,7 @@ export * from './set-timeout';
 export * from './simple-git';
 export * from './ssh2';
 export * from './target';
+export * from './tracer';
 export * from './typedi';
 export * from './user';
 export * from './value';

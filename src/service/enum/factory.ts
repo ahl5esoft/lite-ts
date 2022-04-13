@@ -1,10 +1,12 @@
 import { opentracing } from 'jaeger-client';
-import { EnumFactoryBase, IEnumItemData, ITraceable } from '../..';
+
+import { TracerStrategy } from '../tracer';
+import { EnumFactoryBase, IEnumItemData, ITraceable } from '../../contract';
 
 /**
  * 枚举工厂
  */
-export class EnumFactory extends EnumFactoryBase implements ITraceable {
+export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFactoryBase> {
     /**
      * 构造函数
      * 
@@ -25,11 +27,9 @@ export class EnumFactory extends EnumFactoryBase implements ITraceable {
      */
     public build<T extends IEnumItemData>(model: new () => T) {
         if (model.name in this.m_BuildFuncs) {
-            let enumObj = this.m_BuildFuncs[model.name]();
-            const enumTracer = enumObj as ITraceable;
-            if (enumTracer.withTrace)
-                enumObj = enumTracer.withTrace(this.m_ParentSpan);
-            return enumObj;
+            return new TracerStrategy(
+                this.m_BuildFuncs[model.name]()
+            ).withTrace(this.m_ParentSpan);
         }
 
         throw new Error(`缺少创建函数: ${model.name}`);
