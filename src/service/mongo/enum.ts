@@ -1,5 +1,6 @@
 import { TracerStrategy } from '../tracer';
-import { ICache, IEnum, IEnumItem, IEnumItemData, ITraceable } from '../../contract';
+import { DbFactoryBase, ICache, IEnum, IEnumItem, IEnumItemData, ITraceable, IUnitOfWork } from '../../contract';
+import { global } from '../../model';
 
 /**
  * mongo枚举
@@ -27,6 +28,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<
      */
     public constructor(
         private m_Cache: ICache,
+        private m_DbFactory: DbFactoryBase,
         private m_Name: string,
     ) { }
 
@@ -43,6 +45,36 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<
     }
 
     /**
+     * 更新枚举数据
+     * 
+     * @param data 枚举数据
+     * @param uow 工作单元
+     */
+    public async update(data: T, uow?: IUnitOfWork) {
+        const items = await this.items;
+        const newEnumItems = items.map(r => {
+            if (data.value == r.data.value) {
+                return {
+                    ...r.data,
+                    ...data
+                };
+            }
+            return r.data;
+        });
+        const db = this.m_DbFactory.db(global.Enum, uow);
+        const enums = await db.query().where({
+            id: this.m_Name
+        }).toArray();
+        if (enums?.length) {
+            await db.save({
+                id: this.m_Name,
+                items: newEnumItems
+            });
+        }
+        this.m_Cache.flush();
+    }
+
+    /**
      * 跟踪
      * 
      * @param parentSpan 父跟踪范围
@@ -50,6 +82,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<
     public withTrace(parentSpan: any) {
         return new MongoEnum(
             new TracerStrategy(this.m_Cache).withTrace(parentSpan),
+            this.m_DbFactory,
             this.m_Name,
         ) as IEnum<T>;
     }

@@ -58,4 +58,7 @@ export class RpcEnum<T extends IEnumItemData> implements IEnum<T> {
             return predicate(r.data);
         });
     }
+
+    public async update(_: T): Promise<void> {
+    }
 }
