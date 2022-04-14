@@ -2,9 +2,9 @@ import { TracerStrategy } from '../tracer';
 import { ICache, IEnum, IEnumItem, IEnumItemData, ITraceable } from '../../contract';
 
 /**
- * mongo枚举
+ * 枚举服务(缓存)
  */
-export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<IEnum<T>> {
+export class CacheEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<IEnum<T>> {
     /**
      * 所有枚举项
      */
@@ -48,7 +48,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new MongoEnum(
+        return new CacheEnum(
             new TracerStrategy(this.m_Cache).withTrace(parentSpan),
             this.m_Name,
         ) as IEnum<T>;

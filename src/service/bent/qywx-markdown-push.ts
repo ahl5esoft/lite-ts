@@ -3,25 +3,6 @@ import bent from 'bent';
 import { IPush } from '../..';
 
 /**
- * 请求数据
- */
-interface IRequest {
-    /**
-     * 消息类型
-     */
-    msgtype: 'markdown';
-    /**
-     * markdown结构
-     */
-    markdown: {
-        /**
-         * 内容
-         */
-        content: string;
-    }
-}
-
-/**
  * 响应数据
  */
 interface IResponse {
@@ -65,15 +46,13 @@ export class BentQYWXMarkdownPush implements IPush {
      *  await new service.BentQYWXMarkdownPush('webhook地址').push(markdown内容);
      * ```
      */
-    public async push(content: string) {
-        const req: IRequest = {
+    public async push(text: string) {
+        const resp = await this.m_PostFunc('', {
             msgtype: 'markdown',
             markdown: {
-                content: content
+                content: text
             }
-        };
-        const res = await this.m_PostFunc('', req);
-        const resp = res as IResponse;
+        }) as IResponse;
         if (resp.errcode)
             throw new Error(resp.errmsg);
     }

@@ -1,11 +1,11 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { MongoEnum as Self } from './enum';
+import { CacheEnum as Self } from './enum';
 import { Mock } from '../assert';
 import { ICache } from '../../contract';
 import { enum_ } from '../../model';
 
-describe('src/service/mongo/enum.ts', () => {
+describe('src/service/cache/enum.ts', () => {
     describe('.items', () => {
         it('ok', async () => {
             const mockCache = new Mock<ICache>();

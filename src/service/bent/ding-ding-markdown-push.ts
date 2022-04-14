@@ -2,16 +2,14 @@ import bent from 'bent';
 
 import { IPush } from '../..';
 
-interface IRequest {
-    msgtype: 'markdown';
-    markdown: {
-        text: string;
-        title: string;
-    }
-}
-
 interface IResponse {
+    /**
+     * 错误码
+     */
     errcode: number;
+    /**
+     * 错误消息
+     */
     errmsg: string;
 }
 
@@ -48,15 +46,13 @@ export class BentDingDingMarkdownPush implements IPush {
      * ```
      */
     public async push(text: string) {
-        const req: IRequest = {
+        const resp = await this.m_PostFunc('', {
             msgtype: 'markdown',
             markdown: {
                 text: text,
                 title: this.m_Keyword
             }
-        };
-        const res = await this.m_PostFunc('', req);
-        const resp = res as IResponse;
+        }) as IResponse;
         if (resp.errcode)
             throw new Error(resp.errmsg);
     }

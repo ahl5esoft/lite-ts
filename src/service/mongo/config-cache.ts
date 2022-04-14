@@ -1,13 +1,15 @@
 import { MemoryCache } from '../cache';
-import { ConfigLoaderBase, DbFactoryBase, ICache, NowTimeBase } from '../../contract';
+import { TracerStrategy } from '../tracer';
+import { DbFactoryBase, ICache, NowTimeBase } from '../../contract';
 import { global } from '../../model';
 
 /**
- * mongo配置加载器
+ * mongo配置缓存
  */
-export class MongoConfigLoader extends ConfigLoaderBase {
+export class MongoConfigCache implements ICache {
+    private m_Cache: ICache;
     /**
-     * 缓存实例
+     * 缓存
      */
     protected get cache() {
         if (!this.m_Cache) {
@@ -28,22 +30,37 @@ export class MongoConfigLoader extends ConfigLoaderBase {
      * 
      * @param m_DbFactory 数据库工厂
      * @param m_NowTime 当前时间
-     * @param m_Cache 缓存
      */
     public constructor(
         private m_DbFactory: DbFactoryBase,
         private m_NowTime: NowTimeBase,
-        private m_Cache?: ICache,
-    ) {
-        super();
+    ) { }
+
+    /**
+     * 清空
+     */
+    public flush() {
+        this.cache.flush();
     }
 
     /**
-     * 加载配置
+     * 获取
      * 
-     * @param ctor 构造函数
+     * @param key 键
      */
-    public async load<T>(ctor: new () => T) {
-        return this.cache.get<T>(ctor.name);
+    public async get<T>(key: string) {
+        return this.cache.get<T>(key);
+    }
+
+    /**
+     * 跟踪
+     * 
+     * @param parentSpan 父跟踪范围
+     */
+    public withTrace(parentSpan: any) {
+        return new MongoConfigCache(
+            new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
+            this.m_NowTime,
+        );
     }
 }
