@@ -12,6 +12,14 @@ export interface IEnum<T extends IEnumItemData> {
     readonly items: Promise<IEnumItem<T>[]>;
 
     /**
+     * 添加或者更新枚举数据
+     * 
+     * @param uow 工作单元
+     * @param itemData 更新的数据
+     */
+    addOrSaveItem(uow: IUnitOfWork, itemData: T): Promise<void>;
+
+    /**
      * 获取满足条件的单个枚举项
      * 
      * @param predicate 断言
@@ -19,9 +27,10 @@ export interface IEnum<T extends IEnumItemData> {
     get(predicate: (data: T) => boolean): Promise<IEnumItem<T>>;
 
     /**
-     * 更新枚举数据
+     * 移除枚举数据
      * 
-     * @param data 更新的数据
+     * @param uow 工作单元
+     * @param predicate 断言
      */
-    update(data: T, uow?: IUnitOfWork): Promise<void>;
+    removeItem(uow: IUnitOfWork, predicate: (data: T) => boolean): Promise<void>;
 }

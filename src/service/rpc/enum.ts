@@ -1,6 +1,6 @@
 import { EnumItem } from '../enum';
 import { CustomError } from '../error';
-import { IEnum, IEnumItem, IEnumItemData, RpcBase } from '../../contract';
+import { IEnum, IEnumItem, IEnumItemData, IUnitOfWork, RpcBase } from '../../contract';
 
 /**
  * 远程过程调用枚举
@@ -59,6 +59,9 @@ export class RpcEnum<T extends IEnumItemData> implements IEnum<T> {
         });
     }
 
-    public async update(_: T): Promise<void> {
+    public async addOrSaveItem(_: IUnitOfWork, __: T): Promise<void> {
+    }
+
+    public async removeItem(_: IUnitOfWork, __: (data: T) => boolean): Promise<void> {
     }
 }

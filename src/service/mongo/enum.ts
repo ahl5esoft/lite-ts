@@ -33,6 +33,34 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<
     ) { }
 
     /**
+     * 添加或者更新枚举数据
+     * 
+     * @param uow 工作单元
+     * @param itemData 更新的数据
+     */
+    public async addOrSaveItem(uow: IUnitOfWork, dataItem: T) {
+        const db = this.m_DbFactory.db(global.Enum, uow);
+        const enums = await db.query().where({
+            id: this.m_Name
+        }).toArray();
+        if (enums.length) {
+            const index = enums[0].items.findIndex(r => r.value == dataItem.value);
+            if (index > -1)
+                enums[0].items[index] = dataItem;
+            else
+                enums[0].items.push(dataItem);
+            await db.save(enums[0]);
+        } else {
+            enums.push({
+                id: this.m_Name,
+                items: [dataItem]
+            });
+            await db.add(enums[0]);
+        }
+        this.m_Cache.flush();
+    }
+
+    /**
      * 获取第一个满足条件的项
      * 
      * @param predicate 断言
@@ -45,33 +73,22 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<
     }
 
     /**
-     * 更新枚举数据
+     * 移除枚举数据
      * 
-     * @param data 枚举数据
      * @param uow 工作单元
+     * @param predicate 断言
      */
-    public async update(data: T, uow?: IUnitOfWork) {
-        const items = await this.items;
-        const newEnumItems = items.map(r => {
-            if (data.value == r.data.value) {
-                return {
-                    ...r.data,
-                    ...data
-                };
-            }
-            return r.data;
-        });
-        const db = this.m_DbFactory.db(global.Enum, uow);
-        const enums = await db.query().where({
-            id: this.m_Name
-        }).toArray();
-        if (enums?.length) {
-            await db.save({
-                id: this.m_Name,
-                items: newEnumItems
-            });
+    public async removeItem(uow: IUnitOfWork, predicate: (data: T) => boolean): Promise<void> {
+        const item = await this.get(predicate);
+        if (item) {
+            const db = this.m_DbFactory.db(global.Enum, uow);
+            const enums = await db.query().where({
+                id: this.m_Name
+            }).toArray();
+            const index = enums[0].items.findIndex(predicate);
+            enums[0].items.splice(index, 1);
+            await db.save(enums[0]);
         }
-        this.m_Cache.flush();
     }
 
     /**

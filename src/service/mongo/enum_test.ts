@@ -40,7 +40,7 @@ describe('src/service/mongo/enum.ts', () => {
         });
     });
 
-    describe('.update(data: global.IEnumItemData) => void)', () => {
+    describe('.addOrSaveItem(uow: IUnitOfWork, data: global.IEnumItemData) => void)', () => {
         it('ok', async () => {
             const mockCache = new Mock<ICache>();
             const mockDbFactory = new Mock<DbFactoryBase>();
@@ -62,6 +62,12 @@ describe('src/service/mongo/enum.ts', () => {
                 mockDbRepository.actual
             );
 
+
+            mockDbRepository.expectReturn(
+                r => r.add(mockAny),
+                null
+            );
+
             const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
             mockDbRepository.expectReturn(
                 r => r.query(),
@@ -77,7 +83,25 @@ describe('src/service/mongo/enum.ts', () => {
                 []
             );
 
-            await self.update({ value: 1, key: '', text: '' }, mockUow.actual);
+            await self.addOrSaveItem(mockUow.actual, { value: 1, key: '', text: '' });
+        });
+    });
+
+    describe('.removeItem(uow: IUnitOfWork, predicate: (data: global.IEnumItemData) => boolean)', () => {
+        it('ok', async () => {
+            const mockCache = new Mock<ICache>();
+            const mockDbFactory = new Mock<DbFactoryBase>();
+            const mockUow = new Mock<IUnitOfWork>();
+            const self = new Self(mockCache.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
+
+            mockCache.expectReturn(
+                r => r.get(enum_.ValueTypeData.name),
+                []
+            );
+
+            await self.removeItem(mockUow.actual, r => {
+                return r.key == '';
+            });
         });
     });
 });
