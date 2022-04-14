@@ -4,7 +4,7 @@ import { TargetRemoteValueService } from '../target';
 import {
     DbFactoryBase,
     IAssociateStorageService,
-    IEnum,
+    IReadonlyEnum,
     ITargetValueData,
     ITargetValueService,
     IUserService,
@@ -23,7 +23,7 @@ export class UserService implements IUserService {
     /**
      * 目标数值服务
      */
-    private m_TargetValueServices: { [targetType: number]: ITargetValueService[] } = {};
+    private m_TargetValueServices: { [targetType: number]: ITargetValueService[]; } = {};
 
     private m_ValueService: IUserValueService;
     /**
@@ -59,8 +59,8 @@ export class UserService implements IUserService {
     public constructor(
         public associateStorageService: IAssociateStorageService,
         public userID: string,
-        protected valueTypeEnum: IEnum<enum_.ValueTypeData>,
-        protected targetTypeEnum: IEnum<enum_.TargetTypeData>,
+        protected valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
+        protected targetTypeEnum: IReadonlyEnum<enum_.TargetTypeData>,
         protected dbFactory: DbFactoryBase,
         protected nowTime: NowTimeBase,
         protected rpc: RpcBase,
@@ -97,7 +97,7 @@ export class UserService implements IUserService {
         }
 
         for (const r of this.m_TargetValueServices[targetType]) {
-            const entry = (await r.entry) as any as { no: number };
+            const entry = (await r.entry) as any as { no: number; };
             if (entry.no == targetValue)
                 return r;
         }

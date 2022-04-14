@@ -1,7 +1,7 @@
 import { TargetLocalValueServiceBase } from '../target';
 import {
     DbFactoryBase,
-    IEnum,
+    IReadonlyEnum,
     IRewardData,
     IUnitOfWork,
     IUserService,
@@ -49,7 +49,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
      */
     public constructor(
         public userService: IUserService,
-        valueTypeEnum: IEnum<enum_.ValueTypeData>,
+        valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
         dbFactory: DbFactoryBase,
         nowTime: NowTimeBase,
         stringGenerator: StringGeneratorBase,
@@ -94,7 +94,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
             }, [] as {
                 conditions: IValueConditionData[],
                 targetType: number,
-                targetValue: number
+                targetValue: number;
             }[]).map(async cr => {
                 if (cr.targetType) {
                     const targetValueService = await this.userService.getTargetValueService(cr.targetType, cr.targetValue);
@@ -135,7 +135,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
         }, [] as {
             values: IValueData[],
             targetType: number,
-            targetValue: number
+            targetValue: number;
         }[]).map(async r => {
             if (r.targetType) {
                 const targetValueService = await this.userService.getTargetValueService(r.targetType, r.targetValue);

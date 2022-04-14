@@ -2,13 +2,13 @@ import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
 
 import { UserService as Self } from './service';
 import { Mock, mockAny } from '../assert';
-import { IEnum, ITargetValueData, RpcBase } from '../..';
+import { IReadonlyEnum, ITargetValueData, RpcBase } from '../..';
 import { enum_ } from '../../model';
 
 describe('src/service/user/service.ts', () => {
     describe('.getTargetValueService(targetType: number, targetValue: number)', () => {
         it('无效目标类型', async () => {
-            const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
+            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
             const self = new Self(null, null, null, mockTargetTypeEnum.actual, null, null, null, null, null);
 
             mockTargetTypeEnum.expectReturn(
@@ -27,7 +27,7 @@ describe('src/service/user/service.ts', () => {
         });
 
         it('目标数值服务没有缓存', async () => {
-            const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
+            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
             const mockRpc = new Mock<RpcBase>();
             const userID = 'uid';
             const self = new Self(null, userID, null, mockTargetTypeEnum.actual, null, null, mockRpc.actual, null, null);
@@ -92,7 +92,7 @@ describe('src/service/user/service.ts', () => {
         });
 
         it('目标数值服务不存在', async () => {
-            const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
+            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
             const mockRpc = new Mock<RpcBase>();
             const userID = 'uid';
             const self = new Self(null, userID, null, mockTargetTypeEnum.actual, null, null, mockRpc.actual, null, null);

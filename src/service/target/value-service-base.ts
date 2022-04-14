@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import {
-    IEnum,
+    IReadonlyEnum,
     ITargetValueData,
     ITargetValueService,
     IUnitOfWork,
@@ -27,7 +27,7 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData> impleme
      * @param nowTime 当前时间
      */
     public constructor(
-        protected valueTypeEnum: IEnum<enum_.ValueTypeData>,
+        protected valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
         protected nowTime: NowTimeBase,
     ) { }
 

@@ -8,7 +8,7 @@ import {
     DbFactoryBase,
     DbRepositoryBase,
     IAssociateStorageService,
-    IEnum,
+    IReadonlyEnum,
     IEnumItem,
     ITargetValueChangeData,
     ITargetValueData,
@@ -24,7 +24,7 @@ import { enum_ } from '../../model';
 
 class TargetValue implements ITargetValueData {
     public id: string;
-    public values: { [key: number]: number };
+    public values: { [key: number]: number; };
 }
 
 class TargetValueChange implements ITargetValueChangeData {
@@ -152,7 +152,7 @@ describe('src/service/target/local-value-service-base.ts', () => {
             const mockAssociateStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
             const mockStringGenerator = new Mock<StringGeneratorBase>();
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
             const self = new Self(mockAssociateStorageService.actual, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, TargetValue, TargetValueChange, TargetValueLog, mockValueType.actual, null);
 
@@ -231,7 +231,7 @@ describe('src/service/target/local-value-service-base.ts', () => {
             const mockAssociateStorageService = new Mock<IAssociateStorageService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
             const mockStringGenerator = new Mock<StringGeneratorBase>();
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
             const self = new Self(mockAssociateStorageService.actual, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, TargetValue, TargetValueChange, TargetValueLog, mockValueType.actual, null);
 
@@ -317,7 +317,7 @@ describe('src/service/target/local-value-service-base.ts', () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const mockNowTime = new Mock<NowTimeBase>();
             const mockStringGenerator = new Mock<StringGeneratorBase>();
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
             const self = new Self(mockAssociateStorageService.actual, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, TargetValue, TargetValueChange, TargetValueLog, mockValueType.actual, mockNowTime.actual);
 

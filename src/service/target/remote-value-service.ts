@@ -1,7 +1,7 @@
 import { TargetValueServiceBase } from './value-service-base';
 import { CustomError } from '../error';
 import {
-    IEnum,
+    IReadonlyEnum,
     ITargetValueData,
     IUnitOfWork,
     IValueData,
@@ -51,7 +51,7 @@ export class TargetRemoteValueService extends TargetValueServiceBase<ITargetValu
         private m_Rpc: RpcBase,
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_userID: string,
-        valueTypeEnum: IEnum<enum_.ValueTypeData>,
+        valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
         nowTime: NowTimeBase,
         private m_Entry?: ITargetValueData,
     ) {
