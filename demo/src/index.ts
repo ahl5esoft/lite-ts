@@ -24,7 +24,7 @@ import {
     const cache = new service.MongoEnumCache(dbFactory, nowTime);
     Container.set(
         EnumFactoryBase,
-        new service.EnumFactory({
+        new service.EnumFactory({}, {
             [enum_.CityData.name]: () => {
                 return new service.CacheEnum(cache, enum_.CityData.name);
             }

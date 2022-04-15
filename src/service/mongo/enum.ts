@@ -5,6 +5,9 @@ import { global } from '../../model';
  * 可编辑的Mongo枚举服务
  */
 export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
+    /**
+     * 枚举项
+     */
     public get items() {
         return new Promise<IEnumItem<T>[]>(async (s, f) => {
             try {
@@ -16,6 +19,13 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
         });
     }
 
+    /**
+     * 构造函数
+     * 
+     * @param m_Cache 缓存
+     * @param m_DbFactory 数据库工厂
+     * @param m_Name 枚举名
+     */
     public constructor(
         private m_Cache: ICache,
         private m_DbFactory: DbFactoryBase,
@@ -36,7 +46,10 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
             const index = items.findIndex(r => {
                 return r.value == itemData.value;
             });
-            items[index] = itemData;
+            if (index == -1)
+                items.push(itemData);
+            else
+                items[index] = itemData;
             await db.save({
                 id: this.m_Name,
                 items: items
@@ -47,6 +60,8 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
                 items: [itemData]
             });
         }
+
+        this.m_Cache.flush();
     }
 
     /**
