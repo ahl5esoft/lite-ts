@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 
 import { ValueDataParser as Self } from './data-parser';
 import { Mock, mockAny } from '../assert';
-import { EnumFactoryBase, IEnum, IEnumItem } from '../..';
+import { EnumFactoryBase, IReadonlyEnum, IEnumItem } from '../..';
 import { enum_ } from '../../model';
 
 
@@ -12,7 +12,7 @@ describe('src/service/value/data-parser.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData, /^(.+)\*(\d+)$/);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
@@ -55,7 +55,7 @@ B*22`);
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData, /^(.+)\*(-\d+)$/);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
@@ -98,7 +98,7 @@ B*-5`);
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual

@@ -5,7 +5,7 @@ import { CustomError } from '../error';
 import {
     DbFactoryBase,
     IAssociateStorageService,
-    IEnum,
+    IReadonlyEnum,
     ITargetValueChangeData,
     ITargetValueData,
     ITargetValueLogData,
@@ -49,7 +49,7 @@ export abstract class TargetLocalValueServiceBase<
         protected model: new () => T,
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
-        valueTypeEnum: IEnum<enum_.ValueTypeData>,
+        valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
         nowTime: NowTimeBase,
     ) {
         super(valueTypeEnum, nowTime);

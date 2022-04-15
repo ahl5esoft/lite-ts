@@ -1,11 +1,11 @@
 import { EnumItem } from '../enum';
 import { CustomError } from '../error';
-import { IEnum, IEnumItem, IEnumItemData, RpcBase } from '../../contract';
+import { IReadonlyEnum, IEnumItem, IEnumItemData, RpcBase } from '../../contract';
 
 /**
  * 远程过程调用枚举
  */
-export class RpcEnum<T extends IEnumItemData> implements IEnum<T> {
+export class RpcEnum<T extends IEnumItemData> implements IReadonlyEnum<T> {
     private m_Items: IEnumItem<T>[];
     /**
      * 所有枚举项
