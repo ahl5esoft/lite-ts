@@ -1,4 +1,4 @@
-import { DbFactoryBase, ICache, IEnum, IEnumItem, IEnumItemData, IUnitOfWork } from '../../contract';
+import { DbFactoryBase, ICache, IEnum, IEnumItemData, IReadonlyEnum, IUnitOfWork } from '../../contract';
 import { global } from '../../model';
 
 /**
@@ -9,50 +9,42 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
      * 枚举项
      */
     public get items() {
-        return new Promise<IEnumItem<T>[]>(async (s, f) => {
-            try {
-                const res = await this.m_Cache.get<IEnumItem<T>[]>(this.m_Name);
-                s(res);
-            } catch (ex) {
-                f(ex);
-            }
-        });
+        return this.m_ReadonlyEnum.items;
     }
 
     /**
      * 构造函数
      * 
      * @param m_Cache 缓存
+     * @param m_ReadonlyEnum 只读枚举
      * @param m_DbFactory 数据库工厂
      * @param m_Name 枚举名
      */
     public constructor(
         private m_Cache: ICache,
+        private m_ReadonlyEnum: IReadonlyEnum<T>,
         private m_DbFactory: DbFactoryBase,
         private m_Name: string,
     ) { }
 
     /**
-     * 添加或者保存枚举数据
+     * 添加或者修改枚举项
      * 
      * @param uow 工作单元
-     * @param itemData 枚举数据
+     * @param itemData 枚举项数据
      */
     public async addOrSaveItem(uow: IUnitOfWork, itemData: T) {
         const enumItems = await this.items;
         const db = this.m_DbFactory.db(global.Enum, uow);
         if (enumItems) {
-            const items = enumItems.map(r => r.data);
-            const index = items.findIndex(r => {
-                return r.value == itemData.value;
-            });
-            if (index == -1)
-                items.push(itemData);
-            else
-                items[index] = itemData;
             await db.save({
                 id: this.m_Name,
-                items: items
+                items: enumItems.reduce((memo, r) => {
+                    if (r.data.value != itemData.value)
+                        memo.push(r.data);
+
+                    return memo;
+                }, [itemData])
             });
         } else {
             await db.add({
@@ -70,14 +62,11 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
      * @param predicate 断言
      */
     public async get(predicate: (data: T) => boolean) {
-        const items = await this.items;
-        return items.find(r => {
-            return predicate(r.data);
-        });
+        return this.m_ReadonlyEnum.get(predicate);
     }
 
     /**
-     * 移除枚举数据
+     * 删除枚举项
      * 
      * @param uow 工作单元
      * @param predicate 断言
@@ -87,16 +76,16 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
         if (!enumItems)
             return;
 
-        const items = enumItems.map(r => r.data);
-        const index = items.findIndex(r => {
-            return predicate(r);
+        await this.m_DbFactory.db(global.Enum, uow).save({
+            id: this.m_Name,
+            items: enumItems.reduce((memo, r) => {
+                if (!predicate(r.data))
+                    memo.push(r.data);
+
+                return memo;
+            }, [])
         });
-        if (index > -1) {
-            items.splice(index, 1);
-            await this.m_DbFactory.db(global.Enum, uow).save({
-                id: this.m_Name,
-                items: items
-            });
-        }
+
+        this.m_Cache.flush();
     }
 }

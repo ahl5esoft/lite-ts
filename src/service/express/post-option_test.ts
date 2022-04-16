@@ -4,7 +4,7 @@ import supertest from 'supertest';
 
 import { buildPostExpressOption as self } from './post-option';
 import { Mock } from '../assert';
-import { IApi, ILog } from '../../contract';
+import { IApi, LogBase } from '../../contract';
 
 describe('src/service/express/post-option.ts', () => {
     describe('.buildPostExpressOption', () => {
@@ -12,11 +12,9 @@ describe('src/service/express/post-option.ts', () => {
             const mockApi = new Mock<IApi>({
                 initSession: () => { }
             });
-            const mockLog = new Mock<ILog>();
+            const mockLog = new Mock<LogBase>();
             const app = express();
-            self('/:route', () => {
-                return mockLog.actual;
-            }, async (_: ILog, __: any) => {
+            self(mockLog.actual, '/:route', async (_: any) => {
                 return mockApi.actual;
             })(app);
 

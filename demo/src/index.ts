@@ -8,10 +8,8 @@ import {
     DbFactoryBase,
     EnumFactoryBase,
     IApiResponse,
-    ILog,
     IOFactoryBase,
-    LogFactoryBase,
-    model,
+    LogBase,
     NowTimeBase,
     service
 } from '../../src';
@@ -24,9 +22,9 @@ import {
     const cache = new service.MongoEnumCache(dbFactory, nowTime);
     Container.set(
         EnumFactoryBase,
-        new service.EnumFactory({}, {
+        new service.EnumFactory({
             [enum_.CityData.name]: () => {
-                return new service.CacheEnum(cache, enum_.CityData.name);
+                return new service.CacheReadonlyEnum(cache, enum_.CityData.name);
             }
         })
     );
@@ -48,14 +46,12 @@ import {
                 } as IApiResponse);
             })
         },
-        service.buildPostExpressOption('/:endpoint/:api', () => {
-            return Container.get<LogFactoryBase>(LogFactoryBase as any).build(model.enum_.LogType.console);
-        }, async (log: ILog, req: Request) => {
-            log.addLabel('route', req.path);
-
-            const api = apiFactory.build(req.params.endpoint, req.params.api);
-            return api;
-        }),
+        service.buildPostExpressOption(
+            Container.get<LogBase>(LogBase as any),
+            '/:endpoint/:api',
+            async (req: Request) => {
+                return apiFactory.build(req.params.endpoint, req.params.api);
+            }),
         service.buildPortExpressOption(cfg.name, cfg.port, cfg.version)
     ]).listen();
 })();

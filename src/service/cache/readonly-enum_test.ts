@@ -1,11 +1,11 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { CacheEnum as Self } from './enum';
+import { CacheReadonlyEnum as Self } from './readonly-enum';
 import { Mock } from '../assert';
 import { ICache } from '../../contract';
 import { enum_ } from '../../model';
 
-describe('src/service/cache/enum.ts', () => {
+describe('src/service/cache/readonly-enum.ts', () => {
     describe('.items', () => {
         it('ok', async () => {
             const mockCache = new Mock<ICache>();

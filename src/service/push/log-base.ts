@@ -1,9 +1,9 @@
-import { ILog, IPush } from '../../contract';
+import { IPush, LogBase } from '../../contract';
 
 /**
  * 推送日志基类
  */
-export abstract class PushLogBase implements ILog {
+export abstract class PushLogBase extends LogBase {
     /**
      * 标签
      */
@@ -16,7 +16,9 @@ export abstract class PushLogBase implements ILog {
      */
     public constructor(
         private m_Push: IPush
-    ) { }
+    ) {
+        super();
+    }
 
     /**
      * 添加标签

@@ -1,33 +1,29 @@
 import { initTracer, opentracing } from 'jaeger-client';
 import Container from 'typedi';
 
-import {
-    BentRpc,
-    ConsoleLog,
-    DateNowTime,
-    FSIOFactory,
-    IoredisAdapter,
-    JaegerDbFactory,
-    JeagerRedis,
-    JsYamlConfigLoader,
-    LogFactory,
-    MongoDbFactory,
-    MongoStringGenerator,
-    RedisNowTime,
-    SetTimeoutThread,
-} from '..';
+import { BentRpc } from '../bent';
+import { ConsoleLog } from '../console';
+import { DateNowTime } from '../date';
+import { FSIOFactory } from '../fs';
+import { IoredisAdapter } from '../ioredis';
+import { JaegerDbFactory, JeagerRedis } from '../jaeger';
+import { JsYamlConfigLoader } from '../js-yaml';
+import { LogProxy } from '../log';
+import { MongoDbFactory, MongoStringGenerator } from '../mongo';
+import { RedisNowTime } from '../redis';
+import { SetTimeoutThread } from '../set-timeout';
 import {
     ConfigLoaderBase,
     DbFactoryBase,
     IOFactoryBase,
-    LogFactoryBase,
-    model,
+    LogBase,
     NowTimeBase,
     RedisBase,
     RpcBase,
     StringGeneratorBase,
     ThreadBase
-} from '../..';
+} from '../../contract';
+import { config } from '../../model';
 
 /**
  * 初始化IoC
@@ -51,7 +47,7 @@ export async function initIoC(rootDirPath: string) {
     );
     Container.set(ConfigLoaderBase, configLaoder);
 
-    const cfg = await configLaoder.load(model.config.Default);
+    const cfg = await configLaoder.load(config.Default);
 
     const pkg = await ioFactory.buildFile(rootDirPath, '..', 'package.json').readJSON<{ version: string }>();
     cfg.version = pkg.version;
@@ -101,12 +97,10 @@ export async function initIoC(rootDirPath: string) {
     }
 
     Container.set(
-        LogFactoryBase,
-        new LogFactory({
-            [model.enum_.LogType.console]: () => {
-                return new ConsoleLog();
-            }
-        })
+        LogBase,
+        new LogProxy(
+            () => new ConsoleLog()
+        )
     );
 
     Container.set(

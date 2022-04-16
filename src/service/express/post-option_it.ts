@@ -6,7 +6,7 @@ import supertest from 'supertest';
 import { buildPostExpressOption as self } from './post-option';
 import { Mock } from '../assert';
 import { buildBodyParserJsonExpressOption } from '../body-parser';
-import { IApi, ILog } from '../..';
+import { IApi, LogBase } from '../../contract';
 
 const tracer = initTracer({
     reporter: {
@@ -30,14 +30,12 @@ describe('src/service/express/post-option.ts', () => {
             const mockApi = new Mock<IApi>({
                 initSession: () => { }
             });
-            const mockLog = new Mock<ILog>();
+            const mockLog = new Mock<LogBase>();
             const app = express();
 
             buildBodyParserJsonExpressOption({})(app);
 
-            self('/:endpoint/:api', () => {
-                return mockLog.actual;
-            }, async (_: ILog, __: any) => {
+            self(mockLog.actual, '/:endpoint/:api', async (_: any) => {
                 return mockApi.actual;
             })(app);
 

@@ -1,29 +1,8 @@
 import log4js from 'log4js';
 
-import { ILog } from '../..';
+import { LogBase } from '../../contract';
 
-/**
- * log4js日志
- */
-export class Log4jsLog implements ILog {
-    public constructor() {
-        if (!('toJSON' in Error.prototype)) {
-            Object.defineProperty(Error.prototype, 'toJSON', {
-                value: function () {
-                    var alt = {};
-
-                    Object.getOwnPropertyNames(this).forEach(function (key) {
-                        alt[key] = this[key];
-                    }, this);
-
-                    return alt;
-                },
-                configurable: true,
-                writable: true
-            });
-        }
-    }
-
+export class Log4jsLog extends LogBase {
     /**
      * 标签
      */
@@ -74,11 +53,11 @@ export class Log4jsLog implements ILog {
     /**
      * 输出日志
      * 
-     * @param func 获取输出函数
+     * @param action 获取输出函数
      */
-    private log(func: (logger: log4js.Logger) => (message: any) => void) {
+    private log(action: (logger: log4js.Logger) => (message: string) => void) {
         const logger = log4js.getLogger();
-        const fn = func(logger).bind(logger);
+        const fn = action(logger).bind(logger);
         fn(
             JSON.stringify(this.m_Labels)
         );
@@ -91,5 +70,22 @@ export class Log4jsLog implements ILog {
      */
     public static init(cfg: log4js.Configuration) {
         log4js.configure(cfg);
+
+        if ('toJSON' in Error.prototype)
+            return;
+
+        Object.defineProperty(Error.prototype, 'toJSON', {
+            configurable: true,
+            writable: true,
+            value: function () {
+                let alt = {};
+
+                Object.getOwnPropertyNames(this).forEach(function (key) {
+                    alt[key] = this[key];
+                }, this);
+
+                return alt;
+            },
+        });
     }
 }

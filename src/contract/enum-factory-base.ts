@@ -1,6 +1,5 @@
 import { IReadonlyEnum } from './i-readonly-enum';
 import { IEnumItemData } from './i-enum-item-data';
-import { IEnum } from './i-enum';
 
 /**
  * 枚举工厂
@@ -12,11 +11,4 @@ export abstract class EnumFactoryBase {
      * @param model 枚举模型函数
      */
     public abstract build<T extends IEnumItemData>(model: new () => T): IReadonlyEnum<T>;
-
-    /**
-     * 创建可编辑的枚举对象
-     * 
-     * @param model 枚举模型函数
-     */
-    public abstract buildEditor<T extends IEnumItemData>(model: new () => T): IEnum<T>;
 }

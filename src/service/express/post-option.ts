@@ -4,20 +4,20 @@ import { opentracing } from 'jaeger-client';
 
 import { CustomError } from '../error';
 import { TracerStrategy } from '../tracer';
-import { IApi, IApiResponse, IApiSession, ILog } from '../../contract';
+import { IApi, IApiResponse, IApiSession, LogBase } from '../../contract';
 import { enum_ } from '../../model';
 
 /**
  * 创建post ExpressOption
  * 
+ * @param log 日志
  * @param routeRule 路由规则
- * @param buildLogFunc 创建log函数
  * @param getApiFunc 获取api函数
  */
 export function buildPostExpressOption(
+    log: LogBase,
     routeRule: string,
-    buildLogFunc: () => ILog,
-    getApiFunc: (log: ILog, req: any) => Promise<IApi>,
+    getApiFunc: (req: any) => Promise<IApi>,
 ) {
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
@@ -33,14 +33,12 @@ export function buildPostExpressOption(
                 headers: req.headers
             });
 
-            const log = buildLogFunc();
             let res: IApiResponse = {
                 data: null,
                 err: 0,
             };
             try {
-                const api = await getApiFunc(log, req);
-
+                const api = await getApiFunc(req);
                 const session = api as any as IApiSession;
                 if (session.initSession)
                     await session.initSession(req);
@@ -81,7 +79,7 @@ export function buildPostExpressOption(
                     res.err = ex.code;
                 } else {
                     res.err = enum_.ErrorCode.panic;
-                    log.error(ex);
+                    log.addLabel('route', req.path).error(ex);
                     span.log({
                         err: ex
                     });

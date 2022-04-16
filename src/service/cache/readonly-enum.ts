@@ -4,7 +4,7 @@ import { ICache, IReadonlyEnum, IEnumItem, IEnumItemData, ITraceable } from '../
 /**
  * 枚举服务(缓存)
  */
-export class CacheEnum<T extends IEnumItemData> implements IReadonlyEnum<T>, ITraceable<IReadonlyEnum<T>> {
+export class CacheReadonlyEnum<T extends IEnumItemData> implements IReadonlyEnum<T>, ITraceable<IReadonlyEnum<T>> {
     /**
      * 所有枚举项
      */
@@ -48,7 +48,7 @@ export class CacheEnum<T extends IEnumItemData> implements IReadonlyEnum<T>, ITr
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new CacheEnum(
+        return new CacheReadonlyEnum(
             new TracerStrategy(this.m_Cache).withTrace(parentSpan),
             this.m_Name,
         ) as IReadonlyEnum<T>;

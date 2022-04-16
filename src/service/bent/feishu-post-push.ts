@@ -17,7 +17,7 @@ interface IResposne {
 /**
  * 飞书富文本推送
  */
-export class FeishuPostPush implements IPush {
+export class BentFeishuPostPush implements IPush {
     /**
      * post请求函数
      */

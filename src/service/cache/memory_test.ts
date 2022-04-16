@@ -1,6 +1,6 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { MemoryCache as Self } from './memory-cache';
+import { MemoryCache as Self } from './memory';
 import { Mock } from '../assert';
 import { NowTimeBase } from '../../contract';
 

@@ -7,15 +7,15 @@ import { IUnitOfWork } from './i-unit-of-work';
  */
 export interface IEnum<T extends IEnumItemData> extends IReadonlyEnum<T> {
     /**
-     * 添加或者保存枚举数据
+     * 添加或者修改枚举项
      * 
      * @param uow 工作单元
-     * @param itemData 枚举数据
+     * @param itemData 枚举项数据
      */
     addOrSaveItem(uow: IUnitOfWork, itemData: T): Promise<void>;
 
     /**
-     * 移除枚举数据
+     * 删除枚举项
      * 
      * @param uow 工作单元
      * @param predicate 断言
