@@ -1,16 +1,16 @@
-import { ITargetValueData } from './i-target-value-data';
 import { IUnitOfWork } from './i-unit-of-work';
 import { IValueData } from './i-value-data';
 import { IValueConditionData } from './i-value-condition-data';
+import { global } from '../model';
 
 /**
  * 目标数值服务接口
  */
-export interface ITargetValueService {
+export interface ITargetValueService<T extends global.TargetValue> {
     /**
      * 数据
      */
-    readonly entry: Promise<ITargetValueData>;
+    readonly entry: Promise<T>;
 
     /**
      * 判断条件是否满足

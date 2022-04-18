@@ -1,12 +1,12 @@
 import { deepStrictEqual } from 'assert';
 
-import { MultiDbFactory as Self } from './multi-db-factory';
+import { DbMultiFactory as Self } from './multi-factory';
 import { Mock } from '../assert';
 import { DbFactoryBase } from '../..';
 
 class Test { }
 
-describe('src/service/db/multi-db-factory.ts', () => {
+describe('src/service/db/multi-factory.ts', () => {
     it('.db<T>(model: new () => T, ...extra: any[])', () => {
         const mockDbFactory = new Mock<DbFactoryBase>({
             withTrace: null

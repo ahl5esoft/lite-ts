@@ -1,9 +1,7 @@
-import { ITargetValueData } from '../..';
-
 /**
- * 用户数值
+ * 目标数值模型
  */
-export class UserValue implements ITargetValueData {
+export class TargetValue {
     /**
      * 用户ID
      */

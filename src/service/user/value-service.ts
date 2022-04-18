@@ -1,7 +1,7 @@
-import { TargetLocalValueServiceBase } from '../target';
+import { DbValueServiceBase } from '../db';
 import {
     DbFactoryBase,
-    IReadonlyEnum,
+    EnumFactoryBase,
     IRewardData,
     IUnitOfWork,
     IUserService,
@@ -11,24 +11,24 @@ import {
     NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase
-} from '../..';
-import { enum_, global } from '../../model';
+} from '../../contract';
+import { global } from '../../model';
 
 /**
  * 用户数值服务
  */
-export class UserValueService extends TargetLocalValueServiceBase<
-    global.UserValue,
-    global.UserValueChange,
-    global.UserValueLog
+export class UserValueService extends DbValueServiceBase<
+    global.TargetValue,
+    global.TargetValueChange,
+    global.TargetValueLog
 > implements IUserValueService {
     /**
      * 获取用户数值实体
      */
     public get entry() {
-        return new Promise<global.UserValue>(async (s, f) => {
+        return new Promise<global.TargetValue>(async (s, f) => {
             try {
-                const rows = await this.associateStorageService.find(global.UserValue, r => {
+                const rows = await this.associateService.find<global.TargetValue>(global.TargetValue.name, r => {
                     return r.id == this.userService.userID;
                 });
                 s(rows[0]);
@@ -39,37 +39,39 @@ export class UserValueService extends TargetLocalValueServiceBase<
     }
 
     /**
+     * 构造函数
      * 
      * @param userService 用户服务
-     * @param valueTypeEnum 数值枚举
      * @param dbFactory 数据库工厂
+     * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
      */
     public constructor(
         public userService: IUserService,
-        valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
         dbFactory: DbFactoryBase,
+        enumFactory: EnumFactoryBase,
         nowTime: NowTimeBase,
         stringGenerator: StringGeneratorBase,
         valueInterceptorFactory: ValueInterceptorFactoryBase,
     ) {
         super(
-            userService.associateStorageService,
+            userService.associateService,
             dbFactory,
             stringGenerator,
             valueInterceptorFactory,
             0,
-            global.UserValue,
-            global.UserValueChange,
-            global.UserValueLog,
-            valueTypeEnum,
+            global.TargetValue,
+            global.TargetValueChange,
+            global.TargetValueLog,
+            enumFactory,
             nowTime,
         );
     }
 
     /**
+     * 检查条件
      * 
      * @param uow 工作单元
      * @param conditions 条件
@@ -78,7 +80,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
         for (const r of conditions) {
             const tasks = r.reduce((memo, cr) => {
                 const item = memo.find(sr => {
-                    return sr.targetType == cr.targetType && sr.targetValue == cr.targetValue;
+                    return sr.targetNo == cr.targetNo && sr.targetType == cr.targetType;
                 });
                 if (item) {
                     item.conditions.push(cr);
@@ -86,18 +88,18 @@ export class UserValueService extends TargetLocalValueServiceBase<
                 else {
                     memo.push({
                         conditions: [cr],
+                        targetNo: cr.targetNo,
                         targetType: cr.targetType,
-                        targetValue: cr.targetValue
                     });
                 }
                 return memo;
             }, [] as {
-                conditions: IValueConditionData[],
-                targetType: number,
-                targetValue: number;
+                conditions: IValueConditionData[];
+                targetNo: number;
+                targetType: number;
             }[]).map(async cr => {
                 if (cr.targetType) {
-                    const targetValueService = await this.userService.getTargetValueService(cr.targetType, cr.targetValue);
+                    const targetValueService = await this.userService.getTargetValueService(cr.targetNo, cr.targetType);
                     return targetValueService.checkConditions(uow, [cr.conditions]);
                 } else {
                     return super.checkConditions(uow, [cr.conditions]);
@@ -119,7 +121,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
     public async update(uow: IUnitOfWork, values: IValueData[]) {
         const tasks = values.reduce((memo, r) => {
             const item = memo.find(cr => {
-                return cr.targetType == r.targetType && cr.targetValue == r.targetValue;
+                return cr.targetNo == r.targetNo && cr.targetType == r.targetType;
             });
             if (item) {
                 item.values.push(r);
@@ -127,18 +129,18 @@ export class UserValueService extends TargetLocalValueServiceBase<
             else {
                 memo.push({
                     values: [r],
+                    targetNo: r.targetNo,
                     targetType: r.targetType,
-                    targetValue: r.targetValue
                 });
             }
             return memo;
         }, [] as {
             values: IValueData[],
+            targetNo: number;
             targetType: number,
-            targetValue: number;
         }[]).map(async r => {
             if (r.targetType) {
-                const targetValueService = await this.userService.getTargetValueService(r.targetType, r.targetValue);
+                const targetValueService = await this.userService.getTargetValueService(r.targetNo, r.targetType);
                 return targetValueService.update(uow, r.values);
             } else {
                 await super.update(uow, r.values);
@@ -190,7 +192,7 @@ export class UserValueService extends TargetLocalValueServiceBase<
     protected createEntry() {
         return {
             id: this.userService.userID
-        } as global.UserValue;
+        } as global.TargetValue;
     }
 
     /**
@@ -199,19 +201,15 @@ export class UserValueService extends TargetLocalValueServiceBase<
     protected createLogEntry() {
         return {
             userID: this.userService.userID
-        } as global.UserValueLog;
+        } as global.TargetValueLog;
     }
 
     /**
      * 查找并清除关联用户数值变更数据
      */
     protected async findAndClearChangeEntries() {
-        const changeEntries = await this.associateStorageService.find(global.UserValueChange, r => {
+        return this.associateService.findAndClear<global.TargetValueChange>(global.TargetValueChange.name, r => {
             return r.userID == this.userService.userID;
         });
-        this.associateStorageService.clear(global.UserValueChange, r => {
-            return r.userID == this.userService.userID;
-        });
-        return changeEntries;
     }
 }

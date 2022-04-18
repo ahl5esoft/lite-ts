@@ -7,7 +7,7 @@ import { DbFactoryBase, ITraceable } from '../../contract';
 /**
  * 多数据库工厂
  */
-export class MultiDbFactory extends DbFactoryBase implements ITraceable<DbFactoryBase> {
+export class DbMultiFactory extends DbFactoryBase implements ITraceable<DbFactoryBase> {
     /**
      * 
      * @param m_DbFactories 构造函数
@@ -61,6 +61,6 @@ export class MultiDbFactory extends DbFactoryBase implements ITraceable<DbFactor
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new MultiDbFactory(this.m_DbFactories, parentSpan);
+        return new DbMultiFactory(this.m_DbFactories, parentSpan);
     }
 }

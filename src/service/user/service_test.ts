@@ -2,14 +2,20 @@ import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
 
 import { UserService as Self } from './service';
 import { Mock, mockAny } from '../assert';
-import { IReadonlyEnum, ITargetValueData, RpcBase } from '../..';
+import { EnumFactoryBase, IReadonlyEnum, RpcBase } from '../../contract';
 import { enum_ } from '../../model';
 
 describe('src/service/user/service.ts', () => {
     describe('.getTargetValueService(targetType: number, targetValue: number)', () => {
         it('无效目标类型', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null);
+
             const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
-            const self = new Self(null, null, null, mockTargetTypeEnum.actual, null, null, null, null, null);
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.TargetTypeData),
+                mockTargetTypeEnum.actual
+            );
 
             mockTargetTypeEnum.expectReturn(
                 r => r.get(mockAny),
@@ -18,7 +24,7 @@ describe('src/service/user/service.ts', () => {
 
             let err: Error;
             try {
-                await self.getTargetValueService(1, 1);
+                await self.getTargetValueService(2, 1);
             } catch (ex) {
                 err = ex;
             }
@@ -27,10 +33,16 @@ describe('src/service/user/service.ts', () => {
         });
 
         it('目标数值服务没有缓存', async () => {
-            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockRpc = new Mock<RpcBase>();
             const userID = 'uid';
-            const self = new Self(null, userID, null, mockTargetTypeEnum.actual, null, null, mockRpc.actual, null, null);
+            const self = new Self(null, userID, null, mockEnumFactory.actual, null, mockRpc.actual, null, null);
+
+            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.TargetTypeData),
+                mockTargetTypeEnum.actual
+            );
 
             const targetTypeData = {
                 app: 'test',
@@ -56,7 +68,7 @@ describe('src/service/user/service.ts', () => {
             }, {
                 no: 2,
                 values: {}
-            }] as ITargetValueData[];
+            }];
             mockRpc.expectReturn(
                 r => r.call('/test/ih/find-values-by-user-id'),
                 {
@@ -71,19 +83,19 @@ describe('src/service/user/service.ts', () => {
                 entry: targetValues[1]
             };
             const assertTargetValueServices = [
-                [targetTypeData, targetValues[0], mockTargetValueService1],
-                [targetTypeData, targetValues[1], mockTargetValueService2]
+                [targetValues[0], mockTargetValueService1],
+                [targetValues[1], mockTargetValueService2]
             ];
-            Reflect.set(self, 'createTargetValueService', (arg: enum_.TargetTypeData, arg1: ITargetValueData) => {
+            Reflect.set(self, 'createTargetValueService', (arg: any) => {
                 let temp = assertTargetValueServices.shift();
                 const vs = temp.pop();
-                deepStrictEqual(temp, [arg, arg1]);
+                deepStrictEqual(temp, [arg]);
                 return vs;
             });
 
             let err: Error;
             try {
-                const res = await self.getTargetValueService(1, 2);
+                const res = await self.getTargetValueService(2, 1);
                 strictEqual(res, mockTargetValueService2);
             } catch (ex) {
                 err = ex;
@@ -92,10 +104,16 @@ describe('src/service/user/service.ts', () => {
         });
 
         it('目标数值服务不存在', async () => {
-            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockRpc = new Mock<RpcBase>();
             const userID = 'uid';
-            const self = new Self(null, userID, null, mockTargetTypeEnum.actual, null, null, mockRpc.actual, null, null);
+            const self = new Self(null, userID, null, mockEnumFactory.actual, null, mockRpc.actual, null, null);
+
+            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.TargetTypeData),
+                mockTargetTypeEnum.actual
+            );
 
             const targetTypeData = {
                 app: 'test',
@@ -124,7 +142,7 @@ describe('src/service/user/service.ts', () => {
 
             let err: Error;
             try {
-                await self.getTargetValueService(1, 2);
+                await self.getTargetValueService(2, 1);
             } catch (ex) {
                 err = ex;
             }

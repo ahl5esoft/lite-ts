@@ -72,6 +72,7 @@ export abstract class PushLogBase extends LogBase {
         await this.m_Push.push(
             this.convertToPushMessage(this.m_Labels)
         );
+        this.m_Labels = [];
     }
 
     /**

@@ -15,11 +15,11 @@ export interface IValueData {
      */
     source?: string;
     /**
+     * 目标编号
+     */
+    targetNo?: number;
+    /**
      * 目标类型
      */
     targetType?: number;
-    /**
-     * 目标值
-     */
-    targetValue?: number;
 }

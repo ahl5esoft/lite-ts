@@ -4,23 +4,18 @@ import moment from 'moment';
 import { TargetValueServiceBase } from './value-service-base';
 import { Mock, mockAny } from '../assert';
 import {
-    IReadonlyEnum,
+    EnumFactoryBase,
     IEnumItem,
-    ITargetValueData,
+    IReadonlyEnum,
     IUnitOfWork,
     IValueConditionData,
     IValueData,
     NowTimeBase
-} from '../..';
-import { enum_ } from '../../model';
+} from '../../contract';
+import { enum_, global } from '../../model';
 
-class TargetValue implements ITargetValueData {
-    public id: string;
-    public values: { [key: number]: number; };
-}
-
-class Self extends TargetValueServiceBase<TargetValue> {
-    public entry: Promise<TargetValue>;
+class Self extends TargetValueServiceBase<global.TargetValue> {
+    public entry: Promise<global.TargetValue>;
 
     public async update(_: IUnitOfWork, __: IValueData[]) { }
 
@@ -594,8 +589,14 @@ describe('src/service/target/value-service-base.ts', () => {
 
     describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
         it('entry = null', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const self = new Self(mockEnumFactory.actual, null);
+
             const mockValueTypeEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
-            const self = new Self(mockValueTypeEnum.actual, null);
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
 
             mockValueTypeEnum.expectReturn(
                 r => r.get(mockAny),
@@ -607,8 +608,14 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('entry.value[valueType] = null', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const self = new Self(mockEnumFactory.actual, null);
+
             const mockValueTypeEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
-            const self = new Self(mockValueTypeEnum.actual, null);
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
 
             Reflect.set(self, 'entry', {
                 id: '',
@@ -625,9 +632,15 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('枚举存在但dailyTime无效', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockNowTime = new Mock<NowTimeBase>();
-            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
-            const self = new Self(mockEnum.actual, mockNowTime.actual);
+            const self = new Self(mockEnumFactory.actual, mockNowTime.actual);
+
+            const mockValueTypeEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
 
             Reflect.set(self, 'entry', {
                 id: '',
@@ -639,7 +652,7 @@ describe('src/service/target/value-service-base.ts', () => {
             const mockEnumItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
                 data: {}
             });
-            mockEnum.expectReturn(
+            mockValueTypeEnum.expectReturn(
                 r => r.get(mockAny),
                 mockEnumItem.actual
             );
@@ -654,9 +667,15 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('dailyTime(重置)', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockNowTime = new Mock<NowTimeBase>();
-            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
-            const self = new Self(mockEnum.actual, mockNowTime.actual);
+            const self = new Self(mockEnumFactory.actual, mockNowTime.actual);
+
+            const mockValueTypeEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
 
             Reflect.set(self, 'entry', {
                 id: '',
@@ -671,7 +690,7 @@ describe('src/service/target/value-service-base.ts', () => {
                     dailyTime: 2
                 }
             });
-            mockEnum.expectReturn(
+            mockValueTypeEnum.expectReturn(
                 r => r.get(mockAny),
                 mockEnumItem.actual
             );
@@ -686,9 +705,15 @@ describe('src/service/target/value-service-base.ts', () => {
         });
 
         it('dailyTime(不重置)', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockNowTime = new Mock<NowTimeBase>();
-            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
-            const self = new Self(mockEnum.actual, mockNowTime.actual);
+            const self = new Self(mockEnumFactory.actual, mockNowTime.actual);
+
+            const mockValueTypeEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
 
             Reflect.set(self, 'entry', {
                 id: '',
@@ -703,7 +728,7 @@ describe('src/service/target/value-service-base.ts', () => {
                     dailyTime: 2
                 }
             });
-            mockEnum.expectReturn(
+            mockValueTypeEnum.expectReturn(
                 r => r.get(mockAny),
                 mockEnumItem.actual
             );

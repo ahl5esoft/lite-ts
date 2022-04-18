@@ -1,20 +1,16 @@
 import { notStrictEqual, strictEqual } from 'assert';
 
-import { TargetRemoteValueService as Self } from './remote-value-service';
+import { RpcValueService as Self } from './value-service';
 import { Mock } from '../assert';
 import { CustomError } from '../error';
-import { RpcBase } from '../..';
-import { enum_ } from '../../model';
+import { RpcBase } from '../../contract';
 
-describe('src/service/target/remote-value-service.ts', () => {
+describe('src/service/rpc/value-service.ts', () => {
     describe('.update(_: IUnitOfWork, values: IValueData[])', () => {
         it('err', async () => {
             const mockRpc = new Mock<RpcBase>();
-            const targetTypeData = {
-                app: 'test'
-            } as enum_.TargetTypeData;
             const userID = 'uid';
-            const self = new Self(mockRpc.actual, targetTypeData, userID, null, null);
+            const self = new Self(null, mockRpc.actual, userID, null, null);
 
             mockRpc.expectReturn(
                 r => r.setBody({
@@ -28,7 +24,7 @@ describe('src/service/target/remote-value-service.ts', () => {
             );
 
             mockRpc.expectReturn(
-                r => r.call(`/${targetTypeData.app}/ih/update-values-by-user-id`),
+                r => r.call('/prop/ih/update-values-by-user-id'),
                 {
                     err: 1,
                     data: 'err'
@@ -51,11 +47,8 @@ describe('src/service/target/remote-value-service.ts', () => {
 
         it('ok', async () => {
             const mockRpc = new Mock<RpcBase>();
-            const targetTypeData = {
-                app: 'test'
-            } as enum_.TargetTypeData;
             const userID = 'uid';
-            const self = new Self(mockRpc.actual, targetTypeData, userID, null, null);
+            const self = new Self(null, mockRpc.actual, userID, null, null);
 
             mockRpc.expectReturn(
                 r => r.setBody({
@@ -69,7 +62,7 @@ describe('src/service/target/remote-value-service.ts', () => {
             );
 
             mockRpc.expectReturn(
-                r => r.call(`/${targetTypeData.app}/ih/update-values-by-user-id`),
+                r => r.call('/prop/ih/update-values-by-user-id'),
                 {}
             );
 

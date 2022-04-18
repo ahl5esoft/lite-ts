@@ -1,35 +1,32 @@
 import moment from 'moment';
 
-import { TargetValueServiceBase } from './value-service-base';
 import { CustomError } from '../error';
+import { TargetValueServiceBase } from '../target';
 import {
     DbFactoryBase,
-    IAssociateStorageService,
-    IReadonlyEnum,
-    ITargetValueChangeData,
-    ITargetValueData,
-    ITargetValueLogData,
+    EnumFactoryBase,
     IUnitOfWork,
+    IUserAssociateService,
     IValueData,
     NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
-} from '../..';
-import { enum_ } from '../../model';
+} from '../../contract';
+import { enum_, global } from '../../model';
 
 /**
- * 目标本地数值服务
+ * 数据库数值服务
  */
-export abstract class TargetLocalValueServiceBase<
-    T extends ITargetValueData,
-    TChange extends ITargetValueChangeData,
-    TLog extends ITargetValueLogData,
+export abstract class DbValueServiceBase<
+    T extends global.TargetValue,
+    TChange extends global.TargetValueChange,
+    TLog extends global.TargetValueLog,
     > extends TargetValueServiceBase<T> {
 
     /**
      * 构造函数
      * 
-     * @param associateStorageService 关联存储服务
+     * @param associateService 关联存储服务
      * @param dbFactory 数据库工厂
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
@@ -37,11 +34,11 @@ export abstract class TargetLocalValueServiceBase<
      * @param model 数值模型
      * @param changeModel 数值变更模型
      * @param logModel 数值日志模型
-     * @param valueTypeEnum 数值类型枚举接口
+     * @param enumFactory 枚举工厂
      * @param nowTime 当前时间接口
      */
     public constructor(
-        protected associateStorageService: IAssociateStorageService,
+        protected associateService: IUserAssociateService,
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
@@ -49,22 +46,21 @@ export abstract class TargetLocalValueServiceBase<
         protected model: new () => T,
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
-        valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
+        enumFactory: EnumFactoryBase,
         nowTime: NowTimeBase,
     ) {
-        super(valueTypeEnum, nowTime);
+        super(enumFactory, nowTime);
     }
 
     /**
      * 获取数值数量
      * 获取数值变更数据并清理缓存
      * 
-     * 
      * @param uow 工作单元
      * @param valueType 数值类型
      */
     public async getCount(uow: IUnitOfWork, valueType: number) {
-        let changeEntries = await this.findAndClearChangeEntries();
+        const changeEntries = await this.findAndClearChangeEntries();
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         for (const r of changeEntries) {
             await changeDb.remove(r);
@@ -89,7 +85,7 @@ export abstract class TargetLocalValueServiceBase<
             entry.values = {};
             await db.add(entry);
 
-            this.associateStorageService.add(this.model, entry);
+            this.associateService.add(this.model.name, entry);
         }
 
         const logDb = this.dbFactory.db(this.logModel, uow);
@@ -108,7 +104,7 @@ export abstract class TargetLocalValueServiceBase<
             logEntry.source = r.source;
             logEntry.valueType = r.valueType;
 
-            const valueTypeItem = await this.valueTypeEnum.get(cr => {
+            const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
                 return cr.value == r.valueType;
             });
             if (valueTypeItem) {

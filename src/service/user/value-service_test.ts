@@ -2,8 +2,8 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { UserValueService as Self } from './value-service';
 import { Mock } from '../assert';
-import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData } from '../..';
-import { enum_ } from '../../model';
+import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData } from '../../contract';
+import { enum_, global } from '../../model';
 
 describe('src/service/user/value-service.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][])', () => {
@@ -11,9 +11,9 @@ describe('src/service/user/value-service.ts', () => {
             const mockUserService = new Mock<IUserService>();
             const self = new Self(mockUserService.actual, null, null, null, null, null);
 
-            const mockValueService = new Mock<ITargetValueService>();
+            const mockValueService = new Mock<ITargetValueService<global.TargetValue>>();
             mockUserService.expectReturn(
-                r => r.getTargetValueService(2, 3),
+                r => r.getTargetValueService(3, 2),
                 mockValueService.actual
             );
 
@@ -22,16 +22,16 @@ describe('src/service/user/value-service.ts', () => {
                     [{
                         count: 1,
                         op: enum_.RelationOperator.eq,
-                        targetType: 2,
-                        targetValue: 3,
                         source: 'a',
+                        targetNo: 3,
+                        targetType: 2,
                         valueType: 4
                     }, {
                         count: 1,
                         op: enum_.RelationOperator.eq,
-                        targetType: 2,
-                        targetValue: 3,
                         source: 'b',
+                        targetNo: 3,
+                        targetType: 2,
                         valueType: 4
                     }]
                 ]),
@@ -39,7 +39,7 @@ describe('src/service/user/value-service.ts', () => {
             );
 
             mockUserService.expectReturn(
-                r => r.getTargetValueService(2, 6),
+                r => r.getTargetValueService(6, 2),
                 mockValueService.actual
             );
 
@@ -48,9 +48,9 @@ describe('src/service/user/value-service.ts', () => {
                     [{
                         count: 1,
                         op: enum_.RelationOperator.eq,
-                        targetType: 2,
-                        targetValue: 6,
                         source: 'c',
+                        targetNo: 6,
+                        targetType: 2,
                         valueType: 4
                     }]
                 ]),
@@ -61,23 +61,23 @@ describe('src/service/user/value-service.ts', () => {
                 [{
                     count: 1,
                     op: enum_.RelationOperator.eq,
-                    targetType: 2,
-                    targetValue: 3,
                     source: 'a',
+                    targetType: 2,
+                    targetNo: 3,
                     valueType: 4
                 }, {
                     count: 1,
                     op: enum_.RelationOperator.eq,
-                    targetType: 2,
-                    targetValue: 3,
                     source: 'b',
+                    targetNo: 3,
+                    targetType: 2,
                     valueType: 4
                 }, {
                     count: 1,
                     op: enum_.RelationOperator.eq,
-                    targetType: 2,
-                    targetValue: 6,
                     source: 'c',
+                    targetNo: 6,
+                    targetType: 2,
                     valueType: 4
                 }]
             ]);
@@ -90,56 +90,56 @@ describe('src/service/user/value-service.ts', () => {
             const mockUserService = new Mock<IUserService>();
             const self = new Self(mockUserService.actual, null, null, null, null, null);
 
-            const mockValueService = new Mock<ITargetValueService>();
+            const mockValueService = new Mock<ITargetValueService<global.TargetValue>>();
             mockUserService.expectReturn(
-                r => r.getTargetValueService(2, 3),
+                r => r.getTargetValueService(3, 2),
                 mockValueService.actual
             );
 
             mockValueService.expected.update(null, [{
                 count: 1,
                 source: 'a',
+                targetNo: 3,
                 targetType: 2,
-                targetValue: 3,
                 valueType: 4
             }, {
                 count: 2,
                 source: 'b',
+                targetNo: 3,
                 targetType: 2,
-                targetValue: 3,
                 valueType: 5
             }]);
 
             mockUserService.expectReturn(
-                r => r.getTargetValueService(2, 4),
+                r => r.getTargetValueService(4, 2),
                 mockValueService.actual
             );
 
             mockValueService.expected.update(null, [{
                 count: 3,
                 source: 'c',
+                targetNo: 4,
                 targetType: 2,
-                targetValue: 4,
                 valueType: 6
             }]);
 
             await self.update(null, [{
                 count: 1,
                 source: 'a',
+                targetNo: 3,
                 targetType: 2,
-                targetValue: 3,
                 valueType: 4
             }, {
                 count: 2,
                 source: 'b',
+                targetNo: 3,
                 targetType: 2,
-                targetValue: 3,
                 valueType: 5
             }, {
                 count: 3,
                 source: 'c',
+                targetNo: 4,
                 targetType: 2,
-                targetValue: 4,
                 valueType: 6
             }]);
         });

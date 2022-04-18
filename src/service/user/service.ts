@@ -1,20 +1,19 @@
 import { UserValueService } from './value-service';
 import { CustomError } from '../error';
-import { TargetRemoteValueService } from '../target';
+import { RpcValueService } from '../rpc';
 import {
     DbFactoryBase,
-    IAssociateStorageService,
-    IReadonlyEnum,
-    ITargetValueData,
+    EnumFactoryBase,
     ITargetValueService,
+    IUserAssociateService,
     IUserService,
     IUserValueService,
     NowTimeBase,
     RpcBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase
-} from '../..';
-import { enum_ } from '../../model';
+} from '../../contract';
+import { enum_, global } from '../../model';
 
 /**
  * 用户服务
@@ -23,7 +22,7 @@ export class UserService implements IUserService {
     /**
      * 目标数值服务
      */
-    private m_TargetValueServices: { [targetType: number]: ITargetValueService[]; } = {};
+    private m_TargetValueServices: { [targetType: number]: ITargetValueService<global.TargetValue>[]; } = {};
 
     private m_ValueService: IUserValueService;
     /**
@@ -33,8 +32,8 @@ export class UserService implements IUserService {
         if (!this.m_ValueService) {
             this.m_ValueService = new UserValueService(
                 this,
-                this.valueTypeEnum,
                 this.dbFactory,
+                this.enumFactory,
                 this.nowTime,
                 this.stringGenerator,
                 this.valueInterceptorFactory
@@ -46,22 +45,20 @@ export class UserService implements IUserService {
 
     /**
      * 
-     * @param associateStorageService 关联存储服务
+     * @param associateService 关联存储服务
      * @param userID 用户ID
-     * @param valueTypeEnum 数值类型枚举
-     * @param targetTypeEnum 目标类型枚举
      * @param dbFactory 数据库工厂
+     * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
      * @param rpc 远程过程调用
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
      */
     public constructor(
-        public associateStorageService: IAssociateStorageService,
+        public associateService: IUserAssociateService,
         public userID: string,
-        protected valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
-        protected targetTypeEnum: IReadonlyEnum<enum_.TargetTypeData>,
         protected dbFactory: DbFactoryBase,
+        protected enumFactory: EnumFactoryBase,
         protected nowTime: NowTimeBase,
         protected rpc: RpcBase,
         protected stringGenerator: StringGeneratorBase,
@@ -71,15 +68,12 @@ export class UserService implements IUserService {
     /**
      * 获取目标数值服务
      * 
+     * @param targetNo 目标值
      * @param targetType 目标类型
-     * @param targetValue 目标值
      */
-    public async getTargetValueService(targetType: number, targetValue: number) {
-        if (!targetType)
-            return this.valueService;
-
-        const targetTypeItem = await this.targetTypeEnum.get(r => {
-            return r.value == targetValue;
+    public async getTargetValueService(targetNo: number, targetType: number) {
+        const targetTypeItem = await this.enumFactory.build(enum_.TargetTypeData).get(r => {
+            return r.value == targetType;
         });
         if (!targetTypeItem)
             throw new Error(`无效目标类型: ${targetType}`);
@@ -87,31 +81,30 @@ export class UserService implements IUserService {
         if (!this.m_TargetValueServices[targetType]) {
             const resp = await this.rpc.setBody({
                 userID: this.userID
-            }).call<ITargetValueData[]>(`/${targetTypeItem.data.app}/ih/find-values-by-user-id`);
+            }).call<global.TargetValue[]>(`/${targetTypeItem.data.app}/ih/find-values-by-user-id`);
             if (resp.err)
                 throw new CustomError(resp.err, resp.data);
 
             this.m_TargetValueServices[targetType] = resp.data.map(r => {
-                return this.createTargetValueService(targetTypeItem.data, r);
+                return this.createTargetValueService(r);
             });
         }
 
         for (const r of this.m_TargetValueServices[targetType]) {
             const entry = (await r.entry) as any as { no: number; };
-            if (entry.no == targetValue)
+            if (entry.no == targetNo)
                 return r;
         }
 
-        throw new Error(`无效目标: ${targetTypeItem.data.app}[${targetValue}]`);
+        throw new Error(`无效目标: ${targetTypeItem.data.app}[${targetNo}]`);
     }
 
     /**
      * 创建目标数值服务
      * 
-     * @param targetTypeData 目标类型数据
      * @param targetEntry 目标实体 
      */
-    private createTargetValueService(targetTypeData: enum_.TargetTypeData, targetEntry: ITargetValueData) {
-        return new TargetRemoteValueService(this.rpc, targetTypeData, this.userID, this.valueTypeEnum, this.nowTime, targetEntry);
+    private createTargetValueService(targetEntry: global.TargetValue) {
+        return new RpcValueService(targetEntry, this.rpc, this.userID, this.enumFactory, this.nowTime);
     }
 }

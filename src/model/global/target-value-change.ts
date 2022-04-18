@@ -1,18 +1,12 @@
-import { ITargetValueLogData } from '../..';
-
 /**
- * 用户数值变更日志
+ * 目标数值变更模型
  */
-export class UserValueLog implements ITargetValueLogData {
+export class TargetValueChange {
     /**
-     * 当前数量
+     * 数量
      */
     public count: number;
     public id: string;
-    /**
-     * 旧数量
-     */
-    public oldCount: number;
     /**
      * 来源
      */

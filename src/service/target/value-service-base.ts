@@ -1,20 +1,19 @@
 import moment from 'moment';
 
 import {
-    IReadonlyEnum,
-    ITargetValueData,
+    EnumFactoryBase,
     ITargetValueService,
     IUnitOfWork,
     IValueConditionData,
     IValueData,
     NowTimeBase
-} from '../..';
-import { enum_ } from '../../model';
+} from '../../contract';
+import { enum_, global } from '../../model';
 
 /**
  * 目标数值服务基类
  */
-export abstract class TargetValueServiceBase<T extends ITargetValueData> implements ITargetValueService {
+export abstract class TargetValueServiceBase<T extends global.TargetValue> implements ITargetValueService<T> {
     /**
      * 目标数值数据
      */
@@ -23,11 +22,11 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData> impleme
     /**
      * 构造函数
      * 
-     * @param valueTypeEnum 数值枚举
+     * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
      */
     public constructor(
-        protected valueTypeEnum: IReadonlyEnum<enum_.ValueTypeData>,
+        protected enumFactory: EnumFactoryBase,
         protected nowTime: NowTimeBase,
     ) { }
 
@@ -107,7 +106,7 @@ export abstract class TargetValueServiceBase<T extends ITargetValueData> impleme
         if (!(valueType in entry.values))
             entry.values[valueType] = 0;
 
-        const valueTypeItem = await this.valueTypeEnum.get(cr => {
+        const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
             return cr.value == valueType;
         });
         if (valueTypeItem && valueTypeItem.data.dailyTime > 0) {
