@@ -15,7 +15,7 @@ import {
 } from '../../src';
 
 (async () => {
-    const cfg = await service.initIoC(__dirname);
+    const cfg = await service.initIoC();
 
     const dbFactory = Container.get<DbFactoryBase>(DbFactoryBase as any);
     const nowTime = Container.get<NowTimeBase>(NowTimeBase as any);

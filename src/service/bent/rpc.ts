@@ -56,6 +56,14 @@ class Wrapper extends RpcBase {
     }
 
     public async call(route: string) {
+        const resp = await this.callWithoutError(route);
+        if (resp.err)
+            throw new CustomError(resp.err, resp.data);
+
+        return resp;
+    }
+
+    public async callWithoutError(route: string) {
         const header = this.m_Header || {};
         this.tracer.inject(this.span, opentracing.FORMAT_HTTP_HEADERS, header);
         const res = await this.m_PostFunc(route, this.m_Body, header);
@@ -66,9 +74,6 @@ class Wrapper extends RpcBase {
         if (resp.err)
             this.span.setTag(opentracing.Tags.ERROR, true);
         this.span.finish();
-
-        if (resp.err)
-            throw new CustomError(resp.err, resp.data);
 
         return resp;
     }
@@ -122,12 +127,28 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * @example
      * ```typescript
      *  const rpc: RpcBase;
-     *  const res = await rpc.call('/服务名/端/api名');
-     *  // res is IApiResponse
+     *  const resp = await rpc.call<T>('/服务名/端/api名');
+     *  // resp is IApiDyanmicResponse<T>, 如果resp.err有效则会抛错
      * ```
      */
     public call(route: string) {
         return new Wrapper(this.m_PostFunc, this.m_ParentSpan).call(route);
+    }
+
+    /**
+     * 调用
+     * 
+     * @param route 路由
+     * 
+     * @example
+     * ```typescript
+     *  const rpc: RpcBase;
+     *  const resp = await rpc.callWithoutError<T>('/服务名/端/api名');
+     *  // resp is IApiDyanmicResponse<T>
+     * ```
+     */
+    public callWithoutError(route: string) {
+        return new Wrapper(this.m_PostFunc, this.m_ParentSpan).callWithoutError(route);
     }
 
     /**
@@ -140,8 +161,7 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * @example
      * ```typescript
      *  const rpc: RpcBase;
-     *  const res = await rpc.setBody({ ... }).call('/服务名/端/api名');
-     *  // res is IApiResponse
+     *  rpc.setBody({ ... });
      * ```
      */
     public setBody(v: any) {
@@ -160,8 +180,7 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * @example
      * ```typescript
      *  const rpc: RpcBase;
-     *  const res = await rpc.setHeader({ ... }).call('/服务名/端/api名');
-     *  // res is IApiResponse
+     *  rpc.setHeader({ ... });
      * ```
      */
     public setHeader(v: { [key: string]: string; }) {

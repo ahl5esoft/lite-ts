@@ -27,8 +27,12 @@ import { config } from '../../model';
 
 /**
  * 初始化IoC
+ * 
+ * @param rootDirPath 根目录, 默认: process.cwd()
  */
-export async function initIoC(rootDirPath: string) {
+export async function initIoC(rootDirPath?: string) {
+    rootDirPath ??= process.cwd();
+
     const ioFactory = new FSIOFactory();
     Container.set(IOFactoryBase, ioFactory);
 
@@ -43,13 +47,13 @@ export async function initIoC(rootDirPath: string) {
         }
     }
     const configLaoder = new JsYamlConfigLoader(
-        ioFactory.buildFile(rootDirPath, '..', yamlFilename)
+        ioFactory.buildFile(rootDirPath, yamlFilename)
     );
     Container.set(ConfigLoaderBase, configLaoder);
 
     const cfg = await configLaoder.load(config.Default);
 
-    const pkg = await ioFactory.buildFile(rootDirPath, '..', 'package.json').readJSON<{ version: string }>();
+    const pkg = await ioFactory.buildFile(rootDirPath, 'package.json').readJSON<{ version: string }>();
     cfg.version = pkg.version;
 
     if (cfg.openTracing) {
