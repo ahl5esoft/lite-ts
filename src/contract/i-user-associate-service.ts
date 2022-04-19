@@ -8,7 +8,7 @@ export interface IUserAssociateService {
      * @param key 键
      * @param entry 实体
      */
-    add(key: string, entry: any): Promise<void>;
+    add(key: string, entry: any): void;
     /**
      * 获取满足条件的数据
      * 

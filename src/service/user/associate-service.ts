@@ -1,7 +1,9 @@
+import { IUserAssociateService } from '../../contract';
+
 /**
  * 缓存关联存储服务
  */
-export class UserAssociateService {
+export class UserAssociateService implements IUserAssociateService {
     /**
      * 关联数据缓存
      */

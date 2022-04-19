@@ -8,7 +8,7 @@ class Model {
 
 describe('src/service/user/associate-service.ts', () => {
     describe('.add<T>(model: new () => T, entry: T)', () => {
-        it('ok', async () => {
+        it('ok', () => {
             const self = new Self(null);
 
             self.add(Model.name, {});
