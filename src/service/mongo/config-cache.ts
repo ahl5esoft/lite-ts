@@ -58,9 +58,11 @@ export class MongoConfigCache implements ICache {
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new MongoConfigCache(
+        const instance = new MongoConfigCache(
             new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
             this.m_NowTime,
         );
+        instance.m_Cache = this.cache;
+        return instance;
     }
 }

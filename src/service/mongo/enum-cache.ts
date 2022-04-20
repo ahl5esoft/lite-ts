@@ -63,10 +63,12 @@ export class MongoEnumCache implements ICache, ITraceable<ICache> {
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new MongoEnumCache(
+        const instance = new MongoEnumCache(
             new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
             this.m_NowTime,
             this.m_Sep
         );
+        instance.m_Cache = this.cache;
+        return instance;
     }
 }
