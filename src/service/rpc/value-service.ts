@@ -1,7 +1,8 @@
-import { CustomError } from '../error';
 import { TargetValueServiceBase } from '../target';
+import { TracerStrategy } from '../tracer';
 import {
     EnumFactoryBase,
+    ITraceable,
     IUnitOfWork,
     IValueData,
     NowTimeBase,
@@ -12,7 +13,7 @@ import { global } from '../../model';
 /**
  * 用户其他数值服务
  */
-export class RpcValueService<T extends global.TargetValue> extends TargetValueServiceBase<T> {
+export class RpcValueService<T extends global.TargetValue> extends TargetValueServiceBase<T> implements ITraceable<TargetValueServiceBase<T>> {
     /**
      * 实体
      */
@@ -46,11 +47,24 @@ export class RpcValueService<T extends global.TargetValue> extends TargetValueSe
      * @param values 数值数组
      */
     public async update(_: IUnitOfWork, values: IValueData[]) {
-        const resp = await this.m_Rpc.setBody({
+        await this.m_Rpc.setBody({
             userID: this.m_UserID,
             values: values
         }).call<void>('/prop/ih/update-values-by-user-id');
-        if (resp.err)
-            throw new CustomError(resp.err, resp.data);
+    }
+
+    /**
+     * 包装跟踪
+     * 
+     * @param parentSpan 父范围跟踪
+     */
+    public withTrace(parentSpan: any) {
+        return new RpcValueService<T>(
+            this.m_Entry,
+            new TracerStrategy(this.m_Rpc).withTrace(parentSpan),
+            this.m_UserID,
+            new TracerStrategy(this.enumFactory).withTrace(parentSpan),
+            this.nowTime
+        );
     }
 }

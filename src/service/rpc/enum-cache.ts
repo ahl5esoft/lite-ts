@@ -1,6 +1,5 @@
 import { MemoryCache } from '../cache';
 import { EnumItem } from '../enum';
-import { CustomError } from '../error';
 import { TracerStrategy } from '../tracer';
 import { ICache, ITraceable, NowTimeBase, RpcBase } from '../../contract';
 import { global } from '../../model';
@@ -17,9 +16,6 @@ export class RpcEnumCache implements ICache, ITraceable<ICache> {
         if (!this.m_Cache) {
             this.m_Cache = new MemoryCache(this.m_NowTime, async () => {
                 const resp = await this.m_Rpc.call<global.Enum[]>(`/${this.m_App}/ih/find-all-enums`);
-                if (resp.err)
-                    return new CustomError(resp.err, resp.data);
-
                 return resp.data.reduce((memo, r) => {
                     memo[r.id] = r.items.map(cr => {
                         return new EnumItem(cr, r.id, this.m_Sep);

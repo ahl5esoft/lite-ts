@@ -58,7 +58,9 @@ export class BentFeishuPostPush implements IPush {
                 }
             },
         }) as IResposne;
-        if (resp.code)
+        if (resp.code) {
+            console.log(content);
             throw new Error(resp.msg);
+        }
     }
 }
