@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { MongoConfigCache as Self } from './config-cache';
 import { Mock } from '../assert';
-import { DbFactoryBase, DbRepositoryBase, ICache, IDbQuery } from '../../contract';
+import { CacheBase, DbFactoryBase, DbRepositoryBase, IDbQuery } from '../../contract';
 import { global } from '../../model';
 
 describe('src/service/mongo/config-cache.ts', () => {
@@ -28,7 +28,7 @@ describe('src/service/mongo/config-cache.ts', () => {
                 []
             );
 
-            const resPromsie = Reflect.get(self, 'cache') as Promise<ICache>;
+            const resPromsie = Reflect.get(self, 'cache') as Promise<CacheBase>;
             const res = await resPromsie;
             strictEqual(!!res.flush, true);
             strictEqual(!!res.get, true);
@@ -39,7 +39,7 @@ describe('src/service/mongo/config-cache.ts', () => {
         it('ok', () => {
             const self = new Self(null, null);
 
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             Reflect.set(self, 'm_Cache', mockCache.actual);
 
             mockCache.expected.flush();
@@ -52,7 +52,7 @@ describe('src/service/mongo/config-cache.ts', () => {
         it('ok', async () => {
             const self = new Self(null, null);
 
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             Reflect.set(self, 'm_Cache', mockCache.actual);
 
             mockCache.expectReturn(

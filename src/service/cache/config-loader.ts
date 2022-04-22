@@ -1,5 +1,5 @@
 import { TracerStrategy } from '../tracer';
-import { ConfigLoaderBase, ICache, ITraceable } from '../../contract';
+import { CacheBase, ConfigLoaderBase, ITraceable } from '../../contract';
 
 /**
  * 配置加载器(缓存)
@@ -11,7 +11,7 @@ export class CacheConfigLoader extends ConfigLoaderBase implements ITraceable<Co
      * @param m_Cache 缓存
      */
     public constructor(
-        private m_Cache: ICache
+        private m_Cache: CacheBase
     ) {
         super();
     }

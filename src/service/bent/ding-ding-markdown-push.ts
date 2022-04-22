@@ -1,6 +1,6 @@
 import bent from 'bent';
 
-import { IPush } from '../..';
+import { PushBase } from '../../contract';
 
 interface IResponse {
     /**
@@ -16,7 +16,7 @@ interface IResponse {
 /**
  * 钉钉Markdown推送(基于bent实现)
  */
-export class BentDingDingMarkdownPush implements IPush {
+export class BentDingDingMarkdownPush extends PushBase {
     /**
      * post请求函数
      */
@@ -32,6 +32,8 @@ export class BentDingDingMarkdownPush implements IPush {
         private m_Keyword: string,
         url: string
     ) {
+        super();
+
         this.m_PostFunc = bent(url, 'json', 'POST', 200);
     }
 

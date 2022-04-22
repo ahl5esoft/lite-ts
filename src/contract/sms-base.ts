@@ -5,7 +5,7 @@ export abstract class SmsBase {
     /**
      * 发送
      * 
-     * @param data 短信内容
+     * @param content 内容
      */
-    public abstract send<T>(data: T): Promise<void>;
+    public abstract send<T>(content: T): Promise<void>;
 }

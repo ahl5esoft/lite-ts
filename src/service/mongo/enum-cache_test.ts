@@ -2,7 +2,7 @@ import { strictEqual } from 'assert';
 
 import { MongoEnumCache as Self } from './enum-cache';
 import { Mock } from '../assert';
-import { DbFactoryBase, DbRepositoryBase, ICache, IDbQuery, NowTimeBase } from '../../contract';
+import { CacheBase, DbFactoryBase, DbRepositoryBase, IDbQuery, NowTimeBase } from '../../contract';
 import { global } from '../../model';
 
 describe('src/service/mongo/enum-cache.ts', () => {
@@ -34,7 +34,7 @@ describe('src/service/mongo/enum-cache.ts', () => {
                 []
             );
 
-            const res = Reflect.get(self, 'cache') as ICache;
+            const res = Reflect.get(self, 'cache') as CacheBase;
             await res.get('');
         });
     });
@@ -43,7 +43,7 @@ describe('src/service/mongo/enum-cache.ts', () => {
         it('ok', () => {
             const self = new Self(null, null);
 
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             Reflect.set(self, 'm_Cache', mockCache.actual);
 
             mockCache.expected.flush();
@@ -56,7 +56,7 @@ describe('src/service/mongo/enum-cache.ts', () => {
         it('ok', async () => {
             const self = new Self(null, null);
 
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             Reflect.set(self, 'm_Cache', mockCache.actual);
 
             mockCache.expectReturn(

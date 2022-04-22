@@ -1,4 +1,4 @@
-import { DbFactoryBase, ICache, IEnum, IEnumItemData, IReadonlyEnum, IUnitOfWork } from '../../contract';
+import { CacheBase, DbFactoryBase, IEnum, IEnumItemData, IReadonlyEnum, IUnitOfWork } from '../../contract';
 import { global } from '../../model';
 
 /**
@@ -15,14 +15,14 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
     /**
      * 构造函数
      * 
-     * @param m_Cache 缓存
      * @param m_ReadonlyEnum 只读枚举
+     * @param m_Cache 缓存
      * @param m_DbFactory 数据库工厂
      * @param m_Name 枚举名
      */
     public constructor(
-        private m_Cache: ICache,
         private m_ReadonlyEnum: IReadonlyEnum<T>,
+        private m_Cache: CacheBase,
         private m_DbFactory: DbFactoryBase,
         private m_Name: string,
     ) { }

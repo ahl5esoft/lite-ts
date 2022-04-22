@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 
 import { MongoEnum as Self } from './enum';
 import { Mock, mockAny } from '../assert';
-import { DbFactoryBase, DbRepositoryBase, ICache, IReadonlyEnum } from '../../contract';
+import { CacheBase, DbFactoryBase, DbRepositoryBase, IReadonlyEnum } from '../../contract';
 import { enum_, global } from '../../model';
 
 describe('src/service/cache/enum.ts', () => {
@@ -11,7 +11,7 @@ describe('src/service/cache/enum.ts', () => {
             const mockReadonlyEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>({
                 items: []
             });
-            const self = new Self(null, mockReadonlyEnum.actual, null, null);
+            const self = new Self(mockReadonlyEnum.actual, null, null, null);
 
             const res = await self.items;
             deepStrictEqual(res, []);
@@ -20,12 +20,12 @@ describe('src/service/cache/enum.ts', () => {
 
     describe('.addOrSaveItem(uow: IUnitOfWork, itemData: global.IEnumItemData)', () => {
         it('add', async () => {
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             const mockReadonlyEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>({
                 items: null
             });
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockCache.actual, mockReadonlyEnum.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
+            const self = new Self(mockReadonlyEnum.actual, mockCache.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
 
             const mockDbRepository = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
@@ -49,14 +49,14 @@ describe('src/service/cache/enum.ts', () => {
         });
 
         it('save(增加项)', async () => {
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             const mockReadonlyEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>({
                 items: [{
                     data: {}
                 }]
             });
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockCache.actual, mockReadonlyEnum.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
+            const self = new Self(mockReadonlyEnum.actual, mockCache.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
 
             const mockDbRepository = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
@@ -80,7 +80,7 @@ describe('src/service/cache/enum.ts', () => {
         });
 
         it('save(修改项)', async () => {
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             const mockReadonlyEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>({
                 items: [{
                     data: {
@@ -89,7 +89,7 @@ describe('src/service/cache/enum.ts', () => {
                 }]
             });
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockCache.actual, mockReadonlyEnum.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
+            const self = new Self(mockReadonlyEnum.actual, mockCache.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
 
             const mockDbRepository = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
@@ -116,7 +116,7 @@ describe('src/service/cache/enum.ts', () => {
     describe('.get(predicate: (data: T) => boolean)', () => {
         it('ok', async () => {
             const mockReadonlyEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
-            const self = new Self(null, mockReadonlyEnum.actual, null, null);
+            const self = new Self(mockReadonlyEnum.actual, null, null, null);
 
             mockReadonlyEnum.expectReturn(
                 r => r.get(mockAny),
@@ -132,7 +132,7 @@ describe('src/service/cache/enum.ts', () => {
 
     describe('.removeItem(uow: IUnitOfWork, predicate: (data: global.IEnumItemData) => boolean)', () => {
         it('存在', async () => {
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             const mockReadonlyEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>({
                 items: [{
                     data: {
@@ -141,7 +141,7 @@ describe('src/service/cache/enum.ts', () => {
                 }]
             });
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockCache.actual, mockReadonlyEnum.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
+            const self = new Self(mockReadonlyEnum.actual, mockCache.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
 
             const mockDbRepository = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
@@ -162,7 +162,7 @@ describe('src/service/cache/enum.ts', () => {
         });
 
         it('不存在', async () => {
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             const mockReadonlyEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>({
                 items: [{
                     data: {
@@ -171,7 +171,7 @@ describe('src/service/cache/enum.ts', () => {
                 }]
             });
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockCache.actual, mockReadonlyEnum.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
+            const self = new Self(mockReadonlyEnum.actual, mockCache.actual, mockDbFactory.actual, enum_.ValueTypeData.name);
 
             const mockDbRepository = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(

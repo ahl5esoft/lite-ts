@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { PushLogBase } from './log-base';
 import { Mock } from '../assert';
-import { IPush } from '../../contract';
+import { PushBase } from '../../contract';
 
 class Self extends PushLogBase {
     protected convertToPushMessage(labels: [string, any][]) {
@@ -64,7 +64,7 @@ describe('src/service/push/log-base.ts', () => {
 
     describe('.send()[private]', () => {
         it('ok', async () => {
-            const mockPush = new Mock<IPush>();
+            const mockPush = new Mock<PushBase>();
             const self = new Self(mockPush.actual);
 
             self.addLabel('a', 'b');

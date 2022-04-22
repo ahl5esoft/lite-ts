@@ -1,6 +1,6 @@
-import { ICache, NowTimeBase } from '../../contract';
+import { CacheBase, NowTimeBase } from '../../contract';
 
-export class MemoryCache implements ICache {
+export class MemoryCache extends CacheBase {
     /**
      * 缓存
      */
@@ -21,7 +21,9 @@ export class MemoryCache implements ICache {
         private m_NowTime: NowTimeBase,
         private m_LoadFunc: () => Promise<{ [key: string]: any }>,
         private m_ExpiredOn = 10 * 60,
-    ) { }
+    ) {
+        super();
+    }
 
     /**
      * 清空缓存

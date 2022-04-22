@@ -1,14 +1,14 @@
 import { MemoryCache } from '../cache';
 import { EnumItem } from '../enum';
 import { TracerStrategy } from '../tracer';
-import { ICache, ITraceable, NowTimeBase, RpcBase } from '../../contract';
+import { CacheBase, ITraceable, NowTimeBase, RpcBase } from '../../contract';
 import { global } from '../../model';
 
 /**
  * rpc枚举缓存
  */
-export class RpcEnumCache implements ICache, ITraceable<ICache> {
-    private m_Cache: ICache;
+export class RpcEnumCache extends CacheBase implements ITraceable<CacheBase> {
+    private m_Cache: CacheBase;
     /**
      * 缓存
      */
@@ -41,7 +41,9 @@ export class RpcEnumCache implements ICache, ITraceable<ICache> {
         private m_Rpc: RpcBase,
         private m_App: string,
         private m_Sep = '-'
-    ) { }
+    ) {
+        super();
+    }
 
     /**
      * 清空

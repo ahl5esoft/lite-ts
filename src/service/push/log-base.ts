@@ -1,4 +1,4 @@
-import { IPush, LogBase } from '../../contract';
+import { LogBase, PushBase } from '../../contract';
 
 /**
  * 推送日志基类
@@ -15,7 +15,7 @@ export abstract class PushLogBase extends LogBase {
      * @param m_Push 推送
      */
     public constructor(
-        private m_Push: IPush
+        private m_Push: PushBase
     ) {
         super();
     }

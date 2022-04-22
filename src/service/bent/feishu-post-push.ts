@@ -1,6 +1,6 @@
 import bent from 'bent';
 
-import { IPush } from '../../contract';
+import { PushBase } from '../../contract';
 import { request } from '../../model';
 
 interface IResposne {
@@ -17,7 +17,7 @@ interface IResposne {
 /**
  * 飞书富文本推送
  */
-export class BentFeishuPostPush implements IPush {
+export class BentFeishuPostPush extends PushBase {
     /**
      * post请求函数
      */
@@ -33,6 +33,8 @@ export class BentFeishuPostPush implements IPush {
         private m_Keyword: string,
         url: string
     ) {
+        super();
+
         this.m_PostFunc = bent(url, 'json', 'POST', 200);
     }
 

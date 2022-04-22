@@ -1,5 +1,5 @@
 import { TracerStrategy } from '../tracer';
-import { ICache, IReadonlyEnum, IEnumItem, IEnumItemData, ITraceable } from '../../contract';
+import { IReadonlyEnum, IEnumItem, IEnumItemData, ITraceable, CacheBase } from '../../contract';
 
 /**
  * 枚举服务(缓存)
@@ -26,7 +26,7 @@ export class CacheReadonlyEnum<T extends IEnumItemData> implements IReadonlyEnum
      * @param m_Name 枚举名
      */
     public constructor(
-        private m_Cache: ICache,
+        private m_Cache: CacheBase,
         private m_Name: string,
     ) { }
 

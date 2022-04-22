@@ -1,14 +1,14 @@
 import { MemoryCache } from '../cache';
 import { EnumItem } from '../enum';
 import { TracerStrategy } from '../tracer';
-import { DbFactoryBase, ICache, ITraceable, NowTimeBase } from '../../contract';
+import { CacheBase, DbFactoryBase, ITraceable, NowTimeBase } from '../../contract';
 import { global } from '../../model';
 
 /**
  * mongo枚举缓存
  */
-export class MongoEnumCache implements ICache, ITraceable<ICache> {
-    private m_Cache: ICache;
+export class MongoEnumCache extends CacheBase implements ITraceable<CacheBase> {
+    private m_Cache: CacheBase;
     /**
      * 缓存
      */
@@ -39,7 +39,9 @@ export class MongoEnumCache implements ICache, ITraceable<ICache> {
         private m_DbFactory: DbFactoryBase,
         private m_NowTime: NowTimeBase,
         private m_Sep = '-'
-    ) { }
+    ) {
+        super();
+    }
 
     /**
      * 清空

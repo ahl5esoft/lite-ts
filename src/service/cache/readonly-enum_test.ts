@@ -2,13 +2,13 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { CacheReadonlyEnum as Self } from './readonly-enum';
 import { Mock } from '../assert';
-import { ICache } from '../../contract';
+import { CacheBase } from '../../contract';
 import { enum_ } from '../../model';
 
 describe('src/service/cache/readonly-enum.ts', () => {
     describe('.items', () => {
         it('ok', async () => {
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             const self = new Self(mockCache.actual, enum_.ValueTypeData.name);
 
             mockCache.expectReturn(
@@ -23,7 +23,7 @@ describe('src/service/cache/readonly-enum.ts', () => {
 
     describe('.get(predicate: (data: global.IEnumItemData) => boolean)', () => {
         it('ok', async () => {
-            const mockCache = new Mock<ICache>();
+            const mockCache = new Mock<CacheBase>();
             const self = new Self(mockCache.actual, enum_.ValueTypeData.name);
 
             mockCache.expectReturn(

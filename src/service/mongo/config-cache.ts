@@ -1,13 +1,13 @@
 import { MemoryCache } from '../cache';
 import { TracerStrategy } from '../tracer';
-import { DbFactoryBase, ICache, NowTimeBase } from '../../contract';
+import { CacheBase, DbFactoryBase, ITraceable, NowTimeBase } from '../../contract';
 import { global } from '../../model';
 
 /**
  * mongo配置缓存
  */
-export class MongoConfigCache implements ICache {
-    private m_Cache: ICache;
+export class MongoConfigCache extends CacheBase implements ITraceable<CacheBase> {
+    private m_Cache: CacheBase;
     /**
      * 缓存
      */
@@ -34,7 +34,9 @@ export class MongoConfigCache implements ICache {
     public constructor(
         private m_DbFactory: DbFactoryBase,
         private m_NowTime: NowTimeBase,
-    ) { }
+    ) {
+        super();
+    }
 
     /**
      * 清空
