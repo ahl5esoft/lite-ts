@@ -27,6 +27,7 @@ export * from './i-traceable';
 export * from './i-unit-of-work';
 export * from './i-user-associate-service';
 export * from './i-user-auth-data';
+export * from './i-user-order-service';
 export * from './i-user-service';
 export * from './i-user-value-service';
 export * from './i-value-condition-data';

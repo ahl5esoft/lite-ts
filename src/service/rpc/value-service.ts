@@ -48,7 +48,7 @@ export class RpcValueService<T extends global.TargetValue> extends TargetValueSe
      */
     public async update(_: IUnitOfWork, values: IValueData[]) {
         await this.m_Rpc.setBody({
-            userID: this.m_UserID,
+            ...this.m_Entry,
             values: values
         }).call<void>('/prop/ih/update-values-by-user-id');
     }
