@@ -8,11 +8,11 @@ export class RpcUserOrderService<T extends global.UserOrder> implements IUserOrd
     /**
      * 完成路由
      */
-    public static completeRoute = '/order/ih/complete-by-user';
+    public static completeRoute = '/order/ih/complete';
     /**
      * 获取路由
      */
-    public static getRoute = '/order/ih/get-by-user';
+    public static getRoute = '/order/ih/get';
 
     /**
      * 构造函数
@@ -45,7 +45,6 @@ export class RpcUserOrderService<T extends global.UserOrder> implements IUserOrd
     public async get(orderID: string) {
         const resp = await this.m_Rpc.setBody({
             id: orderID,
-            userID: this.m_UserID,
         }).call<T>(RpcUserOrderService.getRoute);
         return resp.data;
     }
