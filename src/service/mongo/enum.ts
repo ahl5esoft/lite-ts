@@ -36,7 +36,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
     public async addOrSaveItem(uow: IUnitOfWork, itemData: T) {
         const enumItems = await this.items;
         const db = this.m_DbFactory.db(global.Enum, uow);
-        if (enumItems) {
+        if (enumItems.length) {
             await db.save({
                 id: this.m_Name,
                 items: enumItems.reduce((memo, r) => {
@@ -73,7 +73,7 @@ export class MongoEnum<T extends IEnumItemData> implements IEnum<T> {
      */
     public async removeItem(uow: IUnitOfWork, predicate: (data: T) => boolean) {
         const enumItems = await this.items;
-        if (!enumItems)
+        if (!enumItems.length)
             return;
 
         await this.m_DbFactory.db(global.Enum, uow).save({
