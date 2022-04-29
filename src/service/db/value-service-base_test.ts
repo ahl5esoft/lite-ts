@@ -8,8 +8,8 @@ import {
     DbFactoryBase,
     DbRepositoryBase,
     EnumFactoryBase,
+    IEnum,
     IEnumItem,
-    IReadonlyEnum,
     IUnitOfWork,
     IUserAssociateService,
     IValueData,
@@ -178,7 +178,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 logID
             );
 
-            const mockValueType = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockValueType.actual
@@ -262,7 +262,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 logID
             );
 
-            const mockValueType = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockValueType.actual
@@ -353,7 +353,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 logID
             );
 
-            const mockValueType = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockValueType.actual

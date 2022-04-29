@@ -1,19 +1,17 @@
 import { TargetValueServiceBase } from '../target';
-import { TracerStrategy } from '../tracer';
 import {
     EnumFactoryBase,
-    ITraceable,
     IUnitOfWork,
     IValueData,
     NowTimeBase,
     RpcBase
 } from '../../contract';
-import { global } from '../../model';
+import { enum_, global } from '../../model';
 
 /**
  * 用户其他数值服务
  */
-export class RpcValueService<T extends global.TargetValue> extends TargetValueServiceBase<T> implements ITraceable<TargetValueServiceBase<T>> {
+export class RpcValueService<T extends global.TargetValue> extends TargetValueServiceBase<T>{
     /**
      * 实体
      */
@@ -25,15 +23,15 @@ export class RpcValueService<T extends global.TargetValue> extends TargetValueSe
      * 构造函数
      * 
      * @param m_Entry 实体
+     * @param m_TargetTypeData 目标类型数据
      * @param m_Rpc 远程过程调用
-     * @param m_UserID 用户ID
      * @param enumFactory 数值枚举
      * @param nowTime 当前时间
      */
     public constructor(
         private m_Entry: T,
+        private m_TargetTypeData: enum_.TargetTypeData,
         private m_Rpc: RpcBase,
-        private m_UserID: string,
         enumFactory: EnumFactoryBase,
         nowTime: NowTimeBase,
     ) {
@@ -50,21 +48,6 @@ export class RpcValueService<T extends global.TargetValue> extends TargetValueSe
         await this.m_Rpc.setBody({
             ...this.m_Entry,
             values: values
-        }).call<void>('/prop/ih/update-values-by-user-id');
-    }
-
-    /**
-     * 包装跟踪
-     * 
-     * @param parentSpan 父范围跟踪
-     */
-    public withTrace(parentSpan: any) {
-        return new RpcValueService<T>(
-            this.m_Entry,
-            new TracerStrategy(this.m_Rpc).withTrace(parentSpan),
-            this.m_UserID,
-            new TracerStrategy(this.enumFactory).withTrace(parentSpan),
-            this.nowTime
-        );
+        }).call<void>(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
     }
 }

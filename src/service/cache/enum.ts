@@ -1,10 +1,10 @@
 import { TracerStrategy } from '../tracer';
-import { IReadonlyEnum, IEnumItem, IEnumItemData, ITraceable, CacheBase } from '../../contract';
+import { CacheBase, IEnum, IEnumItem, IEnumItemData, ITraceable } from '../../contract';
 
 /**
- * 枚举服务(缓存)
+ * 枚举服务
  */
-export class CacheReadonlyEnum<T extends IEnumItemData> implements IReadonlyEnum<T>, ITraceable<IReadonlyEnum<T>> {
+export class CacheEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<IEnum<T>> {
     /**
      * 所有枚举项
      */
@@ -48,9 +48,9 @@ export class CacheReadonlyEnum<T extends IEnumItemData> implements IReadonlyEnum
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new CacheReadonlyEnum(
+        return new CacheEnum(
             new TracerStrategy(this.m_Cache).withTrace(parentSpan),
             this.m_Name,
-        ) as IReadonlyEnum<T>;
+        ) as IEnum<T>;
     }
 }

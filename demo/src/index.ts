@@ -24,7 +24,7 @@ import {
         EnumFactoryBase,
         new service.EnumFactory({
             [enum_.CityData.name]: () => {
-                return new service.CacheReadonlyEnum(cache, enum_.CityData.name);
+                return new service.CacheEnum(cache, enum_.CityData.name);
             }
         })
     );

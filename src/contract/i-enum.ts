@@ -1,24 +1,19 @@
+import { IEnumItem } from './i-enum-item';
 import { IEnumItemData } from './i-enum-item-data';
-import { IReadonlyEnum } from './i-readonly-enum';
-import { IUnitOfWork } from './i-unit-of-work';
 
 /**
  * 枚举接口
  */
-export interface IEnum<T extends IEnumItemData> extends IReadonlyEnum<T> {
+export interface IEnum<T extends IEnumItemData> {
     /**
-     * 添加或者修改枚举项
-     * 
-     * @param uow 工作单元
-     * @param itemData 枚举项数据
+     * 所有枚举项
      */
-    addOrSaveItem(uow: IUnitOfWork, itemData: T): Promise<void>;
+    readonly items: Promise<IEnumItem<T>[]>;
 
     /**
-     * 删除枚举项
+     * 获取满足条件的单个枚举项
      * 
-     * @param uow 工作单元
      * @param predicate 断言
      */
-    removeItem(uow: IUnitOfWork, predicate: (data: T) => boolean): Promise<void>;
+    get(predicate: (data: T) => boolean): Promise<IEnumItem<T>>;
 }

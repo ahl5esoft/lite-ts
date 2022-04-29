@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 
 import { ValueConditionParser as Self } from './condition-parser';
 import { Mock, mockAny } from '../assert';
-import { EnumFactoryBase, IReadonlyEnum, model } from '../..';
+import { EnumFactoryBase, IEnum } from '../../contract';
 import { enum_ } from '../../model';
 
 describe('src/service/value/condition-parser.ts', () => {
@@ -11,7 +11,7 @@ describe('src/service/value/condition-parser.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
 
-            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
@@ -69,20 +69,20 @@ D>=0.99`);
             deepStrictEqual(res, [
                 [{
                     count: -15,
-                    op: model.enum_.RelationOperator.eq,
+                    op: enum_.RelationOperator.eq,
                     valueType: 11,
                 }, {
                     count: -5,
-                    op: model.enum_.RelationOperator.ge,
+                    op: enum_.RelationOperator.ge,
                     valueType: 22,
                 }],
                 [{
                     count: 20,
-                    op: model.enum_.RelationOperator.le,
+                    op: enum_.RelationOperator.le,
                     valueType: 33,
                 }, {
                     count: 0.99,
-                    op: model.enum_.RelationOperator.ge,
+                    op: enum_.RelationOperator.ge,
                     valueType: 44,
                 }]
             ]);

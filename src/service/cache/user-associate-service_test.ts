@@ -1,6 +1,6 @@
 import { deepStrictEqual } from 'assert';
 
-import { UserAssociateService as Self } from './associate-service';
+import { CacheUserAssociateService as Self } from './user-associate-service';
 
 class Model {
     public no?: number;

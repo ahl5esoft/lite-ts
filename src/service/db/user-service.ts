@@ -1,4 +1,4 @@
-import { UserValueService } from './value-service';
+import { DbUserValueService } from '../db';
 import { CustomError } from '../error';
 import { RpcValueService } from '../rpc';
 import {
@@ -18,7 +18,7 @@ import { enum_, global } from '../../model';
 /**
  * 用户服务
  */
-export class UserService implements IUserService {
+export class DbUserService implements IUserService {
     /**
      * 目标数值服务
      */
@@ -30,7 +30,7 @@ export class UserService implements IUserService {
      */
     public get valueService() {
         if (!this.m_ValueService) {
-            this.m_ValueService = new UserValueService(
+            this.m_ValueService = new DbUserValueService(
                 this,
                 this.dbFactory,
                 this.enumFactory,
@@ -72,21 +72,21 @@ export class UserService implements IUserService {
      * @param targetType 目标类型
      */
     public async getTargetValueService(targetNo: number, targetType: number) {
-        const targetTypeItem = await this.enumFactory.build(enum_.TargetTypeData).get(r => {
+        const targetTypeEnumItem = await this.enumFactory.build(enum_.TargetTypeData).get(r => {
             return r.value == targetType;
         });
-        if (!targetTypeItem)
+        if (!targetTypeEnumItem)
             throw new Error(`无效目标类型: ${targetType}`);
 
         if (!this.m_TargetValueServices[targetType]) {
             const resp = await this.rpc.setBody({
                 userID: this.userID
-            }).call<global.TargetValue[]>(`/${targetTypeItem.data.app}/ih/find-values-by-user-id`);
+            }).call<global.TargetValue[]>(`/${targetTypeEnumItem.data.app}/ih/find-values-by-user-id`);
             if (resp.err)
                 throw new CustomError(resp.err, resp.data);
 
             this.m_TargetValueServices[targetType] = resp.data.map(r => {
-                return this.createTargetValueService(r);
+                return this.createTargetValueService(r, targetTypeEnumItem.data);
             });
         }
 
@@ -96,15 +96,16 @@ export class UserService implements IUserService {
                 return r;
         }
 
-        throw new Error(`无效目标: ${targetTypeItem.data.app}[${targetNo}]`);
+        throw new Error(`无效目标: ${targetTypeEnumItem.data.app}[${targetNo}]`);
     }
 
     /**
      * 创建目标数值服务
      * 
-     * @param targetEntry 目标实体 
+     * @param targetEntry 目标实体
+     * @param targetTypeData 目标类型数据
      */
-    private createTargetValueService(targetEntry: global.TargetValue) {
-        return new RpcValueService(targetEntry, this.rpc, this.userID, this.enumFactory, this.nowTime);
+    private createTargetValueService(targetEntry: global.TargetValue, targetTypeData: enum_.TargetTypeData) {
+        return new RpcValueService(targetEntry, targetTypeData, this.rpc, this.enumFactory, this.nowTime);
     }
 }

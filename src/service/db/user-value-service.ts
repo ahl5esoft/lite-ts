@@ -1,4 +1,4 @@
-import { DbValueServiceBase } from '../db';
+import { DbValueServiceBase } from './value-service-base';
 import {
     DbFactoryBase,
     EnumFactoryBase,
@@ -17,7 +17,7 @@ import { global } from '../../model';
 /**
  * 用户数值服务
  */
-export class UserValueService extends DbValueServiceBase<
+export class DbUserValueService extends DbValueServiceBase<
     global.TargetValue,
     global.TargetValueChange,
     global.TargetValueLog
@@ -77,6 +77,9 @@ export class UserValueService extends DbValueServiceBase<
      * @param conditions 条件
      */
     public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]) {
+        if (!conditions?.length)
+            return true;
+
         for (const r of conditions) {
             const tasks = r.reduce((memo, cr) => {
                 const item = memo.find(sr => {

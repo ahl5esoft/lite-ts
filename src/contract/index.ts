@@ -19,7 +19,6 @@ export * from './i-enum-item-data';
 export * from './i-git-repository';
 export * from './i-git-repository-data';
 export * from './i-parser';
-export * from './i-readonly-enum';
 export * from './i-redis-geo-data';
 export * from './i-reward-data';
 export * from './i-target-value-service';

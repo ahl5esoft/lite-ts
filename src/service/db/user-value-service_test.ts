@@ -1,6 +1,6 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { UserValueService as Self } from './value-service';
+import { DbUserValueService as Self } from './user-value-service';
 import { Mock } from '../assert';
 import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData } from '../../contract';
 import { enum_, global } from '../../model';

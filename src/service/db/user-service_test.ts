@@ -1,17 +1,17 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
 
-import { UserService as Self } from './service';
+import { DbUserService as Self } from './user-service';
 import { Mock, mockAny } from '../assert';
-import { EnumFactoryBase, IReadonlyEnum, RpcBase } from '../../contract';
+import { EnumFactoryBase, IEnum, RpcBase } from '../../contract';
 import { enum_ } from '../../model';
 
-describe('src/service/user/service.ts', () => {
+describe('src/service/db/user-service.ts', () => {
     describe('.getTargetValueService(targetType: number, targetValue: number)', () => {
         it('无效目标类型', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null);
 
-            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
+            const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.TargetTypeData),
                 mockTargetTypeEnum.actual
@@ -38,7 +38,7 @@ describe('src/service/user/service.ts', () => {
             const userID = 'uid';
             const self = new Self(null, userID, null, mockEnumFactory.actual, null, mockRpc.actual, null, null);
 
-            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
+            const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.TargetTypeData),
                 mockTargetTypeEnum.actual
@@ -109,7 +109,7 @@ describe('src/service/user/service.ts', () => {
             const userID = 'uid';
             const self = new Self(null, userID, null, mockEnumFactory.actual, null, mockRpc.actual, null, null);
 
-            const mockTargetTypeEnum = new Mock<IReadonlyEnum<enum_.TargetTypeData>>();
+            const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.TargetTypeData),
                 mockTargetTypeEnum.actual

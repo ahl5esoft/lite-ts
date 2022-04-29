@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 
 import { ValueRewardParser as Self } from './reward-parser';
 import { Mock, mockAny } from '../assert';
-import { EnumFactoryBase, IReadonlyEnum, IEnumItem } from '../..';
+import { EnumFactoryBase, IEnum, IEnumItem } from '../../contract';
 import { enum_ } from '../../model';
 
 
@@ -12,7 +12,7 @@ describe('src/service/value/reward-parser.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
 
-            const mockEnum = new Mock<IReadonlyEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
