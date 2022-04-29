@@ -1,12 +1,11 @@
 import { RpcUserValueService } from './user-value-service';
 import {
     EnumFactoryBase,
-    ITargetValueService,
     IUserAssociateService,
+    IUserValueService,
     NowTimeBase,
     RpcBase,
 } from '../../contract';
-import { global } from '../../model';
 
 /**
  * 用户服务(远程)
@@ -17,7 +16,7 @@ export class RpcUserService {
      */
     public static associateKey = 'user-value';
 
-    private m_ValueService: ITargetValueService<global.TargetValue>;
+    private m_ValueService: IUserValueService;
     /**
      * 数值服务
      */
