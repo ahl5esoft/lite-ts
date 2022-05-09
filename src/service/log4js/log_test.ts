@@ -7,9 +7,9 @@ describe('src/service/log4js/log.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            self.addLabel('a', 'b');
+            const adapter = self.addLabel('a', 'b');
 
-            const res = Reflect.get(self, 'm_Labels');
+            const res = Reflect.get(adapter, 'm_Labels');
             deepStrictEqual(res, {
                 a: 'b'
             });
@@ -43,11 +43,13 @@ describe('src/service/log4js/log.ts', () => {
             });
 
             const err = new Error('err');
-            self.error(err);
+            const adapter = self.addLabel('a', 'b');
+            adapter.error(err);
 
-            const res = Reflect.get(self, 'm_Labels');
+            const res = Reflect.get(adapter, 'm_Labels');
             deepStrictEqual(res, {
-                err: err
+                err: err,
+                a: 'b'
             });
         });
     });

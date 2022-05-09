@@ -2,7 +2,7 @@ import log4js from 'log4js';
 
 import { LogBase } from '../../contract';
 
-export class Log4jsLog extends LogBase {
+class Adapter extends LogBase {
     /**
      * 标签
      */
@@ -61,6 +61,48 @@ export class Log4jsLog extends LogBase {
         fn(
             JSON.stringify(this.m_Labels)
         );
+    }
+}
+
+export class Log4jsLog extends LogBase {
+    /**
+     * 增加标签
+     * 
+     * @param k 键
+     * @param v 值
+     */
+    public addLabel(k: string, v: any) {
+        return new Adapter().addLabel(k, v);
+    }
+
+    /**
+     * 以调试格式输出日志
+     */
+    public debug() {
+        new Adapter().debug();
+    }
+
+    /**
+     * 以错误格式输出日志
+     * 
+     * @param err 错误
+     */
+    public error(err: Error) {
+        new Adapter().error(err);
+    }
+
+    /**
+     * 以信息格式输出日志
+     */
+    public info() {
+        new Adapter().info();
+    }
+
+    /**
+     * 以告警格式输出日志
+     */
+    public warning() {
+        new Adapter().warning();
     }
 
     /**
