@@ -1,9 +1,13 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { DbUserValueService as Self } from './user-value-service';
+import { DbUserValueServiceBase } from './user-value-service-base';
 import { Mock } from '../assert';
 import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData } from '../../contract';
 import { enum_, global } from '../../model';
+
+class Self extends DbUserValueServiceBase {
+    protected async onBeforeUpdate() { }
+}
 
 describe('src/service/user/value-service.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][])', () => {

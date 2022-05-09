@@ -20,6 +20,6 @@ export class TracerStrategy<T> implements ITraceable<T> {
      */
     public withTrace(parentSpan: any) {
         const tracer = this.m_Origin as any as ITraceable<T>;
-        return tracer.withTrace ? tracer.withTrace(parentSpan) : this.m_Origin;
+        return tracer?.withTrace ? tracer.withTrace(parentSpan) : this.m_Origin;
     }
 }

@@ -15,9 +15,9 @@ import {
 import { global } from '../../model';
 
 /**
- * 用户数值服务
+ * 用户数值服务基类
  */
-export class DbUserValueService extends DbValueServiceBase<
+export abstract class DbUserValueServiceBase extends DbValueServiceBase<
     global.TargetValue,
     global.TargetValueChange,
     global.TargetValueLog
@@ -122,6 +122,8 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param values 数值数组
      */
     public async update(uow: IUnitOfWork, values: IValueData[]) {
+        await this.onBeforeUpdate(uow, values);
+
         const tasks = values.reduce((memo, r) => {
             const item = memo.find(cr => {
                 return cr.targetNo == r.targetNo && cr.targetType == r.targetType;
@@ -215,4 +217,12 @@ export class DbUserValueService extends DbValueServiceBase<
             return r.userID == this.userService.userID;
         });
     }
+
+    /**
+     * 更新前
+     * 
+     * @param uow 工作单元
+     * @param values 数值数组
+     */
+    protected abstract onBeforeUpdate(uow: IUnitOfWork, values: IValueData[]): Promise<void>;
 }

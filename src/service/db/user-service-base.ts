@@ -1,4 +1,3 @@
-import { DbUserValueService } from '../db';
 import { CustomError } from '../error';
 import { RpcValueService } from '../rpc';
 import {
@@ -18,30 +17,16 @@ import { enum_, global } from '../../model';
 /**
  * 用户服务
  */
-export class DbUserService implements IUserService {
+export abstract class DbUserServiceBase implements IUserService {
     /**
      * 目标数值服务
      */
     private m_TargetValueServices: { [targetType: number]: ITargetValueService<global.TargetValue>[]; } = {};
 
-    private m_ValueService: IUserValueService;
     /**
      * 用户数值服务
      */
-    public get valueService() {
-        if (!this.m_ValueService) {
-            this.m_ValueService = new DbUserValueService(
-                this,
-                this.dbFactory,
-                this.enumFactory,
-                this.nowTime,
-                this.stringGenerator,
-                this.valueInterceptorFactory
-            );
-        }
-
-        return this.m_ValueService;
-    }
+    public abstract get valueService(): IUserValueService;
 
     /**
      * 

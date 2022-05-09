@@ -1,9 +1,13 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
 
-import { DbUserService as Self } from './user-service';
+import { DbUserServiceBase } from './user-service-base';
 import { Mock, mockAny } from '../assert';
-import { EnumFactoryBase, IEnum, RpcBase } from '../../contract';
+import { EnumFactoryBase, IEnum, IUserValueService, RpcBase } from '../../contract';
 import { enum_ } from '../../model';
+
+class Self extends DbUserServiceBase {
+    public valueService: IUserValueService;
+}
 
 describe('src/service/db/user-service.ts', () => {
     describe('.getTargetValueService(targetType: number, targetValue: number)', () => {
