@@ -14,8 +14,8 @@ import {
 } from '../../contract';
 import { enum_, global } from '../../model';
 
-class Self extends TargetValueServiceBase<global.TargetValue> {
-    public entry: Promise<global.TargetValue>;
+class Self extends TargetValueServiceBase<global.UserValue> {
+    public entry: Promise<global.UserValue>;
 
     public async update(_: IUnitOfWork, __: IValueData[]) { }
 

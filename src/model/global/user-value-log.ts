@@ -1,12 +1,16 @@
 /**
- * 目标数值变更模型
+ * 用户数值变更日志
  */
-export class TargetValueChange {
+export class UserValueLog {
     /**
-     * 数量
+     * 当前数量
      */
     public count: number;
     public id: string;
+    /**
+     * 旧数量
+     */
+    public oldCount: number;
     /**
      * 来源
      */

@@ -18,11 +18,10 @@ import { enum_, global } from '../../model';
  * 数据库数值服务
  */
 export abstract class DbValueServiceBase<
-    T extends global.TargetValue,
-    TChange extends global.TargetValueChange,
-    TLog extends global.TargetValueLog,
-    > extends TargetValueServiceBase<T> {
-
+    T extends global.UserValue,
+    TChange extends global.UserValueChange,
+    TLog extends global.UserValueLog,
+> extends TargetValueServiceBase<T> {
     /**
      * 构造函数
      * 

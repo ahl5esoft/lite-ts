@@ -8,7 +8,7 @@ import { global } from '../model';
 /**
  * 用户数值服务
  */
-export interface IUserValueService extends ITargetValueService<global.TargetValue> {
+export interface IUserValueService extends ITargetValueService<global.UserValue> {
     /**
      * 用户服务
      */

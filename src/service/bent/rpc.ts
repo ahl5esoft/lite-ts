@@ -56,14 +56,14 @@ class Wrapper extends RpcBase {
     }
 
     public async call(route: string) {
-        const resp = await this.callWithoutError(route);
+        const resp = await this.callWithoutThrow(route);
         if (resp.err)
             throw new CustomError(resp.err, resp.data);
 
         return resp;
     }
 
-    public async callWithoutError(route: string) {
+    public async callWithoutThrow(route: string) {
         const header = this.m_Header || {};
         this.tracer.inject(this.span, opentracing.FORMAT_HTTP_HEADERS, header);
         const res = await this.m_PostFunc(route, this.m_Body, header);
@@ -143,12 +143,12 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * @example
      * ```typescript
      *  const rpc: RpcBase;
-     *  const resp = await rpc.callWithoutError<T>('/服务名/端/api名');
+     *  const resp = await rpc.callWithoutThrow<T>('/服务名/端/api名');
      *  // resp is IApiDyanmicResponse<T>
      * ```
      */
-    public callWithoutError(route: string) {
-        return new Wrapper(this.m_PostFunc, this.m_ParentSpan).callWithoutError(route);
+    public callWithoutThrow(route: string) {
+        return new Wrapper(this.m_PostFunc, this.m_ParentSpan).callWithoutThrow(route);
     }
 
     /**

@@ -15,7 +15,7 @@ import { global } from '../../model';
 /**
  * 用户数值服务(远程)
  */
-export class RpcUserValueService extends TargetValueServiceBase<global.TargetValue> implements IUserValueService {
+export class RpcUserValueService extends TargetValueServiceBase<global.UserValue> implements IUserValueService {
     /**
      * 关联键
      */
@@ -30,9 +30,9 @@ export class RpcUserValueService extends TargetValueServiceBase<global.TargetVal
      * 实体
      */
     public get entry() {
-        return new Promise<global.TargetValue>(async (s, f) => {
+        return new Promise<global.UserValue>(async (s, f) => {
             try {
-                const entries = this.m_AssociateService.find<global.TargetValue>(RpcUserValueService.associateKey, r => {
+                const entries = this.m_AssociateService.find<global.UserValue>(RpcUserValueService.associateKey, r => {
                     return r.id == this.m_UserID
                 });
                 s(entries[0]);

@@ -13,7 +13,7 @@ import { enum_, global } from '../../model';
 /**
  * 目标数值服务基类
  */
-export abstract class TargetValueServiceBase<T extends global.TargetValue> implements ITargetValueService<T> {
+export abstract class TargetValueServiceBase<T extends global.UserValue> implements ITargetValueService<T> {
     /**
      * 目标数值数据
      */

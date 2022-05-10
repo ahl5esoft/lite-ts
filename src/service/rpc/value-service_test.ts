@@ -1,21 +1,31 @@
 import { strictEqual } from 'assert';
 
 import { RpcValueService as Self } from './value-service';
-import { Mock } from '../assert';
+import { Mock, mockAny } from '../assert';
 import { CustomError } from '../error';
-import { RpcBase } from '../../contract';
-import { enum_ } from '../../model';
+import { IUserAssociateService, RpcBase } from '../../contract';
+import { enum_, global } from '../../model';
 
 describe('src/service/rpc/value-service.ts', () => {
     describe('.update(_: IUnitOfWork, values: IValueData[])', () => {
         it('ok', async () => {
+            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockRpc = new Mock<RpcBase>();
-            const self = new Self(null, {
-                app: 'test'
-            } as enum_.TargetTypeData, mockRpc.actual, null, null);
+            const self = new Self(mockAssociateService.actual, mockRpc.actual, {
+                app: 'test',
+                value: 1
+            } as enum_.TargetTypeData, {
+                no: 2
+            } as global.UserTargetValue, null, null);
+
+            mockAssociateService.expectReturn(
+                r => r.find(`user-target-value-1`, mockAny),
+                []
+            );
 
             mockRpc.expectReturn(
                 r => r.setBody({
+                    no: 2,
                     values: [{
                         count: 1,
                         valueType: 11

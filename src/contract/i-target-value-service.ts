@@ -6,7 +6,7 @@ import { global } from '../model';
 /**
  * 目标数值服务接口
  */
-export interface ITargetValueService<T extends global.TargetValue> {
+export interface ITargetValueService<T extends global.UserValue> {
     /**
      * 数据
      */

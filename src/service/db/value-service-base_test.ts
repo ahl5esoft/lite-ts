@@ -20,28 +20,28 @@ import {
 } from '../../contract';
 import { enum_, global } from '../../model';
 
-class Self extends DbValueServiceBase<global.TargetValue, global.TargetValueChange, global.TargetValueLog> {
+class Self extends DbValueServiceBase<global.UserValue, global.UserValueChange, global.UserValueLog> {
     public entry: any;
 
-    private m_ChagneEntries: global.TargetValueChange[];
-    public set changeEntries(v: global.TargetValueChange[]) {
+    private m_ChagneEntries: global.UserValueChange[];
+    public set changeEntries(v: global.UserValueChange[]) {
         this.changeEntries = v;
     }
 
     protected createEntry() {
-        return {} as global.TargetValue;
+        return {} as global.UserValue;
     }
 
     protected createChangeEntry() {
         return {
             userID: this.entry.id
-        } as global.TargetValueChange;
+        } as global.UserValueChange;
     }
 
     protected createLogEntry() {
         return {
             userID: this.entry.id
-        } as global.TargetValueLog;
+        } as global.UserValueLog;
     }
 
     protected async findAndClearChangeEntries() {
@@ -55,19 +55,19 @@ describe('src/service/db/value-service-base.ts', () => {
     describe('.getCount(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, null, null, 1, global.TargetValue, global.TargetValueChange, global.TargetValueLog, null, null);
+            const self = new Self(null, mockDbFactory.actual, null, null, 1, global.UserValue, global.UserValueChange, global.UserValueLog, null, null);
 
             Reflect.set(self, 'findChangeEntries', () => {
                 return [{}];
             });
 
-            const mockDbRepo = new Mock<DbRepositoryBase<global.TargetValueChange>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<global.UserValueChange>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValueChange, null),
+                r => r.db(global.UserValueChange, null),
                 mockDbRepo.actual
             );
 
-            mockDbRepo.expected.remove({} as global.TargetValueChange);
+            mockDbRepo.expected.remove({} as global.UserValueChange);
 
             Reflect.set(self, 'update', (_: IUnitOfWork, res: IValueData[]) => {
                 deepStrictEqual(res, [{}]);
@@ -86,13 +86,13 @@ describe('src/service/db/value-service-base.ts', () => {
         it('Iglobal.UserValueData不存在', async () => {
             const mockAssociateService = new Mock<IUserAssociateService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, 1, global.TargetValue, global.TargetValueChange, global.TargetValueLog, null, null);
+            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, 1, global.UserValue, global.UserValueChange, global.UserValueLog, null, null);
 
             Reflect.set(self, 'getEntry', () => { });
 
-            const mockValueDbRepo = new Mock<DbRepositoryBase<global.TargetValue>>();
+            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValue, null),
+                r => r.db(global.UserValue, null),
                 mockValueDbRepo.actual
             );
 
@@ -104,20 +104,20 @@ describe('src/service/db/value-service-base.ts', () => {
 
             const targetValueEntry = {
                 values: {}
-            } as global.TargetValue;
+            } as global.UserValue;
             mockValueDbRepo.expected.add(targetValueEntry);
 
-            mockAssociateService.expected.add(global.TargetValue.name, targetValueEntry);
+            mockAssociateService.expected.add(global.UserValue.name, targetValueEntry);
 
-            const mockLogDbRepo = new Mock<DbRepositoryBase<global.TargetValueLog>>();
+            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValueLog, null),
+                r => r.db(global.UserValueLog, null),
                 mockLogDbRepo.actual
             );
 
             mockValueDbRepo.expected.save({
                 values: {}
-            } as global.TargetValue);
+            } as global.UserValue);
 
             await self.update(null, []);
 
@@ -129,25 +129,25 @@ describe('src/service/db/value-service-base.ts', () => {
             const mockStringGenerator = new Mock<StringGeneratorBase>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.TargetValue, global.TargetValueChange, global.TargetValueLog, mockEnumFactory.actual, null);
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
 
             const entry = {
                 id: 'uid',
                 values: {
                     1: 10
                 }
-            } as global.TargetValue;
+            } as global.UserValue;
             self.entry = entry;
 
-            const mockValueDbRepo = new Mock<DbRepositoryBase<global.TargetValue>>();
+            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValue, null),
+                r => r.db(global.UserValue, null),
                 mockValueDbRepo.actual
             );
 
-            const mockLogDbRepo = new Mock<DbRepositoryBase<global.TargetValueLog>>();
+            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValueLog, null),
+                r => r.db(global.UserValueLog, null),
                 mockLogDbRepo.actual
             );
 
@@ -155,7 +155,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 count: -11,
                 source: 'test',
                 valueType: 1
-            } as global.TargetValueChange;
+            } as global.UserValueChange;
 
             const mockValueInterceptor = new Mock<IValueInterceptor>();
             mockValueInterceptorFactory.expectReturn(
@@ -213,25 +213,25 @@ describe('src/service/db/value-service-base.ts', () => {
             const mockStringGenerator = new Mock<StringGeneratorBase>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.TargetValue, global.TargetValueChange, global.TargetValueLog, mockEnumFactory.actual, null);
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
 
             const entry = {
                 id: 'uid',
                 values: {
                     1: 10
                 }
-            } as global.TargetValue;
+            } as global.UserValue;
             self.entry = entry;
 
-            const mockValueDbRepo = new Mock<DbRepositoryBase<global.TargetValue>>();
+            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValue, null),
+                r => r.db(global.UserValue, null),
                 mockValueDbRepo.actual
             );
 
-            const mockLogDbRepo = new Mock<DbRepositoryBase<global.TargetValueLog>>();
+            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValueLog, null),
+                r => r.db(global.UserValueLog, null),
                 mockLogDbRepo.actual
             );
 
@@ -239,7 +239,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 count: 11,
                 source: 'test',
                 valueType: 1
-            } as global.TargetValueChange;
+            } as global.UserValueChange;
 
             const mockValueInterceptor = new Mock<IValueInterceptor>();
             mockValueInterceptorFactory.expectReturn(
@@ -284,7 +284,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 oldCount: 10,
                 source: valueChange.source,
                 valueType: 1
-            } as global.TargetValueLog);
+            } as global.UserValueLog);
 
             mockValueInterceptor.expected.after(null, self, valueChange);
 
@@ -293,7 +293,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 values: {
                     1: 11
                 }
-            } as global.TargetValue);
+            } as global.UserValue);
 
             await self.update(null, [valueChange]);
         });
@@ -304,25 +304,25 @@ describe('src/service/db/value-service-base.ts', () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const mockStringGenerator = new Mock<StringGeneratorBase>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.TargetValue, global.TargetValueChange, global.TargetValueLog, mockEnumFactory.actual, mockNowTime.actual);
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, mockNowTime.actual);
 
             const entry = {
                 id: 'uid',
                 values: {
                     1: 10
                 }
-            } as global.TargetValue;
+            } as global.UserValue;
             self.entry = entry;
 
-            const mockValueDbRepo = new Mock<DbRepositoryBase<global.TargetValue>>();
+            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValue, null),
+                r => r.db(global.UserValue, null),
                 mockValueDbRepo.actual
             );
 
-            const mockLogDbRepo = new Mock<DbRepositoryBase<global.TargetValueLog>>();
+            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.TargetValueLog, null),
+                r => r.db(global.UserValueLog, null),
                 mockLogDbRepo.actual
             );
 
@@ -330,7 +330,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 count: 11,
                 source: 'test',
                 valueType: 1
-            } as global.TargetValueChange;
+            } as global.UserValueChange;
 
             const mockValueInterceptor = new Mock<IValueInterceptor>();
             mockValueInterceptorFactory.expectReturn(
@@ -381,7 +381,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 oldCount: 10,
                 source: valueChange.source,
                 valueType: 1
-            } as global.TargetValueLog);
+            } as global.UserValueLog);
 
             mockValueInterceptor.expected.after(null, self, valueChange);
 
@@ -391,7 +391,7 @@ describe('src/service/db/value-service-base.ts', () => {
                     1: 11,
                     2: nowUnix
                 }
-            } as global.TargetValue);
+            } as global.UserValue);
 
             await self.update(null, [valueChange]);
         });

@@ -26,5 +26,5 @@ export interface IUserService {
      * @param targetNo 目标编号
      * @param targetType 目标类型
      */
-    getTargetValueService(targetNo: number, targetType: number): Promise<ITargetValueService<global.TargetValue>>;
+    getTargetValueService(targetNo: number, targetType: number): Promise<ITargetValueService<global.UserValue>>;
 }

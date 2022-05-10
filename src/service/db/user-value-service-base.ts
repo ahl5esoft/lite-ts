@@ -18,17 +18,17 @@ import { global } from '../../model';
  * 用户数值服务基类
  */
 export abstract class DbUserValueServiceBase extends DbValueServiceBase<
-    global.TargetValue,
-    global.TargetValueChange,
-    global.TargetValueLog
+    global.UserValue,
+    global.UserValueChange,
+    global.UserValueLog
 > implements IUserValueService {
     /**
      * 获取用户数值实体
      */
     public get entry() {
-        return new Promise<global.TargetValue>(async (s, f) => {
+        return new Promise<global.UserValue>(async (s, f) => {
             try {
-                const rows = await this.associateService.find<global.TargetValue>(global.TargetValue.name, r => {
+                const rows = await this.associateService.find<global.UserValue>(this.model.name, r => {
                     return r.id == this.userService.userID;
                 });
                 s(rows[0]);
@@ -62,9 +62,9 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
             stringGenerator,
             valueInterceptorFactory,
             0,
-            global.TargetValue,
-            global.TargetValueChange,
-            global.TargetValueLog,
+            global.UserValue,
+            global.UserValueChange,
+            global.UserValueLog,
             enumFactory,
             nowTime,
         );
@@ -197,7 +197,7 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
     protected createEntry() {
         return {
             id: this.userService.userID
-        } as global.TargetValue;
+        } as global.UserValue;
     }
 
     /**
@@ -206,14 +206,14 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
     protected createLogEntry() {
         return {
             userID: this.userService.userID
-        } as global.TargetValueLog;
+        } as global.UserValueLog;
     }
 
     /**
      * 查找并清除关联用户数值变更数据
      */
     protected async findAndClearChangeEntries() {
-        return this.associateService.findAndClear<global.TargetValueChange>(global.TargetValueChange.name, r => {
+        return this.associateService.findAndClear<global.UserValueChange>(this.changeModel.name, r => {
             return r.userID == this.userService.userID;
         });
     }

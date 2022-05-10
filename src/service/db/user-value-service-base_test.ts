@@ -15,7 +15,7 @@ describe('src/service/user/value-service.ts', () => {
             const mockUserService = new Mock<IUserService>();
             const self = new Self(mockUserService.actual, null, null, null, null, null);
 
-            const mockValueService = new Mock<ITargetValueService<global.TargetValue>>();
+            const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
             mockUserService.expectReturn(
                 r => r.getTargetValueService(3, 2),
                 mockValueService.actual
@@ -94,7 +94,7 @@ describe('src/service/user/value-service.ts', () => {
             const mockUserService = new Mock<IUserService>();
             const self = new Self(mockUserService.actual, null, null, null, null, null);
 
-            const mockValueService = new Mock<ITargetValueService<global.TargetValue>>();
+            const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
             mockUserService.expectReturn(
                 r => r.getTargetValueService(3, 2),
                 mockValueService.actual

@@ -1,7 +1,7 @@
 /**
- * 目标数值模型
+ * 用户数值模型
  */
-export class TargetValue {
+export class UserValue {
     /**
      * 用户ID
      */

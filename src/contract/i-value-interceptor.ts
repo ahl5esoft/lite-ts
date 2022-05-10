@@ -14,7 +14,7 @@ export interface IValueInterceptor {
      * @param valueService 数值服务
      * @param valueData 数值结构
      */
-    after(uow: IUnitOfWork, valueService: ITargetValueService<global.TargetValue>, valueData: IValueData): Promise<void>;
+    after(uow: IUnitOfWork, valueService: ITargetValueService<global.UserValue>, valueData: IValueData): Promise<void>;
 
     /**
      * 目标数值更新前触发, 如果返回true则目标数值不更新
@@ -23,5 +23,5 @@ export interface IValueInterceptor {
      * @param valueService 数值服务
      * @param valueData 数值结构
      */
-    before(uow: IUnitOfWork, valueService: ITargetValueService<global.TargetValue>, valueData: IValueData): Promise<boolean>;
+    before(uow: IUnitOfWork, valueService: ITargetValueService<global.UserValue>, valueData: IValueData): Promise<boolean>;
 }
