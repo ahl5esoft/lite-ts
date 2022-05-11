@@ -38,7 +38,7 @@ export class CacheUserAssociateService implements IUserAssociateService {
     public async find<T>(key: string, predicate: (r: T) => boolean) {
         const findFunc = this.m_FindFuncs[key];
         if (!findFunc)
-            throw new Error(`UserAssociateService.find: ${key}`);
+            throw new Error(`${CacheUserAssociateService.name}.find: ${key} `);
 
         if (!this.m_Associates[key])
             this.m_Associates[key] = await findFunc();

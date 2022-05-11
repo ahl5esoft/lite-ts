@@ -19,7 +19,7 @@ describe('src/service/rpc/value-service.ts', () => {
             } as global.UserTargetValue, null, null);
 
             mockAssociateService.expectReturn(
-                r => r.find(`user-target-value-1`, mockAny),
+                r => r.find(`${global.UserTargetValue.name}-1`, mockAny),
                 []
             );
 

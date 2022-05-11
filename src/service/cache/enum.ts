@@ -1,10 +1,9 @@
-import { TracerStrategy } from '../tracer';
-import { CacheBase, IEnum, IEnumItem, IEnumItemData, ITraceable } from '../../contract';
+import { CacheBase, IEnum, IEnumItem, IEnumItemData } from '../../contract';
 
 /**
  * 枚举服务
  */
-export class CacheEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<IEnum<T>> {
+export class CacheEnum<T extends IEnumItemData> implements IEnum<T> {
     /**
      * 所有枚举项
      */
@@ -40,17 +39,5 @@ export class CacheEnum<T extends IEnumItemData> implements IEnum<T>, ITraceable<
         return items.find(r => {
             return predicate(r.data);
         });
-    }
-
-    /**
-     * 跟踪
-     * 
-     * @param parentSpan 父跟踪范围
-     */
-    public withTrace(parentSpan: any) {
-        return new CacheEnum(
-            new TracerStrategy(this.m_Cache).withTrace(parentSpan),
-            this.m_Name,
-        ) as IEnum<T>;
     }
 }

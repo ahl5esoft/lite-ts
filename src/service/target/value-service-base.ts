@@ -37,6 +37,9 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      * @param conditions 条件
      */
     public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]) {
+        if (!conditions?.length)
+            return true;
+
         const now = await this.nowTime.unix();
         for (const r of conditions) {
             const tasks = r.map(async cr => {

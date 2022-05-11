@@ -11,11 +11,6 @@ import {
  * 用户服务(远程)
  */
 export class RpcUserService {
-    /**
-     * 关联键
-     */
-    public static associateKey = 'user-value';
-
     private m_ValueService: IUserValueService;
     /**
      * 数值服务

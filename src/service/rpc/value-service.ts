@@ -19,7 +19,7 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
     public get entry() {
         return new Promise<T>(async (s, f) => {
             try {
-                const entries = await this.m_AssociateService.find<T>(`user-target-value-${this.m_TargetTypeData.value}`, r => {
+                const entries = await this.m_AssociateService.find<T>(`${global.UserTargetValue.name}-${this.m_TargetTypeData.value}`, r => {
                     return r.no == this.m_DefaultEntry.no;
                 });
                 s(entries[0]);
@@ -56,9 +56,8 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
      * @param values 数值数组
      */
     public async update(_: IUnitOfWork, values: IValueData[]) {
-        const entry = await this.entry;
         await this.m_Rpc.setBody({
-            ...(entry ?? this.m_DefaultEntry),
+            ...this.m_DefaultEntry,
             values: values
         }).call<void>(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
     }
