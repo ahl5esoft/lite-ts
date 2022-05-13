@@ -7,6 +7,10 @@ export class UserOrder {
      */
     public completeOn: number;
     /**
+     * 商品编号
+     */
+    public goodsNo: number;
+    /**
      * 订单编号
      */
     public id: string;
@@ -14,6 +18,10 @@ export class UserOrder {
      * 支付时间
      */
     public payOn: number;
+    /**
+     * 商店ID
+     */
+    public shopID: string;
     /**
      * 用户id
      */

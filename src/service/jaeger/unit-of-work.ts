@@ -59,7 +59,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * @param model 模型
      * @param entry 实体
      */
-    public registerAdd(model: Function, entry: any) {
+    public registerAdd<T>(model: new () => T, entry: T) {
         this.m_Uow.registerAdd(model, entry);
         this.span.log({
             action: 'add',
@@ -74,7 +74,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * @param model 模型
      * @param entry 实体
      */
-    public registerRemove(model: Function, entry: any) {
+    public registerRemove<T>(model: new () => T, entry: T) {
         this.m_Uow.registerRemove(model, entry);
         this.span.log({
             action: 'remove',
@@ -89,7 +89,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * @param model 模型
      * @param entry 实体
      */
-    public registerSave(model: Function, entry: any) {
+    public registerSave<T>(model: new () => T, entry: T) {
         this.m_Uow.registerSave(model, entry);
         this.span.log({
             action: 'save',

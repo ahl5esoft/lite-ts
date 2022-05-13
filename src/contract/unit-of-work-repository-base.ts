@@ -20,7 +20,7 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
      * @param model 模型
      * @param entry 实体
      */
-    public abstract registerAdd(model: Function, entry: any): void;
+    public abstract registerAdd<T>(model: new () => T, entry: T): void;
 
     /**
      * 注册提交后函数
@@ -37,7 +37,7 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
      * @param model 模型
      * @param entry 实体
      */
-    public abstract registerRemove(model: Function, entry: any): void;
+    public abstract registerRemove<T>(model: new () => T, entry: T): void;
 
     /**
      * 注册更新
@@ -45,5 +45,5 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
      * @param model 模型
      * @param entry 实体
      */
-    public abstract registerSave(model: Function, entry: any): void;
+    public abstract registerSave<T>(model: new () => T, entry: T): void;
 }
