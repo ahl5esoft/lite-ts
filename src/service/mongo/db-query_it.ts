@@ -1,17 +1,17 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { DbPool } from './db-pool';
-import { DbQuery as Self } from './db-query';
+import { MongoDbPool } from './db-pool';
+import { MongoDbQuery as Self } from './db-query';
 import { toEntries } from './helper';
 
-const pool = new DbPool('test-query', 'mongodb://localhost:27017');
+const pool = new MongoDbPool('test-query', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/db-query.ts', () => {
     after(async () => {
         const db = await pool.getDb();
         await db.dropDatabase();
 
-        const client = await pool.getClient();
+        const client = await pool.client;
         await client.close();
     });
 

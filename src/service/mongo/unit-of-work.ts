@@ -1,13 +1,13 @@
 import { ClientSession } from 'mongodb';
 
-import { DbPool } from './db-pool';
+import { MongoDbPool } from './db-pool';
 import { toDoc } from './helper';
-import { UnitOfWorkRepositoryBase } from '../..';
+import { UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
  * 工作单元
  */
-export class UnitOfWork extends UnitOfWorkRepositoryBase {
+export class MongoUnitOfWork extends UnitOfWorkRepositoryBase {
     /**
      * 队列
      */
@@ -18,7 +18,9 @@ export class UnitOfWork extends UnitOfWorkRepositoryBase {
      * 
      * @param m_Pool 连接池
      */
-    public constructor(private m_Pool: DbPool) {
+    public constructor(
+        private m_Pool: MongoDbPool,
+    ) {
         super();
     }
 
@@ -26,7 +28,10 @@ export class UnitOfWork extends UnitOfWorkRepositoryBase {
      * 提交
      */
     public async commit() {
-        const client = await this.m_Pool.getClient();
+        if (!this.m_Queue.length)
+            return;
+
+        const client = await this.m_Pool.client;
         const session = client.startSession();
         session.startTransaction();
 

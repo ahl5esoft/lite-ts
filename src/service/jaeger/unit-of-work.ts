@@ -1,11 +1,15 @@
 import { opentracing } from 'jaeger-client';
 
-import { UnitOfWorkRepositoryBase } from '../..';
+import { UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
  * jaeger工作单元
  */
 export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
+    /**
+     * 空
+     */
+    private m_IsEmpty = true;
     /**
      * 跟踪
      */
@@ -29,7 +33,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * 构造函数
      * 
      * @param m_Uow 原工作单元
-     * @param m_Tracer 跟踪
+     * @param m_ParentSpan 父跟踪范围
      */
     public constructor(
         private m_Uow: UnitOfWorkRepositoryBase,
@@ -42,6 +46,9 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * 提交事务
      */
     public async commit() {
+        if (this.m_IsEmpty)
+            return;
+
         this.span.setTag(opentracing.Tags.DB_STATEMENT, 'commit');
 
         await this.m_Uow.commit();
@@ -66,6 +73,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
             entry: entry,
             table: model.name
         });
+        this.m_IsEmpty = false;
     }
 
     /**
@@ -81,6 +89,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
             entry: entry,
             table: model.name
         });
+        this.m_IsEmpty = false;
     }
 
     /**
@@ -96,6 +105,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
             entry: entry,
             table: model.name
         });
+        this.m_IsEmpty = false;
     }
 
     /**
@@ -103,6 +113,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      */
     private reset() {
         this.afterActions = [];
+        this.m_IsEmpty = true;
         this.m_Span = null;
     }
 }

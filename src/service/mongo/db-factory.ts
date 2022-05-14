@@ -1,7 +1,7 @@
-import { DbPool } from './db-pool';
-import { DbRepository } from './db-repository';
-import { UnitOfWork } from './unit-of-work';
-import { DbFactoryBase, UnitOfWorkRepositoryBase } from '../..';
+import { MongoDbPool } from './db-pool';
+import { MongoDbRepository } from './db-repository';
+import { MongoUnitOfWork } from './unit-of-work';
+import { DbFactoryBase, UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
  * mongo数据库工厂
@@ -10,7 +10,7 @@ export class MongoDbFactory extends DbFactoryBase {
     /**
      * 连接池
      */
-    private m_Pool: DbPool;
+    private m_Pool: MongoDbPool;
 
     /**
      * 构造函数
@@ -21,7 +21,7 @@ export class MongoDbFactory extends DbFactoryBase {
     public constructor(name: string, url: string) {
         super();
 
-        this.m_Pool = new DbPool(name, url);
+        this.m_Pool = new MongoDbPool(name, url);
     }
 
     /**
@@ -31,13 +31,13 @@ export class MongoDbFactory extends DbFactoryBase {
      * @param uow 工作单元
      */
     public db<T>(model: new () => T, uow?: UnitOfWorkRepositoryBase) {
-        return new DbRepository<T>(this.m_Pool, uow, this, model);
+        return new MongoDbRepository<T>(this.m_Pool, uow, this, model);
     }
 
     /**
      * 创建工作单元
      */
     public uow() {
-        return new UnitOfWork(this.m_Pool);
+        return new MongoUnitOfWork(this.m_Pool);
     }
 }

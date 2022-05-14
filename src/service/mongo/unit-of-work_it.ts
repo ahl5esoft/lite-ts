@@ -1,17 +1,17 @@
 import { deepStrictEqual } from 'assert';
 
-import { DbPool } from './db-pool';
+import { MongoDbPool } from './db-pool';
 import { toEntries } from './helper';
-import { UnitOfWork as Self } from './unit-of-work';
+import { MongoUnitOfWork as Self } from './unit-of-work';
 
-const pool = new DbPool('test-uow', 'mongodb://localhost:27017');
+const pool = new MongoDbPool('test-uow', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/unit-of-work.ts', () => {
     after(async () => {
         const db = await pool.getDb();
         await db.dropDatabase();
 
-        const client = await pool.getClient();
+        const client = await pool.client;
         await client.close();
     });
 

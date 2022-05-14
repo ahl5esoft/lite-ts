@@ -1,13 +1,13 @@
 import { deepStrictEqual } from 'assert';
 
 import { MongoDbFactory } from './db-factory';
-import { DbPool } from './db-pool';
-import { DbRepository as Self } from './db-repository';
+import { MongoDbPool } from './db-pool';
+import { MongoDbRepository as Self } from './db-repository';
 import { toEntries } from './helper';
-import { UnitOfWork } from './unit-of-work';
+import { MongoUnitOfWork } from './unit-of-work';
 
 const dbFactory = new MongoDbFactory('test-repository', 'mongodb://localhost:27017');
-const pool = new DbPool('test-repository', 'mongodb://localhost:27017');
+const pool = new MongoDbPool('test-repository', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/db-repository.ts', () => {
     after(async () => {
@@ -18,7 +18,7 @@ describe('src/service/mongo/db-repository.ts', () => {
     describe('.add(entry: any): Promise<void>', () => {
         class TestAdd { }
         it('m_IsTx = true', async () => {
-            const uow = new UnitOfWork(pool);
+            const uow = new MongoUnitOfWork(pool);
             const self = new Self(pool, uow, dbFactory, TestAdd);
             const entry = {
                 id: `${TestAdd.name}-1`,
@@ -103,7 +103,7 @@ describe('src/service/mongo/db-repository.ts', () => {
             const collection = db.collection(TestRemove.name);
             await collection.insertMany(rows);
 
-            const uow = new UnitOfWork(pool);
+            const uow = new MongoUnitOfWork(pool);
             const self = new Self(pool, uow, dbFactory, TestRemove);
             await self.remove({
                 id: rows[0]._id,
@@ -144,7 +144,7 @@ describe('src/service/mongo/db-repository.ts', () => {
             const collection = db.collection(TestSave.name);
             await collection.insertMany(rows);
 
-            const uow = new UnitOfWork(pool);
+            const uow = new MongoUnitOfWork(pool);
             const self = new Self(pool, uow, dbFactory, TestSave);
             let entry = toEntries(rows)[0];
             entry.name = 'two';

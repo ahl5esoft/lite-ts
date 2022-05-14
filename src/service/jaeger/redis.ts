@@ -2,8 +2,14 @@ import { opentracing } from 'jaeger-client';
 
 import { IRedisGeoData, RedisBase } from '../..';
 
+/**
+ * jeager redis
+ */
 export class JeagerRedis extends RedisBase {
     private m_Span: opentracing.Span;
+    /**
+     * 跟踪
+     */
     protected get span() {
         if (!this.m_Span) {
             this.m_Span = opentracing.globalTracer().startSpan('redis', {
@@ -14,6 +20,12 @@ export class JeagerRedis extends RedisBase {
         return this.m_Span;
     }
 
+    /**
+     * 构造函数
+     * 
+     * @param m_Redis redis实例
+     * @param m_ParentSpan 父跟踪范围
+     */
     public constructor(
         private m_Redis: RedisBase,
         private m_ParentSpan?: opentracing.Span
