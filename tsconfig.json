@@ -16,6 +16,7 @@
         "noUnusedParameters": true,
         "outDir": "./dist",
         "removeComments": true,
+        "skipLibCheck": true,
         "target": "es6"
     },
     "exclude": [

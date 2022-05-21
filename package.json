@@ -1,7 +1,6 @@
 {
 	"dependencies": {
 		"@elastic/elasticsearch": "^8.0.0",
-		"@types/ssh2": "^0.5.48",
 		"bcryptjs": "^2.4.3",
 		"bent": "^7.3.12",
 		"body-parser": "^1.19.0",
@@ -17,8 +16,6 @@
 		"mysql2": "^2.3.3",
 		"reflect-metadata": "^0.1.13",
 		"sequelize": "^6.16.2",
-		"simple-git": "^2.48.0",
-		"ssh2": "^1.5.0",
 		"typedi": "^0.8.0"
 	},
 	"description": "基础库(typescript)",
@@ -58,5 +55,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "12.123.34"
+	"version": "12.130.34"
 }

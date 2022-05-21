@@ -162,6 +162,9 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
     public async updateByRewards(uow: IUnitOfWork, source: string, rewards: IRewardData[][]) {
         let res: IValueData[] = [];
         for (const r of rewards) {
+            if (!r.length)
+                continue;
+
             let rewardData: IRewardData;
             if (r.length == 1) {
                 rewardData = r[0];
@@ -184,7 +187,8 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
             });
         }
 
-        await this.update(uow, res);
+        if (res.length)
+            await this.update(uow, res);
 
         return res;
     }

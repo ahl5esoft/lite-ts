@@ -29,8 +29,6 @@ export * from './redis';
 export * from './rpc';
 export * from './sequelize';
 export * from './set-timeout';
-export * from './simple-git';
-export * from './ssh2';
 export * from './target';
 export * from './tracer';
 export * from './typedi';
