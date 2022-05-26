@@ -43,24 +43,23 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
         const now = await this.nowTime.unix();
         for (const r of conditions) {
             const tasks = r.map(async cr => {
-                const aCount = await this.getCount(uow, cr.valueType);
-                let bCount = cr.count;
+                let aCount = await this.getCount(uow, cr.valueType);
                 let op = cr.op;
                 if (cr.op.endsWith('now-diff')) {
-                    bCount += now;
+                    aCount = now - aCount;
                     op = cr.op.replace('now-diff', '') as enum_.RelationOperator;
                 }
                 switch (op) {
                     case enum_.RelationOperator.ge:
-                        return aCount >= bCount;
+                        return aCount >= cr.count;
                     case enum_.RelationOperator.gt:
-                        return aCount > bCount;
+                        return aCount > cr.count;
                     case enum_.RelationOperator.le:
-                        return aCount <= bCount;
+                        return aCount <= cr.count;
                     case enum_.RelationOperator.lt:
-                        return aCount < bCount;
+                        return aCount < cr.count;
                     default:
-                        return aCount == bCount;
+                        return aCount == cr.count;
                 }
             });
             const res = await Promise.all(tasks);

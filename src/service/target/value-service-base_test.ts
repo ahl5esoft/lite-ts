@@ -78,7 +78,7 @@ describe('src/service/target/value-service-base.ts', () => {
             );
 
             Reflect.set(self, 'getCount', () => {
-                return 11;
+                return 9;
             });
 
             const res = await self.checkConditions(null, [[{
@@ -162,7 +162,7 @@ describe('src/service/target/value-service-base.ts', () => {
             );
 
             Reflect.set(self, 'getCount', () => {
-                return 11;
+                return 9;
             });
 
             const res = await self.checkConditions(null, [[{
@@ -246,7 +246,7 @@ describe('src/service/target/value-service-base.ts', () => {
             );
 
             Reflect.set(self, 'getCount', () => {
-                return 12;
+                return 8;
             });
 
             const res = await self.checkConditions(null, [[{
@@ -330,7 +330,7 @@ describe('src/service/target/value-service-base.ts', () => {
             );
 
             Reflect.set(self, 'getCount', () => {
-                return 11;
+                return 9;
             });
 
             const res = await self.checkConditions(null, [[{
@@ -351,7 +351,7 @@ describe('src/service/target/value-service-base.ts', () => {
             );
 
             Reflect.set(self, 'getCount', () => {
-                return 12;
+                return 8;
             });
 
             const res = await self.checkConditions(null, [[{
@@ -435,7 +435,7 @@ describe('src/service/target/value-service-base.ts', () => {
             );
 
             Reflect.set(self, 'getCount', () => {
-                return 11;
+                return 8;
             });
 
             const res = await self.checkConditions(null, [[{
