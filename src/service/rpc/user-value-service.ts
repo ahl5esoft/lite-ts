@@ -27,7 +27,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
     public get entry() {
         return new Promise<global.UserValue>(async (s, f) => {
             try {
-                const entries = this.m_AssociateService.find<global.UserValue>(global.UserValue.name, r => {
+                const entries = await this.m_AssociateService.find<global.UserValue>(global.UserValue.name, r => {
                     return r.id == this.m_UserID
                 });
                 s(entries[0]);

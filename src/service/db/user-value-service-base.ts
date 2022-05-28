@@ -109,7 +109,9 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
                 }
             });
             const taskResults = await Promise.all(tasks);
-            return taskResults.every(cr => cr);
+            const ok = taskResults.every(cr => cr);
+            if (ok)
+                return ok;
         }
 
         return false;
