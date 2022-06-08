@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual } from 'assert';
+import { strictEqual } from 'assert';
 import moment from 'moment';
 
 import { TargetValueServiceBase } from './value-service-base';
@@ -8,7 +8,6 @@ import {
     IEnum,
     IEnumItem,
     IUnitOfWork,
-    IValueConditionData,
     IValueData,
     NowTimeBase
 } from '../../contract';
@@ -558,32 +557,6 @@ describe('src/service/target/value-service-base.ts', () => {
                 }]
             ]);
             strictEqual(res, true);
-        });
-    });
-
-    describe('.enough(uow: IUnitOfWork, values: IValueData[])', () => {
-        it('ok', async () => {
-            const self = new Self(null, null);
-
-            Reflect.set(self, 'checkConditions', (_: IUnitOfWork, res: IValueConditionData[]) => {
-                deepStrictEqual(res, [[{
-                    count: 11,
-                    op: enum_.RelationOperator.ge,
-                    valueType: 1
-                }, {
-                    count: 22,
-                    op: enum_.RelationOperator.ge,
-                    valueType: 2
-                }]]);
-            });
-
-            await self.enough(null, [{
-                count: -11,
-                valueType: 1
-            }, {
-                count: 22,
-                valueType: 2
-            }]);
         });
     });
 

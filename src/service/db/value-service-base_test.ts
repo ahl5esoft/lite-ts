@@ -159,7 +159,7 @@ describe('src/service/db/value-service-base.ts', () => {
 
             const mockValueInterceptor = new Mock<IValueInterceptor>();
             mockValueInterceptorFactory.expectReturn(
-                r => r.build(1, valueChange.valueType),
+                r => r.build(valueChange.valueType),
                 mockValueInterceptor.actual
             );
 
@@ -243,7 +243,7 @@ describe('src/service/db/value-service-base.ts', () => {
 
             const mockValueInterceptor = new Mock<IValueInterceptor>();
             mockValueInterceptorFactory.expectReturn(
-                r => r.build(1, valueChange.valueType),
+                r => r.build(valueChange.valueType),
                 mockValueInterceptor.actual
             );
 
@@ -334,7 +334,7 @@ describe('src/service/db/value-service-base.ts', () => {
 
             const mockValueInterceptor = new Mock<IValueInterceptor>();
             mockValueInterceptorFactory.expectReturn(
-                r => r.build(1, valueChange.valueType),
+                r => r.build(valueChange.valueType),
                 mockValueInterceptor.actual
             );
 

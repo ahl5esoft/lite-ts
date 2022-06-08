@@ -42,6 +42,7 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
      * 构造函数
      * 
      * @param userService 用户服务
+     * @param m_NowValueType 当前时间数值类型
      * @param dbFactory 数据库工厂
      * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
@@ -50,6 +51,7 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
      */
     public constructor(
         public userService: IUserService,
+        private m_NowValueType: number,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
         nowTime: NowTimeBase,
@@ -57,7 +59,7 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
         valueInterceptorFactory: ValueInterceptorFactoryBase,
     ) {
         super(
-            userService.associateService,
+            userService?.associateService,
             dbFactory,
             stringGenerator,
             valueInterceptorFactory,
@@ -115,6 +117,19 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
         }
 
         return false;
+    }
+
+    /**
+     * 获取当前unix
+     * 
+     * @param uow 工作单元
+     */
+    public async getNow(uow: IUnitOfWork) {
+        let now = await this.getCount(uow, this.m_NowValueType);
+        if (!now)
+            now = await this.nowTime.unix();
+
+        return now;
     }
 
     /**

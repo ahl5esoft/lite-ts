@@ -72,25 +72,6 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
     }
 
     /**
-     * 是否足够
-     * 
-     * @param uow 工作单元
-     * @param values 数值数据
-     */
-    public async enough(uow: IUnitOfWork, values: IValueData[]) {
-        return this.checkConditions(
-            uow,
-            [values.map(r => {
-                return {
-                    count: Math.abs(r.count),
-                    op: enum_.RelationOperator.ge,
-                    valueType: r.valueType
-                };
-            })]
-        );
-    }
-
-    /**
      * 获取数量
      * 
      * @param _ 工作单元(忽略)

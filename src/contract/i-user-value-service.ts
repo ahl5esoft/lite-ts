@@ -13,7 +13,12 @@ export interface IUserValueService extends ITargetValueService<global.UserValue>
      * 用户服务
      */
     readonly userService: IUserService;
-
+    /**
+     * 获取当前时间
+     * 
+     * @param uow 工作单元
+     */
+    getNow(uow: IUnitOfWork): Promise<number>;
     /**
      * 
      * @param uow 

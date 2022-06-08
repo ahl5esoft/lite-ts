@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserValueServiceBase } from './user-value-service-base';
 import { Mock } from '../assert';
-import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData } from '../../contract';
+import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData, NowTimeBase } from '../../contract';
 import { enum_, global } from '../../model';
 
 class Self extends DbUserValueServiceBase {
@@ -13,7 +13,7 @@ describe('src/service/user/value-service.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][])', () => {
         it('ok', async () => {
             const mockUserService = new Mock<IUserService>();
-            const self = new Self(mockUserService.actual, null, null, null, null, null);
+            const self = new Self(mockUserService.actual, 0, null, null, null, null, null);
 
             const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
             mockUserService.expectReturn(
@@ -89,10 +89,46 @@ describe('src/service/user/value-service.ts', () => {
         });
     });
 
+    describe('.getNow(uow: IUnitOfWork)', () => {
+        it('数值', async () => {
+            const self = new Self(null, 1, null, null, null, null, null);
+
+            const mockUow = new Mock<IUnitOfWork>();
+            Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
+                strictEqual(arg, mockUow.actual);
+                strictEqual(arg1, 1);
+                return 11;
+            });
+
+            const res = await self.getNow(mockUow.actual);
+            strictEqual(res, 11);
+        });
+        
+        it('NowTime', async () => {
+            const mockNowTime = new Mock<NowTimeBase>();
+            const self = new Self(null, 1, null, null, mockNowTime.actual, null, null);
+
+            const mockUow = new Mock<IUnitOfWork>();
+            Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
+                strictEqual(arg, mockUow.actual);
+                strictEqual(arg1, 1);
+                return 0;
+            });
+
+            mockNowTime.expectReturn(
+                r => r.unix(),
+                99
+            );
+
+            const res = await self.getNow(mockUow.actual);
+            strictEqual(res, 99);
+        });
+    });
+
     describe('.update(uow: IUnitOfWork, values: IValueData[])', () => {
         it('ok', async () => {
             const mockUserService = new Mock<IUserService>();
-            const self = new Self(mockUserService.actual, null, null, null, null, null);
+            const self = new Self(mockUserService.actual, 0, null, null, null, null, null);
 
             const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
             mockUserService.expectReturn(
@@ -154,7 +190,7 @@ describe('src/service/user/value-service.ts', () => {
             const userID = 'user-id';
             const self = new Self({
                 userID: userID
-            } as IUserService, null, null, null, null, null);
+            } as IUserService, 0, null, null, null, null, null);
 
             const source = 'test';
             const rewards = [

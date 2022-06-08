@@ -20,6 +20,7 @@ export class RpcUserService {
             this.m_ValueService = new RpcUserValueService(
                 this.associateService,
                 this.rpc,
+                this.m_NowValueType,
                 this.userID,
                 this.enumFactory,
                 this.nowTime,
@@ -37,6 +38,7 @@ export class RpcUserService {
      * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
      * @param rpc 远程过程调用
+     * @param m_NowValueType 当前时间数值类型
      */
     public constructor(
         public associateService: IUserAssociateService,
@@ -44,5 +46,6 @@ export class RpcUserService {
         protected enumFactory: EnumFactoryBase,
         protected nowTime: NowTimeBase,
         protected rpc: RpcBase,
+        private m_NowValueType: number,
     ) { }
 }

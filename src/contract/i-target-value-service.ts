@@ -11,7 +11,6 @@ export interface ITargetValueService<T extends global.UserValue> {
      * 数据
      */
     readonly entry: Promise<T>;
-
     /**
      * 判断条件是否满足
      * 
@@ -19,15 +18,6 @@ export interface ITargetValueService<T extends global.UserValue> {
      * @param conditions 数值条件
      */
     checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]): Promise<boolean>;
-
-    /**
-     * 是否足够
-     * 
-     * @param uow 工作单元
-     * @param values 数值结构数组
-     */
-    enough(uow: IUnitOfWork, values: IValueData[]): Promise<boolean>;
-
     /**
      * 获取数值数量
      * 
@@ -35,7 +25,6 @@ export interface ITargetValueService<T extends global.UserValue> {
      * @param valueType 数值类型
      */
     getCount(uow: IUnitOfWork, valueType: number): Promise<number>;
-
     /**
      * 更新数值
      * 
