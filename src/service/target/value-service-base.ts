@@ -6,7 +6,6 @@ import {
     IUnitOfWork,
     IValueConditionData,
     IValueData,
-    NowTimeBase
 } from '../../contract';
 import { enum_, global } from '../../model';
 
@@ -23,11 +22,9 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      * 构造函数
      * 
      * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间
      */
     public constructor(
         protected enumFactory: EnumFactoryBase,
-        protected nowTime: NowTimeBase,
     ) { }
 
     /**
@@ -40,26 +37,31 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
         if (!conditions?.length)
             return true;
 
-        const now = await this.nowTime.unix();
+        const now = await this.getNow(uow);
         for (const r of conditions) {
             const tasks = r.map(async cr => {
                 let aCount = await this.getCount(uow, cr.valueType);
-                let op = cr.op;
-                if (cr.op.endsWith('now-diff')) {
+                let bCount = cr.count;
+                let op: string = cr.op;
+                if (cr.op.includes(enum_.RelationOperator.nowDiff)) {
                     aCount = now - aCount;
-                    op = cr.op.replace('now-diff', '') as enum_.RelationOperator;
+                    op = cr.op.replace(enum_.RelationOperator.nowDiff, '');
+                } else if (cr.op.includes(enum_.RelationOperator.mod)) {
+                    aCount = aCount % Math.floor(cr.count / 100);
+                    op = cr.op.replace(enum_.RelationOperator.mod, '');
+                    bCount = bCount % 100;
                 }
                 switch (op) {
                     case enum_.RelationOperator.ge:
-                        return aCount >= cr.count;
+                        return aCount >= bCount;
                     case enum_.RelationOperator.gt:
-                        return aCount > cr.count;
+                        return aCount > bCount
                     case enum_.RelationOperator.le:
-                        return aCount <= cr.count;
+                        return aCount <= bCount;
                     case enum_.RelationOperator.lt:
-                        return aCount < cr.count;
+                        return aCount < bCount;
                     default:
-                        return aCount == cr.count;
+                        return aCount == bCount;
                 }
             });
             const res = await Promise.all(tasks);
@@ -74,11 +76,10 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
     /**
      * 获取数量
      * 
-     * @param _ 工作单元(忽略)
+     * @param uow 工作单元(忽略)
      * @param valueType 数值类型
-     * @returns 
      */
-    public async getCount(_: IUnitOfWork, valueType: number) {
+    public async getCount(uow: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
         if (!entry) {
             entry = {
@@ -93,7 +94,7 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
             return cr.value == valueType;
         });
         if (valueTypeItem && valueTypeItem.data.dailyTime > 0) {
-            const nowUnix = await this.nowTime.unix();
+            const nowUnix = await this.getNow(uow);
             const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
             const isSameDay = moment.unix(nowUnix).isSame(
                 moment.unix(oldUnix),
@@ -113,4 +114,11 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      * @param values 数值数据
      */
     public abstract update(uow: IUnitOfWork, values: IValueData[]): Promise<void>;
+
+    /**
+     * 获取当前时间
+     * 
+     * @param uow 工作单元
+     */
+    protected abstract getNow(uow: IUnitOfWork): Promise<number>;
 }

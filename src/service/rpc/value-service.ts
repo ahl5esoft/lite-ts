@@ -2,9 +2,8 @@ import { TargetValueServiceBase } from '../target';
 import {
     EnumFactoryBase,
     IUnitOfWork,
-    IUserAssociateService,
+    IUserService,
     IValueData,
-    NowTimeBase,
     RpcBase
 } from '../../contract';
 import { enum_, global } from '../../model';
@@ -19,8 +18,8 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
     public get entry() {
         return new Promise<T>(async (s, f) => {
             try {
-                const entries = await this.m_AssociateService.find<T>(`${global.UserTargetValue.name}-${this.m_TargetTypeData.value}`, r => {
-                    return r.no == this.m_DefaultEntry.no;
+                const entries = await this.m_UserService.associateService.find<T>(this.m_TargetTypeData.key, r => {
+                    return r.no == this.m_Entry.no;
                 });
                 s(entries[0]);
             } catch (ex) {
@@ -32,21 +31,20 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
     /**
      * 构造函数
      * 
-     * @param m_AssociateService 关联服务
-     * @param m_TargetTypeData 目标类型数据
+     * @param m_UserService 用户数值服务
      * @param m_Rpc 远程过程调用
+     * @param m_TargetTypeData 目标类型数据
+     * @param m_Entry 实体
      * @param enumFactory 数值枚举
-     * @param nowTime 当前时间
      */
     public constructor(
-        private m_AssociateService: IUserAssociateService,
+        private m_UserService: IUserService,
         private m_Rpc: RpcBase,
         private m_TargetTypeData: enum_.TargetTypeData,
-        private m_DefaultEntry: T,
+        private m_Entry: T,
         enumFactory: EnumFactoryBase,
-        nowTime: NowTimeBase,
     ) {
-        super(enumFactory, nowTime);
+        super(enumFactory);
     }
 
     /**
@@ -57,8 +55,17 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
      */
     public async update(_: IUnitOfWork, values: IValueData[]) {
         await this.m_Rpc.setBody({
-            ...this.m_DefaultEntry,
+            ...this.m_Entry,
             values: values
         }).call<void>(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
+    }
+
+    /**
+     * 获取当前时间
+     * 
+     * @param uow 工作单元
+     */
+    protected async getNow(uow: IUnitOfWork) {
+        return this.m_UserService.valueService.getNow(uow);
     }
 }

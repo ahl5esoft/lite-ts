@@ -2,6 +2,7 @@ import { RpcUserValueService } from './user-value-service';
 import {
     EnumFactoryBase,
     IUserAssociateService,
+    IUserService,
     IUserValueService,
     NowTimeBase,
     RpcBase,
@@ -10,7 +11,7 @@ import {
 /**
  * 用户服务(远程)
  */
-export class RpcUserService {
+export class RpcUserService implements IUserService {
     private m_ValueService: IUserValueService;
     /**
      * 数值服务
@@ -18,12 +19,11 @@ export class RpcUserService {
     public get valueService() {
         if (!this.m_ValueService) {
             this.m_ValueService = new RpcUserValueService(
-                this.associateService,
+                this,
+                this.nowTime,
                 this.rpc,
                 this.m_NowValueType,
-                this.userID,
                 this.enumFactory,
-                this.nowTime,
             );
         }
 
@@ -48,4 +48,11 @@ export class RpcUserService {
         protected rpc: RpcBase,
         private m_NowValueType: number,
     ) { }
+
+    /**
+     * 获取目标数值服务
+     */
+    public async getTargetValueService() {
+        return null;
+    }
 }

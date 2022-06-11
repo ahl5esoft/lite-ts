@@ -15,9 +15,9 @@ import {
 import { global } from '../../model';
 
 /**
- * 用户数值服务基类
+ * 用户数值服务
  */
-export abstract class DbUserValueServiceBase extends DbValueServiceBase<
+export class DbUserValueService extends DbValueServiceBase<
     global.UserValue,
     global.UserValueChange,
     global.UserValueLog
@@ -42,19 +42,19 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
      * 构造函数
      * 
      * @param userService 用户服务
+     * @param m_NowTime 当前时间
      * @param m_NowValueType 当前时间数值类型
      * @param dbFactory 数据库工厂
      * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
      */
     public constructor(
         public userService: IUserService,
+        private m_NowTime: NowTimeBase,
         private m_NowValueType: number,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
-        nowTime: NowTimeBase,
         stringGenerator: StringGeneratorBase,
         valueInterceptorFactory: ValueInterceptorFactoryBase,
     ) {
@@ -63,12 +63,10 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
             dbFactory,
             stringGenerator,
             valueInterceptorFactory,
-            0,
             global.UserValue,
             global.UserValueChange,
             global.UserValueLog,
             enumFactory,
-            nowTime,
         );
     }
 
@@ -127,7 +125,7 @@ export abstract class DbUserValueServiceBase extends DbValueServiceBase<
     public async getNow(uow: IUnitOfWork) {
         let now = await this.getCount(uow, this.m_NowValueType);
         if (!now)
-            now = await this.nowTime.unix();
+            now = await this.m_NowTime.unix();
 
         return now;
     }

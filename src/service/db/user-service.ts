@@ -1,3 +1,4 @@
+import { DbUserValueService } from './user-value-service';
 import { RpcValueService } from '../rpc';
 import {
     DbFactoryBase,
@@ -9,14 +10,14 @@ import {
     NowTimeBase,
     RpcBase,
     StringGeneratorBase,
-    ValueInterceptorFactoryBase
+    ValueInterceptorFactoryBase,
 } from '../../contract';
 import { enum_, global } from '../../model';
 
 /**
  * 用户服务
  */
-export abstract class DbUserServiceBase implements IUserService {
+export class DbUserService implements IUserService {
     /**
      * 目标数值服务
      */
@@ -26,10 +27,25 @@ export abstract class DbUserServiceBase implements IUserService {
         };
     } = {};
 
+    private m_ValueService: IUserValueService;
     /**
      * 用户数值服务
      */
-    public abstract get valueService(): IUserValueService;
+    public get valueService() {
+        if (!this.m_ValueService) {
+            this.m_ValueService = new DbUserValueService(
+                this,
+                this.nowTime,
+                this.nowValueType,
+                this.dbFactory,
+                this.enumFactory,
+                this.stringGenerator,
+                this.valueInterceptorFactory,
+            );
+        }
+
+        return this.m_ValueService;
+    }
 
     /**
      * 
@@ -41,6 +57,7 @@ export abstract class DbUserServiceBase implements IUserService {
      * @param rpc 远程过程调用
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
+     * @param m_NowValueType 当前时间数值类型
      */
     public constructor(
         public associateService: IUserAssociateService,
@@ -51,6 +68,7 @@ export abstract class DbUserServiceBase implements IUserService {
         protected rpc: RpcBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
+        protected nowValueType: number,
     ) { }
 
     /**
@@ -84,9 +102,9 @@ export abstract class DbUserServiceBase implements IUserService {
      * @param targetNo 目标编号
      */
     private createTargetValueService(targetTypeData: enum_.TargetTypeData, targetNo: number) {
-        return new RpcValueService(this.associateService, this.rpc, targetTypeData, {
+        return new RpcValueService(this, this.rpc, targetTypeData, {
             no: targetNo,
             userID: this.userID,
-        } as global.UserTargetValue, this.enumFactory, this.nowTime);
+        } as global.UserTargetValue, this.enumFactory);
     }
 }

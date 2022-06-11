@@ -7,39 +7,27 @@ export enum RelationOperator {
      */
     eq = '=',
     /**
-     * 与当前时间差(等于)
-     */
-    eqNowDiff = '=now-diff',
-    /**
      * 大于等于
      */
     ge = '>=',
-    /**
-     * 与当前时间差(大于等于)
-     */
-    geNowDiff = '>=now-diff',
     /**
      * 大于
      */
     gt = '>',
     /**
-     * 与当前时间差(大于)
-     */
-    gtNowDiff = '>now-diff',
-    /**
      * 小于
      */
     le = '<=',
-    /**
-     * 与当前时间差(小于等于)
-     */
-    leNowDiff = '<=now-diff',
     /**
      * 小于
      */
     lt = '<',
     /**
-     * 与当前时间差(小于)
+     * 与当前时间差, 格式为: 数值类型 now-diff[op(= or >= or > or <= or <)] 数量 => 当前时间 - 数值类型 [op] 数量
      */
-    ltNowDiff = '<now-diff',
+    nowDiff = 'now-diff',
+    /**
+     * 取余, 格式为: 数值类型 %[op(= or >= or > or <= or <)] 数量 => 数值类型 % (数量 / 100) [op] (数量 % 100)
+     */
+    mod = '%'
 }

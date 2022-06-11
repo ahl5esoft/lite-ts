@@ -8,7 +8,6 @@ import {
     IUnitOfWork,
     IUserAssociateService,
     IValueData,
-    NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../../contract';
@@ -29,26 +28,22 @@ export abstract class DbValueServiceBase<
      * @param dbFactory 数据库工厂
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
-     * @param targetType 目标类型
      * @param model 数值模型
      * @param changeModel 数值变更模型
      * @param logModel 数值日志模型
      * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间接口
      */
     public constructor(
         protected associateService: IUserAssociateService,
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
-        protected targetType: number,
         protected model: new () => T,
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
         enumFactory: EnumFactoryBase,
-        nowTime: NowTimeBase,
     ) {
-        super(enumFactory, nowTime);
+        super(enumFactory);
     }
 
     /**
@@ -110,7 +105,7 @@ export abstract class DbValueServiceBase<
                 if (valueTypeItem.data.isReplace) {
                     entry.values[r.valueType] = r.count;
                 } else if (valueTypeItem.data.dailyTime > 0) {
-                    const nowUnix = await this.nowTime.unix();
+                    const nowUnix = await this.getNow(uow);
                     const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),

@@ -41,9 +41,9 @@ export class MongoUnitOfWork extends UnitOfWorkRepositoryBase {
 
         await session.commitTransaction();
 
-        for (const r of this.afterActions)
+        for (const r of Object.values(this.afterAction))
             await r();
-        this.afterActions = [];
+        this.afterAction = {};
     }
 
     /**

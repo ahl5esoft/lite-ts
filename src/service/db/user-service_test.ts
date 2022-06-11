@@ -1,19 +1,15 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
 
-import { DbUserServiceBase } from './user-service-base';
+import { DbUserService as Self } from './user-service';
 import { Mock, mockAny } from '../assert';
-import { EnumFactoryBase, IEnum, IUserValueService } from '../../contract';
+import { EnumFactoryBase, IEnum } from '../../contract';
 import { enum_ } from '../../model';
-
-class Self extends DbUserServiceBase {
-    public valueService: IUserValueService;
-}
 
 describe('src/service/db/user-service.ts', () => {
     describe('.getTargetValueService(targetType: number, targetValue: number)', () => {
         it('无效目标类型', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null);
+            const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null, 0);
 
             const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
             mockEnumFactory.expectReturn(
@@ -38,7 +34,7 @@ describe('src/service/db/user-service.ts', () => {
 
         it('目标编号未缓存', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null);
+            const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null, 0);
 
             const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
             mockEnumFactory.expectReturn(
@@ -82,7 +78,7 @@ describe('src/service/db/user-service.ts', () => {
 
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null);
+            const self = new Self(null, null, null, mockEnumFactory.actual, null, null, null, null, 0);
 
             const mockTargetTypeEnum = new Mock<IEnum<enum_.TargetTypeData>>();
             mockEnumFactory.expectReturn(

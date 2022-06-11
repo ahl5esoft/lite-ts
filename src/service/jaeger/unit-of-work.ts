@@ -53,7 +53,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
 
         await this.m_Uow.commit();
 
-        for (const r of this.afterActions)
+        for (const r of Object.values(this.afterAction))
             await r();
 
         this.span.finish();
@@ -112,7 +112,7 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * 重置
      */
     private reset() {
-        this.afterActions = [];
+        this.afterAction = {};
         this.m_IsEmpty = true;
         this.m_Span = null;
     }

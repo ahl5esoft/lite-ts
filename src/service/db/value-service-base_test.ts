@@ -14,7 +14,6 @@ import {
     IUserAssociateService,
     IValueData,
     IValueInterceptor,
-    NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../../contract';
@@ -49,13 +48,17 @@ class Self extends DbValueServiceBase<global.UserValue, global.UserValueChange, 
         this.changeEntries = [];
         return changeEntries;
     }
+
+    protected async getNow() {
+        return 0;
+    }
 }
 
 describe('src/service/db/value-service-base.ts', () => {
     describe('.getCount(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, null, null, 1, global.UserValue, global.UserValueChange, global.UserValueLog, null, null);
+            const self = new Self(null, mockDbFactory.actual, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, null);
 
             Reflect.set(self, 'findChangeEntries', () => {
                 return [{}];
@@ -86,7 +89,7 @@ describe('src/service/db/value-service-base.ts', () => {
         it('Iglobal.UserValueData不存在', async () => {
             const mockAssociateService = new Mock<IUserAssociateService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, 1, global.UserValue, global.UserValueChange, global.UserValueLog, null, null);
+            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, null);
 
             Reflect.set(self, 'getEntry', () => { });
 
@@ -129,7 +132,7 @@ describe('src/service/db/value-service-base.ts', () => {
             const mockStringGenerator = new Mock<StringGeneratorBase>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual);
 
             const entry = {
                 id: 'uid',
@@ -213,7 +216,7 @@ describe('src/service/db/value-service-base.ts', () => {
             const mockStringGenerator = new Mock<StringGeneratorBase>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual);
 
             const entry = {
                 id: 'uid',
@@ -301,10 +304,9 @@ describe('src/service/db/value-service-base.ts', () => {
         it('IValueTypeData.dailyTime', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const mockNowTime = new Mock<NowTimeBase>();
             const mockStringGenerator = new Mock<StringGeneratorBase>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, 1, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, mockNowTime.actual);
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual);
 
             const entry = {
                 id: 'uid',
@@ -370,10 +372,9 @@ describe('src/service/db/value-service-base.ts', () => {
             );
 
             const nowUnix = moment().unix();
-            mockNowTime.expectReturn(
-                r => r.unix(),
-                nowUnix
-            );
+            Reflect.set(self, 'getNow', () => {
+                return nowUnix;
+            });
 
             mockLogDbRepo.expected.add({
                 count: 11,
