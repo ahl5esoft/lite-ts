@@ -7,6 +7,7 @@ import {
     NowTimeBase,
     RpcBase,
 } from '../../contract';
+import { enum_ } from '../../model';
 
 /**
  * 用户服务(远程)
@@ -22,6 +23,7 @@ export class RpcUserService implements IUserService {
                 this,
                 this.nowTime,
                 this.rpc,
+                this.m_TargetTypeData,
                 this.m_NowValueType,
                 this.enumFactory,
             );
@@ -46,6 +48,7 @@ export class RpcUserService implements IUserService {
         protected enumFactory: EnumFactoryBase,
         protected nowTime: NowTimeBase,
         protected rpc: RpcBase,
+        private m_TargetTypeData: enum_.TargetTypeData,
         private m_NowValueType: number,
     ) { }
 

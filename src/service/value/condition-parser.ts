@@ -1,4 +1,4 @@
-import { EnumFactoryBase, IParser, IValueConditionData } from '../..';
+import { EnumFactoryBase, IParser, IValueConditionData } from '../../contract';
 import { enum_ } from '../../model';
 
 /**
@@ -8,7 +8,7 @@ export class ValueConditionParser<T extends enum_.ValueTypeData> implements IPar
     /**
      * 匹配规则
      */
-    public static reg = /^([^=><]+)([=><]+)(-?\d+(\.?\d+)?)$/;
+    public static reg = /^([^=><%-]+)(%|now-diff)*([=><]+)(-?\d+(\.?\d+)?)$/;
 
     /**
      * 构造函数
@@ -67,13 +67,17 @@ export class ValueConditionParser<T extends enum_.ValueTypeData> implements IPar
             if (!enumItem)
                 throw new Error(`无效数值条件名: ${r}`);
 
-            const count = Number(match[3]);
+            const count = Number(match[4]);
             if (isNaN(count))
                 throw new Error(`无效数值条件数量: ${r}`);
 
+            let op = match[3];
+            if (match[2])
+                op = match[2] + match[3];
+
             res[res.length - 1].push({
                 count: count,
-                op: match[2] as enum_.RelationOperator,
+                op: op as enum_.RelationOperator,
                 valueType: enumItem.data.value
             });
         }

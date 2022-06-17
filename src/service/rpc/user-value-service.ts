@@ -9,7 +9,7 @@ import {
     NowTimeBase,
     RpcBase,
 } from '../../contract';
-import { global } from '../../model';
+import { enum_, global } from '../../model';
 
 /**
  * 用户数值服务(远程)
@@ -44,6 +44,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
         public userService: IUserService,
         private m_NowTime: NowTimeBase,
         private m_Rpc: RpcBase,
+        private m_TargetTypeData: enum_.TargetTypeData,
         private m_NowValueType: number,
         enumFactory: EnumFactoryBase,
     ) {
@@ -73,7 +74,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
         await this.m_Rpc.setBody({
             userID: this.userService.userID,
             values: values
-        }).call<void>('/prop/ih/update-values-by-user-id');
+        }).call<void>(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
     }
 
     /**
@@ -88,7 +89,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
             rewards,
             source: source,
             userID: this.userService.userID,
-        }).call<IValueData[]>('/prop/ih/update-user-value-by-rewards');
+        }).call<IValueData[]>(`/${this.m_TargetTypeData.app}/ih/update-user-value-by-rewards`);
         return resp.data;
     }
 }
