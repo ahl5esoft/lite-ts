@@ -19,7 +19,7 @@ export class MongoConfigCache extends CacheBase implements ITraceable<CacheBase>
                     memo[r.id] = r.items;
                     return memo;
                 }, {});
-            });
+            }, this.m_CacheExpres);
         }
 
         return this.m_Cache;
@@ -30,10 +30,12 @@ export class MongoConfigCache extends CacheBase implements ITraceable<CacheBase>
      * 
      * @param m_DbFactory 数据库工厂
      * @param m_NowTime 当前时间
+     * @param m_CacheExpres 缓存过期时间
      */
     public constructor(
         private m_DbFactory: DbFactoryBase,
         private m_NowTime: NowTimeBase,
+        private m_CacheExpres: number = null,
     ) {
         super();
     }

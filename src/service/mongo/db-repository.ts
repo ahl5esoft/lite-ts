@@ -1,5 +1,5 @@
-import { MongoDbPool } from './db-pool';
 import { MongoDbQuery } from './db-query';
+import { MongoPool } from './pool';
 import { DbFactoryBase, DbRepositoryBase, UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
@@ -15,7 +15,7 @@ export class MongoDbRepository<T> extends DbRepositoryBase<T> {
      * @param model 模型
      */
     public constructor(
-        private m_Pool: MongoDbPool,
+        private m_Pool: MongoPool,
         uow: UnitOfWorkRepositoryBase,
         dbFactory: DbFactoryBase,
         model: new () => T,

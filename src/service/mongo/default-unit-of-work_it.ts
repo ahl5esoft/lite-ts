@@ -1,14 +1,14 @@
 import { deepStrictEqual } from 'assert';
 
-import { MongoDbPool } from './db-pool';
 import { toEntries } from './helper';
-import { MongoUnitOfWork as Self } from './unit-of-work';
+import { MongoPool } from './pool';
+import { MongoDefaultUnitOfWork as Self } from './default-unit-of-work';
 
-const pool = new MongoDbPool('test-uow', 'mongodb://localhost:27017');
+const pool = new MongoPool('test-uow', 'mongodb://localhost:27017');
 
-describe('src/service/mongo/unit-of-work.ts', () => {
+describe('src/service/mongo/default-unit-of-work.ts', () => {
     after(async () => {
-        const db = await pool.getDb();
+        const db = await pool.db;
         await db.dropDatabase();
 
         const client = await pool.client;
@@ -29,7 +29,7 @@ describe('src/service/mongo/unit-of-work.ts', () => {
             self.registerAdd(RegisterAdd, entry);
             await self.commit();
 
-            const db = await pool.getDb();
+            const db = await pool.db;
             const res = await db.collection(RegisterAdd.name).find().toArray();
             deepStrictEqual(
                 toEntries(res),
@@ -44,11 +44,11 @@ describe('src/service/mongo/unit-of-work.ts', () => {
         }
         it('ok', async () => {
             const rows = [{
-                _id: `${RegisterRemove.name}-1`,
+                _id: `${RegisterRemove.name}-1` as any,
             }, {
-                _id: `${RegisterRemove.name}-2`,
+                _id: `${RegisterRemove.name}-2` as any,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(RegisterRemove.name);
             await collection.insertMany(rows);
 
@@ -71,10 +71,10 @@ describe('src/service/mongo/unit-of-work.ts', () => {
         }
         it('ok', async () => {
             const rows = [{
-                _id: `${RegisterSave.name}-1`,
+                _id: `${RegisterSave.name}-1` as any,
                 name: 'one',
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(RegisterSave.name);
             await collection.insertMany(rows);
 

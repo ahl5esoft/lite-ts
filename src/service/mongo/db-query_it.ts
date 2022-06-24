@@ -1,14 +1,14 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
-import { MongoDbPool } from './db-pool';
+import { MongoPool } from './pool';
 import { MongoDbQuery as Self } from './db-query';
 import { toEntries } from './helper';
 
-const pool = new MongoDbPool('test-query', 'mongodb://localhost:27017');
+const pool = new MongoPool('test-query', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/db-query.ts', () => {
     after(async () => {
-        const db = await pool.getDb();
+        const db = await pool.db;
         await db.dropDatabase();
 
         const client = await pool.client;
@@ -23,12 +23,12 @@ describe('src/service/mongo/db-query.ts', () => {
         });
 
         it('all', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${table}-1`,
             }, {
                 _id: `${table}-2`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
@@ -43,7 +43,7 @@ describe('src/service/mongo/db-query.ts', () => {
     describe('.order(...fields)', () => {
         const table = 'test-query-order';
         it('ok', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${table}-3`,
                 index: 1,
             }, {
@@ -53,7 +53,7 @@ describe('src/service/mongo/db-query.ts', () => {
                 _id: `${table}-5`,
                 index: -1,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
@@ -71,14 +71,14 @@ describe('src/service/mongo/db-query.ts', () => {
     describe('.orderByDesc(...fields)', () => {
         const table = 'test-query-orderByDesc';
         it('ok', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${table}-6`,
                 index: 1,
             }, {
                 _id: `${table}-7`,
                 index: 2,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
@@ -96,12 +96,12 @@ describe('src/service/mongo/db-query.ts', () => {
     describe('.skip(skip)', () => {
         const table = 'test-query-skip';
         it('ok', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${table}-8`,
             }, {
                 _id: `${table}-9`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
@@ -119,14 +119,14 @@ describe('src/service/mongo/db-query.ts', () => {
     describe('.take(take)', () => {
         const table = 'test-query-take';
         it('ok', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${table}-10`,
             }, {
                 _id: `${table}-11`,
             }, {
                 _id: `${table}-12`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
@@ -144,12 +144,12 @@ describe('src/service/mongo/db-query.ts', () => {
     describe('.toArray()', () => {
         const table = 'test-query-toArray';
         it('ok', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${table}-1`,
             }, {
                 _id: `${table}-2`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(table);
             await collection.insertMany(rows);
 
@@ -167,7 +167,7 @@ describe('src/service/mongo/db-query.ts', () => {
     describe('.where(selector)', () => {
         const table = 'test-query-where';
         it('ok', async () => {
-            let rows = [{
+            let rows: any = [{
                 _id: `${table}-13`,
                 type: 1,
             }, {
@@ -177,7 +177,7 @@ describe('src/service/mongo/db-query.ts', () => {
                 _id: `${table}-15`,
                 type: 1,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             let collection = db.collection(table);
             await collection.insertMany(rows);
 

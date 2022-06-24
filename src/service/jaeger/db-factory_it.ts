@@ -11,7 +11,7 @@ class TestJaeger {
     public name: string;
 }
 
-const dbFactory: DbFactoryBase = new MongoDbFactory('lite-ts', 'mongodb://localhost:27017');
+const dbFactory: DbFactoryBase = new MongoDbFactory(false, 'lite-ts', 'mongodb://localhost:27017');
 const tracer = initTracer({
     reporter: {
         collectorEndpoint: 'http://10.10.0.66:14268/api/traces'

@@ -1,24 +1,24 @@
 import { deepStrictEqual } from 'assert';
 
 import { MongoDbFactory } from './db-factory';
-import { MongoDbPool } from './db-pool';
 import { MongoDbRepository as Self } from './db-repository';
+import { MongoDefaultUnitOfWork } from './default-unit-of-work';
 import { toEntries } from './helper';
-import { MongoUnitOfWork } from './unit-of-work';
+import { MongoPool } from './pool';
 
-const dbFactory = new MongoDbFactory('test-repository', 'mongodb://localhost:27017');
-const pool = new MongoDbPool('test-repository', 'mongodb://localhost:27017');
+const dbFactory = new MongoDbFactory(false, 'test-repository', 'mongodb://localhost:27017');
+const pool = new MongoPool('test-repository', 'mongodb://localhost:27017');
 
 describe('src/service/mongo/db-repository.ts', () => {
     after(async () => {
-        const db = await pool.getDb();
+        const db = await pool.db;
         await db.dropDatabase();
     });
 
     describe('.add(entry: any): Promise<void>', () => {
         class TestAdd { }
         it('m_IsTx = true', async () => {
-            const uow = new MongoUnitOfWork(pool);
+            const uow = new MongoDefaultUnitOfWork(pool);
             const self = new Self(pool, uow, dbFactory, TestAdd);
             const entry = {
                 id: `${TestAdd.name}-1`,
@@ -26,7 +26,7 @@ describe('src/service/mongo/db-repository.ts', () => {
             };
             await self.add(entry);
 
-            const db = await pool.getDb();
+            const db = await pool.db;
             const res = await db.collection(TestAdd.name).find().toArray();
             deepStrictEqual(res, []);
         });
@@ -39,7 +39,7 @@ describe('src/service/mongo/db-repository.ts', () => {
             };
             await self.add(entry);
 
-            const db = await pool.getDb();
+            const db = await pool.db;
             const res = await db.collection(TestAdd.name).find().toArray();
             deepStrictEqual(
                 toEntries(res),
@@ -51,12 +51,12 @@ describe('src/service/mongo/db-repository.ts', () => {
     describe('.query(): IQuery', () => {
         class TestQuery { }
         it('ok', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${TestQuery.name}-1`,
             }, {
                 _id: `${TestQuery.name}-2`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(TestQuery.name);
             await collection.insertMany(rows);
 
@@ -71,12 +71,12 @@ describe('src/service/mongo/db-repository.ts', () => {
         });
 
         it('where', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${TestQuery.name}-3`,
             }, {
                 _id: `${TestQuery.name}-4`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(TestQuery.name);
             await collection.insertMany(rows);
 
@@ -96,14 +96,14 @@ describe('src/service/mongo/db-repository.ts', () => {
     describe('.remove(entry: any): Promise<void>', () => {
         class TestRemove { }
         it('m_IsTx = true', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${TestRemove.name}-1`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(TestRemove.name);
             await collection.insertMany(rows);
 
-            const uow = new MongoUnitOfWork(pool);
+            const uow = new MongoDefaultUnitOfWork(pool);
             const self = new Self(pool, uow, dbFactory, TestRemove);
             await self.remove({
                 id: rows[0]._id,
@@ -116,10 +116,10 @@ describe('src/service/mongo/db-repository.ts', () => {
         });
 
         it('m_IsTx = false', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${TestRemove.name}-1`,
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(TestRemove.name);
             await collection.insertMany(rows);
 
@@ -136,15 +136,15 @@ describe('src/service/mongo/db-repository.ts', () => {
     describe('.save(entry: any): Promise<void>', () => {
         class TestSave { }
         it('m_IsTx = true', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${TestSave.name}-1`,
                 name: 'one',
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(TestSave.name);
             await collection.insertMany(rows);
 
-            const uow = new MongoUnitOfWork(pool);
+            const uow = new MongoDefaultUnitOfWork(pool);
             const self = new Self(pool, uow, dbFactory, TestSave);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
@@ -157,11 +157,11 @@ describe('src/service/mongo/db-repository.ts', () => {
         });
 
         it('m_IsTx = false', async () => {
-            const rows = [{
+            const rows: any = [{
                 _id: `${TestSave.name}-2`,
                 name: 'one',
             }];
-            const db = await pool.getDb();
+            const db = await pool.db;
             const collection = db.collection(TestSave.name);
             await collection.insertMany(rows);
 

@@ -15,12 +15,12 @@ export class MemoryCache extends CacheBase {
      * 
      * @param m_NowTime 当前时间
      * @param m_LoadFunc 加载函数
-     * @param m_ExpiredOn 过期时间, 默认: 10m
+     * @param m_Expires 过期时间, 默认: 1m
      */
     public constructor(
         private m_NowTime: NowTimeBase,
         private m_LoadFunc: () => Promise<{ [key: string]: any }>,
-        private m_ExpiredOn = 10 * 60,
+        private m_Expires = 60,
     ) {
         super();
     }
@@ -39,7 +39,7 @@ export class MemoryCache extends CacheBase {
      */
     public async get<T>(key: string) {
         const now = await this.m_NowTime.unix();
-        if (now - this.m_LastLoadedOn >= this.m_ExpiredOn) {
+        if (now - this.m_LastLoadedOn >= this.m_Expires) {
             this.m_Cache = await this.m_LoadFunc();
             this.m_LastLoadedOn = now;
         }

@@ -1,6 +1,6 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
-import { StringGeneratorBase } from '../..';
+import { StringGeneratorBase } from '../../contract';
 
 /**
  * mongo字符串生成器
@@ -10,6 +10,6 @@ export class MongoStringGenerator extends StringGeneratorBase {
      * 生成ID
      */
     public async generate(): Promise<string> {
-        return new ObjectID().toHexString();
+        return new ObjectId().toHexString();
     }
 }

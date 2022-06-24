@@ -22,7 +22,7 @@ export class MongoEnumCache extends CacheBase implements ITraceable<CacheBase> {
                     });
                     return memo;
                 }, {});
-            });
+            }, this.m_CacheExpires);
         }
 
         return this.m_Cache;
@@ -34,11 +34,13 @@ export class MongoEnumCache extends CacheBase implements ITraceable<CacheBase> {
      * @param m_DbFactory 数据库工厂
      * @param m_NowTime 当前时间
      * @param m_Sep 分隔符, 默认: '-'
+     * @param m_CacheExpires 缓存过期时间, 默认: 无
      */
     public constructor(
         private m_DbFactory: DbFactoryBase,
         private m_NowTime: NowTimeBase,
-        private m_Sep = '-'
+        private m_Sep = '-',
+        private m_CacheExpires: number = null
     ) {
         super();
     }

@@ -1,7 +1,7 @@
-import { FilterQuery } from 'mongodb';
+import { Filter } from 'mongodb';
 
-import { MongoDbPool } from './db-pool';
 import { toEntries } from './helper';
+import { MongoPool } from './pool';
 import { IDbQuery } from '../../contract';
 
 /**
@@ -23,7 +23,7 @@ export class MongoDbQuery<T> implements IDbQuery<T> {
     /**
      * 条件
      */
-    private m_Where: FilterQuery<any>;
+    private m_Where: Filter<any>;
 
     /**
      * 构造函数
@@ -32,7 +32,7 @@ export class MongoDbQuery<T> implements IDbQuery<T> {
      * @param m_Table 表
      */
     public constructor(
-        private m_Pool: MongoDbPool,
+        private m_Pool: MongoPool,
         private m_Table: string
     ) { }
 
@@ -40,8 +40,8 @@ export class MongoDbQuery<T> implements IDbQuery<T> {
      * 查询数量
      */
     public async count() {
-        const cursor = await this.getCursor();
-        return await cursor.count();
+        const db = await this.m_Pool.db;
+        return db.collection(this.m_Table).countDocuments(this.m_Where);
     }
 
     /**
@@ -86,29 +86,7 @@ export class MongoDbQuery<T> implements IDbQuery<T> {
      * 查询行数据
      */
     public async toArray(): Promise<T[]> {
-        const cursor = await this.getCursor();
-        const rows = await cursor.toArray();
-        return toEntries(rows);
-    }
-
-    /**
-     * 设置条件
-     * 
-     * @param filter 条件
-     */
-    public where(filter: any) {
-        this.m_Where = 'id' in filter ? Object.keys(filter).reduce((memo, r): any => {
-            memo[r == 'id' ? '_id' : r] = filter[r];
-            return memo;
-        }, {}) : filter;
-        return this;
-    }
-
-    /**
-     * 获取游标
-     */
-    private async getCursor() {
-        const db = await this.m_Pool.getDb();
+        const db = await this.m_Pool.db;
         const cursor = db.collection(this.m_Table).find(this.m_Where);
         this.m_Where = null;
 
@@ -127,7 +105,21 @@ export class MongoDbQuery<T> implements IDbQuery<T> {
             this.m_Take = 0;
         }
 
-        return cursor;
+        const rows = await cursor.toArray();
+        return toEntries(rows);
+    }
+
+    /**
+     * 设置条件
+     * 
+     * @param filter 条件
+     */
+    public where(filter: any) {
+        this.m_Where = 'id' in filter ? Object.keys(filter).reduce((memo, r): any => {
+            memo[r == 'id' ? '_id' : r] = filter[r];
+            return memo;
+        }, {}) : filter;
+        return this;
     }
 
     /**

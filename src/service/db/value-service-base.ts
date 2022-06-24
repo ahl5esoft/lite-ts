@@ -84,6 +84,12 @@ export abstract class DbValueServiceBase<
 
         const logDb = this.dbFactory.db(this.logModel, uow);
         for (const r of values) {
+            const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
+                return cr.value == r.valueType;
+            });
+            if (!valueTypeItem?.data.isReplace && r.count == 0)
+                continue;
+
             if (!(r.valueType in entry.values))
                 entry.values[r.valueType] = 0;
 
@@ -98,9 +104,6 @@ export abstract class DbValueServiceBase<
             logEntry.source = r.source;
             logEntry.valueType = r.valueType;
 
-            const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
-                return cr.value == r.valueType;
-            });
             if (valueTypeItem) {
                 if (valueTypeItem.data.isReplace) {
                     entry.values[r.valueType] = r.count;

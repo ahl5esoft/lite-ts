@@ -36,9 +36,9 @@ describe('src/service/ioredis/index.ts', () => {
             await client.del(key);
         });
 
-        it('不存在', async () => {
+        it.only('不存在', async () => {
             const key = 'test-blpop-not-exists';
-            const res = await self.blpop(1, key);
+            const res = await self.blpop(2, key);
             strictEqual(res, null);
         });
     });

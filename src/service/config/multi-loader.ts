@@ -1,9 +1,10 @@
-import { ConfigLoaderBase } from '../../contract';
+import { ConfigLoaderBase, ITraceable } from '../../contract';
+import { TracerStrategy } from '../tracer';
 
 /**
  * 多配置加载器
  */
-export class MultiConfigLoader extends ConfigLoaderBase {
+export class MultiConfigLoader extends ConfigLoaderBase implements ITraceable<ConfigLoaderBase> {
     /**
      * 构造函数
      * 
@@ -26,5 +27,18 @@ export class MultiConfigLoader extends ConfigLoaderBase {
             if (v)
                 return v;
         }
+    }
+
+    /**
+     * 跟踪
+     * 
+     * @param parentSpan 父范围
+     */
+    public withTrace(parentSpan: any) {
+        return new MultiConfigLoader(
+            this.m_ConfigLoaders.map(r => {
+                return new TracerStrategy(r).withTrace(parentSpan);
+            })
+        );
     }
 }

@@ -74,8 +74,9 @@ export async function initIoC(rootDirPath?: string) {
         Container.set(RpcBase, rpc);
     }
 
-    if (cfg.mongo) {
-        const dbFactory = new MongoDbFactory(cfg.name, cfg.mongo);
+    const mongo = cfg.distributedMongo || cfg.mongo;
+    if (mongo) {
+        const dbFactory = new MongoDbFactory(!!cfg.distributedMongo, cfg.name, mongo);
         Container.set(
             DbFactoryBase,
             new JaegerDbFactory(dbFactory)

@@ -16,6 +16,15 @@ import { enum_, global } from '../../model';
  */
 export class RpcUserValueService extends TargetValueServiceBase<global.UserValue> implements IUserValueService {
     /**
+     * 根据奖励更新数值路由
+     */
+    public static updateByRewardsRoute = 'update-user-value-by-rewards';
+    /**
+     * 更新数值路由
+     */
+    public static updateRoute = 'update-values-by-user-id';
+
+    /**
      * 实体
      */
     public get entry() {
@@ -74,7 +83,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
         await this.m_Rpc.setBody({
             userID: this.userService.userID,
             values: values
-        }).call<void>(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
+        }).call<void>(`/${this.m_TargetTypeData.app}/ih/${RpcUserValueService.updateRoute}`);
     }
 
     /**
@@ -89,7 +98,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
             rewards,
             source: source,
             userID: this.userService.userID,
-        }).call<IValueData[]>(`/${this.m_TargetTypeData.app}/ih/update-user-value-by-rewards`);
+        }).call<IValueData[]>(`/${this.m_TargetTypeData.app}/ih/${RpcUserValueService.updateByRewardsRoute}`);
         return resp.data;
     }
 }

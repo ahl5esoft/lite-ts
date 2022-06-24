@@ -1,6 +1,6 @@
 import Ioredis from 'ioredis';
 
-import { IRedisGeoData, RedisBase } from '../..';
+import { IRedisGeoData, RedisBase } from '../../contract';
 
 type RedisType = Ioredis.Cluster | Ioredis.Redis;
 

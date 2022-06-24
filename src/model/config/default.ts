@@ -5,6 +5,10 @@ import { TracingConfig, TracingOptions } from 'jaeger-client';
  */
 export class Default {
     /**
+     * 分布式mongo
+     */
+    public distributedMongo: string;
+    /**
      * 网关地址
      */
     public gatewayUrl: string;
