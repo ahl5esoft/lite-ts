@@ -53,6 +53,6 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new ValueInterceptorFactory(parentSpan);
+        return parentSpan ? new ValueInterceptorFactory(parentSpan) : this;
     }
 }

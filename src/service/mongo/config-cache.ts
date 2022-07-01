@@ -62,6 +62,9 @@ export class MongoConfigCache extends CacheBase implements ITraceable<CacheBase>
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
+        if (!parentSpan)
+            return this;
+
         const instance = new MongoConfigCache(
             new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
             this.m_NowTime,

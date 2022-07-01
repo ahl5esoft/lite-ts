@@ -51,13 +51,21 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
 
         this.span.setTag(opentracing.Tags.DB_STATEMENT, 'commit');
 
-        await this.m_Uow.commit();
+        try {
+            await this.m_Uow.commit();
 
-        for (const r of Object.values(this.afterAction))
-            await r();
-
-        this.span.finish();
-        this.reset();
+            for (const r of Object.values(this.afterAction)) {
+                await r();
+            }
+        } catch (ex) {
+            this.span.log({
+                err: ex
+            });
+            throw ex;
+        } finally {
+            this.span.finish();
+            this.reset();
+        }
     }
 
     /**

@@ -22,15 +22,15 @@ export function buildPostExpressOption(
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
             const tracer = opentracing.globalTracer();
-            const span = tracer.startSpan(req.path, {
+            const tracerSpan = tracer.startSpan(req.path, {
                 childOf: tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers),
                 tags: {
                     [opentracing.Tags.SPAN_KIND]: opentracing.Tags.SPAN_KIND_RPC_SERVER,
                     [opentracing.Tags.HTTP_METHOD]: req.method,
                 }
             });
-            span.log({
-                headers: req.headers
+            tracerSpan.log({
+                header: req.headers
             });
 
             let res: IApiResponse = {
@@ -44,11 +44,11 @@ export function buildPostExpressOption(
                     await session.initSession(req);
 
                 Object.keys(api).forEach(r => {
-                    api[r] = new TracerStrategy(api[r]).withTrace(span);
+                    api[r] = new TracerStrategy(api[r]).withTrace(tracerSpan);
                 });
 
                 if (req.body) {
-                    span.log({
+                    tracerSpan.log({
                         body: req.body
                     });
                     Object.keys(req.body).forEach(r => {
@@ -61,7 +61,7 @@ export function buildPostExpressOption(
 
                 const validationErrors = await validate(api);
                 if (validationErrors.length) {
-                    span.log({
+                    tracerSpan.log({
                         validate: validationErrors.map(r => {
                             return {
                                 arg: r.property,
@@ -74,23 +74,26 @@ export function buildPostExpressOption(
 
                 res.data = await api.call();
             } catch (ex) {
+                tracerSpan.setTag(opentracing.Tags.ERROR, true);
+
                 if (ex instanceof CustomError) {
                     res.data = ex.data;
                     res.err = ex.code;
                 } else {
-                    res.err = enum_.ErrorCode.panic;
                     log.addLabel('route', req.path).error(ex);
-                    span.log({
+                    tracerSpan.log({
                         err: ex
                     });
+
+                    res.err = enum_.ErrorCode.panic;
                 }
-                span.setTag(opentracing.Tags.ERROR, true);
             }
             finally {
-                resp.json(res);
-                span.log({
+                tracerSpan.log({
                     result: res
                 }).finish();
+
+                resp.json(res);
             }
         });
     }

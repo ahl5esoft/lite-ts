@@ -47,12 +47,20 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      * @returns 行数
      */
     public async count() {
-        const res = await this.m_DbQuery.count();
-        this.span.setTag(opentracing.Tags.DB_STATEMENT, 'count').log({
-            result: res
-        }).finish();
-
-        return res;
+        try {
+            const res = await this.m_DbQuery.count();
+            this.span.log({
+                result: res
+            });
+            return res;
+        } catch (ex) {
+            this.span.log({
+                err: ex
+            }).setTag(opentracing.Tags.ERROR, true);
+            throw ex;
+        } finally {
+            this.span.setTag(opentracing.Tags.DB_STATEMENT, 'count').finish();
+        }
     }
 
     /**
@@ -113,14 +121,20 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      * @returns 数据行数, 无结果则返回空数组
      */
     public async toArray() {
-        this.span.setTag(opentracing.Tags.DB_STATEMENT, 'toArray');
-
-        const res = await this.m_DbQuery.toArray();
-        this.span.log({
-            result: res
-        }).finish();
-
-        return res;
+        try {
+            const res = await this.m_DbQuery.toArray();
+            this.span.log({
+                result: res
+            });
+            return res;
+        } catch (ex) {
+            this.span.log({
+                err: ex
+            }).setTag(opentracing.Tags.ERROR, true);
+            throw ex;
+        } finally {
+            this.span.setTag(opentracing.Tags.DB_STATEMENT, 'toArray').finish();
+        }
     }
 
     /**

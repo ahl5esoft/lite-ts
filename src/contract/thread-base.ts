@@ -8,7 +8,6 @@ export abstract class ThreadBase {
      * @param ms 时间
      */
     public abstract sleep(ms: number): Promise<void>;
-
     /**
      * 休眠(区间)
      * 
@@ -16,6 +15,13 @@ export abstract class ThreadBase {
      * @param maxMs 最大时间
      */
     public abstract sleepRange(minMs: number, maxMs: number): Promise<void>;
+    /**
+     * 观察耗时
+     * 
+     * @param title 标题
+     * @param func 函数
+     */
+    public abstract stopWatch<T>(title: string, func: () => Promise<T>): Promise<T>;
     /**
      * 尝试执行函数
      * 

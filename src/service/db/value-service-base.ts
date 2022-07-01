@@ -135,7 +135,8 @@ export abstract class DbValueServiceBase<
             }
 
             logEntry.count = entry.values[r.valueType];
-            await logDb.add(logEntry);
+            if (logEntry.oldCount != logEntry.count)
+                await logDb.add(logEntry);
 
             await interceptor.after(uow, this, r);
         }

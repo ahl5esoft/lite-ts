@@ -41,6 +41,6 @@ export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFacto
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new EnumFactory(this.m_BuildFuncs, parentSpan);
+        return parentSpan ? new EnumFactory(this.m_BuildFuncs, parentSpan) : this;
     }
 }

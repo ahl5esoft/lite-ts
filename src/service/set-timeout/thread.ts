@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { ThreadBase } from '../..';
 
 /**
@@ -34,6 +35,22 @@ export class SetTimeoutThread extends ThreadBase {
             Math.random() * (maxMs - minMs)
         );
         await this.sleep(minMs + ms);
+    }
+
+    /**
+     * 观察耗时
+     * 
+     * @param title 标题
+     * @param func 函数
+     */
+    public async stopWatch<T>(title: string, func: () => Promise<T>) {
+        const begin = moment();
+        const res = await func();
+        console.log(
+            title,
+            moment().diff(begin, 'second', true)
+        );
+        return res;
     }
 
     /**

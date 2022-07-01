@@ -90,10 +90,8 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
         if (!(valueType in entry.values))
             entry.values[valueType] = 0;
 
-        const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
-            return cr.value == valueType;
-        });
-        if (valueTypeItem && valueTypeItem.data.dailyTime > 0) {
+        const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).getByValue(valueType);
+        if (valueTypeItem?.data.dailyTime > 0) {
             const nowUnix = await this.getNow(uow);
             const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
             const isSameDay = moment.unix(nowUnix).isSame(

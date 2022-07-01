@@ -53,6 +53,6 @@ export class JaegerDbFactory extends DbFactoryBase implements ITraceable<DbFacto
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new JaegerDbFactory(this.m_DbFactory, parentSpan);
+        return parentSpan ? new JaegerDbFactory(this.m_DbFactory, parentSpan) : this.m_DbFactory;
     }
 }

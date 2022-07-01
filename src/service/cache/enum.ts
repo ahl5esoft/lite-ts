@@ -10,8 +10,10 @@ export class CacheEnum<T extends IEnumItemData> implements IEnum<T> {
     public get items() {
         return new Promise<IEnumItem<T>[]>(async (s, f) => {
             try {
-                const res = await this.m_Cache.get<IEnumItem<T>[]>(this.m_Name);
-                s(res ?? []);
+                const res = await this.m_Cache.get<{ [value: number]: IEnumItem<T> }>(this.m_Name);
+                s(
+                    res ? Object.values(res) : []
+                );
             } catch (ex) {
                 f(ex);
             }
@@ -39,5 +41,15 @@ export class CacheEnum<T extends IEnumItemData> implements IEnum<T> {
         return items.find(r => {
             return predicate(r.data);
         });
+    }
+
+    /**
+     * 根据编号获取
+     * 
+     * @param v 值
+     */
+    public async getByValue(v: number) {
+        const allItem = await this.m_Cache.get<{ [value: number]: IEnumItem<T> }>(this.m_Name);
+        return allItem[v];
     }
 }

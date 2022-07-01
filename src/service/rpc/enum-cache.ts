@@ -67,6 +67,9 @@ export class RpcEnumCache extends CacheBase implements ITraceable<CacheBase> {
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
+        if (!parentSpan)
+            return this;
+
         const instance = new RpcEnumCache(
             this.m_NowTime,
             new TracerStrategy(this.m_Rpc).withTrace(parentSpan),

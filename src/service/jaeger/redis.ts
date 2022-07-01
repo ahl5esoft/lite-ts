@@ -1,11 +1,11 @@
 import { opentracing } from 'jaeger-client';
 
-import { IRedisGeoData, RedisBase } from '../..';
+import { IRedisGeoData, ITraceable, RedisBase } from '../../contract';
 
 /**
  * jeager redis
  */
-export class JeagerRedis extends RedisBase {
+export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
     private m_Span: opentracing.Span;
     /**
      * 跟踪
@@ -213,6 +213,15 @@ export class JeagerRedis extends RedisBase {
         return this.m_Redis.ttl(key);
     }
 
+    /**
+     * 跟踪
+     * 
+     * @param parentSpan 父范围
+     */
+    public withTrace(parentSpan: any) {
+        return parentSpan ? new JeagerRedis(this.m_Redis, parentSpan) : this.m_Redis;
+    }
+
     private async exec(cmd: string, args: any[], logData: { [key: string]: any; }) {
         try {
             const res = await this.m_Redis[cmd].bind(this.m_Redis).apply(this.m_Redis, args);
@@ -222,6 +231,9 @@ export class JeagerRedis extends RedisBase {
             });
             return res;
         } catch (ex) {
+            this.span.log({
+                err: ex
+            }).setTag(opentracing.Tags.ERROR, true);
             throw ex;
         } finally {
             this.span.finish();

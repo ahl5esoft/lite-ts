@@ -35,10 +35,10 @@ export class MultiConfigLoader extends ConfigLoaderBase implements ITraceable<Co
      * @param parentSpan 父范围
      */
     public withTrace(parentSpan: any) {
-        return new MultiConfigLoader(
+        return parentSpan ? new MultiConfigLoader(
             this.m_ConfigLoaders.map(r => {
                 return new TracerStrategy(r).withTrace(parentSpan);
             })
-        );
+        ) : this;
     }
 }

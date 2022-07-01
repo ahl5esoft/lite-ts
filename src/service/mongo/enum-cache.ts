@@ -17,9 +17,10 @@ export class MongoEnumCache extends CacheBase implements ITraceable<CacheBase> {
             this.m_Cache = new MemoryCache(this.m_NowTime, async () => {
                 const entries = await this.m_DbFactory.db(global.Enum).query().toArray();
                 return entries.reduce((memo, r) => {
-                    memo[r.id] = r.items.map(cr => {
-                        return new EnumItem(cr, r.id, this.m_Sep);
-                    });
+                    memo[r.id] = r.items.reduce((memo, cr) => {
+                        memo[cr.value] = new EnumItem(cr, r.id, this.m_Sep);
+                        return memo;
+                    }, {});
                     return memo;
                 }, {});
             }, this.m_CacheExpires);
@@ -67,12 +68,15 @@ export class MongoEnumCache extends CacheBase implements ITraceable<CacheBase> {
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        const instance = new MongoEnumCache(
+        if (!parentSpan)
+            return this;
+
+        const cache = new MongoEnumCache(
             new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
             this.m_NowTime,
             this.m_Sep
         );
-        instance.m_Cache = this.cache;
-        return instance;
+        cache.m_Cache = this.cache;
+        return cache;
     }
 }

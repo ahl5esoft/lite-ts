@@ -31,8 +31,8 @@ export class CacheConfigLoader extends ConfigLoaderBase implements ITraceable<Co
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new CacheConfigLoader(
+        return parentSpan ? new CacheConfigLoader(
             new TracerStrategy(this.m_Cache).withTrace(parentSpan),
-        );
+        ) : this;
     }
 }

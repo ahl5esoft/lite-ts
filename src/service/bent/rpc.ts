@@ -1,104 +1,18 @@
 import bent from 'bent';
 import { opentracing } from 'jaeger-client';
 
-import { CustomError } from '../error';
-import { IApiResponse, ITraceable, RpcBase } from '../../contract';
-
-/**
- * 包装器
- */
-class Wrapper extends RpcBase {
-    /**
-     * body数据
-     */
-    private m_Body: any;
-    /**
-     * 头数据
-     */
-    private m_Header: { [key: string]: string; };
-
-    private m_Span: opentracing.Span;
-    /**
-     * 跟踪范围
-     */
-    protected get span() {
-        if (!this.m_Span) {
-            this.m_Span = this.tracer.startSpan('rpc', {
-                childOf: this.m_ParentSpan
-            });
-        }
-
-        return this.m_Span;
-    }
-
-    private m_Tracer: opentracing.Tracer;
-    /**
-     * 跟踪
-     */
-    protected get tracer() {
-        if (!this.m_Tracer)
-            this.m_Tracer = opentracing.globalTracer();
-
-        return this.m_Tracer;
-    }
-
-    /**
-     * 构造函数
-     * 
-     * @param m_PostFunc 请求函数
-     * @param m_ParentSpan 父跟踪范围
-     */
-    public constructor(
-        private m_PostFunc: bent.RequestFunction<bent.Json>,
-        private m_ParentSpan: opentracing.Span
-    ) {
-        super();
-    }
-
-    public async call(route: string) {
-        const resp = await this.callWithoutThrow(route);
-        if (resp.err)
-            throw new CustomError(resp.err, resp.data);
-
-        return resp;
-    }
-
-    public async callWithoutThrow(route: string) {
-        const header = this.m_Header || {};
-        this.tracer.inject(this.span, opentracing.FORMAT_HTTP_HEADERS, header);
-        const res = await this.m_PostFunc(route, this.m_Body, header);
-        const resp = res as IApiResponse;
-        this.span.setTag('route', route).log({
-            result: resp
-        });
-        if (resp.err)
-            this.span.setTag(opentracing.Tags.ERROR, true);
-        this.span.finish();
-
-        return resp;
-    }
-
-    public setBody(v: any) {
-        this.span.log({
-            body: v
-        });
-        this.m_Body = v;
-        return this;
-    }
-
-    public setHeader(v: { [key: string]: string; }) {
-        this.span.log({
-            header: v
-        });
-        this.m_Header = v;
-        return this;
-    }
-}
+import { BentDefaultRpc } from './default-rpc';
+import { BentTracerRpc } from './tracer-rpc';
+import { ITraceable, RpcBase } from '../../contract';
 
 /**
  * 远程过程调用对象(基于bent实现)
  */
 export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
+    /**
+     * 创建rpc
+     */
+    private m_BuildFunc = (postFunc: bent.RequestFunction<bent.Json>) => new BentDefaultRpc(postFunc);
     /**
      * post请求函数
      */
@@ -108,12 +22,8 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * 构造函数
      * 
      * @param url 服务基地址
-     * @param m_ParentSpan 父跟踪范围
      */
-    public constructor(
-        url: string,
-        private m_ParentSpan?: opentracing.Span
-    ) {
+    public constructor(url: string) {
         super();
 
         this.m_PostFunc = bent(url, 'json', 'POST', 200);
@@ -131,8 +41,8 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      *  // resp is IApiDyanmicResponse<T>, 如果resp.err有效则会抛错
      * ```
      */
-    public call(route: string) {
-        return new Wrapper(this.m_PostFunc, this.m_ParentSpan).call(route);
+    public call<T>(route: string) {
+        return this.m_BuildFunc(this.m_PostFunc).call<T>(route);
     }
 
     /**
@@ -147,16 +57,14 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      *  // resp is IApiDyanmicResponse<T>
      * ```
      */
-    public callWithoutThrow(route: string) {
-        return new Wrapper(this.m_PostFunc, this.m_ParentSpan).callWithoutThrow(route);
+    public callWithoutThrow<T>(route: string) {
+        return this.m_BuildFunc(this.m_PostFunc).callWithoutThrow<T>(route);
     }
 
     /**
      * 设置body
      * 
-     * @param v body值
-     * 
-     * @returns 远程过程调用对象
+     * @param v 值
      * 
      * @example
      * ```typescript
@@ -165,17 +73,13 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * ```
      */
     public setBody(v: any) {
-        const wrapper = new Wrapper(this.m_PostFunc, this.m_ParentSpan);
-        wrapper.setBody(v);
-        return wrapper;
+        return this.m_BuildFunc(this.m_PostFunc).setBody(v);
     }
 
     /**
      * 设置请求头
      * 
-     * @param v 请求头
-     * 
-     * @returns 远程过程调用对象
+     * @param v 值
      * 
      * @example
      * ```typescript
@@ -184,9 +88,7 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * ```
      */
     public setHeader(v: { [key: string]: string; }) {
-        const wrapper = new Wrapper(this.m_PostFunc, this.m_ParentSpan);
-        wrapper.setHeader(v);
-        return wrapper;
+        return this.m_BuildFunc(this.m_PostFunc).setHeader(v);
     }
 
     /**
@@ -195,8 +97,18 @@ export class BentRpc extends RpcBase implements ITraceable<RpcBase> {
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        const rpc = new BentRpc('', parentSpan);
+        if (!parentSpan)
+            return this;
+
+        const rpc = new BentRpc('');
         rpc.m_PostFunc = this.m_PostFunc;
+
+        const tracer = opentracing.globalTracer();
+        const tracerSpan = tracer.startSpan('rpc', {
+            childOf: parentSpan,
+        });
+        rpc.m_BuildFunc = (postFunc: bent.RequestFunction<bent.Json>) => new BentTracerRpc(tracer, tracerSpan, postFunc);
+
         return rpc;
     }
 }

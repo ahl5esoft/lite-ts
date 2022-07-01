@@ -61,6 +61,6 @@ export class DbMultiFactory extends DbFactoryBase implements ITraceable<DbFactor
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return new DbMultiFactory(this.m_DbFactories, parentSpan);
+        return parentSpan ? new DbMultiFactory(this.m_DbFactories, parentSpan) : this;
     }
 }
