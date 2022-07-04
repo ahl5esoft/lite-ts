@@ -1,4 +1,4 @@
-import { IEnumItem, IEnumItemData } from '../..';
+import { IEnumItem, IEnumItemData } from '../../contract';
 
 /**
  * 枚举项

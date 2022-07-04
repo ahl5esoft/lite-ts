@@ -6,6 +6,7 @@ import {
     IUnitOfWork,
     IValueConditionData,
     IValueData,
+    NowTimeBase,
 } from '../../contract';
 import { enum_, global } from '../../model';
 
@@ -22,9 +23,11 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      * 构造函数
      * 
      * @param enumFactory 枚举工厂
+     * @param nowTime 当前时间
      */
     public constructor(
         protected enumFactory: EnumFactoryBase,
+        protected nowTime: NowTimeBase,
     ) { }
 
     /**
@@ -76,10 +79,10 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
     /**
      * 获取数量
      * 
-     * @param uow 工作单元(忽略)
+     * @param _ 工作单元(忽略)
      * @param valueType 数值类型
      */
-    public async getCount(uow: IUnitOfWork, valueType: number) {
+    public async getCount(_: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
         if (!entry) {
             entry = {
@@ -92,7 +95,7 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
 
         const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).getByValue(valueType);
         if (valueTypeItem?.data.dailyTime > 0) {
-            const nowUnix = await this.getNow(uow);
+            const nowUnix = await this.nowTime.unix();
             const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
             const isSameDay = moment.unix(nowUnix).isSame(
                 moment.unix(oldUnix),

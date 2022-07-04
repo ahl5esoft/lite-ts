@@ -21,11 +21,11 @@ export class RpcUserService implements IUserService {
         if (!this.m_ValueService) {
             this.m_ValueService = new RpcUserValueService(
                 this,
-                this.nowTime,
                 this.rpc,
                 this.m_TargetTypeData,
                 this.m_NowValueType,
                 this.enumFactory,
+                this.nowTime,
             );
         }
 

@@ -35,10 +35,10 @@ export class DbUserService implements IUserService {
         if (!this.m_ValueService) {
             this.m_ValueService = new DbUserValueService(
                 this,
-                this.nowTime,
                 this.nowValueType,
                 this.dbFactory,
                 this.enumFactory,
+                this.nowTime,
                 this.stringGenerator,
                 this.valueInterceptorFactory,
             );
@@ -105,6 +105,6 @@ export class DbUserService implements IUserService {
         return new RpcValueService(this, this.rpc, targetTypeData, {
             no: targetNo,
             userID: this.userID,
-        } as global.UserTargetValue, this.enumFactory);
+        } as global.UserTargetValue, this.enumFactory, this.nowTime);
     }
 }

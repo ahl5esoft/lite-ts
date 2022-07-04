@@ -110,5 +110,41 @@ enum ValueType {
                 value: 1
             }]);
         });
+
+        it('对象标签', async () => {
+            const mockIOFactory = new Mock<IOFactoryBase>();
+            const self = new Self(mockIOFactory.actual);
+
+            const mockFile = new Mock<IOFileBase>();
+            const filePath = 'file-path';
+            mockIOFactory.expectReturn(
+                r => r.buildFile(filePath),
+                mockFile.actual
+            );
+
+            mockFile.expectReturn(
+                r => r.readString(),
+                `/**
+* 枚举对象
+*/
+enum ValueType {
+    /**
+     * [anyPet.genus=4][anyPet.grade=100_008]任意品级八属系四宠物
+    */
+    anyPetGenusDGradeH = 490_052,
+}`
+            );
+
+            const res = await self.parse(filePath);
+            deepStrictEqual(res, [{
+                anyPet: {
+                    genus: 4,
+                    grade: 100_008
+                },
+                key: 'anyPetGenusDGradeH',
+                text: '任意品级八属系四宠物',
+                value: 490_052
+            }]);
+        });
     });
 });

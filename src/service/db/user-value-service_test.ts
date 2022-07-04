@@ -9,7 +9,7 @@ describe('src/service/user/value-service.ts', () => {
     describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][])', () => {
         it('ok', async () => {
             const mockUserService = new Mock<IUserService>();
-            const self = new Self(mockUserService.actual, null, 0, null, null, null, null);
+            const self = new Self(mockUserService.actual, 0, null, null, null, null, null);
 
             const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
             mockUserService.expectReturn(
@@ -87,7 +87,7 @@ describe('src/service/user/value-service.ts', () => {
 
     describe('.getNow(uow: IUnitOfWork)', () => {
         it('数值', async () => {
-            const self = new Self(null, null, 1, null, null, null, null);
+            const self = new Self(null, 1, null, null, null, null, null);
 
             const mockUow = new Mock<IUnitOfWork>();
             Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
@@ -102,7 +102,7 @@ describe('src/service/user/value-service.ts', () => {
 
         it('NowTime', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
-            const self = new Self(null, mockNowTime.actual, 1, null, null, null, null);
+            const self = new Self(null, 1, null, null, mockNowTime.actual, null, null);
 
             const mockUow = new Mock<IUnitOfWork>();
             Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
@@ -124,7 +124,7 @@ describe('src/service/user/value-service.ts', () => {
     describe('.update(uow: IUnitOfWork, values: IValueData[])', () => {
         it('ok', async () => {
             const mockUserService = new Mock<IUserService>();
-            const self = new Self(mockUserService.actual, null, 0, null, null, null, null);
+            const self = new Self(mockUserService.actual, 0, null, null, null, null, null);
 
             const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
             mockUserService.expectReturn(
@@ -186,7 +186,7 @@ describe('src/service/user/value-service.ts', () => {
             const userID = 'user-id';
             const self = new Self({
                 userID: userID
-            } as IUserService, null, 0, null, null, null, null);
+            } as IUserService, 0, null, null, null, null, null);
 
             const source = 'test';
             const rewards = [

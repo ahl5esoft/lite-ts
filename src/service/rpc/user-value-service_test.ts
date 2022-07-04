@@ -8,7 +8,7 @@ import { enum_ } from '../../model';
 describe('src/service/rpc/user-value-service.ts', () => {
     describe('.getNow(uow: IUnitOfWork)', () => {
         it('数值', async () => {
-            const self = new Self(null, null, null, {} as enum_.TargetTypeData, 1, null);
+            const self = new Self(null, null, {} as enum_.TargetTypeData, 1, null, null);
 
             const mockUow = new Mock<IUnitOfWork>();
             Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
@@ -23,7 +23,7 @@ describe('src/service/rpc/user-value-service.ts', () => {
 
         it('NowTime', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
-            const self = new Self(null, mockNowTime.actual, null, {} as enum_.TargetTypeData, 1, null);
+            const self = new Self(null, null, {} as enum_.TargetTypeData, 1, null, mockNowTime.actual);
 
             const mockUow = new Mock<IUnitOfWork>();
             Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
@@ -49,9 +49,9 @@ describe('src/service/rpc/user-value-service.ts', () => {
                 userID
             });
             const mockRpc = new Mock<RpcBase>();
-            const self = new Self(mockUserService.actual, null, mockRpc.actual, {
+            const self = new Self(mockUserService.actual, mockRpc.actual, {
                 app: 'prop'
-            } as enum_.TargetTypeData, 0, null);
+            } as enum_.TargetTypeData, 0, null, null);
 
             mockRpc.expectReturn(
                 r => r.setBody({
@@ -83,9 +83,9 @@ describe('src/service/rpc/user-value-service.ts', () => {
             const mockUserService = new Mock<IUserService>({
                 userID
             });
-            const self = new Self(mockUserService.actual, null, mockRpc.actual, {
+            const self = new Self(mockUserService.actual, mockRpc.actual, {
                 app: 'prop'
-            } as enum_.TargetTypeData, 0, null);
+            } as enum_.TargetTypeData, 0, null, null);
 
             const source = 'test'
             mockRpc.expectReturn(

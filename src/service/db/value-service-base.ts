@@ -8,6 +8,7 @@ import {
     IUnitOfWork,
     IUserAssociateService,
     IValueData,
+    NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../../contract';
@@ -32,6 +33,7 @@ export abstract class DbValueServiceBase<
      * @param changeModel 数值变更模型
      * @param logModel 数值日志模型
      * @param enumFactory 枚举工厂
+     * @param nowTime 当前时间
      */
     public constructor(
         protected associateService: IUserAssociateService,
@@ -42,8 +44,9 @@ export abstract class DbValueServiceBase<
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
         enumFactory: EnumFactoryBase,
+        nowTime: NowTimeBase,
     ) {
-        super(enumFactory);
+        super(enumFactory, nowTime);
     }
 
     /**

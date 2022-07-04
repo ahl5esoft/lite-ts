@@ -10,3 +10,6 @@ Default:
         type: const
         param: 1
   port: 9999
+  redis:
+    host: 127.0.0.1
+    port: 6379

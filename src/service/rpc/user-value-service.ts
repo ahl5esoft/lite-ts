@@ -44,20 +44,21 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
      * 构造函数
      * 
      * @param userService 用户服务
-     * @param m_NowTime 当前时间
      * @param m_Rpc 远程过程调用
+     * @param m_TargetTypeData 目标类型数据
      * @param m_NowValueType 当前时间数值类型
      * @param enumFactory 枚举工厂
+     * @param nowTime 当前时间
      */
     public constructor(
         public userService: IUserService,
-        private m_NowTime: NowTimeBase,
         private m_Rpc: RpcBase,
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_NowValueType: number,
         enumFactory: EnumFactoryBase,
+        nowTime: NowTimeBase,
     ) {
-        super(enumFactory);
+        super(enumFactory, nowTime);
     }
 
     /**
@@ -68,7 +69,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
     public async getNow(uow: IUnitOfWork) {
         let now = await this.getCount(uow, this.m_NowValueType);
         if (!now)
-            now = await this.m_NowTime.unix();
+            now = await this.nowTime.unix();
 
         return now;
     }

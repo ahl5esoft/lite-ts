@@ -4,6 +4,7 @@ import {
     IUnitOfWork,
     IUserService,
     IValueData,
+    NowTimeBase,
     RpcBase
 } from '../../contract';
 import { enum_, global } from '../../model';
@@ -36,6 +37,7 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
      * @param m_TargetTypeData 目标类型数据
      * @param m_Entry 实体
      * @param enumFactory 数值枚举
+     * @param nowTime 当前时间
      */
     public constructor(
         private m_UserService: IUserService,
@@ -43,8 +45,9 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_Entry: T,
         enumFactory: EnumFactoryBase,
+        nowTime: NowTimeBase,
     ) {
-        super(enumFactory);
+        super(enumFactory, nowTime);
     }
 
     /**
