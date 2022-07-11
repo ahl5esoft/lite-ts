@@ -1,4 +1,4 @@
-import { ICommandResult } from './i-command-result';
+import { response } from '../model';
 
 /**
  * 命令行基类
@@ -7,7 +7,7 @@ export abstract class CommandBase {
     /**
      * 执行命令
      */
-    public abstract exec(...args: string[]): Promise<ICommandResult>;
+    public abstract exec(...args: string[]): Promise<response.CommandResult>;
 
     /**
      * 设置命令执行时的路径

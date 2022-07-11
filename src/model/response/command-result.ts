@@ -1,6 +1,7 @@
-import { ICommandResult } from '../..';
-
-export class CommandResult implements ICommandResult {
+/**
+ * 命令结果
+ */
+export class CommandResult {
     public code: number;
     public errBf: string[] = [];
     public outBf: string[] = [];

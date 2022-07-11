@@ -1,7 +1,7 @@
 import { opentracing } from 'jaeger-client';
 import Container from 'typedi';
 
-import { valueInterceptorCtor } from './interceptor-metadata';
+import { valueInterceptorMetadata } from './interceptor-metadata';
 import { TracerStrategy } from '../tracer';
 import { ITraceable, IValueInterceptor, ValueInterceptorFactoryBase } from '../../contract';
 
@@ -35,11 +35,18 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
      * 
      * @param valueType 数值类型
      */
-    public build(valueType: number) {
-        const ctor = valueInterceptorCtor[valueType];
-        if (ctor) {
-            const interceptor = Container.get(ctor);
-            Container.remove(ctor);
+    public async build(valueType: number) {
+        if (!valueInterceptorMetadata.valueType[valueType]) {
+            for (const r of valueInterceptorMetadata.predicates) {
+                const ok = await r.predicate(valueType);
+                if (ok)
+                    valueInterceptorMetadata.valueType[valueType] = r.ctor;
+            }
+        }
+
+        if (valueInterceptorMetadata.valueType[valueType]) {
+            const interceptor = Container.get(valueInterceptorMetadata.valueType[valueType]);
+            Container.remove(valueInterceptorMetadata.valueType[valueType]);
 
             return new TracerStrategy(interceptor).withTrace(this.m_ParentSpan);
         }

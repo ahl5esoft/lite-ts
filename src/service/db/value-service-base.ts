@@ -20,7 +20,7 @@ import { enum_, global } from '../../model';
 export abstract class DbValueServiceBase<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
-    TLog extends global.UserValueLog,
+    TLog extends global.UserValueLog
     > extends TargetValueServiceBase<T> {
     /**
      * 构造函数
@@ -96,7 +96,7 @@ export abstract class DbValueServiceBase<
             if (!(r.valueType in entry.values))
                 entry.values[r.valueType] = 0;
 
-            const interceptor = this.valueInterceptorFactory.build(r.valueType);
+            const interceptor = await this.valueInterceptorFactory.build(r.valueType);
             const isIntercepted = await interceptor.before(uow, this, r);
             if (isIntercepted)
                 continue;

@@ -1,4 +1,4 @@
-import { EnumFactoryBase, IParser, IValueData } from '../..';
+import { EnumFactoryBase, IParser, IValueData } from '../../contract';
 import { enum_ } from '../../model';
 
 interface IReward extends IValueData {

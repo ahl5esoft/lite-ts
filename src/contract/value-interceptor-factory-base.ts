@@ -9,5 +9,5 @@ export abstract class ValueInterceptorFactoryBase {
      * 
      * @param valueType 数值类型
      */
-    public abstract build(valueType: number): IValueInterceptor;
+    public abstract build(valueType: number): Promise<IValueInterceptor>;
 }

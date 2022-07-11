@@ -11,7 +11,6 @@ export * from './i-api-dynamic-response';
 export * from './i-api-port';
 export * from './i-api-response';
 export * from './i-api-session';
-export * from './i-command-result';
 export * from './i-db-query';
 export * from './i-enum';
 export * from './i-enum-item';

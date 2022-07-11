@@ -1,7 +1,7 @@
 import { ChildProcessWithoutNullStreams, CommonSpawnOptions, spawn } from 'child_process';
 
-import { CommandResult } from '../command';
-import { CommandBase, ICommandResult } from '../..';
+import { CommandBase } from '../../contract';
+import { response } from '../../model';
 
 class CommandWrapper implements CommandBase {
     private m_Dir: string;
@@ -15,7 +15,7 @@ class CommandWrapper implements CommandBase {
         if (this.m_Timeout)
             opt.timeout = this.m_Timeout;
 
-        const res = new CommandResult();
+        const res = new response.CommandResult();
         let child: ChildProcessWithoutNullStreams;
         child = args.reduce((memo, r) => {
             if (r == '|')
@@ -62,7 +62,7 @@ class CommandWrapper implements CommandBase {
             }, this.m_Timeout);
         }
 
-        return new Promise<ICommandResult>((s, f) => {
+        return new Promise<response.CommandResult>((s, f) => {
             child.on('error', err => {
                 if (timeout)
                     clearTimeout(timeout);

@@ -5,7 +5,7 @@ export abstract class CacheBase {
     /**
      * 清空
      */
-    public abstract flush(): void;
+    public abstract flush(): Promise<void>;
     /**
      * 获取
      * 

@@ -10,7 +10,7 @@ import {
     IApiResponse,
     IOFactoryBase,
     LogBase,
-    model,
+    NowTimeBase,
     RedisBase,
     service
 } from '../../src';
@@ -19,11 +19,12 @@ import {
     const cfg = await service.initIoC();
 
     const dbFactory = Container.get<DbFactoryBase>(DbFactoryBase as any);
+    const nowTime = Container.get<NowTimeBase>(NowTimeBase as any);
     const enumDataSource = new service.MongoEnumDataSource(dbFactory, '-');
     const redis = Container.get<RedisBase>(RedisBase as any);
-    const redisCache = new service.RedisCase(redis, async () => {
+    const redisCache = new service.RedisCache(nowTime, redis, async () => {
         return enumDataSource.findEnums();
-    }, model.global.Enum.name);
+    }, 'lite-ts:enum');
     Container.set(
         EnumFactoryBase,
         new service.EnumFactory({

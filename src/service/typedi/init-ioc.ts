@@ -9,13 +9,14 @@ import { IoredisAdapter } from '../ioredis';
 import { JaegerDbFactory, JeagerRedis } from '../jaeger';
 import { JsYamlConfigLoader } from '../js-yaml';
 import { LogProxy } from '../log';
-import { MongoDbFactory, MongoStringGenerator } from '../mongo';
-import { RedisNowTime } from '../redis';
+import { loadMongoConfigDataSource, MongoDbFactory, MongoEnumDataSource, MongoStringGenerator } from '../mongo';
+import { RedisCache, RedisLock, RedisNowTime } from '../redis';
 import { SetTimeoutThread } from '../set-timeout';
 import {
     ConfigLoaderBase,
     DbFactoryBase,
     IOFactoryBase,
+    LockBase,
     LogBase,
     NowTimeBase,
     RedisBase,
@@ -23,7 +24,7 @@ import {
     StringGeneratorBase,
     ThreadBase
 } from '../../contract';
-import { config } from '../../model';
+import { config, enum_, global } from '../../model';
 
 /**
  * 初始化IoC
@@ -52,7 +53,6 @@ export async function initIoC(rootDirPath?: string) {
     Container.set(ConfigLoaderBase, configLaoder);
 
     const cfg = await configLaoder.load(config.Default);
-
     const pkg = await ioFactory.buildFile(rootDirPath, 'package.json').readJSON<{ version: string }>();
     cfg.version = pkg.version;
 
@@ -75,30 +75,45 @@ export async function initIoC(rootDirPath?: string) {
     }
 
     const mongo = cfg.distributedMongo || cfg.mongo;
+    let dbFactory: DbFactoryBase;
     if (mongo) {
-        const dbFactory = new MongoDbFactory(!!cfg.distributedMongo, cfg.name, mongo);
+        dbFactory = new MongoDbFactory(!!cfg.distributedMongo, cfg.name, mongo);
         Container.set(
             DbFactoryBase,
             new JaegerDbFactory(dbFactory)
         );
     }
 
+    let redis: RedisBase;
+    let nowTime: NowTimeBase;
     if (cfg.redis) {
-        const redis = new IoredisAdapter(cfg.redis);
+        redis = new IoredisAdapter(cfg.redis);
         Container.set(
             RedisBase,
             new JeagerRedis(redis)
         );
 
+        nowTime = new RedisNowTime(redis);
+
         Container.set(
-            NowTimeBase,
-            new RedisNowTime(redis)
+            LockBase,
+            new RedisLock(redis)
         );
     } else {
-        Container.set(
-            NowTimeBase,
-            new DateNowTime()
-        );
+        nowTime = new DateNowTime();
+    }
+    Container.set(NowTimeBase, nowTime);
+
+    if (redis && dbFactory.constructor == MongoDbFactory) {
+        const configCache = new RedisCache(nowTime, redis, () => {
+            return loadMongoConfigDataSource(dbFactory);
+        }, `${cfg.name}:${global.Config.name}`);
+        Container.set(enum_.IoC.configCache, configCache);
+
+        const enumCache = new RedisCache(nowTime, redis, () => {
+            return new MongoEnumDataSource(dbFactory, '-').findEnums();
+        }, `${cfg.name}:${global.Enum.name}`);
+        Container.set(enum_.IoC.enumCache, enumCache);
     }
 
     Container.set(
