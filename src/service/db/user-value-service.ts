@@ -198,7 +198,7 @@ export class DbUserValueService extends DbValueServiceBase<
             }
             res.push({
                 count: rewardData.count,
-                source: source,
+                source: rewardData.source ?? source,
                 valueType: rewardData.valueType
             });
         }
