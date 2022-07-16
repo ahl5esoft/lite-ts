@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserValueService as Self } from './user-value-service';
 import { Mock } from '../assert';
-import { IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData, NowTimeBase } from '../../contract';
+import { EnumFactoryBase, IEnum, IRewardData, ITargetValueService, IUnitOfWork, IUserService, IValueData, NowTimeBase } from '../../contract';
 import { enum_, global } from '../../model';
 
 describe('src/service/user/value-service.ts', () => {
@@ -182,11 +182,37 @@ describe('src/service/user/value-service.ts', () => {
     });
 
     describe('.updateByRewards(uow: IUnitOfWork, rewards: IRewardData[][], source: string)', () => {
-        it('', async () => {
+        it('ok', async () => {
             const userID = 'user-id';
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self({
                 userID: userID
-            } as IUserService, 0, null, null, null, null, null);
+            } as IUserService, 0, null, mockEnumFactory.actual, null, null, null);
+
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockEnum.actual
+            );
+            mockEnum.expectReturn(
+                r => r.getByValue(1),
+                {
+                    data: {
+                        value: 1,
+                        goodsNo: 301001,
+                        goodsType: 1
+                    }
+                }
+            );
+            mockEnum.expectReturn(
+                r => r.getByValue(2),
+                {
+                    data: {
+                        value: 2,
+                        goodsType: 2
+                    }
+                }
+            );
 
             const source = 'test';
             const rewards = [
@@ -204,7 +230,7 @@ describe('src/service/user/value-service.ts', () => {
                     weight: 1
                 }]
             ] as IRewardData[][];
-            const expectRes = [{
+            const expectValues = [{
                 count: 11,
                 source: source,
                 valueType: 1
@@ -213,14 +239,24 @@ describe('src/service/user/value-service.ts', () => {
                 source: source,
                 valueType: 2
             }];
+
+            const expectRes = [{
+                count: 11,
+                valueType: 301001,
+                goodsType: 1
+            }, {
+                count: 22,
+                valueType: 2,
+                goodsType: 2
+            }];
             Reflect.set(self, 'update', (arg: IUnitOfWork, arg1: IValueData[]) => {
                 deepStrictEqual(
                     [arg, arg1],
                     [
                         null,
-                        expectRes
+                        expectValues
                     ]
-                )
+                );
             });
 
             const res = await self.updateByRewards(null, source, rewards);

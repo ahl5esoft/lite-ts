@@ -2,6 +2,7 @@ import { DbValueServiceBase } from './value-service-base';
 import {
     DbFactoryBase,
     EnumFactoryBase,
+    IClientValueData,
     IRewardData,
     IUnitOfWork,
     IUserService,
@@ -12,7 +13,7 @@ import {
     StringGeneratorBase,
     ValueInterceptorFactoryBase
 } from '../../contract';
-import { global } from '../../model';
+import { enum_, global } from '../../model';
 
 /**
  * 用户数值服务
@@ -176,7 +177,9 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param source 来源
      */
     public async updateByRewards(uow: IUnitOfWork, source: string, rewards: IRewardData[][]) {
-        let res: IValueData[] = [];
+        const values: IValueData[] = [];
+        const res: IClientValueData[] = [];
+        const valueTypeDataEnums = this.enumFactory.build(enum_.ValueTypeData);
         for (const r of rewards) {
             if (!r.length)
                 continue;
@@ -196,15 +199,21 @@ export class DbUserValueService extends DbValueServiceBase<
                     return rand <= 0;
                 });
             }
-            res.push({
+            const valueTypeData = await valueTypeDataEnums.getByValue(rewardData.valueType);
+            values.push({
                 count: rewardData.count,
                 source: rewardData.source ?? source,
                 valueType: rewardData.valueType
             });
+            res.push({
+                count: rewardData.count,
+                valueType: valueTypeData.data.goodsNo ?? valueTypeData.data.value,
+                goodsType: valueTypeData.data.goodsType ?? 1
+            });
         }
 
-        if (res.length)
-            await this.update(uow, res);
+        if (values.length)
+            await this.update(uow, values);
 
         return res;
     }

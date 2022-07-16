@@ -7,6 +7,7 @@ export * from './db-factory-base';
 export * from './db-repository-base';
 export * from './enum-factory-base';
 export * from './i-api';
+export * from './i-client-value-data';
 export * from './i-api-dynamic-response';
 export * from './i-api-port';
 export * from './i-api-response';

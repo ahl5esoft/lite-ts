@@ -49,6 +49,40 @@ export class ValueTypeData implements IEnumItemData {
      */
     public dailyTime?: number;
     /**
+     * 道具编号(客户端使用)
+     * 
+     * @example
+     * ```typescript
+     *  const valueTypeDatas: IValueTypeData[] = [{
+     *      value: 1,
+     *      text: '金币',
+     *      goodsNo: 1021
+     *  }];
+     * 
+     *  const valueService: ITargetValueService;
+     *  valueService.data = {
+     *      id: '目标ID',
+     *      values: [{
+     *          1: 5
+     *      }]
+     *  };
+     * 
+     *  await valueService.update(工作单元, [{
+     *      count: 100,
+     *      valueType: 1
+     *  }]);
+     *  const res = await valueService.getCount(工作单元, 1);
+     * ```
+     */
+    public goodsNo?: number;
+    /**
+     * 道具类型
+     * 1.普通道具
+     * 2.装备
+     * 3.宠物
+     */
+    public goodsType?: number;
+    /**
      * 数值类型更新之后的值可为负数
      * 
      * @example

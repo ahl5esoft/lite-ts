@@ -1,6 +1,7 @@
 import { TargetValueServiceBase } from '../target';
 import {
     EnumFactoryBase,
+    IClientValueData,
     IRewardData,
     IUnitOfWork,
     IUserService,
@@ -31,7 +32,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
         return new Promise<global.UserValue>(async (s, f) => {
             try {
                 const entries = await this.userService.associateService.find<global.UserValue>(global.UserValue.name, r => {
-                    return r.id == this.userService.userID
+                    return r.id == this.userService.userID;
                 });
                 s(entries[0]);
             } catch (ex) {
@@ -99,7 +100,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
             rewards,
             source: source,
             userID: this.userService.userID,
-        }).call<IValueData[]>(`/${this.m_TargetTypeData.app}/ih/${RpcUserValueService.updateByRewardsRoute}`);
+        }).call<IClientValueData[]>(`/${this.m_TargetTypeData.app}/ih/${RpcUserValueService.updateByRewardsRoute}`);
         return resp.data;
     }
 }

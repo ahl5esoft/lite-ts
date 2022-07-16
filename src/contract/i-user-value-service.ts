@@ -1,8 +1,8 @@
+import { IClientValueData } from './i-client-value-data';
 import { IRewardData } from './i-reward-data';
 import { ITargetValueService } from './i-target-value-service';
 import { IUnitOfWork } from './i-unit-of-work';
 import { IUserService } from './i-user-service';
-import { IValueData } from './i-value-data';
 import { global } from '../model';
 
 /**
@@ -25,5 +25,5 @@ export interface IUserValueService extends ITargetValueService<global.UserValue>
      * @param rewards 
      * @param source 
      */
-    updateByRewards(uow: IUnitOfWork, source: string, rewards: IRewardData[][]): Promise<IValueData[]>;
+    updateByRewards(uow: IUnitOfWork, source: string, rewards: IRewardData[][]): Promise<IClientValueData[]>;
 }
