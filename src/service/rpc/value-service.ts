@@ -60,7 +60,7 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
         await this.m_Rpc.setBody({
             ...this.m_Entry,
             values: values
-        }).call<void>(`/${this.m_TargetTypeData.app}/ih/update-values-by-user-id`);
+        }).call<void>(`/${this.m_TargetTypeData.app}/update-values-by-user-id`);
     }
 
     /**

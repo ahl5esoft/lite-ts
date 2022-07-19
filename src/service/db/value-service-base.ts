@@ -87,16 +87,18 @@ export abstract class DbValueServiceBase<
 
         const logDb = this.dbFactory.db(this.logModel, uow);
         for (const r of values) {
+            if (typeof r.valueType != 'number' || typeof r.count != 'number')
+                continue;
+
             const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
                 return cr.value == r.valueType;
             });
             if (!valueTypeItem?.data.isReplace && r.count == 0)
                 continue;
 
-            if (!(r.valueType in entry.values))
-                entry.values[r.valueType] = 0;
+            entry.values[r.valueType] ??= 0;
 
-            const interceptor = await this.valueInterceptorFactory.build(r.valueType);
+            const interceptor = await this.valueInterceptorFactory.build(r);
             const isIntercepted = await interceptor.before(uow, this, r);
             if (isIntercepted)
                 continue;

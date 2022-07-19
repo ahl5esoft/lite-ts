@@ -65,7 +65,7 @@ describe('src/service/rpc/user-value-service.ts', () => {
             );
 
             mockRpc.expectReturn(
-                r => r.call(`/prop/ih/${Self.updateRoute}`),
+                r => r.call(`/prop/${Self.updateRoute}`),
                 {}
             );
 
@@ -98,7 +98,7 @@ describe('src/service/rpc/user-value-service.ts', () => {
             );
 
             mockRpc.expectReturn(
-                r => r.call(`/prop/ih/${Self.updateByRewardsRoute}`),
+                r => r.call(`/prop/${Self.updateByRewardsRoute}`),
                 {
                     data: [{}]
                 }

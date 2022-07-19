@@ -1,4 +1,5 @@
 import { IValueInterceptor } from '../../contract';
+import { enum_ } from '../../model';
 
 /**
  * 数值拦截元数据
@@ -15,7 +16,7 @@ export const valueInterceptorMetadata = {
         /**
          * 断言
          */
-        predicate: (valueType: number) => Promise<boolean>
+        predicate: (valueType: enum_.ValueTypeData) => boolean
     }[],
     /**
      * 数值类型

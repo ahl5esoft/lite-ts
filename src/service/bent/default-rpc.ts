@@ -47,8 +47,8 @@ export class BentDefaultRpc extends RpcBase {
      */
     public async callWithoutThrow<T>(route: string) {
         const routeArgs = route.split('/');
-        if (routeArgs.length == 2)
-            routeArgs.splice(1, 0, 'ih');
+        if (routeArgs.length == 3)
+            routeArgs.splice(2, 0, 'ih');
         route = routeArgs.join('/');
         const resp = await this.postFunc(route, this.body, this.header || {});
         return resp as IApiDyanmicResponse<T>;

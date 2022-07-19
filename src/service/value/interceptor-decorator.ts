@@ -1,5 +1,6 @@
 import { valueInterceptorMetadata } from './interceptor-metadata';
 import { IValueInterceptor } from '../../contract';
+import { enum_ } from '../../model';
 
 /**
  * 数值拦截器
@@ -13,14 +14,14 @@ export function ValueIntercept(valueType: number): (ctor: new () => IValueInterc
  * 
  * @param predicate 断言
  */
-export function ValueIntercept(predicate: (valueType: number) => Promise<boolean>): (ctor: new () => IValueInterceptor) => void;
+export function ValueIntercept(predicate: (valueType: enum_.ValueTypeData) => boolean): (ctor: new () => IValueInterceptor) => void;
 
 /**
  * 数值拦截装饰器
  * 
  * @param any 数值类型或断言
  */
-export function ValueIntercept(any: number | ((valueType: number) => Promise<boolean>)) {
+export function ValueIntercept(any: number | ((valueType: enum_.ValueTypeData) => boolean)) {
     return (ctor: new () => IValueInterceptor) => {
         if (typeof any == 'number') {
             valueInterceptorMetadata.valueType[any] = ctor;

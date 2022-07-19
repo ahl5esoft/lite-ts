@@ -2,19 +2,15 @@ import { opentracing } from 'jaeger-client';
 import Container from 'typedi';
 
 import { valueInterceptorMetadata } from './interceptor-metadata';
+import { NullValueInterceptor } from './null-interceptor';
 import { TracerStrategy } from '../tracer';
-import { ITraceable, IValueInterceptor, ValueInterceptorFactoryBase } from '../../contract';
+import { EnumFactoryBase, ITraceable, IValueData, ValueInterceptorFactoryBase } from '../../contract';
+import { enum_ } from '../../model';
 
 /**
  * null数值拦截器
  */
-const nullValueInterceptor: IValueInterceptor = {
-    after: async () => { },
-    before: async () => {
-        return false;
-    }
-};
-
+const nullValueInterceptor = new NullValueInterceptor();
 /**
  * 数值拦截器工厂
  */
@@ -22,9 +18,11 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
     /**
      * 构造函数
      * 
+     * @param m_EnumFactory 枚举工厂
      * @param m_ParentSpan 父跟踪范围
      */
     public constructor(
+        private m_EnumFactory: EnumFactoryBase,
         private m_ParentSpan?: opentracing.Span
     ) {
         super();
@@ -33,20 +31,26 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
     /**
      * 创建数值拦截器
      * 
-     * @param valueType 数值类型
+     * @param value 数值
      */
-    public async build(valueType: number) {
-        if (!valueInterceptorMetadata.valueType[valueType]) {
-            for (const r of valueInterceptorMetadata.predicates) {
-                const ok = await r.predicate(valueType);
-                if (ok)
-                    valueInterceptorMetadata.valueType[valueType] = r.ctor;
+    public async build(value: IValueData) {
+        if (value.isSkipIntercept)
+            return nullValueInterceptor;
+
+        if (!valueInterceptorMetadata.valueType[value.valueType]) {
+            const valueTypeItem = await this.m_EnumFactory.build(enum_.ValueTypeData).getByValue(value.valueType);
+            if (valueTypeItem) {
+                for (const r of valueInterceptorMetadata.predicates) {
+                    const ok = r.predicate(valueTypeItem.data);
+                    if (ok)
+                        valueInterceptorMetadata.valueType[value.valueType] = r.ctor;
+                }
             }
         }
 
-        if (valueInterceptorMetadata.valueType[valueType]) {
-            const interceptor = Container.get(valueInterceptorMetadata.valueType[valueType]);
-            Container.remove(valueInterceptorMetadata.valueType[valueType]);
+        if (valueInterceptorMetadata.valueType[value.valueType]) {
+            const interceptor = Container.get(valueInterceptorMetadata.valueType[value.valueType]);
+            Container.remove(valueInterceptorMetadata.valueType[value.valueType]);
 
             return new TracerStrategy(interceptor).withTrace(this.m_ParentSpan);
         }
@@ -60,6 +64,9 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new ValueInterceptorFactory(parentSpan) : this;
+        return parentSpan ? new ValueInterceptorFactory(
+            new TracerStrategy(this.m_EnumFactory).withTrace(parentSpan),
+            parentSpan,
+        ) : this;
     }
 }

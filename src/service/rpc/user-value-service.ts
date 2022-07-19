@@ -84,7 +84,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
         await this.m_Rpc.setBody({
             userID: this.userService.userID,
             values: values
-        }).call<void>(`/${this.m_TargetTypeData.app}/ih/${RpcUserValueService.updateRoute}`);
+        }).call<void>(`/${this.m_TargetTypeData.app}/${RpcUserValueService.updateRoute}`);
     }
 
     /**
@@ -99,7 +99,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
             rewards,
             source: source,
             userID: this.userService.userID,
-        }).call<IValueData[]>(`/${this.m_TargetTypeData.app}/ih/${RpcUserValueService.updateByRewardsRoute}`);
+        }).call<IValueData[]>(`/${this.m_TargetTypeData.app}/${RpcUserValueService.updateByRewardsRoute}`);
         return resp.data;
     }
 }

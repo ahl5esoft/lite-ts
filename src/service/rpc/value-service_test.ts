@@ -38,7 +38,7 @@ describe('src/service/rpc/value-service.ts', () => {
             );
 
             mockRpc.expectReturn(
-                r => r.call('/test/ih/update-values-by-user-id'),
+                r => r.call('/test/update-values-by-user-id'),
                 {}
             );
 

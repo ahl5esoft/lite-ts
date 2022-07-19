@@ -13,7 +13,7 @@ describe('src/service/rpc/load-enum-data-source.ts', () => {
             const self = new Self(mockRpc.actual, 'app', '-');
 
             mockRpc.expectReturn(
-                r => r.call<global.Enum[]>(`/app/ih/find-all-enums`),
+                r => r.call<global.Enum[]>(`/app/find-all-enums`),
                 {
                     err: 0,
                     data: [{

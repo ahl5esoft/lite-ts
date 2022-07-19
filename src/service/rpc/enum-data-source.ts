@@ -22,7 +22,7 @@ export class RpcEnumDataSource extends EnumDataSourceBase {
     }
 
     protected async load() {
-        const resp = await this.m_Rpc.call<global.Enum[]>(`/${this.m_App}/ih/find-all-enums`);
+        const resp = await this.m_Rpc.call<global.Enum[]>(`/${this.m_App}/find-all-enums`);
         return resp.data;
     }
 }

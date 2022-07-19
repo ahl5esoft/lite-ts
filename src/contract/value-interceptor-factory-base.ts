@@ -1,3 +1,4 @@
+import { IValueData } from './i-value-data';
 import { IValueInterceptor } from './i-value-interceptor';
 
 /**
@@ -7,7 +8,7 @@ export abstract class ValueInterceptorFactoryBase {
     /**
      * 创建数值拦截器
      * 
-     * @param valueType 数值类型
+     * @param value 数值
      */
-    public abstract build(valueType: number): Promise<IValueInterceptor>;
+    public abstract build(value: IValueData): Promise<IValueInterceptor>;
 }
