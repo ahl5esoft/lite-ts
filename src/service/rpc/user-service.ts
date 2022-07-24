@@ -2,17 +2,17 @@ import { RpcUserValueService } from './user-value-service';
 import {
     EnumFactoryBase,
     IUserAssociateService,
-    IUserService,
     IUserValueService,
     NowTimeBase,
     RpcBase,
+    UserServiceBase,
 } from '../../contract';
 import { enum_ } from '../../model';
 
 /**
  * 用户服务(远程)
  */
-export class RpcUserService implements IUserService {
+export class RpcUserService extends UserServiceBase {
     private m_ValueService: IUserValueService;
     /**
      * 数值服务
@@ -35,23 +35,24 @@ export class RpcUserService implements IUserService {
     /**
      * 构造函数
      * 
-     * @param associateService 关联服务
-     * @param userID 用户ID
      * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
      * @param rpc 远程过程调用
      * @param m_NowValueType 当前时间数值类型
+     * @param associateService 关联服务
+     * @param userID 用户ID
      */
     public constructor(
-        public associateService: IUserAssociateService,
-        public userID: string,
         protected enumFactory: EnumFactoryBase,
         protected nowTime: NowTimeBase,
         protected rpc: RpcBase,
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_NowValueType: number,
-    ) { }
-
+        associateService: IUserAssociateService,
+        userID: string,
+    ) {
+        super(associateService, userID);
+    }
     /**
      * 获取目标数值服务
      */
