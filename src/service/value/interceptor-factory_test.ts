@@ -5,8 +5,8 @@ import { ValueInterceptorFactory as Self } from './interceptor-factory';
 import { valueInterceptorMetadata } from './interceptor-metadata';
 import { NullValueInterceptor } from './null-interceptor';
 import { Mock } from '../assert';
-import { EnumFactoryBase, IEnum, IValueData, IValueInterceptor } from '../../contract';
-import { enum_ } from '../../model';
+import { EnumFactoryBase, IEnum, IValueInterceptor } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 @ValueIntercept((data: enum_.ValueTypeData) => {
     return data.value == 10;
@@ -51,7 +51,7 @@ describe('src/service/value/interceptor-factory.ts', () => {
 
             const res = await self.build({
                 valueType: 10
-            } as IValueData);
+            } as contract.IValue);
             strictEqual(res.constructor, PredicateValueInterceptor);
             strictEqual(valueInterceptorMetadata.valueType[10], PredicateValueInterceptor);
         });
@@ -61,7 +61,7 @@ describe('src/service/value/interceptor-factory.ts', () => {
 
             const res = await self.build({
                 valueType: 1
-            } as IValueData);
+            } as contract.IValue);
             strictEqual(res.constructor, ValueTypeValueInterceptor);
         });
 
@@ -71,7 +71,7 @@ describe('src/service/value/interceptor-factory.ts', () => {
             const res = await self.build({
                 isSkipIntercept: true,
                 valueType: 1,
-            } as IValueData);
+            } as contract.IValue);
             strictEqual(res.constructor, NullValueInterceptor);
         });
     });

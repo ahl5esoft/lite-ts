@@ -1,8 +1,9 @@
 import { deepStrictEqual } from 'assert';
+
+import { DbUserRewardService as Self } from './user-reward-service';
+import { Mock } from '../assert';
 import { EnumFactoryBase, IEnum, IUserRandSeedService, UserServiceBase } from '../../contract';
 import { enum_ } from '../../model';
-import { Mock } from '../assert';
-import { DbUserRewardService as Self } from './user-reward-service';
 
 describe('src/service/db/user-reward-service.ts', () => {
     describe('.findResults(uow: IUnitOfWork, rewards: IRewardData[][], scene?: string)', () => {

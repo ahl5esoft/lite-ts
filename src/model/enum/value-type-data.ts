@@ -1,9 +1,9 @@
-import { IEnumItemData, IRewardData } from '../../contract';
+import { IEnumItem, IReward } from '../contract';
 
 /**
  * 数值枚举模型
  */
-export class ValueTypeData implements IEnumItemData {
+export class ValueTypeData implements IEnumItem {
     /**
      * 键
      */
@@ -76,7 +76,7 @@ export class ValueTypeData implements IEnumItemData {
     /**
      * 开启奖励
      */
-    public openRewards?: IRewardData[][];
+    public openRewards?: IReward[][];
     /**
      * 数值类型每次更新时都是替换, 默认为累积
      * 

@@ -1,5 +1,5 @@
-import { EnumFactoryBase, IParser, IValueConditionData } from '../../contract';
-import { enum_ } from '../../model';
+import { EnumFactoryBase, IParser } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 /**
  * 数值条件解析器
@@ -26,8 +26,6 @@ export class ValueConditionParser<T extends enum_.ValueTypeData> implements IPar
      * 
      * @param text 文本内容
      * 
-     * @returns IValueConditionData[][]
-     * 
      * @example
      * ```typescript
      *  const parser: ValueConditionParser<枚举模型>;
@@ -48,7 +46,7 @@ export class ValueConditionParser<T extends enum_.ValueTypeData> implements IPar
      */
     public async parse(text: string) {
         const lines = text.split(/\r\n|\n|\r/g);
-        let res: IValueConditionData[][] = [[]];
+        let res: contract.IValueCondition[][] = [[]];
         const valueTypeEnum = this.enumFactory.build(this.m_ValueTypeModel);
         for (const r of lines) {
             const match = r.match(ValueConditionParser.reg);
@@ -76,8 +74,8 @@ export class ValueConditionParser<T extends enum_.ValueTypeData> implements IPar
                 op = match[2] + match[3];
 
             res[res.length - 1].push({
-                count: count,
-                op: op as enum_.RelationOperator,
+                count,
+                op,
                 valueType: enumItem.data.value
             });
         }

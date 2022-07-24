@@ -1,7 +1,7 @@
 /**
  * 数值结构
  */
-export interface IValueData {
+export interface IValue {
     /**
      * 数量
      */

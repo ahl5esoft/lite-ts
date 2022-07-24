@@ -1,5 +1,5 @@
-import { IValueData } from './i-value-data';
 import { IValueInterceptor } from './i-value-interceptor';
+import { contract } from '../model';
 
 /**
  * 数值拦截器工厂
@@ -10,5 +10,5 @@ export abstract class ValueInterceptorFactoryBase {
      * 
      * @param value 数值
      */
-    public abstract build(value: IValueData): Promise<IValueInterceptor>;
+    public abstract build(value: contract.IValue): Promise<IValueInterceptor>;
 }

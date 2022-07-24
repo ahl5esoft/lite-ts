@@ -4,7 +4,7 @@ import Container from 'typedi';
 import { BentRpc } from '../bent';
 import { ConsoleLog } from '../console';
 import { DateNowTime } from '../date';
-import { DbUserRandSeedService } from '../db';
+import { DbUserRandSeedService, DbUserRewardService } from '../db';
 import { FSIOFactory } from '../fs';
 import { IoredisAdapter } from '../ioredis';
 import { JaegerDbFactory, JeagerRedis } from '../jaeger';
@@ -16,6 +16,7 @@ import { SetTimeoutThread } from '../set-timeout';
 import {
     ConfigLoaderBase,
     DbFactoryBase,
+    EnumFactoryBase,
     IOFactoryBase,
     IUserAssociateService,
     LockBase,
@@ -139,6 +140,12 @@ export async function initIoC(rootDirPath?: string) {
     UserServiceBase.buildRandServiceFunc = (associateService: IUserAssociateService, scene: string, userID: string, range: [number, number]) => {
         return new DbUserRandSeedService(associateService, dbFactory, scene, userID, range);
     };
+    UserServiceBase.buildRewardServiceFunc = (userService: UserServiceBase) => {
+        return new DbUserRewardService(
+            Container.get<EnumFactoryBase>(EnumFactoryBase as any),
+            userService
+        );
+    }
 
     return cfg;
 }

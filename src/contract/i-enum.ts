@@ -1,10 +1,10 @@
 import { IEnumItem } from './i-enum-item';
-import { IEnumItemData } from './i-enum-item-data';
+import { contract } from '../model';
 
 /**
  * 枚举接口
  */
-export interface IEnum<T extends IEnumItemData> {
+export interface IEnum<T extends contract.IEnumItem> {
     /**
      * 所有枚举项
      */

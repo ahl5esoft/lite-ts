@@ -1,7 +1,8 @@
 import { opentracing } from 'jaeger-client';
 
 import { TracerStrategy } from '../tracer';
-import { EnumFactoryBase, IEnumItemData, ITraceable } from '../../contract';
+import { EnumFactoryBase, ITraceable } from '../../contract';
+import { contract } from '../../model';
 
 /**
  * 枚举工厂
@@ -25,7 +26,7 @@ export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFacto
      * 
      * @param model 枚举模型
      */
-    public build<T extends IEnumItemData>(model: new () => T) {
+    public build<T extends contract.IEnumItem>(model: new () => T) {
         if (model.name in this.m_BuildFuncs) {
             return new TracerStrategy(
                 this.m_BuildFuncs[model.name]()

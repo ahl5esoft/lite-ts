@@ -1,15 +1,13 @@
 import { TargetValueServiceBase } from '../target';
 import {
     EnumFactoryBase,
-    IRewardData,
     IUnitOfWork,
-    IUserService,
     IUserValueService,
-    IValueData,
     NowTimeBase,
     RpcBase,
+    UserServiceBase,
 } from '../../contract';
-import { enum_, global } from '../../model';
+import { contract, enum_, global } from '../../model';
 
 /**
  * 用户数值服务(远程)
@@ -51,7 +49,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
      * @param nowTime 当前时间
      */
     public constructor(
-        public userService: IUserService,
+        public userService: UserServiceBase,
         private m_Rpc: RpcBase,
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_NowValueType: number,
@@ -80,26 +78,10 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
      * @param _ 工作单元(忽略)
      * @param values 数值数组
      */
-    public async update(_: IUnitOfWork, values: IValueData[]) {
+    public async update(_: IUnitOfWork, values: contract.IValue[]) {
         await this.m_Rpc.setBody({
             userID: this.userService.userID,
             values: values
         }).call<void>(`/${this.m_TargetTypeData.app}/${RpcUserValueService.updateRoute}`);
-    }
-
-    /**
-     * 根据奖励更新数值
-     * 
-     * @param _ 工作单元
-     * @param source 来源
-     * @param rewards 奖励
-     */
-    public async updateByRewards(_: IUnitOfWork, source: string, rewards: IRewardData[][]) {
-        const resp = await this.m_Rpc.setBody({
-            rewards,
-            source: source,
-            userID: this.userService.userID,
-        }).call<IValueData[]>(`/${this.m_TargetTypeData.app}/${RpcUserValueService.updateByRewardsRoute}`);
-        return resp.data;
     }
 }

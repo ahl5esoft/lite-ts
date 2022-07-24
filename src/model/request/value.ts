@@ -1,11 +1,11 @@
 import { IsNumber, IsOptional } from 'class-validator';
 
-import { IValueData } from '../../contract';
+import { IValue } from '../contract';
 
 /**
  * 数值请求模型
  */
-export class Value implements IValueData {
+export class Value implements IValue {
     /**
      * 数量
      */

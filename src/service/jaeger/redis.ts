@@ -1,6 +1,7 @@
 import { opentracing } from 'jaeger-client';
 
-import { IRedisGeoData, ITraceable, RedisBase } from '../../contract';
+import { ITraceable, RedisBase } from '../../contract';
+import { contract } from '../../model';
 
 /**
  * jeager redis
@@ -76,7 +77,7 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         });
     }
 
-    public async geoadd(key: string, ...values: IRedisGeoData[]) {
+    public async geoadd(key: string, ...values: contract.IRedisGeo[]) {
         return await this.exec('geoadd', [key, ...values], {
             key,
             values

@@ -1,4 +1,4 @@
-import { IRedisGeoData } from './i-redis-geo-data';
+import { contract } from '../model';
 
 /**
  * Redis接口
@@ -60,7 +60,7 @@ export abstract class RedisBase {
      * @param key 键
      * @param datas geo数据数组 
      */
-    public abstract geoadd(key: string, ...datas: IRedisGeoData[]): Promise<number>;
+    public abstract geoadd(key: string, ...datas: contract.IRedisGeo[]): Promise<number>;
 
     /**
      * 获取坐标
@@ -201,7 +201,7 @@ export abstract class RedisBase {
      * @param args 扩展参数
      */
     public abstract set(key: string, value: string, ...args: any[]): Promise<boolean>;
-    
+
     /**
      * 获取redis时间
      */

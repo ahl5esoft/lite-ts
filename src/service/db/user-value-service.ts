@@ -2,16 +2,14 @@ import { DbValueServiceBase } from './value-service-base';
 import {
     DbFactoryBase,
     EnumFactoryBase,
-    IRewardData,
     IUnitOfWork,
-    IUserService,
     IUserValueService,
-    IValueData,
     NowTimeBase,
     StringGeneratorBase,
+    UserServiceBase,
     ValueInterceptorFactoryBase
 } from '../../contract';
-import { global } from '../../model';
+import { contract, global } from '../../model';
 
 /**
  * 用户数值服务
@@ -20,7 +18,7 @@ export class DbUserValueService extends DbValueServiceBase<
     global.UserValue,
     global.UserValueChange,
     global.UserValueLog
-> implements IUserValueService {
+    > implements IUserValueService {
     /**
      * 获取用户数值实体
      */
@@ -49,7 +47,7 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param valueInterceptorFactory 数值拦截器工厂
      */
     public constructor(
-        public userService: IUserService,
+        public userService: UserServiceBase,
         private m_NowValueType: number,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
@@ -90,13 +88,13 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param rewards 奖励
      * @param source 来源
      */
-    public async updateByRewards(uow: IUnitOfWork, source: string, rewards: IRewardData[][]) {
-        let res: IValueData[] = [];
+    public async updateByRewards(uow: IUnitOfWork, source: string, rewards: contract.IReward[][]) {
+        let res: contract.IValue[] = [];
         for (const r of rewards) {
             if (!r.length)
                 continue;
 
-            let rewardData: IRewardData;
+            let rewardData: contract.IReward;
             if (r.length == 1) {
                 rewardData = r[0];
             } else {

@@ -1,9 +1,9 @@
-import { IEnumItemData } from './i-enum-item-data';
+import { contract } from '../model';
 
 /**
  * 枚举项接口
  */
-export interface IEnumItem<T extends IEnumItemData> {
+export interface IEnumItem<T extends contract.IEnumItem> {
     /**
      * 枚举项数据
      */

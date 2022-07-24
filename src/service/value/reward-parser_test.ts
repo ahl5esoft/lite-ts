@@ -10,7 +10,7 @@ describe('src/service/value/reward-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
+            const self = new Self(mockEnumFactory.actual);
 
             const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(

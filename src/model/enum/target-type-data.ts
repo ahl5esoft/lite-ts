@@ -1,9 +1,9 @@
-import { IEnumItemData } from '../../contract';
+import { IEnumItem } from '../contract';
 
 /**
  * 目标类型枚举
  */
-export class TargetTypeData implements IEnumItemData {
+export class TargetTypeData implements IEnumItem {
     /**
      * 应用名
      */

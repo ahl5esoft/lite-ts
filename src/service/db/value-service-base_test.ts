@@ -12,12 +12,11 @@ import {
     IEnumItem,
     IUnitOfWork,
     IUserAssociateService,
-    IValueData,
     IValueInterceptor,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../../contract';
-import { enum_, global } from '../../model';
+import { contract, enum_, global } from '../../model';
 
 class Self extends DbValueServiceBase<global.UserValue, global.UserValueChange, global.UserValueLog> {
     public entry: any;
@@ -72,7 +71,7 @@ describe('src/service/db/value-service-base.ts', () => {
 
             mockDbRepo.expected.remove({} as global.UserValueChange);
 
-            Reflect.set(self, 'update', (_: IUnitOfWork, res: IValueData[]) => {
+            Reflect.set(self, 'update', (_: IUnitOfWork, res: contract.IValue[]) => {
                 deepStrictEqual(res, [{}]);
             });
 
@@ -85,7 +84,7 @@ describe('src/service/db/value-service-base.ts', () => {
         });
     });
 
-    describe('.update(uow: IUnitOfWork, values: IValueData[])', () => {
+    describe('.update(uow: IUnitOfWork, values: contract.IValue[])', () => {
         it('Iglobal.UserValueData不存在', async () => {
             const mockAssociateService = new Mock<IUserAssociateService>();
             const mockDbFactory = new Mock<DbFactoryBase>();

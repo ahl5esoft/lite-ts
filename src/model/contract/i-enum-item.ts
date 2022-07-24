@@ -1,7 +1,7 @@
 /**
  * 枚举项数据
  */
-export interface IEnumItemData {
+export interface IEnumItem {
     /**
      * 枚举值
      */

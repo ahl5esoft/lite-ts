@@ -1,10 +1,10 @@
-import { EnumFactoryBase, IRewardData, IUnitOfWork, IValueData, UserServiceBase } from '../../contract';
-import { enum_ } from '../../model';
+import { EnumFactoryBase, IUnitOfWork, IUserRewardService, UserServiceBase } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 /**
  * 用户奖励服务
  */
-export class DbUserRewardService {
+export class DbUserRewardService implements IUserRewardService {
     /**
      * 构造函数
      * 
@@ -23,15 +23,15 @@ export class DbUserRewardService {
      * @param rewards 奖励
      * @param scene 场景
      */
-    public async findResults(uow: IUnitOfWork, rewards: IRewardData[][], scene = '') {
-        const values: IValueData[] = [];
+    public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '') {
+        const values: contract.IValue[] = [];
         const randSeedService = this.m_UserService.getRandSeedService(scene);
         const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
         for (const r of rewards) {
             if (!r?.length)
                 continue;
 
-            let reward: IRewardData;
+            let reward: contract.IReward;
             if (r.length == 1) {
                 reward = r[0];
             } else {
@@ -72,7 +72,7 @@ export class DbUserRewardService {
      * @param rewards 奖励
      * @param scene 场景
      */
-    public async preview(uow: IUnitOfWork, rewards: IRewardData[][], scene?: string) {
+    public async preview(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '') {
         return this.previewWithOffset(uow, rewards, 0, scene);
     }
 
@@ -84,15 +84,15 @@ export class DbUserRewardService {
      * @param offset 偏移
      * @param scene 场景
      */
-    private async previewWithOffset(uow: IUnitOfWork, rewards: IRewardData[][], offset: number, scene: string) {
-        const values: IValueData[] = [];
+    private async previewWithOffset(uow: IUnitOfWork, rewards: contract.IReward[][], offset: number, scene: string) {
+        const values: contract.IValue[] = [];
         const randSeedService = this.m_UserService.getRandSeedService(scene);
         const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
         for (const r of rewards) {
             if (!r?.length)
                 continue;
 
-            let reward: IRewardData;
+            let reward: contract.IReward;
             if (r.length == 1) {
                 reward = r[0];
             } else {

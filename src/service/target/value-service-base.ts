@@ -4,11 +4,9 @@ import {
     EnumFactoryBase,
     ITargetValueService,
     IUnitOfWork,
-    IValueConditionData,
-    IValueData,
     NowTimeBase,
 } from '../../contract';
-import { enum_, global } from '../../model';
+import { contract, enum_, global } from '../../model';
 
 /**
  * 目标数值服务基类
@@ -36,7 +34,7 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      * @param uow 工作单元
      * @param conditions 条件
      */
-    public async checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]) {
+    public async checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[][]) {
         if (!conditions?.length)
             return true;
 
@@ -114,7 +112,7 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      * @param uow 工作单元
      * @param values 数值数据
      */
-    public abstract update(uow: IUnitOfWork, values: IValueData[]): Promise<void>;
+    public abstract update(uow: IUnitOfWork, values: contract.IValue[]): Promise<void>;
 
     /**
      * 获取当前时间

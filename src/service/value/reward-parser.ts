@@ -1,24 +1,18 @@
-import { EnumFactoryBase, IParser, IValueData } from '../../contract';
-import { enum_ } from '../../model';
-
-interface IReward extends IValueData {
-    weight: number;
-}
+import { EnumFactoryBase, IParser } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 /**
  * 数值奖励解析器
  */
-export class ValueRewardParser<T extends enum_.ValueTypeData> implements IParser {
+export class ValueRewardParser implements IParser {
     /**
      * 构造函数
      * 
      * @param m_EnumFactory 枚举工厂
-     * @param m_ValueTypeModel 枚举模型
      * @param m_Reg 匹配规则
      */
     public constructor(
         private m_EnumFactory: EnumFactoryBase,
-        private m_ValueTypeModel: new () => T,
         private m_Reg = /^([^*]+)\*(-?\d+)(\*?(\d+))?$/,
     ) { }
 
@@ -49,8 +43,8 @@ export class ValueRewardParser<T extends enum_.ValueTypeData> implements IParser
      */
     public async parse(text: string) {
         const lines = text.split(/\r\n|\n|\r/g);
-        const res: IReward[][] = [[]];
-        const valueTypeEnum = this.m_EnumFactory.build(this.m_ValueTypeModel);
+        const res: contract.IReward[][] = [[]];
+        const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
         for (const r of lines) {
             const match = r.match(this.m_Reg);
             if (!match) {
@@ -77,7 +71,7 @@ export class ValueRewardParser<T extends enum_.ValueTypeData> implements IParser
                 weight = parseInt(match[4]) || 0;
 
             res[res.length - 1].push({
-                count: count,
+                count,
                 valueType: enumItem.data.value,
                 weight: weight
             });

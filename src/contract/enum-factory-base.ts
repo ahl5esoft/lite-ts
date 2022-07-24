@@ -1,5 +1,5 @@
 import { IEnum } from './i-enum';
-import { IEnumItemData } from './i-enum-item-data';
+import { contract } from '../model';
 
 /**
  * 枚举工厂
@@ -10,5 +10,5 @@ export abstract class EnumFactoryBase {
      * 
      * @param model 枚举模型函数
      */
-    public abstract build<T extends IEnumItemData>(model: new () => T): IEnum<T>;
+    public abstract build<T extends contract.IEnumItem>(model: new () => T): IEnum<T>;
 }

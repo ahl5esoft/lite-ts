@@ -2,7 +2,8 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserValueService as Self } from './user-value-service';
 import { Mock } from '../assert';
-import { IRewardData, IUnitOfWork, IUserService, IValueData, NowTimeBase } from '../../contract';
+import { IUnitOfWork, NowTimeBase, UserServiceBase } from '../../contract';
+import { contract } from '../../model';
 
 describe('src/service/user/value-service.ts', () => {
     describe('.getNow(uow: IUnitOfWork)', () => {
@@ -41,12 +42,12 @@ describe('src/service/user/value-service.ts', () => {
         });
     });
 
-    describe('.updateByRewards(uow: IUnitOfWork, rewards: IRewardData[][], source: string)', () => {
+    describe('.updateByRewards(uow: IUnitOfWork, rewards: contract.IReward[][], source: string)', () => {
         it('', async () => {
             const userID = 'user-id';
             const self = new Self({
                 userID: userID
-            } as IUserService, 0, null, null, null, null, null);
+            } as UserServiceBase, 0, null, null, null, null, null);
 
             const source = 'test';
             const rewards = [
@@ -63,7 +64,7 @@ describe('src/service/user/value-service.ts', () => {
                     valueType: 2,
                     weight: 1
                 }]
-            ] as IRewardData[][];
+            ] as contract.IReward[][];
             const expectRes = [{
                 count: 11,
                 source: source,
@@ -73,7 +74,7 @@ describe('src/service/user/value-service.ts', () => {
                 source: source,
                 valueType: 2
             }];
-            Reflect.set(self, 'update', (arg: IUnitOfWork, arg1: IValueData[]) => {
+            Reflect.set(self, 'update', (arg: IUnitOfWork, arg1: contract.IValue[]) => {
                 deepStrictEqual(
                     [arg, arg1],
                     [

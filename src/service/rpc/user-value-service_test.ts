@@ -1,8 +1,8 @@
-import { deepStrictEqual, strictEqual } from 'assert';
+import { strictEqual } from 'assert';
 
 import { RpcUserValueService as Self } from './user-value-service';
 import { Mock } from '../assert';
-import { IUnitOfWork, IUserService, NowTimeBase, RpcBase } from '../../contract';
+import { IUnitOfWork, NowTimeBase, RpcBase, UserServiceBase } from '../../contract';
 import { enum_ } from '../../model';
 
 describe('src/service/rpc/user-value-service.ts', () => {
@@ -42,10 +42,10 @@ describe('src/service/rpc/user-value-service.ts', () => {
         });
     });
 
-    describe('.update(_: IUnitOfWork, values: IValueData[])', () => {
+    describe('.update(_: IUnitOfWork, values: contract.IValue[])', () => {
         it('ok', async () => {
             const userID = 'uid';
-            const mockUserService = new Mock<IUserService>({
+            const mockUserService = new Mock<UserServiceBase>({
                 userID
             });
             const mockRpc = new Mock<RpcBase>();
@@ -73,39 +73,6 @@ describe('src/service/rpc/user-value-service.ts', () => {
                 count: 1,
                 valueType: 11
             }]);
-        });
-    });
-
-    describe('.updateByRewards(_: IUnitOfWork, source: string, rewards: IRewardData[][])', () => {
-        it('ok', async () => {
-            const mockRpc = new Mock<RpcBase>();
-            const userID = 'uid';
-            const mockUserService = new Mock<IUserService>({
-                userID
-            });
-            const self = new Self(mockUserService.actual, mockRpc.actual, {
-                app: 'prop'
-            } as enum_.TargetTypeData, 0, null, null);
-
-            const source = 'test'
-            mockRpc.expectReturn(
-                r => r.setBody({
-                    rewards: [[]],
-                    source,
-                    userID,
-                }),
-                mockRpc.actual
-            );
-
-            mockRpc.expectReturn(
-                r => r.call(`/prop/${Self.updateByRewardsRoute}`),
-                {
-                    data: [{}]
-                }
-            );
-
-            const res = await self.updateByRewards(null, source, [[]]);
-            deepStrictEqual(res, [{}]);
         });
     });
 });

@@ -8,10 +8,9 @@ import {
     IEnum,
     IEnumItem,
     IUnitOfWork,
-    IValueData,
     NowTimeBase,
 } from '../../contract';
-import { enum_, global } from '../../model';
+import { contract, enum_, global } from '../../model';
 
 class Self extends TargetValueServiceBase<global.UserValue> {
     public entry: Promise<global.UserValue>;
@@ -24,7 +23,7 @@ class Self extends TargetValueServiceBase<global.UserValue> {
         super(enumFactory, nowTime);
     }
 
-    public async update(_: IUnitOfWork, __: IValueData[]) { }
+    public async update(_: IUnitOfWork, __: contract.IValue[]) { }
 
     protected async getEntry() {
         return this.entry;
@@ -36,7 +35,7 @@ class Self extends TargetValueServiceBase<global.UserValue> {
 }
 
 describe('src/service/target/value-service-base.ts', () => {
-    describe('.checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[])', () => {
+    describe('.checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[])', () => {
         it(`${enum_.RelationOperator.eq}(单组)`, async () => {
             const self = new Self(10, null, null);
 

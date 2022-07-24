@@ -7,12 +7,11 @@ import {
     EnumFactoryBase,
     IUnitOfWork,
     IUserAssociateService,
-    IValueData,
     NowTimeBase,
     StringGeneratorBase,
     ValueInterceptorFactoryBase,
 } from '../../contract';
-import { enum_, global } from '../../model';
+import { contract, enum_, global } from '../../model';
 
 /**
  * 数据库数值服务
@@ -74,7 +73,7 @@ export abstract class DbValueServiceBase<
      * @param uow 工作单元
      * @param values 数值数据
      */
-    public async update(uow: IUnitOfWork, values: IValueData[]) {
+    public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         let entry = await this.entry;
         const db = this.dbFactory.db(this.model, uow);
         if (!entry) {

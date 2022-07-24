@@ -1,12 +1,12 @@
-import { IsEnum, IsNumber, Min } from 'class-validator';
+import { IsNumber, Max, Min } from 'class-validator';
 
+import { IValueCondition } from '../contract';
 import { RelationOperator } from '../enum';
-import { IValueConditionData } from '../..';
 
 /**
  * 数值条件
  */
-export class ValueCondition implements IValueConditionData {
+export class ValueCondition implements IValueCondition {
     /**
      * 数量
      */
@@ -17,7 +17,8 @@ export class ValueCondition implements IValueConditionData {
     /**
      * 运算符
      */
-    @IsEnum(RelationOperator)
+    @Max(16)
+    @Min(1)
     public op: RelationOperator;
 
     /**

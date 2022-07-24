@@ -1,9 +1,10 @@
-import { IEnumItem, IEnumItemData } from '../../contract';
+import { IEnumItem } from '../../contract';
+import { contract } from '../../model';
 
 /**
  * 枚举项
  */
-export class EnumItem<T extends IEnumItemData> implements IEnumItem<T> {
+export class EnumItem<T extends contract.IEnumItem> implements IEnumItem<T> {
     private m_EncodingKey: string;
     /**
      * 默认多语言键, 格式: 枚举名{分隔符}枚举值

@@ -3,14 +3,14 @@ import { strictEqual } from 'assert';
 import { RpcValueService as Self } from './value-service';
 import { Mock, mockAny } from '../assert';
 import { CustomError } from '../error';
-import { IUserAssociateService, IUserService, RpcBase } from '../../contract';
+import { IUserAssociateService, RpcBase, UserServiceBase } from '../../contract';
 import { enum_, global } from '../../model';
 
 describe('src/service/rpc/value-service.ts', () => {
-    describe('.update(_: IUnitOfWork, values: IValueData[])', () => {
+    describe('.update(_: IUnitOfWork, values: contract.IValue[])', () => {
         it('ok', async () => {
             const mockAssociateService = new Mock<IUserAssociateService>();
-            const mockUserService = new Mock<IUserService>({
+            const mockUserService = new Mock<UserServiceBase>({
                 associateService: mockAssociateService.actual
             });
             const mockRpc = new Mock<RpcBase>();

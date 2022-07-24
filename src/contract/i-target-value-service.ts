@@ -1,7 +1,5 @@
 import { IUnitOfWork } from './i-unit-of-work';
-import { IValueData } from './i-value-data';
-import { IValueConditionData } from './i-value-condition-data';
-import { global } from '../model';
+import { contract, global } from '../model';
 
 /**
  * 目标数值服务接口
@@ -17,7 +15,7 @@ export interface ITargetValueService<T extends global.UserValue> {
      * @param uow 工作单元
      * @param conditions 数值条件
      */
-    checkConditions(uow: IUnitOfWork, conditions: IValueConditionData[][]): Promise<boolean>;
+    checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[][]): Promise<boolean>;
     /**
      * 获取数值数量
      * 
@@ -31,5 +29,5 @@ export interface ITargetValueService<T extends global.UserValue> {
      * @param uow 工作单元
      * @param values 数值结构数组
      */
-    update(uow: IUnitOfWork, values: IValueData[]): Promise<void>;
+    update(uow: IUnitOfWork, values: contract.IValue[]): Promise<void>;
 }

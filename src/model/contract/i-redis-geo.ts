@@ -1,7 +1,7 @@
 /**
  * Redis Geo结构
  */
-export interface IRedisGeoData {
+export interface IRedisGeo {
     /**
      * 纬度
      */

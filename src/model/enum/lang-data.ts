@@ -1,9 +1,9 @@
-import { IEnumItemData } from '../..';
+import { IEnumItem } from '../contract';
 
 /**
  * 语言枚举模型
  */
-export class LangData implements IEnumItemData {
+export class LangData implements IEnumItem {
     /**
      * 枚举键, 例如: en
      */

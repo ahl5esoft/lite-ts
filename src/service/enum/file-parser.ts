@@ -1,4 +1,5 @@
-import { IEnumItemData, IOFactoryBase, IParser } from '../..';
+import { IOFactoryBase, IParser } from '../../contract';
+import { contract } from '../../model';
 
 /**
  * 枚举文件解析器
@@ -62,7 +63,7 @@ export class EnumFileParser implements IParser {
         const file = this.m_IOFactory.buildFile(filePath);
         const content = await file.readString();
         const lines = content.split(/[\r\n]+/g);
-        const res: IEnumItemData[] = [];
+        const res: contract.IEnumItem[] = [];
         let isBegin = false;
         for (const r of lines) {
             if (!isBegin) {
@@ -102,7 +103,7 @@ export class EnumFileParser implements IParser {
      * @param entry 实体
      * @param attr 特性
      */
-    private parseAttr(entry: IEnumItemData, attr: string) {
+    private parseAttr(entry: contract.IEnumItem, attr: string) {
         if (!attr)
             return;
 
@@ -146,7 +147,7 @@ export class EnumFileParser implements IParser {
      * @param k 键
      * @param v 值
      */
-    private setAtttr(entry: IEnumItemData, k: string, v: any) {
+    private setAtttr(entry: contract.IEnumItem, k: string, v: any) {
         const keys = k.split('.');
         let temp = entry;
         keys.forEach((r, i) => {

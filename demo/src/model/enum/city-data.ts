@@ -1,9 +1,9 @@
-import { IEnumItemData } from '../../../../src';
+import { contract } from '../../../../src/model';
 
 /**
  * 城市
  */
-export class CityData implements IEnumItemData {
+export class CityData implements contract.IEnumItem {
     /**
      * 英文名
      */

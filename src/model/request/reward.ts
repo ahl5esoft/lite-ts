@@ -1,11 +1,11 @@
 import { IsNumber, IsOptional, Min } from 'class-validator';
 
-import { IRewardData } from '../..';
+import { IReward } from '../contract';
 
 /**
  * 奖励
  */
-export class Reward implements IRewardData {
+export class Reward implements IReward {
     /**
      * 数量
      */

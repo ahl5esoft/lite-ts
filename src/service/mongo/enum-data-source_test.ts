@@ -2,8 +2,8 @@ import { deepStrictEqual } from 'assert';
 
 import { MongoEnumDataSource as Self } from './enum-data-source';
 import { Mock } from '../assert';
-import { DbFactoryBase, DbRepositoryBase, IDbQuery, IEnumItemData } from '../../contract';
-import { global } from '../../model';
+import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../../contract';
+import { contract, global } from '../../model';
 
 describe('src/service/mongo/load-enum-data-source.ts', () => {
     describe('.loadEnumDataSource(dbFactory: DbFactoryBase)', () => {
@@ -29,7 +29,7 @@ describe('src/service/mongo/load-enum-data-source.ts', () => {
             }, {
                 text: 'b',
                 value: 2
-            }] as IEnumItemData[]
+            }] as contract.IEnumItem[]
             mockDbQuery.expectReturn(
                 r => r.toArray(),
                 [{

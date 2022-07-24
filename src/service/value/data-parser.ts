@@ -1,5 +1,5 @@
-import { EnumFactoryBase, IParser, IValueData } from '../../contract';
-import { enum_ } from '../../model';
+import { EnumFactoryBase, IParser } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 /**
  * 数值数据解析器
@@ -38,7 +38,7 @@ export class ValueDataParser<T extends enum_.ValueTypeData> implements IParser {
      */
     public async parse(text: string) {
         const lines = text.split(/\r\n|\n|\r/g);
-        const res: IValueData[] = [];
+        const res: contract.IValue[] = [];
         const valueTypeEnum = this.m_EnumFactory.build(this.m_ValueTypeModel);
         for (const r of lines) {
             const match = r.match(this.m_Reg);
@@ -56,7 +56,7 @@ export class ValueDataParser<T extends enum_.ValueTypeData> implements IParser {
                 throw new Error(`无效数值消费数量: ${r}`);
 
             res.push({
-                count: count,
+                count,
                 valueType: enumItem.data.value
             });
         }

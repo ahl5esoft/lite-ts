@@ -1,9 +1,10 @@
-import { CacheBase, IEnum, IEnumItem, IEnumItemData } from '../../contract';
+import { CacheBase, IEnum, IEnumItem } from '../../contract';
+import { contract } from '../../model';
 
 /**
  * 枚举服务
  */
-export class CacheEnum<T extends IEnumItemData> implements IEnum<T> {
+export class CacheEnum<T extends contract.IEnumItem> implements IEnum<T> {
     /**
      * 所有枚举项
      */

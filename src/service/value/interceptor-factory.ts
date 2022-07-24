@@ -4,8 +4,8 @@ import Container from 'typedi';
 import { valueInterceptorMetadata } from './interceptor-metadata';
 import { NullValueInterceptor } from './null-interceptor';
 import { TracerStrategy } from '../tracer';
-import { EnumFactoryBase, ITraceable, IValueData, ValueInterceptorFactoryBase } from '../../contract';
-import { enum_ } from '../../model';
+import { EnumFactoryBase, ITraceable, ValueInterceptorFactoryBase } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 /**
  * null数值拦截器
@@ -33,7 +33,7 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
      * 
      * @param value 数值
      */
-    public async build(value: IValueData) {
+    public async build(value: contract.IValue) {
         if (value.isSkipIntercept)
             return nullValueInterceptor;
 

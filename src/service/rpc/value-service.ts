@@ -2,12 +2,11 @@ import { TargetValueServiceBase } from '../target';
 import {
     EnumFactoryBase,
     IUnitOfWork,
-    IUserService,
-    IValueData,
     NowTimeBase,
-    RpcBase
+    RpcBase,
+    UserServiceBase
 } from '../../contract';
-import { enum_, global } from '../../model';
+import { contract, enum_, global } from '../../model';
 
 /**
  * 用户其他数值服务
@@ -40,7 +39,7 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
      * @param nowTime 当前时间
      */
     public constructor(
-        private m_UserService: IUserService,
+        private m_UserService: UserServiceBase,
         private m_Rpc: RpcBase,
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_Entry: T,
@@ -56,7 +55,7 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
      * @param _ 工作单元(忽略)
      * @param values 数值数组
      */
-    public async update(_: IUnitOfWork, values: IValueData[]) {
+    public async update(_: IUnitOfWork, values: contract.IValue[]) {
         await this.m_Rpc.setBody({
             ...this.m_Entry,
             values: values
