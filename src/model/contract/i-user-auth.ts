@@ -1,7 +1,7 @@
 /**
  * 用户数据
  */
- export interface IUserAuthData {
+export interface IUserAuth {
     /**
      * 来源
      */

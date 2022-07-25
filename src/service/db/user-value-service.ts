@@ -18,7 +18,7 @@ export class DbUserValueService extends DbValueServiceBase<
     global.UserValue,
     global.UserValueChange,
     global.UserValueLog
-    > implements IUserValueService {
+> implements IUserValueService {
     /**
      * 获取用户数值实体
      */
@@ -82,44 +82,38 @@ export class DbUserValueService extends DbValueServiceBase<
     }
 
     /**
-     * 根据奖励更新数值
+     * 更新数值
      * 
      * @param uow 工作单元
-     * @param rewards 奖励
-     * @param source 来源
+     * @param values 数值数组
      */
-    public async updateByRewards(uow: IUnitOfWork, source: string, rewards: contract.IReward[][]) {
-        let res: contract.IValue[] = [];
-        for (const r of rewards) {
-            if (!r.length)
-                continue;
-
-            let rewardData: contract.IReward;
-            if (r.length == 1) {
-                rewardData = r[0];
-            } else {
-                const total = r.reduce((memo, r) => {
-                    return memo + r.weight * 1;
-                }, 0);
-                let rand = Math.floor(
-                    Math.random() * total
-                );
-                rewardData = r.find(cr => {
-                    rand -= cr.weight;
-                    return rand <= 0;
+    public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        const tasks = values.reduce((memo, r) => {
+            const item = memo.find(cr => {
+                return cr.targetType == r.targetType;
+            });
+            if (item) {
+                item.values.push(r);
+            }
+            else {
+                memo.push({
+                    values: [r],
+                    targetType: r.targetType,
                 });
             }
-            res.push({
-                count: rewardData.count,
-                source: rewardData.source ?? source,
-                valueType: rewardData.valueType
-            });
-        }
-
-        if (res.length)
-            await this.update(uow, res);
-
-        return res;
+            return memo;
+        }, [] as {
+            values: contract.IValue[],
+            targetType: number,
+        }[]).map(async r => {
+            if (r.targetType) {
+                const targetValueService = await this.userService.getTargetValueService(r.targetType);
+                return targetValueService.update(uow, r.values);
+            } else {
+                return super.update(uow, r.values);
+            }
+        });
+        await Promise.all(tasks);
     }
 
     /**

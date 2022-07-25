@@ -1,9 +1,9 @@
-import { deepStrictEqual, strictEqual } from 'assert';
+import { strictEqual } from 'assert';
 
 import { DbUserValueService as Self } from './user-value-service';
 import { Mock } from '../assert';
-import { IUnitOfWork, NowTimeBase, UserServiceBase } from '../../contract';
-import { contract } from '../../model';
+import { ITargetValueService, IUnitOfWork, NowTimeBase, UserServiceBase } from '../../contract';
+import { global } from '../../model';
 
 describe('src/service/user/value-service.ts', () => {
     describe('.getNow(uow: IUnitOfWork)', () => {
@@ -42,50 +42,56 @@ describe('src/service/user/value-service.ts', () => {
         });
     });
 
-    describe('.updateByRewards(uow: IUnitOfWork, rewards: contract.IReward[][], source: string)', () => {
-        it('', async () => {
-            const userID = 'user-id';
-            const self = new Self({
-                userID: userID
-            } as UserServiceBase, 0, null, null, null, null, null);
+    describe('.update(uow: IUnitOfWork, values: IValueData[])', () => {
+        it('ok', async () => {
+            const mockUserService = new Mock<UserServiceBase>();
+            const self = new Self(mockUserService.actual, 0, null, null, null, null, null);
 
-            const source = 'test';
-            const rewards = [
-                [{
-                    count: 11,
-                    valueType: 1
-                }],
-                [{
-                    count: 22,
-                    valueType: 2,
-                    weight: 999
-                }, {
-                    count: 222,
-                    valueType: 2,
-                    weight: 1
-                }]
-            ] as contract.IReward[][];
-            const expectRes = [{
-                count: 11,
-                source: source,
-                valueType: 1
+            const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
+            mockUserService.expectReturn(
+                r => r.getTargetValueService(2),
+                mockValueService.actual
+            );
+
+            mockValueService.expected.update(null, [{
+                count: 1,
+                source: 'a',
+                targetNo: 3,
+                targetType: 2,
+                valueType: 4
             }, {
-                count: 22,
-                source: source,
-                valueType: 2
-            }];
-            Reflect.set(self, 'update', (arg: IUnitOfWork, arg1: contract.IValue[]) => {
-                deepStrictEqual(
-                    [arg, arg1],
-                    [
-                        null,
-                        expectRes
-                    ]
-                )
-            });
+                count: 2,
+                source: 'b',
+                targetNo: 3,
+                targetType: 2,
+                valueType: 5
+            }, {
+                count: 3,
+                source: 'c',
+                targetNo: 4,
+                targetType: 2,
+                valueType: 6
+            }]);
 
-            const res = await self.updateByRewards(null, source, rewards);
-            deepStrictEqual(res, expectRes);
+            await self.update(null, [{
+                count: 1,
+                source: 'a',
+                targetNo: 3,
+                targetType: 2,
+                valueType: 4
+            }, {
+                count: 2,
+                source: 'b',
+                targetNo: 3,
+                targetType: 2,
+                valueType: 5
+            }, {
+                count: 3,
+                source: 'c',
+                targetNo: 4,
+                targetType: 2,
+                valueType: 6
+            }]);
         });
     });
 });

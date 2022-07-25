@@ -9,6 +9,10 @@ export class Default {
      */
     public distributedMongo: string;
     /**
+     * 枚举分隔符
+     */
+    public enumSep: string;
+    /**
      * 网关地址
      */
     public gatewayUrl: string;

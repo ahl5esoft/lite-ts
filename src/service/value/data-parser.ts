@@ -4,17 +4,15 @@ import { contract, enum_ } from '../../model';
 /**
  * 数值数据解析器
  */
-export class ValueDataParser<T extends enum_.ValueTypeData> implements IParser {
+export class ValueDataParser implements IParser {
     /**
      * 构造函数
      * 
      * @param m_EnumFactory 枚举工厂
-     * @param m_ValueTypeModel 枚举模型
      * @param m_Reg 匹配规则
      */
     public constructor(
         private m_EnumFactory: EnumFactoryBase,
-        private m_ValueTypeModel: new () => T,
         private m_Reg = /^(.+)\*(-?\d+)$/,
     ) { }
 
@@ -39,7 +37,7 @@ export class ValueDataParser<T extends enum_.ValueTypeData> implements IParser {
     public async parse(text: string) {
         const lines = text.split(/\r\n|\n|\r/g);
         const res: contract.IValue[] = [];
-        const valueTypeEnum = this.m_EnumFactory.build(this.m_ValueTypeModel);
+        const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
         for (const r of lines) {
             const match = r.match(this.m_Reg);
             if (!match)

@@ -9,7 +9,7 @@ describe('src/service/value/condition-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it(enum_.RelationOperator.nowDiff, async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
+            const self = new Self(mockEnumFactory.actual);
 
             const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
@@ -40,7 +40,7 @@ describe('src/service/value/condition-parser.ts', () => {
 
         it(enum_.RelationOperator.mod, async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
+            const self = new Self(mockEnumFactory.actual);
 
             const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
@@ -71,7 +71,7 @@ describe('src/service/value/condition-parser.ts', () => {
 
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
+            const self = new Self(mockEnumFactory.actual);
 
             const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(

@@ -14,7 +14,7 @@ describe('src/service/rpc/value-service.ts', () => {
                 associateService: mockAssociateService.actual
             });
             const mockRpc = new Mock<RpcBase>();
-            const self = new Self(mockUserService.actual, mockRpc.actual, {
+            const self = new Self(mockRpc.actual, mockUserService.actual, {
                 app: 'test',
                 value: 1
             } as enum_.TargetTypeData, {

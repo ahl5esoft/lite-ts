@@ -10,7 +10,7 @@ describe('src/service/value/data-parser.ts', () => {
     describe('.parse(text: string)', () => {
         it('增加', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData, /^(.+)\*(\d+)$/);
+            const self = new Self(mockEnumFactory.actual, /^(.+)\*(\d+)$/);
 
             const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
@@ -53,7 +53,7 @@ B*22`);
 
         it('减少', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData, /^(.+)\*(-\d+)$/);
+            const self = new Self(mockEnumFactory.actual, /^(.+)\*(-\d+)$/);
 
             const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
@@ -96,7 +96,7 @@ B*-5`);
 
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, enum_.ValueTypeData);
+            const self = new Self(mockEnumFactory.actual);
 
             const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(

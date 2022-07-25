@@ -4,7 +4,7 @@ import { contract, enum_ } from '../../model';
 /**
  * 数值条件解析器
  */
-export class ValueConditionParser<T extends enum_.ValueTypeData> implements IParser {
+export class ValueConditionParser implements IParser {
     /**
      * 匹配规则
      */
@@ -14,11 +14,9 @@ export class ValueConditionParser<T extends enum_.ValueTypeData> implements IPar
      * 构造函数
      * 
      * @param enumFactory 枚举工厂
-     * @param m_ValueTypeModel 枚举模型
      */
     public constructor(
         protected enumFactory: EnumFactoryBase,
-        private m_ValueTypeModel: new () => T
     ) { }
 
     /**
@@ -47,7 +45,7 @@ export class ValueConditionParser<T extends enum_.ValueTypeData> implements IPar
     public async parse(text: string) {
         const lines = text.split(/\r\n|\n|\r/g);
         let res: contract.IValueCondition[][] = [[]];
-        const valueTypeEnum = this.enumFactory.build(this.m_ValueTypeModel);
+        const valueTypeEnum = this.enumFactory.build(enum_.ValueTypeData);
         for (const r of lines) {
             const match = r.match(ValueConditionParser.reg);
             if (!match) {

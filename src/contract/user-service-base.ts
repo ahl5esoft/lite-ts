@@ -1,7 +1,10 @@
+import { EnumFactoryBase } from './enum-factory-base';
+import { ITargetValueService } from './i-target-value-service';
 import { IUserAssociateService } from './i-user-associate-service';
 import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
 import { IUserValueService } from './i-user-value-service';
+import { global } from '../model';
 
 /**
  * 用户服务基类
@@ -18,7 +21,7 @@ export abstract class UserServiceBase {
     /**
      * 创建奖励服务函数
      */
-    public static buildRewardServiceFunc: (userService: UserServiceBase) => IUserRewardService;
+    public static buildRewardServiceFunc: (enumFactory: EnumFactoryBase, userService: UserServiceBase) => IUserRewardService;
 
     /**
      * 随机种子服务
@@ -30,7 +33,7 @@ export abstract class UserServiceBase {
      * 奖励服务
      */
     public get rewardService() {
-        this.m_RewardService ??= UserServiceBase.buildRewardServiceFunc(this);
+        this.m_RewardService ??= UserServiceBase.buildRewardServiceFunc(this.enumFactory, this);
         return this.m_RewardService;
     }
 
@@ -44,10 +47,12 @@ export abstract class UserServiceBase {
      * 
      * @param associateService 关联服务
      * @param userID 用户ID
+     * @param enumFactory 枚举工厂
      */
     public constructor(
         public associateService: IUserAssociateService,
         public userID: string,
+        protected enumFactory: EnumFactoryBase,
     ) { }
 
     /**
@@ -60,4 +65,11 @@ export abstract class UserServiceBase {
         this.m_RandSeedService[scene] ??= UserServiceBase.buildRandServiceFunc(this.associateService, scene, this.userID, range);
         return this.m_RandSeedService[scene];
     }
+
+    /**
+     * 获取目标数值服务
+     * 
+     * @param targetType 目标类型
+     */
+    public abstract getTargetValueService(targetType: number): Promise<ITargetValueService<global.UserValue>>;
 }

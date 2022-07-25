@@ -20,7 +20,7 @@ export abstract class DbValueServiceBase<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
-    > extends TargetValueServiceBase<T> {
+> extends TargetValueServiceBase<T> {
     /**
      * 构造函数
      * 
@@ -74,8 +74,8 @@ export abstract class DbValueServiceBase<
      * @param values 数值数据
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        let entry = await this.entry;
         const db = this.dbFactory.db(this.model, uow);
+        let entry = await this.entry;
         if (!entry) {
             entry = this.createEntry();
             entry.values = {};
@@ -86,7 +86,7 @@ export abstract class DbValueServiceBase<
 
         const logDb = this.dbFactory.db(this.logModel, uow);
         for (const r of values) {
-            if (typeof r.valueType != 'number' || typeof r.count != 'number')
+            if (typeof r.valueType != 'number' || typeof r.count != 'number' || isNaN(r.count))
                 continue;
 
             const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
@@ -128,6 +128,7 @@ export abstract class DbValueServiceBase<
                 }
 
                 if (entry.values[r.valueType] < 0 && !valueTypeItem.data.isNegative) {
+                    entry.values[r.valueType] -= r.count;
                     throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
                         consume: Math.abs(r.count),
                         count: logEntry.oldCount,

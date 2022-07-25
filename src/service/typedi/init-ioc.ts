@@ -4,7 +4,7 @@ import Container from 'typedi';
 import { BentRpc } from '../bent';
 import { ConsoleLog } from '../console';
 import { DateNowTime } from '../date';
-import { DbUserRandSeedService, DbUserRewardService } from '../db';
+import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
 import { FSIOFactory } from '../fs';
 import { IoredisAdapter } from '../ioredis';
 import { JaegerDbFactory, JeagerRedis } from '../jaeger';
@@ -29,6 +29,7 @@ import {
     UserServiceBase
 } from '../../contract';
 import { config, enum_, global } from '../../model';
+import { RpcValueService } from '../rpc';
 
 /**
  * 初始化IoC
@@ -140,10 +141,17 @@ export async function initIoC(rootDirPath?: string) {
     UserServiceBase.buildRandServiceFunc = (associateService: IUserAssociateService, scene: string, userID: string, range: [number, number]) => {
         return new DbUserRandSeedService(associateService, dbFactory, scene, userID, range);
     };
-    UserServiceBase.buildRewardServiceFunc = (userService: UserServiceBase) => {
-        return new DbUserRewardService(
-            Container.get<EnumFactoryBase>(EnumFactoryBase as any),
-            userService
+    UserServiceBase.buildRewardServiceFunc = (enumFactory: EnumFactoryBase, userService: UserServiceBase) => {
+        return new DbUserRewardService(enumFactory, userService);
+    };
+    DbUserService.buildTargetValueServiceFunc = (enumFactory: EnumFactoryBase, rpc: RpcBase, userService: UserServiceBase, targetTypeData: enum_.TargetTypeData, userID: string) => {
+        return new RpcValueService(
+            rpc,
+            userService,
+            targetTypeData,
+            { userID, } as global.UserTargetValue,
+            enumFactory,
+            Container.get<NowTimeBase>(NowTimeBase as any),
         );
     }
 

@@ -31,16 +31,16 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
     /**
      * 构造函数
      * 
-     * @param m_UserService 用户数值服务
      * @param m_Rpc 远程过程调用
+     * @param m_UserService 用户数值服务
      * @param m_TargetTypeData 目标类型数据
      * @param m_Entry 实体
      * @param enumFactory 数值枚举
      * @param nowTime 当前时间
      */
     public constructor(
-        private m_UserService: UserServiceBase,
         private m_Rpc: RpcBase,
+        private m_UserService: UserServiceBase,
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_Entry: T,
         enumFactory: EnumFactoryBase,

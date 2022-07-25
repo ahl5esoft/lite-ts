@@ -14,10 +14,6 @@ import { contract, enum_, global } from '../../model';
  */
 export class RpcUserValueService extends TargetValueServiceBase<global.UserValue> implements IUserValueService {
     /**
-     * 根据奖励更新数值路由
-     */
-    public static updateByRewardsRoute = 'update-user-value-by-rewards';
-    /**
      * 更新数值路由
      */
     public static updateRoute = 'update-values-by-user-id';
