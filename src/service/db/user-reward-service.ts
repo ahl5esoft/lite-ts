@@ -21,9 +21,10 @@ export class DbUserRewardService implements IUserRewardService {
      * 
      * @param uow 工作单元
      * @param rewards 奖励
+     * @param source 来源
      * @param scene 场景
      */
-    public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '') {
+    public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
         const values: contract.IValue[] = [];
         const randSeedService = this.m_UserService.getRandSeedService(scene);
         const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
@@ -52,13 +53,16 @@ export class DbUserRewardService implements IUserRewardService {
             const valueTypeItem = await valueTypeEnum.getByValue(reward.valueType);
             if (valueTypeItem?.data.openRewards) {
                 for (let i = 0; i < reward.count; i++) {
-                    const res = await this.findResults(uow, valueTypeItem.data.openRewards, scene);
+                    const res = await this.findResults(uow, valueTypeItem.data.openRewards, source, scene);
                     values.push(...res);
                 }
             } else {
                 values.push({
                     count: reward.count,
-                    valueType: reward.valueType
+                    source: reward.source ?? source,
+                    targetNo: reward.targetNo,
+                    targetType: reward.targetType,
+                    valueType: reward.valueType,
                 });
             }
         }

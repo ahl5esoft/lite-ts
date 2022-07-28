@@ -12,6 +12,7 @@ import { JsYamlConfigLoader } from '../js-yaml';
 import { LogProxy } from '../log';
 import { loadMongoConfigDataSource, MongoDbFactory, MongoEnumDataSource, MongoStringGenerator } from '../mongo';
 import { RedisCache, RedisLock, RedisNowTime } from '../redis';
+import { RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
 import {
     ConfigLoaderBase,
@@ -29,16 +30,13 @@ import {
     UserServiceBase
 } from '../../contract';
 import { config, enum_, global } from '../../model';
-import { RpcValueService } from '../rpc';
 
 /**
  * 初始化IoC
  * 
- * @param rootDirPath 根目录, 默认: process.cwd()
+ * @param globalModel 全局模型
  */
-export async function initIoC(rootDirPath?: string) {
-    rootDirPath ??= process.cwd();
-
+export async function initIoC(globalModel: { [name: string]: any }) {
     const ioFactory = new FSIOFactory();
     Container.set(IOFactoryBase, ioFactory);
 
@@ -53,12 +51,18 @@ export async function initIoC(rootDirPath?: string) {
         }
     }
     const configLaoder = new JsYamlConfigLoader(
-        ioFactory.buildFile(rootDirPath, yamlFilename)
+        ioFactory.buildFile(
+            process.cwd(),
+            yamlFilename
+        )
     );
     Container.set(ConfigLoaderBase, configLaoder);
 
     const cfg = await configLaoder.load(config.Default);
-    const pkg = await ioFactory.buildFile(rootDirPath, 'package.json').readJSON<{ version: string }>();
+    const pkg = await ioFactory.buildFile(
+        process.cwd(),
+        'package.json'
+    ).readJSON<{ version: string }>();
     cfg.version = pkg.version;
 
     if (cfg.openTracing) {
@@ -109,15 +113,15 @@ export async function initIoC(rootDirPath?: string) {
     }
     Container.set(NowTimeBase, nowTime);
 
-    if (redis && dbFactory.constructor == MongoDbFactory) {
+    if (redis && dbFactory?.constructor == MongoDbFactory) {
         const configCache = new RedisCache(nowTime, redis, () => {
-            return loadMongoConfigDataSource(dbFactory);
-        }, `${cfg.name}:${global.Config.name}`);
+            return loadMongoConfigDataSource(dbFactory, globalModel[cfg.configModel] ?? global.Config);
+        }, `${cfg.name}:${cfg.configModel ?? global.Config.name}`);
         Container.set(enum_.IoC.configCache, configCache);
 
         const enumCache = new RedisCache(nowTime, redis, () => {
-            return new MongoEnumDataSource(dbFactory, '-').findEnums();
-        }, `${cfg.name}:${global.Enum.name}`);
+            return new MongoEnumDataSource(dbFactory, '-', globalModel[cfg.enumModel] ?? global.Enum).findEnums();
+        }, `${cfg.name}:${cfg.enumModel ?? global.Enum.name}`);
         Container.set(enum_.IoC.enumCache, enumCache);
     }
 

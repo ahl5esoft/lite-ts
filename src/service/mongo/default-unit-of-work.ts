@@ -1,4 +1,4 @@
-import { ClientSession } from 'mongodb';
+import { AnyBulkWriteOperation, ClientSession } from 'mongodb';
 
 import { MongoUnitOfWorkBase } from './unit-of-work-base';
 
@@ -10,9 +10,15 @@ export class MongoDefaultUnitOfWork extends MongoUnitOfWorkBase {
      * 提交
      * 
      * @param session 会话
+     * @param bulks 批量
      */
-    protected async onCommit(session: ClientSession) {
-        for (const r of this.queue)
-            await r(session);
+    protected async onCommit(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]) {
+        const db = await this.pool.db;
+        for (const r of bulks) {
+            await db.collection(r[0]).bulkWrite(r[1], {
+                ordered: false,
+                session
+            });
+        }
     }
 }

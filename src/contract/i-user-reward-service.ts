@@ -10,9 +10,10 @@ export interface IUserRewardService {
      * 
      * @param uow 工作单元
      * @param rewards 奖励
+     * @param source 来源
      * @param scene 场景
      */
-    findResults(uow: IUnitOfWork, rewards: contract.IReward[][], scene?: string): Promise<contract.IValue[]>;
+    findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene?: string): Promise<contract.IValue[]>;
     /**
      * 预览
      * 

@@ -5,31 +5,24 @@ import Container from 'typedi';
 
 import { enum_ } from './model';
 import {
-    DbFactoryBase,
+    CacheBase,
     EnumFactoryBase,
     IApiResponse,
     IOFactoryBase,
     LogBase,
-    NowTimeBase,
-    RedisBase,
+    model,
     service
 } from '../../src';
 
 (async () => {
-    const cfg = await service.initIoC();
+    const cfg = await service.initIoC(model.global);
 
-    const dbFactory = Container.get<DbFactoryBase>(DbFactoryBase as any);
-    const nowTime = Container.get<NowTimeBase>(NowTimeBase as any);
-    const enumDataSource = new service.MongoEnumDataSource(dbFactory, '-');
-    const redis = Container.get<RedisBase>(RedisBase as any);
-    const redisCache = new service.RedisCache(nowTime, redis, async () => {
-        return enumDataSource.findEnums();
-    }, 'lite-ts:enum');
+    const enumCache = Container.get<CacheBase>(model.enum_.IoC.enumCache);
     Container.set(
         EnumFactoryBase,
         new service.EnumFactory({
             [enum_.CityData.name]: () => {
-                return new service.CacheEnum(redisCache, enum_.CityData.name);
+                return new service.CacheEnum(enumCache, enum_.CityData.name);
             }
         })
     );

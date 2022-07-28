@@ -73,12 +73,14 @@ describe('src/service/db/user-reward-service.ts', () => {
                     count: 2,
                     valueType: 1
                 }]
-            ]);
+            ], 'test');
             deepStrictEqual(res, [{
                 count: 3,
+                source: 'test',
                 valueType: 4,
             }, {
                 count: 3,
+                source: 'test',
                 valueType: 4,
             }]);
         });
@@ -113,16 +115,19 @@ describe('src/service/db/user-reward-service.ts', () => {
             const res = await self.findResults(null, [
                 [{
                     count: 2,
+                    source: 't2',
                     valueType: 1,
                     weight: 10
                 }, {
                     count: 2,
+                    source: 't2',
                     valueType: 3,
                     weight: 11
                 }]
-            ]);
+            ], 'test');
             deepStrictEqual(res, [{
                 count: 2,
+                source: 't2',
                 valueType: 3,
             }]);
         });

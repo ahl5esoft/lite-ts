@@ -12,7 +12,7 @@
 		"js-yaml": "^4.1.0",
 		"log4js": "^6.4.1",
 		"moment": "^2.29.1",
-		"mongodb": "4.7",
+		"mongodb": "^4.8.1",
 		"mysql2": "^2.3.3",
 		"reflect-metadata": "^0.1.13",
 		"sequelize": "^6.16.2",
@@ -55,5 +55,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "13.160.45"
+	"version": "13.166.49"
 }

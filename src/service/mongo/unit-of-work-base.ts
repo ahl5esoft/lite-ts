@@ -1,4 +1,4 @@
-import { ClientSession } from 'mongodb';
+import { AnyBulkWriteOperation, ClientSession } from 'mongodb';
 
 import { MongoPool } from './pool';
 import { toDoc } from './helper';
@@ -9,17 +9,17 @@ import { UnitOfWorkRepositoryBase } from '../../contract';
  */
 export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
     /**
-     * 队列
+     * 批量
      */
-    protected queue: ((session: ClientSession) => Promise<void>)[] = [];
+    private m_Bulk: { [model: string]: AnyBulkWriteOperation[] } = {};
 
     /**
      * 构造函数
      * 
-     * @param m_Pool 连接池
+     * @param pool 连接池
      */
     public constructor(
-        private m_Pool: MongoPool,
+        protected pool: MongoPool,
     ) {
         super();
     }
@@ -28,14 +28,15 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
      * 提交
      */
     public async commit() {
-        if (!this.queue.length)
+        const bulks = Object.entries(this.m_Bulk);
+        if (!bulks.length)
             return;
 
-        const client = await this.m_Pool.client;
+        const client = await this.pool.client;
         const session = client.startSession();
-        await this.onCommit(session);
+        await this.onCommit(session, bulks);
         await session.endSession();
-        this.queue = [];
+        this.m_Bulk = {};
 
         try {
             for (const r of Object.values(this.afterAction))
@@ -52,14 +53,11 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
      * @param entry 实体
      */
     public registerAdd(model: Function, entry: any) {
-        this.queue.push(async session => {
-            const db = await this.m_Pool.db;
-            await db.collection(model.name).insertOne(
-                toDoc(entry),
-                {
-                    session,
-                }
-            );
+        this.m_Bulk[model.name] ??= [];
+        this.m_Bulk[model.name].push({
+            insertOne: {
+                document: toDoc(entry)
+            }
         });
     }
 
@@ -70,13 +68,13 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
      * @param entry 实体
      */
     public registerRemove(model: Function, entry: any) {
-        this.queue.push(async session => {
-            const db = await this.m_Pool.db;
-            await db.collection(model.name).deleteOne({
-                _id: entry.id,
-            }, {
-                session,
-            });
+        this.m_Bulk[model.name] ??= [];
+        this.m_Bulk[model.name].push({
+            deleteOne: {
+                filter: {
+                    _id: entry.id,
+                }
+            }
         });
     }
 
@@ -87,15 +85,16 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
      * @param entry 实体
      */
     public registerSave(model: Function, entry: any) {
-        this.queue.push(async session => {
-            const db = await this.m_Pool.db;
-            await db.collection(model.name).updateOne({
-                _id: entry.id,
-            }, {
-                $set: toDoc(entry),
-            }, {
-                session,
-            });
+        this.m_Bulk[model.name] ??= [];
+        this.m_Bulk[model.name].push({
+            updateOne: {
+                filter: {
+                    _id: entry.id,
+                },
+                update: {
+                    $set: toDoc(entry),
+                }
+            }
         });
     }
 
@@ -103,6 +102,7 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
      * 提交
      * 
      * @param session 会话
+     * @param bulks 批量操作
      */
-    protected abstract onCommit(session: ClientSession): Promise<void>;
+    protected abstract onCommit(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]): Promise<void>;
 }

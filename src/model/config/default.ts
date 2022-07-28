@@ -5,9 +5,17 @@ import { TracingConfig, TracingOptions } from 'jaeger-client';
  */
 export class Default {
     /**
+     * 配置模型
+     */
+    public configModel: string;
+    /**
      * 分布式mongo
      */
     public distributedMongo: string;
+    /**
+     * 枚举模型
+     */
+    public enumModel: string;
     /**
      * 枚举分隔符
      */

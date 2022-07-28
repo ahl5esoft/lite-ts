@@ -5,19 +5,21 @@ import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../../contract';
 import { contract, global } from '../../model';
 
+class TestEnum extends global.Enum { }
+
 describe('src/service/mongo/load-enum-data-source.ts', () => {
     describe('.loadEnumDataSource(dbFactory: DbFactoryBase)', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockDbFactory.actual, '-');
+            const self = new Self(mockDbFactory.actual, '-', TestEnum);
 
-            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<TestEnum>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.Enum),
+                r => r.db(TestEnum),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
+            const mockDbQuery = new Mock<IDbQuery<TestEnum>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual

@@ -82,13 +82,12 @@ export class DbUserRandSeedService implements IUserRandSeedService {
         }
 
         entries[0].seed[this.m_Scene] ??= '';
-        if (entries[0].seed[this.m_Scene].length >= this.m_Range[0])
-            return;
+        if (entries[0].seed[this.m_Scene].length < this.m_Range[0]) {
+            while (entries[0].seed[this.m_Scene].length < this.m_Range[1])
+                entries[0].seed[this.m_Scene] += Math.random().toString(10).substring(2);
 
-        while (entries[0].seed[this.m_Scene].length < this.m_Range[1])
-            entries[0].seed[this.m_Scene] += Math.random().toString(10).substring(2);
-
-        await db.save(entries[0]);
+            await db.save(entries[0]);
+        }
 
         return [...entries[0].seed[this.m_Scene]];
     }
