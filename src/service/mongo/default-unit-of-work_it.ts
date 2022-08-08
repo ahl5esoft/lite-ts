@@ -82,12 +82,15 @@ describe('src/service/mongo/default-unit-of-work.ts', () => {
             let entry = toEntries(rows)[0];
             entry.name = 'two';
             self.registerSave(RegisterSave, entry);
+            entry = toEntries(rows)[0];
+            entry.name = 'three';
+            self.registerSave(RegisterSave, entry);
             await self.commit();
 
             const res = await db.collection(RegisterSave.name).find().toArray();
             deepStrictEqual(res, [{
                 _id: rows[0]._id,
-                name: entry.name,
+                name: 'three',
             }]);
         });
     });

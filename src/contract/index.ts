@@ -19,6 +19,7 @@ export * from './i-target-value-service';
 export * from './i-traceable';
 export * from './i-unit-of-work';
 export * from './i-user-associate-service';
+export * from './i-user-portrait-service';
 export * from './i-user-rand-seed-service';
 export * from './i-user-reward-service';
 export * from './i-user-value-service';

@@ -20,7 +20,7 @@ export class SequelizeDbRepository<T> extends DbRepositoryBase<T> {
         uow: UnitOfWorkRepositoryBase,
         model: new () => T,
     ) {
-        super(model, uow, dbFactory);
+        super(dbFactory, model, uow);
     }
 
     /**

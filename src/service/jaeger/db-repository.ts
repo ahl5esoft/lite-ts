@@ -30,11 +30,11 @@ export class JaegerDbRepository<T> extends DbRepositoryBase<T> {
     public constructor(
         private m_OriginDbFactory: DbFactoryBase,
         private m_ParentSpan: opentracing.Span,
-        uow: UnitOfWorkRepositoryBase,
         jaegerDbFactory: DbFactoryBase,
+        uow: UnitOfWorkRepositoryBase,
         model: new () => T,
     ) {
-        super(model, uow, jaegerDbFactory);
+        super(jaegerDbFactory, model, uow);
     }
 
     /**

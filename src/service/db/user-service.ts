@@ -54,27 +54,27 @@ export class DbUserService extends UserServiceBase {
      * 构造函数
      * 
      * @param dbFactory 数据库工厂
-     * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
-     * @param rpc 远程过程调用
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
      * @param nowValueType 当前时间数值类型
      * @param associateService 关联存储服务
+     * @param enumFactory 枚举工厂
+     * @param rpc 远程过程调用
      * @param userID 用户ID
      */
     public constructor(
         protected dbFactory: DbFactoryBase,
         protected nowTime: NowTimeBase,
-        protected rpc: RpcBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected nowValueType: number,
         associateService: IUserAssociateService,
         enumFactory: EnumFactoryBase,
+        rpc: RpcBase,
         userID: string,
     ) {
-        super(associateService, userID, enumFactory);
+        super(associateService, userID, enumFactory, rpc);
     }
 
     /**

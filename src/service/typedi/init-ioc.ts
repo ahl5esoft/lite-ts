@@ -10,9 +10,10 @@ import { IoredisAdapter } from '../ioredis';
 import { JaegerDbFactory, JeagerRedis } from '../jaeger';
 import { JsYamlConfigLoader } from '../js-yaml';
 import { LogProxy } from '../log';
+import { Log4jsLog } from '../log4js';
 import { loadMongoConfigDataSource, MongoDbFactory, MongoEnumDataSource, MongoStringGenerator } from '../mongo';
 import { RedisCache, RedisLock, RedisNowTime } from '../redis';
-import { RpcValueService } from '../rpc';
+import { RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
 import {
     ConfigLoaderBase,
@@ -125,11 +126,16 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         Container.set(enum_.IoC.enumCache, enumCache);
     }
 
+    let buildLogFunc: () => LogBase;
+    if (cfg.log4js) {
+        Log4jsLog.init(cfg.log4js);
+        buildLogFunc = () => new Log4jsLog();
+    } else {
+        buildLogFunc = () => new ConsoleLog();
+    }
     Container.set(
         LogBase,
-        new LogProxy(
-            () => new ConsoleLog()
-        )
+        new LogProxy(buildLogFunc)
     );
 
     Container.set(
@@ -142,6 +148,9 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         new SetTimeoutThread()
     );
 
+    UserServiceBase.buildPortraitServiceFunc = (rpc: RpcBase, userID: string) => {
+        return new RpcUserPortraitService(rpc, userID);
+    };
     UserServiceBase.buildRandServiceFunc = (associateService: IUserAssociateService, scene: string, userID: string, range: [number, number]) => {
         return new DbUserRandSeedService(associateService, dbFactory, scene, userID, range);
     };

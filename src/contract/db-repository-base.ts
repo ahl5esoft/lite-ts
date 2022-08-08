@@ -18,7 +18,7 @@ export abstract class DbRepositoryBase<T> {
      */
     protected get uow() {
         if (!this.m_Uow) {
-            this.m_Uow = this.m_DbFactory.uow() as UnitOfWorkRepositoryBase;
+            this.m_Uow = this.dbFactory.uow() as UnitOfWorkRepositoryBase;
             this.m_IsTx = false;
         }
 
@@ -28,14 +28,14 @@ export abstract class DbRepositoryBase<T> {
     /**
      * 构造函数
      * 
+     * @param dbFactory 数据库工厂
      * @param model 模型
      * @param m_Uow 工作单元
-     * @param m_DbFactory 数据库工厂
      */
     public constructor(
+        protected dbFactory: DbFactoryBase,
         protected model: new () => T,
         private m_Uow: UnitOfWorkRepositoryBase,
-        private m_DbFactory: DbFactoryBase,
     ) { }
 
     /**

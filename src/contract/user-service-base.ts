@@ -1,9 +1,11 @@
 import { EnumFactoryBase } from './enum-factory-base';
 import { ITargetValueService } from './i-target-value-service';
 import { IUserAssociateService } from './i-user-associate-service';
+import { IUserPortraitService } from './i-user-portrait-service';
 import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
 import { IUserValueService } from './i-user-value-service';
+import { RpcBase } from './rpc-base';
 import { global } from '../model';
 
 /**
@@ -14,6 +16,10 @@ export abstract class UserServiceBase {
      * 随机种子区间
      */
     public static randSeedRange = {};
+    /**
+     * 创建画像服务函数
+     */
+    public static buildPortraitServiceFunc: (rpc: RpcBase, userID: string) => IUserPortraitService;
     /**
      * 创建随机种子服务函数
      */
@@ -27,6 +33,15 @@ export abstract class UserServiceBase {
      * 随机种子服务
      */
     private m_RandSeedService: { [scene: string]: IUserRandSeedService } = {};
+
+    private m_PortraitService: IUserPortraitService;
+    /**
+     * 画像服务
+     */
+    public get portraitService() {
+        this.m_PortraitService ??= UserServiceBase.buildPortraitServiceFunc(this.rpc, this.userID);
+        return this.m_PortraitService;
+    }
 
     private m_RewardService: IUserRewardService;
     /**
@@ -48,11 +63,13 @@ export abstract class UserServiceBase {
      * @param associateService 关联服务
      * @param userID 用户ID
      * @param enumFactory 枚举工厂
+     * @param rpc 远程过程调用
      */
     public constructor(
         public associateService: IUserAssociateService,
         public userID: string,
         protected enumFactory: EnumFactoryBase,
+        protected rpc: RpcBase,
     ) { }
 
     /**

@@ -43,32 +43,6 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
     }
 
     /**
-     * 提交事务
-     */
-    public async commit() {
-        if (this.m_IsEmpty)
-            return;
-
-        this.span.setTag(opentracing.Tags.DB_STATEMENT, 'commit');
-
-        try {
-            await this.m_Uow.commit();
-
-            for (const r of Object.values(this.afterAction)) {
-                await r();
-            }
-        } catch (ex) {
-            this.span.log({
-                err: ex
-            });
-            throw ex;
-        } finally {
-            this.span.finish();
-            this.reset();
-        }
-    }
-
-    /**
      * 注册新增
      * 
      * @param model 模型
@@ -117,10 +91,31 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
     }
 
     /**
+     * 提交事务
+     */
+    protected async onCommit() {
+        if (this.m_IsEmpty)
+            return;
+
+        this.span.setTag(opentracing.Tags.DB_STATEMENT, 'commit');
+
+        try {
+            await this.m_Uow.commit();
+        } catch (ex) {
+            this.span.log({
+                err: ex
+            });
+            throw ex;
+        } finally {
+            this.span.finish();
+            this.reset();
+        }
+    }
+
+    /**
      * 重置
      */
     private reset() {
-        this.afterAction = {};
         this.m_IsEmpty = true;
         this.m_Span = null;
     }

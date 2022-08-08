@@ -25,28 +25,6 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
     }
 
     /**
-     * 提交
-     */
-    public async commit() {
-        const bulks = Object.entries(this.m_Bulk);
-        if (!bulks.length)
-            return;
-
-        const client = await this.pool.client;
-        const session = client.startSession();
-        await this.onCommit(session, bulks);
-        await session.endSession();
-        this.m_Bulk = {};
-
-        try {
-            for (const r of Object.values(this.afterAction))
-                await r();
-        } catch { } finally {
-            this.afterAction = {};
-        }
-    }
-
-    /**
      * 注册新增
      * 
      * @param model 模型
@@ -86,16 +64,40 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
      */
     public registerSave(model: Function, entry: any) {
         this.m_Bulk[model.name] ??= [];
+
+        const doc = toDoc(entry);
+        const index = this.m_Bulk[model.name].findIndex(r => {
+            return (r as any).updateOne?.filter?._id == doc._id;
+        });
+        if (index != -1)
+            this.m_Bulk[model.name].splice(index, 1);
+
+        delete doc._id;
         this.m_Bulk[model.name].push({
             updateOne: {
                 filter: {
                     _id: entry.id,
                 },
                 update: {
-                    $set: toDoc(entry),
+                    $set: doc,
                 }
             }
         });
+    }
+
+    /**
+     * 提交
+     */
+    protected async onCommit() {
+        const bulks = Object.entries(this.m_Bulk);
+        if (!bulks.length)
+            return;
+
+        const client = await this.pool.client;
+        const session = client.startSession();
+        await this.commitWithSession(session, bulks);
+        await session.endSession();
+        this.m_Bulk = {};
     }
 
     /**
@@ -104,5 +106,5 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
      * @param session 会话
      * @param bulks 批量操作
      */
-    protected abstract onCommit(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]): Promise<void>;
+    protected abstract commitWithSession(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]): Promise<void>;
 }

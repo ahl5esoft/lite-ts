@@ -12,7 +12,7 @@ export class MongoDistributedUnitOfWork extends MongoUnitOfWorkBase {
      * @param session 会话
      * @param bulks 批量
      */
-    protected async onCommit(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]) {
+    protected async commitWithSession(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]) {
         try {
             session.startTransaction({
                 readPreference: ReadPreference.primary,

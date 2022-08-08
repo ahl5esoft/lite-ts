@@ -12,7 +12,7 @@ export class MongoDefaultUnitOfWork extends MongoUnitOfWorkBase {
      * @param session 会话
      * @param bulks 批量
      */
-    protected async onCommit(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]) {
+    protected async commitWithSession(session: ClientSession, bulks: [string, AnyBulkWriteOperation[]][]) {
         const db = await this.pool.db;
         for (const r of bulks) {
             await db.collection(r[0]).bulkWrite(r[1], {

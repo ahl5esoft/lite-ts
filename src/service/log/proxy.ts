@@ -7,10 +7,10 @@ export class LogProxy extends LogBase {
     /**
      * 构造函数
      * 
-     * @param m_CreateFunc 创建函数
+     * @param m_BuildFunc 创建函数
      */
     public constructor(
-        private m_CreateFunc: () => LogBase
+        private m_BuildFunc: () => LogBase
     ) {
         super();
     }
@@ -22,7 +22,7 @@ export class LogProxy extends LogBase {
      * @param v 值
      */
     public addLabel(k: string, v: any) {
-        return this.m_CreateFunc().addLabel(k, v);
+        return this.m_BuildFunc().addLabel(k, v);
     }
 
     /**
@@ -36,7 +36,7 @@ export class LogProxy extends LogBase {
      * @param err 错误
      */
     public error(err: Error) {
-        this.m_CreateFunc().error(err);
+        this.m_BuildFunc().error(err);
     }
 
     /**

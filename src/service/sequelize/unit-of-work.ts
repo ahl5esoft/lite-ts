@@ -1,7 +1,7 @@
 import { Sequelize, Transaction } from 'sequelize';
 
 import { SequelizeModelPool } from './model-pool';
-import { UnitOfWorkRepositoryBase } from '../..';
+import { UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
  * sequelize工作单元仓储
@@ -23,22 +23,6 @@ export class SequelizeUnitOfWork extends UnitOfWorkRepositoryBase {
         private m_SeqModelPool: SequelizeModelPool,
     ) {
         super();
-    }
-
-    /**
-     * 提交事务
-     */
-    public async commit() {
-        const tx = await this.m_Seq.transaction();
-        try {
-            for (const r of this.m_Actons)
-                await r(tx);
-
-            await tx.commit();
-        } catch (ex) {
-            await tx.rollback();
-            throw ex;
-        }
     }
 
     /**
@@ -87,5 +71,21 @@ export class SequelizeUnitOfWork extends UnitOfWorkRepositoryBase {
                 },
             });
         });
+    }
+
+    /**
+     * 提交事务
+     */
+    protected async onCommit() {
+        const tx = await this.m_Seq.transaction();
+        try {
+            for (const r of this.m_Actons)
+                await r(tx);
+
+            await tx.commit();
+        } catch (ex) {
+            await tx.rollback();
+            throw ex;
+        }
     }
 }

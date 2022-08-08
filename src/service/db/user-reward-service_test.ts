@@ -77,10 +77,14 @@ describe('src/service/db/user-reward-service.ts', () => {
             deepStrictEqual(res, [{
                 count: 3,
                 source: 'test',
+                targetNo: undefined,
+                targetType: undefined,
                 valueType: 4,
             }, {
                 count: 3,
                 source: 'test',
+                targetNo: undefined,
+                targetType: undefined,
                 valueType: 4,
             }]);
         });
@@ -128,6 +132,8 @@ describe('src/service/db/user-reward-service.ts', () => {
             deepStrictEqual(res, [{
                 count: 2,
                 source: 't2',
+                targetNo: undefined,
+                targetType: undefined,
                 valueType: 3,
             }]);
         });

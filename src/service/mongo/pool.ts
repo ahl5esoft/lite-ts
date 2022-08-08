@@ -12,9 +12,7 @@ export class MongoPool {
         return new Promise<MongoClient>(async (s, f) => {
             if (!this.m_Client) {
                 try {
-                    const client = new MongoClient(this.m_Url);
-                    await client.connect();
-                    this.m_Client = client;
+                    this.m_Client = await new MongoClient(this.m_Url).connect();
                 } catch (ex) {
                     return f(ex);
                 }

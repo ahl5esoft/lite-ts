@@ -43,7 +43,7 @@ export class DbUserRewardService implements IUserRewardService {
                     uow,
                     total.toString().length
                 );
-                let rand = seed % total;
+                let rand = seed % total + 1;
                 reward = r.find(cr => {
                     rand -= cr.weight;
                     return rand <= 0;
@@ -106,7 +106,7 @@ export class DbUserRewardService implements IUserRewardService {
                 const len = total.toString().length;
                 const seed = await randSeedService.get(uow, len, offset);
                 offset += len;
-                let rand = seed % total;
+                let rand = seed % total + 1;
                 reward = r.find(cr => {
                     rand -= cr.weight;
                     return rand <= 0;

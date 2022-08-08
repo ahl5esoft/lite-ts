@@ -25,6 +25,10 @@ export class Default {
      */
     public gatewayUrl: string;
     /**
+     * log4js配置
+     */
+    public log4js: any;
+    /**
      * mongo连接
      */
     public mongo: string;

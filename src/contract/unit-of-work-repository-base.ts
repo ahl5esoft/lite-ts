@@ -7,7 +7,7 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
     /**
      * 提交后函数
      */
-    protected afterAction: { [key: string]: () => Promise<void> } = {};
+    private m_AfterAction: { [key: string]: () => Promise<void> } = {};
 
     /**
      * 注册提交后函数
@@ -16,14 +16,26 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
      * @param key 键
      */
     public registerAfter(action: () => Promise<void>, key?: string) {
-        key ??= `key-${Object.keys(this.afterAction).length}`;
-        this.afterAction[key] = action;
+        key ??= `key-${Object.keys(this.m_AfterAction).length}`;
+        this.m_AfterAction[key] = action;
     }
 
     /**
      * 提交
      */
-    public abstract commit(): Promise<void>;
+    public async commit() {
+        try {
+            await this.onCommit();
+        } finally {
+            const tasks = Object.values(this.m_AfterAction).map(r => {
+                return r();
+            });
+            Promise.all(tasks).catch(console.error).finally(() => {
+                this.m_AfterAction = {};
+            });
+        }
+    }
+
     /**
      * 注册新增
      * 
@@ -45,4 +57,8 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
      * @param entry 实体
      */
     public abstract registerSave<T>(model: new () => T, entry: T): void;
+    /**
+     * 提交
+     */
+    protected abstract onCommit(): Promise<void>;
 }

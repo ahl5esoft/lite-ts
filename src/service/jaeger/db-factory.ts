@@ -31,8 +31,8 @@ export class JaegerDbFactory extends DbFactoryBase implements ITraceable<DbFacto
         return new JaegerDbRepository<T>(
             this.m_DbFactory,
             this.m_ParentSpan,
-            uow,
             this,
+            uow,
             model
         );
     }

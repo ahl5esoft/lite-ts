@@ -20,7 +20,7 @@ export class MongoDbRepository<T> extends DbRepositoryBase<T> {
         dbFactory: DbFactoryBase,
         model: new () => T,
     ) {
-        super(model, uow, dbFactory);
+        super(dbFactory, model, uow);
     }
 
     /**

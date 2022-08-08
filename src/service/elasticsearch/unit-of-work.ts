@@ -40,43 +40,6 @@ export class ElasticSearchUnitOfWork extends UnitOfWorkRepositoryBase {
     }
 
     /**
-     * 提交
-     */
-    public async commit() {
-        const operations = [];
-        for (const r of this.m_Items) {
-            const index = await this.m_Pool.getIndex(r.model);
-            const opEntry = {
-                _id: r.entry.id,
-                _index: index,
-            };
-            if (r.op == 'index') {
-                operations.push({
-                    [r.op]: opEntry
-                }, r.entry);
-            } else if (r.op == 'delete') {
-                operations.push({
-                    [r.op]: opEntry
-                });
-            } else {
-                operations.push({
-                    delete: opEntry
-                }, {
-                    index: opEntry
-                }, r.entry);
-            }
-        }
-        this.m_Items = [];
-
-        await this.m_Pool.client.bulk({
-            operations: operations,
-            refresh: true
-        }, {
-            ignore: [400]
-        });
-    }
-
-    /**
      * 注册新增
      * 
      * @param model 模型
@@ -115,6 +78,43 @@ export class ElasticSearchUnitOfWork extends UnitOfWorkRepositoryBase {
             entry: entry,
             model: model,
             op: 'update',
+        });
+    }
+
+    /**
+     * 提交
+     */
+    protected async onCommit() {
+        const operations = [];
+        for (const r of this.m_Items) {
+            const index = await this.m_Pool.getIndex(r.model);
+            const opEntry = {
+                _id: r.entry.id,
+                _index: index,
+            };
+            if (r.op == 'index') {
+                operations.push({
+                    [r.op]: opEntry
+                }, r.entry);
+            } else if (r.op == 'delete') {
+                operations.push({
+                    [r.op]: opEntry
+                });
+            } else {
+                operations.push({
+                    delete: opEntry
+                }, {
+                    index: opEntry
+                }, r.entry);
+            }
+        }
+        this.m_Items = [];
+
+        await this.m_Pool.client.bulk({
+            operations: operations,
+            refresh: true
+        }, {
+            ignore: [400]
         });
     }
 }
