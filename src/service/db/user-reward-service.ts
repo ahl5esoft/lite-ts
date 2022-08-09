@@ -77,55 +77,44 @@ export class DbUserRewardService implements IUserRewardService {
      * @param scene 场景
      */
     public async preview(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '') {
-        return this.previewWithOffset(uow, rewards, 0, scene);
-    }
-
-    /**
-     * 预览奖励
-     * 
-     * @param uow 工作单元
-     * @param rewards 奖励
-     * @param offset 偏移
-     * @param scene 场景
-     */
-    private async previewWithOffset(uow: IUnitOfWork, rewards: contract.IReward[][], offset: number, scene: string) {
-        const values: contract.IValue[] = [];
+        let rewardsQueue = rewards;
+        const results: contract.IValue[] = [];
         const randSeedService = this.m_UserService.getRandSeedService(scene);
+        let offset = 0;
         const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
-        for (const r of rewards) {
-            if (!r?.length)
+        while (rewardsQueue.length) {
+            const childRewards = rewardsQueue.pop();
+            if (!childRewards?.length)
                 continue;
 
             let reward: contract.IReward;
-            if (r.length == 1) {
-                reward = r[0];
+            if (childRewards.length == 1) {
+                reward = childRewards[0];
             } else {
-                const total = r.reduce((memo, cr) => {
-                    return memo + cr.weight * 1;
+                const total = childRewards.reduce((memo, r) => {
+                    return memo + r.weight * 1;
                 }, 0);
                 const len = total.toString().length;
                 const seed = await randSeedService.get(uow, len, offset);
                 offset += len;
                 let rand = seed % total + 1;
-                reward = r.find(cr => {
-                    rand -= cr.weight;
+                reward = childRewards.find(r => {
+                    rand -= r.weight;
                     return rand <= 0;
                 });
             }
 
             const valueTypeItem = await valueTypeEnum.getByValue(reward.valueType);
             if (valueTypeItem?.data.openRewards) {
-                for (let i = 0; i < reward.count; i++) {
-                    const res = await this.previewWithOffset(uow, valueTypeItem.data.openRewards, offset, scene);
-                    values.push(...res);
-                }
+                for (let i = 0; i < reward.count; i++)
+                    rewardsQueue.splice(valueTypeItem.data.openRewards.length * i, 0, ...valueTypeItem.data.openRewards);
             } else {
-                values.push({
+                results.push({
                     count: reward.count,
                     valueType: reward.valueType
                 });
             }
         }
-        return values;
+        return results;
     }
 }

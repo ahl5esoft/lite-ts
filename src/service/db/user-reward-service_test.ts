@@ -138,4 +138,89 @@ describe('src/service/db/user-reward-service.ts', () => {
             }]);
         });
     });
+
+    describe(`.preview(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '')`, () => {
+        it('ok', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const mockUserService = new Mock<UserServiceBase>();
+            const self = new Self(mockEnumFactory.actual, mockUserService.actual);
+
+            const mockRandSeedService = new Mock<IUserRandSeedService>();
+            mockUserService.expectReturn(
+                r => r.getRandSeedService('test'),
+                mockRandSeedService.actual
+            );
+
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockEnum.actual
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 2, 0),
+                11
+            );
+
+            mockEnum.expectReturn(
+                r => r.getByValue(1),
+                {
+                    data: {
+                        openRewards: [
+                            [{
+                                count: 4,
+                                valueType: 3,
+                                weight: 1
+                            }, {
+                                count: 6,
+                                valueType: 5,
+                                weight: 1
+                            },]
+                        ]
+                    } as enum_.ValueTypeData
+                }
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 2),
+                0
+            );
+
+            mockEnum.expectReturn(
+                r => r.getByValue(3),
+                null
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 3),
+                1
+            );
+
+            mockEnum.expectReturn(
+                r => r.getByValue(5),
+                null
+            );
+
+            const res = await self.preview(null, [
+                [{
+                    count: 10,
+                    source: 't2',
+                    valueType: 1,
+                    weight: 1
+                }, {
+                    count: 2,
+                    source: 't2',
+                    valueType: 1,
+                    weight: 9
+                }]
+            ], 'test');
+            deepStrictEqual(res, [{
+                count: 4,
+                valueType: 3
+            }, {
+                count: 6,
+                valueType: 5
+            }]);
+        });
+    });
 });
