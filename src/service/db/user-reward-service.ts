@@ -77,7 +77,7 @@ export class DbUserRewardService implements IUserRewardService {
      * @param scene 场景
      */
     public async preview(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '') {
-        let rewardsQueue = rewards;
+        let rewardsQueue = JSON.parse(JSON.stringify(rewards));
         const results: contract.IValue[] = [];
         const randSeedService = this.m_UserService.getRandSeedService(scene);
         let offset = 0;
