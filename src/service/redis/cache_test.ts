@@ -1,22 +1,21 @@
 import { strictEqual } from 'assert';
+import moment from 'moment';
 
 import { RedisCache as Self } from './cache';
 import { Mock } from '../assert';
-import { NowTimeBase, RedisBase } from '../../contract';
+import { RedisBase } from '../../contract';
 
 describe('src/service/redis/cache.ts', () => {
     describe('.flush()', () => {
         it('ok', async () => {
-            const mockNowTime = new Mock<NowTimeBase>();
             const mockRedis = new Mock<RedisBase>();
-            const self = new Self(mockNowTime.actual, mockRedis.actual, null, 'test');
+            const self = new Self(mockRedis.actual, null, 'test');
 
-            mockNowTime.expectReturn(
-                r => r.unix(),
-                99
+            mockRedis.expected.hset(
+                'cache',
+                'test',
+                moment().unix().toString()
             );
-
-            mockRedis.expected.hset('cache', 'test', '99');
 
             await self.flush();
         });
@@ -26,7 +25,7 @@ describe('src/service/redis/cache.ts', () => {
         it('ok', async () => {
             const mockRedis = new Mock<RedisBase>();
             let loadCount = 0;
-            const self = new Self(null, mockRedis.actual, async () => {
+            const self = new Self(mockRedis.actual, async () => {
                 loadCount++;
                 return { a: 1 };
             }, 'test');

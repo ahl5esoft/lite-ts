@@ -6,18 +6,13 @@ import { IDbQuery } from '../..';
  * jaeger数据库查询
  */
 export class JaegerDbQuery<T> implements IDbQuery<T> {
-    /**
-     * 跟踪
-     */
-    private m_Tracer = opentracing.globalTracer();
-
     private m_Span: opentracing.Span;
     /**
      * 跟踪范围
      */
     protected get span() {
         if (!this.m_Span) {
-            this.m_Span = this.m_Tracer.startSpan('db.query', {
+            this.m_Span = opentracing.globalTracer().startSpan('db.query', {
                 childOf: this.m_ParentSpan,
                 tags: {
                     table: this.m_Table

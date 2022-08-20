@@ -17,7 +17,7 @@ export class MongoDefaultUnitOfWork extends MongoUnitOfWorkBase {
         for (const r of bulks) {
             await db.collection(r[0]).bulkWrite(r[1], {
                 ordered: false,
-                session
+                session,
             });
         }
     }

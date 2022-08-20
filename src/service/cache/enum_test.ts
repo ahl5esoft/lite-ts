@@ -17,7 +17,7 @@ describe('src/service/cache/enum.ts', () => {
             );
 
             const res = await self.items;
-            deepStrictEqual(res, []);
+            deepStrictEqual(res, {});
         });
     });
 
@@ -35,23 +35,6 @@ describe('src/service/cache/enum.ts', () => {
                 return r.key == '';
             });
             strictEqual(res, undefined);
-        });
-    });
-
-    describe('.getByValue(v: number)', () => {
-        it('ok', async () => {
-            const mockCache = new Mock<CacheBase>();
-            const self = new Self(mockCache.actual, enum_.ValueTypeData.name);
-
-            mockCache.expectReturn(
-                r => r.get(enum_.ValueTypeData.name),
-                {
-                    1: 'a'
-                }
-            );
-
-            const res = await self.getByValue(1);
-            strictEqual(res, 'a');
         });
     });
 });

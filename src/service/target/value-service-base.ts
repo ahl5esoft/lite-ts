@@ -82,19 +82,15 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      */
     public async getCount(_: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
-        if (!entry) {
-            entry = {
-                values: {}
-            } as T;
-        }
+        entry ??= {
+            values: {}
+        } as T;
+        entry.values[valueType] ??= 0;
 
-        if (!(valueType in entry.values))
-            entry.values[valueType] = 0;
-
-        const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).getByValue(valueType);
-        if (valueTypeItem?.data.dailyTime > 0) {
+        const valueTypeItems = await this.enumFactory.build(enum_.ValueTypeData).items;
+        if (valueTypeItems[valueType]?.data.dailyTime) {
             const nowUnix = await this.nowTime.unix();
-            const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
+            const oldUnix = entry.values[valueTypeItems[valueType].data.dailyTime] || 0;
             const isSameDay = moment.unix(nowUnix).isSame(
                 moment.unix(oldUnix),
                 'day'

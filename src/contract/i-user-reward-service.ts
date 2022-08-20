@@ -18,8 +18,8 @@ export interface IUserRewardService {
      * 预览
      * 
      * @param uow 工作单元
-     * @param rewards 奖励
+     * @param rewardsGroup 奖励组
      * @param scene 场景
      */
-    preview(uow: IUnitOfWork, rewards: contract.IReward[][], scene?: string): Promise<contract.IValue[]>;
+    preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene?: string): Promise<{ [key: string]: contract.IValue[] }>;
 }

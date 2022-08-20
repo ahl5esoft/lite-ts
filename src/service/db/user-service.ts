@@ -12,6 +12,7 @@ import {
     ValueInterceptorFactoryBase,
 } from '../../contract';
 import { enum_, global } from '../../model';
+import { opentracing } from 'jaeger-client';
 
 /**
  * 用户服务
@@ -46,6 +47,7 @@ export class DbUserService extends UserServiceBase {
             this.nowTime,
             this.stringGenerator,
             this.valueInterceptorFactory,
+            this.parentSpan,
         );
         return this.m_ValueService;
     }
@@ -57,6 +59,7 @@ export class DbUserService extends UserServiceBase {
      * @param nowTime 当前时间
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
+     * @param parentSpan 父范围
      * @param nowValueType 当前时间数值类型
      * @param associateService 关联存储服务
      * @param enumFactory 枚举工厂
@@ -69,6 +72,7 @@ export class DbUserService extends UserServiceBase {
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected nowValueType: number,
+        protected parentSpan: opentracing.Span,
         associateService: IUserAssociateService,
         enumFactory: EnumFactoryBase,
         rpc: RpcBase,
@@ -86,11 +90,11 @@ export class DbUserService extends UserServiceBase {
         if (targetType == 0)
             throw new Error('无法用此方法获取用户数值服务');
 
-        const targetTypeEnumItem = await this.enumFactory.build(enum_.TargetTypeData).getByValue(targetType);
-        if (!targetTypeEnumItem)
+        const items = await this.enumFactory.build(enum_.TargetTypeData).items;
+        if (!items[targetType])
             throw new Error(`无效目标类型: ${targetType}`);
 
-        this.m_TargetTypeValueService[targetType] ??= DbUserService.buildTargetValueServiceFunc(this.enumFactory, this.rpc, this, targetTypeEnumItem.data, this.userID);
+        this.m_TargetTypeValueService[targetType] ??= DbUserService.buildTargetValueServiceFunc(this.enumFactory, this.rpc, this, items[targetType].data, this.userID);
         return this.m_TargetTypeValueService[targetType];
     }
 }

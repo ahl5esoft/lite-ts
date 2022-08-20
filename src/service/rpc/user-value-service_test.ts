@@ -42,7 +42,7 @@ describe('src/service/rpc/user-value-service.ts', () => {
         });
     });
 
-    describe('.update(_: IUnitOfWork, values: contract.IValue[])', () => {
+    describe('.update(uow: IUnitOfWork, values: contract.IValue[])', () => {
         it('ok', async () => {
             const userID = 'uid';
             const mockUserService = new Mock<UserServiceBase>({

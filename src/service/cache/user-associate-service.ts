@@ -35,14 +35,16 @@ export class CacheUserAssociateService implements IUserAssociateService {
      * @param key 键
      * @param predicate 断言
      */
-    public async find<T>(key: string, predicate: (r: T) => boolean) {
+    public async find<T>(key: string, predicate?: (r: T) => boolean) {
         const findFunc = this.m_FindFuncs[key];
         if (!findFunc)
             throw new Error(`${CacheUserAssociateService.name}.find: ${key} `);
 
-        if (!this.m_Associates[key])
-            this.m_Associates[key] = await findFunc();
+        this.m_Associates[key] ??= await findFunc();
 
+        predicate ??= () => {
+            return true;
+        };
         return this.m_Associates[key].filter(predicate);
     }
 

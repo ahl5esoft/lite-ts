@@ -38,10 +38,10 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
             return nullValueInterceptor;
 
         if (!valueInterceptorMetadata.valueType[value.valueType]) {
-            const valueTypeItem = await this.m_EnumFactory.build(enum_.ValueTypeData).getByValue(value.valueType);
-            if (valueTypeItem) {
+            const valueTypeItems = await this.m_EnumFactory.build(enum_.ValueTypeData).items;
+            if (valueTypeItems[value.valueType]) {
                 for (const r of valueInterceptorMetadata.predicates) {
-                    const ok = r.predicate(valueTypeItem.data);
+                    const ok = r.predicate(valueTypeItems[value.valueType].data);
                     if (ok)
                         valueInterceptorMetadata.valueType[value.valueType] = r.ctor;
                 }

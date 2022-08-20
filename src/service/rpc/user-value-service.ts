@@ -19,13 +19,18 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
     public static updateRoute = 'update-values-by-user-id';
 
     /**
+     * 变更
+     */
+    private m_ChangeValue = {};
+
+    /**
      * 实体
      */
     public get entry() {
         return new Promise<global.UserValue>(async (s, f) => {
             try {
                 const entries = await this.userService.associateService.find<global.UserValue>(global.UserValue.name, r => {
-                    return r.id == this.userService.userID
+                    return r.id == this.userService.userID;
                 });
                 s(entries[0]);
             } catch (ex) {
@@ -71,13 +76,33 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
     /**
      * 更新
      * 
-     * @param _ 工作单元(忽略)
+     * @param uow 工作单元
      * @param values 数值数组
      */
-    public async update(_: IUnitOfWork, values: contract.IValue[]) {
-        await this.m_Rpc.setBody({
-            userID: this.userService.userID,
-            values: values
-        }).call<void>(`/${this.m_TargetTypeData.app}/${RpcUserValueService.updateRoute}`);
+    public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        const route = ['', this.m_TargetTypeData.app, RpcUserValueService.updateRoute].join('/')
+        if (uow) {
+            for (const r of values) {
+                this.m_ChangeValue[r.valueType] ??= 0;
+                this.m_ChangeValue[r.valueType] += r.count;
+            }
+            uow.registerAfter(async () => {
+                await this.m_Rpc.setBody({
+                    userID: this.userService.userID,
+                    values: Object.entries(this.m_ChangeValue).map(([k, v]) => {
+                        return {
+                            ...values[0],
+                            count: v,
+                            valueType: parseInt(k),
+                        };
+                    })
+                }).call<void>(route);
+            }, route);
+        } else {
+            await this.m_Rpc.setBody({
+                userID: this.userService.userID,
+                values: values
+            }).call<void>(route);
+        }
     }
 }

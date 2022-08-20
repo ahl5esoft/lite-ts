@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { CacheBase, NowTimeBase, RedisBase } from '../../contract';
+import { CacheBase, RedisBase } from '../../contract';
 
 /**
  * redis缓存
@@ -22,16 +22,14 @@ export class RedisCache extends CacheBase {
     /**
      * 构造函数
      * 
-     * @param m_NowTime 当前时间
      * @param m_Redis redis
-     * @param m_LoadFunc 加载函数
      * @param m_CacheKey 缓存键
+     * @param m_LoadFunc 加载函数
      */
     public constructor(
-        private m_NowTime: NowTimeBase,
         private m_Redis: RedisBase,
-        private m_LoadFunc: () => Promise<{ [key: string]: any }>,
         private m_CacheKey: string,
+        private m_LoadFunc: () => Promise<{ [key: string]: any }>,
     ) {
         super();
     }
@@ -40,11 +38,10 @@ export class RedisCache extends CacheBase {
      * 刷新
      */
     public async flush() {
-        const now = await this.m_NowTime.unix();
         await this.m_Redis.hset(
             'cache',
             this.m_CacheKey,
-            now.toString()
+            moment().unix().toString()
         );
     }
 
@@ -55,12 +52,10 @@ export class RedisCache extends CacheBase {
      */
     public async get<T>(key: string) {
         const value = await this.m_Redis.hget('cache', this.m_CacheKey);
-        let oldCacheOn = parseInt(value);
-        if (isNaN(oldCacheOn))
-            oldCacheOn = this.m_Now;
-        if (this.m_CacheOn != oldCacheOn) {
+        const lastCacheOn = parseInt(value) || this.m_Now;
+        if (this.m_CacheOn != lastCacheOn) {
             this.m_Cache = await this.m_LoadFunc();
-            this.m_CacheOn = oldCacheOn;
+            this.m_CacheOn = lastCacheOn;
         }
 
         return this.m_Cache[key] as T;

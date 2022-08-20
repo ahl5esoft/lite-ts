@@ -2,14 +2,13 @@ import { deepStrictEqual, strictEqual } from 'assert';
 import moment from 'moment';
 
 import { DbValueServiceBase } from './value-service-base';
-import { Mock, mockAny } from '../assert';
+import { Mock } from '../assert';
 import { CustomError } from '../error';
 import {
     DbFactoryBase,
     DbRepositoryBase,
     EnumFactoryBase,
     IEnum,
-    IEnumItem,
     IUnitOfWork,
     IUserAssociateService,
     IValueInterceptor,
@@ -85,10 +84,11 @@ describe('src/service/db/value-service-base.ts', () => {
     });
 
     describe('.update(uow: IUnitOfWork, values: contract.IValue[])', () => {
-        it('Iglobal.UserValueData不存在', async () => {
+        it('IValueTypeData不存在', async () => {
             const mockAssociateService = new Mock<IUserAssociateService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, null, null);
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
 
             Reflect.set(self, 'getEntry', () => { });
 
@@ -116,6 +116,18 @@ describe('src/service/db/value-service-base.ts', () => {
                 r => r.db(global.UserValueLog, null),
                 mockLogDbRepo.actual
             );
+
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
+                items: {}
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueType.actual
+            );
+
+            Reflect.set(self, 'getNow', () => {
+                return 0;
+            });
 
             mockValueDbRepo.expected.save({
                 values: {}
@@ -180,20 +192,18 @@ describe('src/service/db/value-service-base.ts', () => {
                 logID
             );
 
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
+                items: {
+                    1: {
+                        data: {
+                            isPositive: true
+                        }
+                    }
+                }
+            });
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockValueType.actual
-            );
-
-            const mockValueTypeItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
-                data: {
-                    isPositive: true
-                }
-            });
-            mockValueType.expectReturn(
-                r => r.get(mockAny),
-                mockValueTypeItem.actual
             );
 
             let err: CustomError;
@@ -264,20 +274,18 @@ describe('src/service/db/value-service-base.ts', () => {
                 logID
             );
 
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
+                items: {
+                    1: {
+                        data: {
+                            isReplace: true
+                        }
+                    }
+                }
+            });
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockValueType.actual
-            );
-
-            const mockValueTypeItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
-                data: {
-                    isReplace: true
-                }
-            });
-            mockValueType.expectReturn(
-                r => r.get(mockAny),
-                mockValueTypeItem.actual
             );
 
             mockLogDbRepo.expected.add({
@@ -354,20 +362,18 @@ describe('src/service/db/value-service-base.ts', () => {
                 logID
             );
 
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
+                items: {
+                    1: {
+                        data: {
+                            dailyTime: 2
+                        }
+                    }
+                }
+            });
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockValueType.actual
-            );
-
-            const mockValueTypeItem = new Mock<IEnumItem<enum_.ValueTypeData>>({
-                data: {
-                    dailyTime: 2
-                }
-            });
-            mockValueType.expectReturn(
-                r => r.get(mockAny),
-                mockValueTypeItem.actual
             );
 
             const nowUnix = moment().unix();
@@ -379,7 +385,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 count: 11,
                 id: logID,
                 oldCount: 10,
-                source: valueChange.source,
+                source: valueChange.source + '(每日重置)',
                 valueType: 1
             } as global.UserValueLog);
 

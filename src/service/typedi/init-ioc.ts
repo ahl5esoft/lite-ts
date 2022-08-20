@@ -115,14 +115,14 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     Container.set(NowTimeBase, nowTime);
 
     if (redis && dbFactory?.constructor == MongoDbFactory) {
-        const configCache = new RedisCache(nowTime, redis, () => {
+        const configCache = new RedisCache(redis, `${cfg.name}:${cfg.configModel ?? global.Config.name}`, () => {
             return loadMongoConfigDataSource(dbFactory, globalModel[cfg.configModel] ?? global.Config);
-        }, `${cfg.name}:${cfg.configModel ?? global.Config.name}`);
+        });
         Container.set(enum_.IoC.configCache, configCache);
 
-        const enumCache = new RedisCache(nowTime, redis, () => {
+        const enumCache = new RedisCache(redis, `${cfg.name}:${cfg.enumModel ?? global.Enum.name}`, () => {
             return new MongoEnumDataSource(dbFactory, '-', globalModel[cfg.enumModel] ?? global.Enum).findEnums();
-        }, `${cfg.name}:${cfg.enumModel ?? global.Enum.name}`);
+        });
         Container.set(enum_.IoC.enumCache, enumCache);
     }
 

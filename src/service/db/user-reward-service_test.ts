@@ -1,4 +1,4 @@
-import { deepStrictEqual } from 'assert';
+import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserRewardService as Self } from './user-reward-service';
 import { Mock } from '../assert';
@@ -18,24 +18,23 @@ describe('src/service/db/user-reward-service.ts', () => {
                 mockRandSeedService.actual
             );
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
-            mockEnumFactory.expectReturn(
-                r => r.build(enum_.ValueTypeData),
-                mockEnum.actual
-            );
-
-            mockEnum.expectReturn(
-                r => r.getByValue(1),
-                {
-                    data: {
-                        openRewards: [
-                            [{
-                                count: 3,
-                                valueType: 4,
-                            }]
-                        ]
-                    } as enum_.ValueTypeData
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+                items: {
+                    1: {
+                        data: {
+                            openRewards: [
+                                [{
+                                    count: 3,
+                                    valueType: 4,
+                                }]
+                            ]
+                        } as enum_.ValueTypeData
+                    }
                 }
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockEnum.actual
             );
 
             mockUserService.expectReturn(
@@ -48,11 +47,6 @@ describe('src/service/db/user-reward-service.ts', () => {
                 mockEnum.actual
             );
 
-            mockEnum.expectReturn(
-                r => r.getByValue(4),
-                null
-            );
-
             mockUserService.expectReturn(
                 r => r.getRandSeedService(''),
                 mockRandSeedService.actual
@@ -61,11 +55,6 @@ describe('src/service/db/user-reward-service.ts', () => {
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
-            );
-
-            mockEnum.expectReturn(
-                r => r.getByValue(4),
-                null
             );
 
             const res = await self.findResults(null, [
@@ -111,11 +100,6 @@ describe('src/service/db/user-reward-service.ts', () => {
                 11
             );
 
-            mockEnum.expectReturn(
-                r => r.getByValue(3),
-                null
-            );
-
             const res = await self.findResults(null, [
                 [{
                     count: 2,
@@ -139,7 +123,7 @@ describe('src/service/db/user-reward-service.ts', () => {
         });
     });
 
-    describe(`.preview(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '')`, () => {
+    describe(`.preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '')`, () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockUserService = new Mock<UserServiceBase>();
@@ -151,7 +135,25 @@ describe('src/service/db/user-reward-service.ts', () => {
                 mockRandSeedService.actual
             );
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+                items: {
+                    1: {
+                        data: {
+                            openRewards: [
+                                [{
+                                    count: 4,
+                                    valueType: 3,
+                                    weight: 1
+                                }, {
+                                    count: 6,
+                                    valueType: 5,
+                                    weight: 1
+                                },]
+                            ]
+                        } as enum_.ValueTypeData
+                    }
+                }
+            });
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
@@ -162,33 +164,9 @@ describe('src/service/db/user-reward-service.ts', () => {
                 11
             );
 
-            mockEnum.expectReturn(
-                r => r.getByValue(1),
-                {
-                    data: {
-                        openRewards: [
-                            [{
-                                count: 4,
-                                valueType: 3,
-                                weight: 1
-                            }, {
-                                count: 6,
-                                valueType: 5,
-                                weight: 1
-                            },]
-                        ]
-                    } as enum_.ValueTypeData
-                }
-            );
-
             mockRandSeedService.expectReturn(
                 r => r.get(null, 1, 2),
                 0
-            );
-
-            mockEnum.expectReturn(
-                r => r.getByValue(3),
-                null
             );
 
             mockRandSeedService.expectReturn(
@@ -196,12 +174,7 @@ describe('src/service/db/user-reward-service.ts', () => {
                 1
             );
 
-            mockEnum.expectReturn(
-                r => r.getByValue(5),
-                null
-            );
-
-            const res = await self.preview(null, [
+            const rewards = [
                 [{
                     count: 10,
                     source: 't2',
@@ -213,14 +186,20 @@ describe('src/service/db/user-reward-service.ts', () => {
                     valueType: 1,
                     weight: 9
                 }]
-            ], 'test');
-            deepStrictEqual(res, [{
-                count: 4,
-                valueType: 3
-            }, {
-                count: 6,
-                valueType: 5
-            }]);
+            ];
+            const res = await self.preview(null, {
+                '': rewards
+            }, 'test');
+            deepStrictEqual(res, {
+                '': [{
+                    count: 4,
+                    valueType: 3
+                }, {
+                    count: 6,
+                    valueType: 5
+                }]
+            });
+            strictEqual(rewards.length, 1);
         });
     });
 });

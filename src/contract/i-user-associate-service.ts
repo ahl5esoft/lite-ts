@@ -15,7 +15,7 @@ export interface IUserAssociateService {
      * @param key 键
      * @param predicate 断言
      */
-    find<T>(key: string, predicate: (r: T) => boolean): Promise<T[]>;
+    find<T>(key: string, predicate?: (r: T) => boolean): Promise<T[]>;
     /**
      * 获取并清除满足条件的数据
      * 

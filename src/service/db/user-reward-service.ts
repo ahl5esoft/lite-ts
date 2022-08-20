@@ -27,7 +27,7 @@ export class DbUserRewardService implements IUserRewardService {
     public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
         const values: contract.IValue[] = [];
         const randSeedService = this.m_UserService.getRandSeedService(scene);
-        const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
+        const valueTypeItems = this.m_EnumFactory.build(enum_.ValueTypeData).items;
         for (const r of rewards) {
             if (!r?.length)
                 continue;
@@ -50,10 +50,9 @@ export class DbUserRewardService implements IUserRewardService {
                 });
             }
 
-            const valueTypeItem = await valueTypeEnum.getByValue(reward.valueType);
-            if (valueTypeItem?.data.openRewards) {
+            if (valueTypeItems[reward.valueType]?.data.openRewards) {
                 for (let i = 0; i < reward.count; i++) {
-                    const res = await this.findResults(uow, valueTypeItem.data.openRewards, source, scene);
+                    const res = await this.findResults(uow, valueTypeItems[reward.valueType].data.openRewards, source, scene);
                     values.push(...res);
                 }
             } else {
@@ -73,48 +72,51 @@ export class DbUserRewardService implements IUserRewardService {
      * 预览
      * 
      * @param uow 工作单元
-     * @param rewards 奖励
+     * @param rewardsGroup 奖励组
      * @param scene 场景
      */
-    public async preview(uow: IUnitOfWork, rewards: contract.IReward[][], scene = '') {
-        let rewardsQueue = rewards;
-        const results: contract.IValue[] = [];
-        const randSeedService = this.m_UserService.getRandSeedService(scene);
+    public async preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '') {
         let offset = 0;
-        const valueTypeEnum = this.m_EnumFactory.build(enum_.ValueTypeData);
-        while (rewardsQueue.length) {
-            const childRewards = rewardsQueue.pop();
-            if (!childRewards?.length)
-                continue;
+        const res = {};
+        const valueTypeItems = await this.m_EnumFactory.build(enum_.ValueTypeData).items;
+        for (const [k, v] of Object.entries(rewardsGroup)) {
+            const values: contract.IValue[] = [];
+            const randSeedService = this.m_UserService.getRandSeedService(scene);
+            let rewardsQueue = [...v];
+            while (rewardsQueue.length) {
+                const childRewards = rewardsQueue.pop();
+                if (!childRewards?.length)
+                    continue;
 
-            let reward: contract.IReward;
-            if (childRewards.length == 1) {
-                reward = childRewards[0];
-            } else {
-                const total = childRewards.reduce((memo, r) => {
-                    return memo + r.weight * 1;
-                }, 0);
-                const len = total.toString().length;
-                const seed = await randSeedService.get(uow, len, offset);
-                offset += len;
-                let rand = seed % total + 1;
-                reward = childRewards.find(r => {
-                    rand -= r.weight;
-                    return rand <= 0;
-                });
-            }
+                let reward: contract.IReward;
+                if (childRewards.length == 1) {
+                    reward = childRewards[0];
+                } else {
+                    const total = childRewards.reduce((memo, r) => {
+                        return memo + r.weight * 1;
+                    }, 0);
+                    const len = total.toString().length;
+                    const seed = await randSeedService.get(uow, len, offset);
+                    offset += len;
+                    let rand = seed % total + 1;
+                    reward = childRewards.find(r => {
+                        rand -= r.weight;
+                        return rand <= 0;
+                    });
+                }
 
-            const valueTypeItem = await valueTypeEnum.getByValue(reward.valueType);
-            if (valueTypeItem?.data.openRewards) {
-                for (let i = 0; i < reward.count; i++)
-                    rewardsQueue.splice(valueTypeItem.data.openRewards.length * i, 0, ...valueTypeItem.data.openRewards);
-            } else {
-                results.push({
-                    count: reward.count,
-                    valueType: reward.valueType
-                });
+                if (valueTypeItems[reward.valueType]?.data.openRewards) {
+                    for (let i = 0; i < reward.count; i++)
+                        rewardsQueue.splice(valueTypeItems[reward.valueType].data.openRewards.length * i, 0, ...valueTypeItems[reward.valueType].data.openRewards);
+                } else {
+                    values.push({
+                        count: reward.count,
+                        valueType: reward.valueType
+                    });
+                }
             }
+            res[k] = values;
         }
-        return results;
+        return res;
     }
 }

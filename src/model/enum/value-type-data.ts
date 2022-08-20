@@ -74,10 +74,6 @@ export class ValueTypeData implements IEnumItem {
      */
     public isNegative?: boolean;
     /**
-     * 开启奖励
-     */
-    public openRewards?: IReward[][];
-    /**
      * 数值类型每次更新时都是替换, 默认为累积
      * 
      * @example
@@ -105,4 +101,8 @@ export class ValueTypeData implements IEnumItem {
      *  // res = 22
      */
     public isReplace?: boolean;
+    /**
+     * 开启奖励
+     */
+    public openRewards?: IReward[][];
 }

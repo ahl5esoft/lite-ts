@@ -24,6 +24,7 @@ export * from './i-user-rand-seed-service';
 export * from './i-user-reward-service';
 export * from './i-user-value-service';
 export * from './i-value-interceptor';
+export * from './i-value-type-service';
 export * from './io-directory-base';
 export * from './io-factory-base';
 export * from './io-file-base';

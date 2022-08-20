@@ -27,14 +27,13 @@ describe('src/service/jaeger/unit-of-work.ts', () => {
         });
     });
 
-    describe('.registerAdd(table: string, entry: any)', () => {
+    describe('.registerAdd<T>(model: new () => T, entry: T)', () => {
         it('ok', () => {
-            const mockUow = new Mock<UnitOfWorkRepositoryBase>();
-            const self = new Self(mockUow.actual, null);
-
-            mockUow.expected.registerAdd(TestUnitOfWorkModel, {});
+            const self = new Self(null, null);
 
             self.registerAdd(TestUnitOfWorkModel, {});
+
+            // const res = Reflect
         });
     });
 

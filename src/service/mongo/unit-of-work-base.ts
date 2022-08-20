@@ -94,7 +94,13 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
             return;
 
         const client = await this.pool.client;
-        const session = client.startSession();
+        const session = client.startSession({
+            defaultTransactionOptions: {
+                writeConcern: {
+                    w: 1
+                }
+            }
+        });
         await this.commitWithSession(session, bulks);
         await session.endSession();
         this.m_Bulk = {};

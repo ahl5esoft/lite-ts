@@ -1,3 +1,4 @@
+import { opentracing } from 'jaeger-client';
 import moment from 'moment';
 
 import { CustomError } from '../error';
@@ -20,7 +21,7 @@ export abstract class DbValueServiceBase<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
-> extends TargetValueServiceBase<T> {
+    > extends TargetValueServiceBase<T> {
     /**
      * 构造函数
      * 
@@ -28,6 +29,7 @@ export abstract class DbValueServiceBase<
      * @param dbFactory 数据库工厂
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
+     * @param parentSpan 父范围
      * @param model 数值模型
      * @param changeModel 数值变更模型
      * @param logModel 数值日志模型
@@ -39,6 +41,7 @@ export abstract class DbValueServiceBase<
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
+        protected parentSpan: opentracing.Span,
         protected model: new () => T,
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
@@ -56,15 +59,32 @@ export abstract class DbValueServiceBase<
      * @param valueType 数值类型
      */
     public async getCount(uow: IUnitOfWork, valueType: number) {
+        const span = opentracing.globalTracer().startSpan('value.getCount', {
+            childOf: this.parentSpan,
+        });
+
         const changeEntries = await this.findAndClearChangeEntries();
         const changeDb = this.dbFactory.db(this.changeModel, uow);
-        for (const r of changeEntries) {
-            await changeDb.remove(r);
+        if (changeEntries.length) {
+            span.log({
+                changes: changeEntries
+            });
 
-            await this.update(uow, [r]);
+            const values: contract.IValue[] = [];
+            for (const r of changeEntries) {
+                await changeDb.remove(r);
+                values.push({
+                    count: r.count,
+                    source: r.source,
+                    valueType: r.valueType
+                });
+            }
+            await this.update(uow, values);
         }
 
-        return super.getCount(uow, valueType);
+        const res = await super.getCount(uow, valueType);
+        span.finish();
+        return res;
     }
 
     /**
@@ -74,6 +94,10 @@ export abstract class DbValueServiceBase<
      * @param values 数值数据
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        const span = opentracing.globalTracer().startSpan('value.update', {
+            childOf: this.parentSpan,
+        });
+
         const db = this.dbFactory.db(this.model, uow);
         let entry = await this.entry;
         if (!entry) {
@@ -85,17 +109,16 @@ export abstract class DbValueServiceBase<
         }
 
         const logDb = this.dbFactory.db(this.logModel, uow);
+        const valueTypeItems = await this.enumFactory.build(enum_.ValueTypeData).items;
+        const nowUnix = await this.getNow(uow);
         for (const r of values) {
             if (typeof r.valueType != 'number' || typeof r.count != 'number' || isNaN(r.count))
                 continue;
 
-            const valueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).get(cr => {
-                return cr.value == r.valueType;
-            });
-            if (!valueTypeItem?.data.isReplace && r.count == 0)
-                continue;
-
             entry.values[r.valueType] ??= 0;
+
+            if (!valueTypeItems[r.valueType]?.data.isReplace && r.count == 0)
+                continue;
 
             const interceptor = await this.valueInterceptorFactory.build(r);
             const isIntercepted = await interceptor.before(uow, this, r);
@@ -108,27 +131,28 @@ export abstract class DbValueServiceBase<
             logEntry.source = r.source;
             logEntry.valueType = r.valueType;
 
-            if (valueTypeItem) {
-                if (valueTypeItem.data.isReplace) {
+            if (valueTypeItems[r.valueType]) {
+                if (valueTypeItems[r.valueType].data.isReplace) {
                     entry.values[r.valueType] = r.count;
-                } else if (valueTypeItem.data.dailyTime > 0) {
-                    const nowUnix = await this.getNow(uow);
-                    const oldUnix = entry.values[valueTypeItem.data.dailyTime] || 0;
+                } else if (valueTypeItems[r.valueType].data.dailyTime > 0) {
+                    const oldUnix = entry.values[valueTypeItems[r.valueType].data.dailyTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
                         'day'
                     );
-                    if (!isSameDay)
+                    if (!isSameDay) {
                         entry.values[r.valueType] = 0;
+                        logEntry.source += '(每日重置)';
+                    }
 
-                    entry.values[valueTypeItem.data.dailyTime] = nowUnix;
+                    entry.values[valueTypeItems[r.valueType].data.dailyTime] = nowUnix;
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;
                 }
 
-                if (entry.values[r.valueType] < 0 && !valueTypeItem.data.isNegative) {
-                    entry.values[r.valueType] -= r.count;
+                if (entry.values[r.valueType] < 0 && !valueTypeItems[r.valueType].data.isNegative) {
+                    entry.values[r.valueType] = logEntry.oldCount;
                     throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
                         consume: Math.abs(r.count),
                         count: logEntry.oldCount,
@@ -147,6 +171,8 @@ export abstract class DbValueServiceBase<
         }
 
         await db.save(entry);
+
+        span.log({ values }).finish();
     }
 
     /**

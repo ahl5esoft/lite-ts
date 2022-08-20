@@ -3,31 +3,44 @@ import { opentracing } from 'jaeger-client';
 import { UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
+ * 动作类型
+ */
+enum Action {
+    /**
+     * 删除
+     */
+    delete = 'remove',
+    /**
+     * 插入
+     */
+    insert = 'add',
+    /**
+     * 更新
+     */
+    update = 'save',
+}
+
+/**
  * jaeger工作单元
  */
 export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
     /**
-     * 空
+     * 队列
      */
-    private m_IsEmpty = true;
-    /**
-     * 跟踪
-     */
-    private m_Tracer = opentracing.globalTracer();
-
-    private m_Span: opentracing.Span;
-    /**
-     * 跟踪范围
-     */
-    protected get span() {
-        if (!this.m_Span) {
-            this.m_Span = this.m_Tracer.startSpan('db.uow', {
-                childOf: this.m_ParentSpan
-            });
-        }
-
-        return this.m_Span;
-    }
+    private m_Queue: {
+        /**
+         * 动作
+         */
+        action: Action;
+        /**
+         * 实体
+         */
+        entry: any;
+        /**
+         * 模型
+         */
+        model: new () => any;
+    }[] = [];
 
     /**
      * 构造函数
@@ -49,13 +62,11 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * @param entry 实体
      */
     public registerAdd<T>(model: new () => T, entry: T) {
-        this.m_Uow.registerAdd(model, entry);
-        this.span.log({
-            action: 'add',
-            entry: entry,
-            table: model.name
+        this.m_Queue.push({
+            action: Action.insert,
+            entry,
+            model
         });
-        this.m_IsEmpty = false;
     }
 
     /**
@@ -65,13 +76,11 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * @param entry 实体
      */
     public registerRemove<T>(model: new () => T, entry: T) {
-        this.m_Uow.registerRemove(model, entry);
-        this.span.log({
-            action: 'remove',
-            entry: entry,
-            table: model.name
+        this.m_Queue.push({
+            action: Action.delete,
+            entry,
+            model
         });
-        this.m_IsEmpty = false;
     }
 
     /**
@@ -81,42 +90,54 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * @param entry 实体
      */
     public registerSave<T>(model: new () => T, entry: T) {
-        this.m_Uow.registerSave(model, entry);
-        this.span.log({
-            action: 'save',
-            entry: entry,
-            table: model.name
+        this.m_Queue.push({
+            action: Action.update,
+            entry,
+            model
         });
-        this.m_IsEmpty = false;
     }
 
     /**
      * 提交事务
      */
     protected async onCommit() {
-        if (this.m_IsEmpty)
+        if (!this.m_Queue.length)
             return;
 
-        this.span.setTag(opentracing.Tags.DB_STATEMENT, 'commit');
+        const span = opentracing.globalTracer().startSpan('db.uow', {
+            childOf: this.m_ParentSpan
+        });
+        span.setTag(opentracing.Tags.DB_STATEMENT, 'commit');
 
         try {
+            for (const r of this.m_Queue) {
+                switch (r.action) {
+                    case Action.delete:
+                        this.m_Uow.registerRemove(r.model, r.entry);
+                        break;
+                    case Action.insert:
+                        this.m_Uow.registerAdd(r.model, r.entry);
+                        break;
+                    case Action.update:
+                        this.m_Uow.registerSave(r.model, r.entry);
+                        break;
+                }
+                span.log({
+                    action: 'save',
+                    entry: r.entry,
+                    table: r.model.name
+                });
+            }
+
             await this.m_Uow.commit();
         } catch (ex) {
-            this.span.log({
+            span.log({
                 err: ex
             });
             throw ex;
         } finally {
-            this.span.finish();
-            this.reset();
+            span.finish();
+            this.m_Queue = [];
         }
-    }
-
-    /**
-     * 重置
-     */
-    private reset() {
-        this.m_IsEmpty = true;
-        this.m_Span = null;
     }
 }

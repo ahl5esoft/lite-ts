@@ -8,7 +8,7 @@ import { global } from '../../model';
 describe('src/service/user/value-service.ts', () => {
     describe('.getNow(uow: IUnitOfWork)', () => {
         it('数值', async () => {
-            const self = new Self(null, 1, null, null, null, null, null);
+            const self = new Self(null, 1, null, null, null, null, null, null);
 
             const mockUow = new Mock<IUnitOfWork>();
             Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
@@ -23,7 +23,7 @@ describe('src/service/user/value-service.ts', () => {
 
         it('NowTime', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
-            const self = new Self(null, 1, null, null, mockNowTime.actual, null, null);
+            const self = new Self(null, 1, null, null, mockNowTime.actual, null, null, null);
 
             const mockUow = new Mock<IUnitOfWork>();
             Reflect.set(self, 'getCount', (arg: IUnitOfWork, arg1: number) => {
@@ -45,7 +45,7 @@ describe('src/service/user/value-service.ts', () => {
     describe('.update(uow: IUnitOfWork, values: IValueData[])', () => {
         it('ok', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, 0, null, null, null, null, null);
+            const self = new Self(mockUserService.actual, 0, null, null, null, null, null, null);
 
             const mockValueService = new Mock<ITargetValueService<global.UserValue>>();
             mockUserService.expectReturn(

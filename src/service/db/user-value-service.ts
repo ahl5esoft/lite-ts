@@ -10,6 +10,7 @@ import {
     ValueInterceptorFactoryBase
 } from '../../contract';
 import { contract, global } from '../../model';
+import { opentracing } from 'jaeger-client';
 
 /**
  * 用户数值服务
@@ -45,6 +46,7 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param nowTime 当前时间
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
+     * @param parentSpan 父范围
      */
     public constructor(
         public userService: UserServiceBase,
@@ -54,12 +56,14 @@ export class DbUserValueService extends DbValueServiceBase<
         nowTime: NowTimeBase,
         stringGenerator: StringGeneratorBase,
         valueInterceptorFactory: ValueInterceptorFactoryBase,
+        parentSpan: opentracing.Span,
     ) {
         super(
             userService?.associateService,
             dbFactory,
             stringGenerator,
             valueInterceptorFactory,
+            parentSpan,
             global.UserValue,
             global.UserValueChange,
             global.UserValueLog,
@@ -88,6 +92,9 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param values 数值数组
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        const span = opentracing.globalTracer().startSpan('userValue.update', {
+            childOf: this.parentSpan,
+        });
         const tasks = values.reduce((memo, r) => {
             const item = memo.find(cr => {
                 return cr.targetType == r.targetType;
@@ -114,6 +121,7 @@ export class DbUserValueService extends DbValueServiceBase<
             }
         });
         await Promise.all(tasks);
+        span.log(values).finish();
     }
 
     /**

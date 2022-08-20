@@ -34,19 +34,18 @@ describe('src/service/value/interceptor-factory.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+                items: {
+                    10: {
+                        data: {
+                            value: 10
+                        }
+                    }
+                }
+            });
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
-            );
-
-            mockEnum.expectReturn(
-                r => r.getByValue(10),
-                {
-                    data: {
-                        value: 10
-                    }
-                }
             );
 
             const res = await self.build({
