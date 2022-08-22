@@ -20,6 +20,21 @@ export class RedisCache extends CacheBase {
     private m_Now = moment().unix();
 
     /**
+     * 是否过期
+     */
+    public get isExpired() {
+        return new Promise<[boolean, number]>(async (s, f) => {
+            try {
+                const value = await this.m_Redis.hget('cache', this.m_CacheKey);
+                const lastCacheOn = parseInt(value) || this.m_Now;
+                s([this.m_CacheOn != lastCacheOn, lastCacheOn]);
+            } catch (ex) {
+                f(ex);
+            }
+        });
+    }
+
+    /**
      * 构造函数
      * 
      * @param m_Redis redis
@@ -51,11 +66,10 @@ export class RedisCache extends CacheBase {
      * @param key 键
      */
     public async get<T>(key: string) {
-        const value = await this.m_Redis.hget('cache', this.m_CacheKey);
-        const lastCacheOn = parseInt(value) || this.m_Now;
-        if (this.m_CacheOn != lastCacheOn) {
+        const isExpired = await this.isExpired;
+        if (isExpired[0]) {
             this.m_Cache = await this.m_LoadFunc();
-            this.m_CacheOn = lastCacheOn;
+            this.m_CacheOn = isExpired[1];
         }
 
         return this.m_Cache[key] as T;

@@ -105,4 +105,17 @@ export class ValueTypeData implements IEnumItem {
      * 开启奖励
      */
     public openRewards?: IReward[][];
+    /**
+     * 奖励附加
+     */
+    public rewardAddition?: {
+        /**
+         * 奖励数值类型
+         */
+        rewardValueType: number;
+        /**
+         * 数值类型
+         */
+        valueType: number;
+    }
 }

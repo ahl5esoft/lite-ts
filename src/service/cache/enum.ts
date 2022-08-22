@@ -6,13 +6,29 @@ import { contract } from '../../model';
  */
 export class CacheEnum<T extends contract.IEnumItem> implements IEnum<T> {
     /**
-     * 所有枚举项
+     * 所有枚举项(字典)
      */
-    public get items() {
+    public get allItem() {
         return new Promise<{ [value: number]: IEnumItem<T> }>(async (s, f) => {
             try {
                 const res = await this.m_Cache.get<{ [value: number]: IEnumItem<T> }>(this.m_Name);
-                s(res);
+                s(res ?? {});
+            } catch (ex) {
+                f(ex);
+            }
+        });
+    }
+
+    /**
+     * 所有枚举项(数组)
+     */
+    public get items() {
+        return new Promise<IEnumItem<T>[]>(async (s, f) => {
+            try {
+                const res = await this.m_Cache.get<{ [value: number]: IEnumItem<T> }>(this.m_Name);
+                s(
+                    res ? Object.values(res) : []
+                );
             } catch (ex) {
                 f(ex);
             }
@@ -37,7 +53,7 @@ export class CacheEnum<T extends contract.IEnumItem> implements IEnum<T> {
      */
     public async get(predicate: (data: T) => boolean) {
         const items = await this.items;
-        return Object.values(items).find(r => {
+        return items.find(r => {
             return predicate(r.data);
         });
     }

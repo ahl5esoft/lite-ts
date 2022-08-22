@@ -6,6 +6,7 @@ import {
     NowTimeBase,
     RpcBase,
     UserServiceBase,
+    ValueTypeServiceBase,
 } from '../../contract';
 import { enum_ } from '../../model';
 
@@ -40,6 +41,7 @@ export class RpcUserService extends UserServiceBase {
      * @param associateService 关联服务
      * @param enumFactory 枚举工厂
      * @param rpc 远程过程调用
+     * @param valueTypeService 数值类型服务
      * @param userID 用户ID
      */
     public constructor(
@@ -49,9 +51,10 @@ export class RpcUserService extends UserServiceBase {
         associateService: IUserAssociateService,
         enumFactory: EnumFactoryBase,
         rpc: RpcBase,
+        valueTypeService: ValueTypeServiceBase,
         userID: string,
     ) {
-        super(associateService, userID, enumFactory, rpc);
+        super(associateService, userID, enumFactory, rpc, valueTypeService);
     }
 
     /**

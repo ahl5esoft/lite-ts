@@ -29,7 +29,7 @@ export abstract class DbValueServiceBase<
      * @param dbFactory 数据库工厂
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
-     * @param parentSpan 父范围
+     * @param tracerSpan 跟踪范围
      * @param model 数值模型
      * @param changeModel 数值变更模型
      * @param logModel 数值日志模型
@@ -41,7 +41,7 @@ export abstract class DbValueServiceBase<
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
-        protected parentSpan: opentracing.Span,
+        protected tracerSpan: opentracing.Span,
         protected model: new () => T,
         protected changeModel: new () => TChange,
         protected logModel: new () => TLog,
@@ -60,7 +60,7 @@ export abstract class DbValueServiceBase<
      */
     public async getCount(uow: IUnitOfWork, valueType: number) {
         const span = opentracing.globalTracer().startSpan('value.getCount', {
-            childOf: this.parentSpan,
+            childOf: this.tracerSpan,
         });
 
         const changeEntries = await this.findAndClearChangeEntries();
@@ -83,7 +83,10 @@ export abstract class DbValueServiceBase<
         }
 
         const res = await super.getCount(uow, valueType);
-        span.finish();
+        span.log({
+            valueType,
+            result: res,
+        }).finish();
         return res;
     }
 
@@ -95,7 +98,7 @@ export abstract class DbValueServiceBase<
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         const span = opentracing.globalTracer().startSpan('value.update', {
-            childOf: this.parentSpan,
+            childOf: this.tracerSpan,
         });
 
         const db = this.dbFactory.db(this.model, uow);
@@ -109,7 +112,7 @@ export abstract class DbValueServiceBase<
         }
 
         const logDb = this.dbFactory.db(this.logModel, uow);
-        const valueTypeItems = await this.enumFactory.build(enum_.ValueTypeData).items;
+        const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
         const nowUnix = await this.getNow(uow);
         for (const r of values) {
             if (typeof r.valueType != 'number' || typeof r.count != 'number' || isNaN(r.count))
@@ -117,7 +120,7 @@ export abstract class DbValueServiceBase<
 
             entry.values[r.valueType] ??= 0;
 
-            if (!valueTypeItems[r.valueType]?.data.isReplace && r.count == 0)
+            if (!allValueTypeItem[r.valueType]?.data.isReplace && r.count == 0)
                 continue;
 
             const interceptor = await this.valueInterceptorFactory.build(r);
@@ -131,11 +134,11 @@ export abstract class DbValueServiceBase<
             logEntry.source = r.source;
             logEntry.valueType = r.valueType;
 
-            if (valueTypeItems[r.valueType]) {
-                if (valueTypeItems[r.valueType].data.isReplace) {
+            if (allValueTypeItem[r.valueType]) {
+                if (allValueTypeItem[r.valueType].data.isReplace) {
                     entry.values[r.valueType] = r.count;
-                } else if (valueTypeItems[r.valueType].data.dailyTime > 0) {
-                    const oldUnix = entry.values[valueTypeItems[r.valueType].data.dailyTime] || 0;
+                } else if (allValueTypeItem[r.valueType].data.dailyTime > 0) {
+                    const oldUnix = entry.values[allValueTypeItem[r.valueType].data.dailyTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
                         'day'
@@ -145,13 +148,13 @@ export abstract class DbValueServiceBase<
                         logEntry.source += '(每日重置)';
                     }
 
-                    entry.values[valueTypeItems[r.valueType].data.dailyTime] = nowUnix;
+                    entry.values[allValueTypeItem[r.valueType].data.dailyTime] = nowUnix;
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;
                 }
 
-                if (entry.values[r.valueType] < 0 && !valueTypeItems[r.valueType].data.isNegative) {
+                if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType].data.isNegative) {
                     entry.values[r.valueType] = logEntry.oldCount;
                     throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
                         consume: Math.abs(r.count),

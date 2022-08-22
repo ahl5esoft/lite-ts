@@ -3,6 +3,10 @@
  */
 export abstract class CacheBase {
     /**
+     * 是否过期
+     */
+    public abstract get isExpired(): Promise<[boolean, number]>;
+    /**
      * 清空
      */
     public abstract flush(): Promise<void>;

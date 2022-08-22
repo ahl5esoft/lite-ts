@@ -42,3 +42,4 @@ export * from './thread-base';
 export * from './user-service-base';
 export * from './unit-of-work-repository-base';
 export * from './value-interceptor-factory-base';
+export * from './value-type-service-base';

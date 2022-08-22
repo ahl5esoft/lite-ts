@@ -56,14 +56,14 @@ export class DbUserValueService extends DbValueServiceBase<
         nowTime: NowTimeBase,
         stringGenerator: StringGeneratorBase,
         valueInterceptorFactory: ValueInterceptorFactoryBase,
-        parentSpan: opentracing.Span,
+        tracerSpan: opentracing.Span,
     ) {
         super(
             userService?.associateService,
             dbFactory,
             stringGenerator,
             valueInterceptorFactory,
-            parentSpan,
+            tracerSpan,
             global.UserValue,
             global.UserValueChange,
             global.UserValueLog,
@@ -93,7 +93,7 @@ export class DbUserValueService extends DbValueServiceBase<
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         const span = opentracing.globalTracer().startSpan('userValue.update', {
-            childOf: this.parentSpan,
+            childOf: this.tracerSpan,
         });
         const tasks = values.reduce((memo, r) => {
             const item = memo.find(cr => {
@@ -121,7 +121,7 @@ export class DbUserValueService extends DbValueServiceBase<
             }
         });
         await Promise.all(tasks);
-        span.log(values).finish();
+        span.finish();
     }
 
     /**

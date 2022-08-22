@@ -1,5 +1,5 @@
-import { EnumFactoryBase, IUnitOfWork, IUserRewardService, UserServiceBase } from '../../contract';
-import { contract, enum_ } from '../../model';
+import { IUnitOfWork, IUserRewardService, UserServiceBase, ValueTypeServiceBase } from '../../contract';
+import { contract } from '../../model';
 
 /**
  * 用户奖励服务
@@ -8,12 +8,12 @@ export class DbUserRewardService implements IUserRewardService {
     /**
      * 构造函数
      * 
-     * @param m_EnumFactory 枚举工厂
      * @param m_UserService 用户服务
+     * @param m_ValueTypeService 数值类型服务
      */
     public constructor(
-        private m_EnumFactory: EnumFactoryBase,
         private m_UserService: UserServiceBase,
+        private m_ValueTypeService: ValueTypeServiceBase,
     ) { }
 
     /**
@@ -27,7 +27,6 @@ export class DbUserRewardService implements IUserRewardService {
     public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
         const values: contract.IValue[] = [];
         const randSeedService = this.m_UserService.getRandSeedService(scene);
-        const valueTypeItems = this.m_EnumFactory.build(enum_.ValueTypeData).items;
         for (const r of rewards) {
             if (!r?.length)
                 continue;
@@ -50,9 +49,10 @@ export class DbUserRewardService implements IUserRewardService {
                 });
             }
 
-            if (valueTypeItems[reward.valueType]?.data.openRewards) {
+            const openRewards = await this.findOpenRewards(uow, reward.valueType);
+            if (openRewards) {
                 for (let i = 0; i < reward.count; i++) {
-                    const res = await this.findResults(uow, valueTypeItems[reward.valueType].data.openRewards, source, scene);
+                    const res = await this.findResults(uow, openRewards, source, scene);
                     values.push(...res);
                 }
             } else {
@@ -78,7 +78,6 @@ export class DbUserRewardService implements IUserRewardService {
     public async preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '') {
         let offset = 0;
         const res = {};
-        const valueTypeItems = await this.m_EnumFactory.build(enum_.ValueTypeData).items;
         for (const [k, v] of Object.entries(rewardsGroup)) {
             const values: contract.IValue[] = [];
             const randSeedService = this.m_UserService.getRandSeedService(scene);
@@ -105,9 +104,10 @@ export class DbUserRewardService implements IUserRewardService {
                     });
                 }
 
-                if (valueTypeItems[reward.valueType]?.data.openRewards) {
+                const openRewards = await this.findOpenRewards(uow, reward.valueType);
+                if (openRewards) {
                     for (let i = 0; i < reward.count; i++)
-                        rewardsQueue.splice(valueTypeItems[reward.valueType].data.openRewards.length * i, 0, ...valueTypeItems[reward.valueType].data.openRewards);
+                        rewardsQueue.splice(openRewards.length * i, 0, ...openRewards);
                 } else {
                     values.push({
                         count: reward.count,
@@ -116,6 +116,46 @@ export class DbUserRewardService implements IUserRewardService {
                 }
             }
             res[k] = values;
+        }
+        return res;
+    }
+
+    /**
+     * 获取开启奖励
+     * 
+     * @param uow 工作单元
+     * @param valueType 数值
+     */
+    private async findOpenRewards(uow: IUnitOfWork, valueType: number) {
+        const allOpenReward = await this.m_ValueTypeService.get<{ [valueType: number]: contract.IReward[][] }>('openRewards');
+        if (!allOpenReward[valueType])
+            return;
+
+        const rewardAddition = await this.m_ValueTypeService.get<{
+            [valueType: number]: {
+                [rewardValueType: number]: number
+            }
+        }>('rewardAddition');
+        if (!rewardAddition[valueType])
+            return allOpenReward[valueType];
+
+        const res = [];
+        for (const r of allOpenReward[valueType]) {
+            if (r.length > 1) {
+                const children = [];
+                for (const cr of r) {
+                    let weightAddition = 0;
+                    if (rewardAddition[valueType][cr.valueType])
+                        weightAddition = await this.m_UserService.valueService.getCount(uow, rewardAddition[valueType][cr.valueType]);
+                    children.push({
+                        ...cr,
+                        weight: cr.weight + weightAddition
+                    });
+                }
+                res.push(children);
+            } else {
+                res.push(r);
+            }
         }
         return res;
     }

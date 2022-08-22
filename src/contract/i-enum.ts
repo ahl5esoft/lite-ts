@@ -8,7 +8,11 @@ export interface IEnum<T extends contract.IEnumItem> {
     /**
      * 所有枚举项
      */
-    readonly items: Promise<{ [value: number]: IEnumItem<T> }>;
+    readonly allItem: Promise<{ [value: number]: IEnumItem<T> }>;
+    /**
+     * 所有枚举项
+     */
+    readonly items: Promise<IEnumItem<T>[]>;
     /**
      * 获取满足条件的单个枚举项
      * 

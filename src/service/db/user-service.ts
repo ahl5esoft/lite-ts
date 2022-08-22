@@ -1,3 +1,5 @@
+import { opentracing } from 'jaeger-client';
+
 import { DbUserValueService } from './user-value-service';
 import {
     DbFactoryBase,
@@ -10,9 +12,9 @@ import {
     StringGeneratorBase,
     UserServiceBase,
     ValueInterceptorFactoryBase,
+    ValueTypeServiceBase,
 } from '../../contract';
 import { enum_, global } from '../../model';
-import { opentracing } from 'jaeger-client';
 
 /**
  * 用户服务
@@ -64,6 +66,7 @@ export class DbUserService extends UserServiceBase {
      * @param associateService 关联存储服务
      * @param enumFactory 枚举工厂
      * @param rpc 远程过程调用
+     * @param valueTypeService 数值类型服务
      * @param userID 用户ID
      */
     public constructor(
@@ -76,9 +79,10 @@ export class DbUserService extends UserServiceBase {
         associateService: IUserAssociateService,
         enumFactory: EnumFactoryBase,
         rpc: RpcBase,
+        valueTypeService: ValueTypeServiceBase,
         userID: string,
     ) {
-        super(associateService, userID, enumFactory, rpc);
+        super(associateService, userID, enumFactory, rpc, valueTypeService);
     }
 
     /**
@@ -90,11 +94,11 @@ export class DbUserService extends UserServiceBase {
         if (targetType == 0)
             throw new Error('无法用此方法获取用户数值服务');
 
-        const items = await this.enumFactory.build(enum_.TargetTypeData).items;
-        if (!items[targetType])
+        const allItem = await this.enumFactory.build(enum_.TargetTypeData).allItem;
+        if (!allItem[targetType])
             throw new Error(`无效目标类型: ${targetType}`);
 
-        this.m_TargetTypeValueService[targetType] ??= DbUserService.buildTargetValueServiceFunc(this.enumFactory, this.rpc, this, items[targetType].data, this.userID);
+        this.m_TargetTypeValueService[targetType] ??= DbUserService.buildTargetValueServiceFunc(this.enumFactory, this.rpc, this, allItem[targetType].data, this.userID);
         return this.m_TargetTypeValueService[targetType];
     }
 }

@@ -6,6 +6,7 @@ import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
 import { IUserValueService } from './i-user-value-service';
 import { RpcBase } from './rpc-base';
+import { ValueTypeServiceBase } from './value-type-service-base';
 import { global } from '../model';
 
 /**
@@ -27,7 +28,7 @@ export abstract class UserServiceBase {
     /**
      * 创建奖励服务函数
      */
-    public static buildRewardServiceFunc: (enumFactory: EnumFactoryBase, userService: UserServiceBase) => IUserRewardService;
+    public static buildRewardServiceFunc: (userService: UserServiceBase, valueTypeService: ValueTypeServiceBase) => IUserRewardService;
 
     /**
      * 随机种子服务
@@ -48,7 +49,7 @@ export abstract class UserServiceBase {
      * 奖励服务
      */
     public get rewardService() {
-        this.m_RewardService ??= UserServiceBase.buildRewardServiceFunc(this.enumFactory, this);
+        this.m_RewardService ??= UserServiceBase.buildRewardServiceFunc(this, this.valueTypeService);
         return this.m_RewardService;
     }
 
@@ -64,12 +65,14 @@ export abstract class UserServiceBase {
      * @param userID 用户ID
      * @param enumFactory 枚举工厂
      * @param rpc 远程过程调用
+     * @param valueTypeService 数值类型服务
      */
     public constructor(
         public associateService: IUserAssociateService,
         public userID: string,
         protected enumFactory: EnumFactoryBase,
         protected rpc: RpcBase,
+        protected valueTypeService: ValueTypeServiceBase,
     ) { }
 
     /**

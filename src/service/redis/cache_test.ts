@@ -9,7 +9,7 @@ describe('src/service/redis/cache.ts', () => {
     describe('.flush()', () => {
         it('ok', async () => {
             const mockRedis = new Mock<RedisBase>();
-            const self = new Self(mockRedis.actual, null, 'test');
+            const self = new Self(mockRedis.actual, 'test', null);
 
             mockRedis.expected.hset(
                 'cache',
@@ -25,10 +25,10 @@ describe('src/service/redis/cache.ts', () => {
         it('ok', async () => {
             const mockRedis = new Mock<RedisBase>();
             let loadCount = 0;
-            const self = new Self(mockRedis.actual, async () => {
+            const self = new Self(mockRedis.actual, 'test', async () => {
                 loadCount++;
                 return { a: 1 };
-            }, 'test');
+            });
 
             mockRedis.expectReturn(
                 r => r.hget('cache', 'test'),

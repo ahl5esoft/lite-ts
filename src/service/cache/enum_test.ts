@@ -17,7 +17,7 @@ describe('src/service/cache/enum.ts', () => {
             );
 
             const res = await self.items;
-            deepStrictEqual(res, {});
+            deepStrictEqual(res, []);
         });
     });
 
