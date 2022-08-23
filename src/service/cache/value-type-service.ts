@@ -6,6 +6,11 @@ import { enum_ } from '../../model';
  */
 export class CacheValueTypeSerivce extends ValueTypeServiceBase {
     /**
+     * 更新时间
+     */
+    private m_UpdateOn = 0;
+
+    /**
      * 构造函数
      * 
      * @param m_PropCahce 道具缓存
@@ -22,6 +27,7 @@ export class CacheValueTypeSerivce extends ValueTypeServiceBase {
         m_ReduceFunc.openRewards = (memo, r) => {
             if (r.openRewards)
                 memo[r.value] = r.openRewards;
+
             return memo;
         };
         m_ReduceFunc.rewardAddition = (memo, r) => {
@@ -29,6 +35,7 @@ export class CacheValueTypeSerivce extends ValueTypeServiceBase {
                 memo[r.rewardAddition.valueType] ??= {};
                 memo[r.rewardAddition.valueType][r.rewardAddition.rewardValueType] = r.value;
             }
+
             return memo;
         };
     }
@@ -47,9 +54,10 @@ export class CacheValueTypeSerivce extends ValueTypeServiceBase {
      * 重置
      */
     private async reset() {
-        const isExpired = await this.m_PropCahce.isExpired;
-        if (!isExpired[0])
+        if (this.m_UpdateOn == this.m_PropCahce.updateOn)
             return;
+
+        this.m_UpdateOn = this.m_PropCahce.updateOn;
 
         const items = await this.m_EnumFactory.build(enum_.ValueTypeData).items;
         for (const r of items) {

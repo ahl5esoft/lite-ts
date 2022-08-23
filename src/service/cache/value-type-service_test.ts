@@ -9,7 +9,7 @@ describe('src/service/cache/value-type-service.ts', () => {
     describe('.get<T>(key: string)', () => {
         it('ok', async () => {
             const mockCache = new Mock<CacheBase>({
-                isExpired: [true, 999]
+                updateOn: 11
             });
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockCache.actual, mockEnumFactory.actual, {});

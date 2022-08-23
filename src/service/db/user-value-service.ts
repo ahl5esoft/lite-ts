@@ -7,7 +7,7 @@ import {
     NowTimeBase,
     StringGeneratorBase,
     UserServiceBase,
-    ValueInterceptorFactoryBase
+    ValueInterceptorFactoryBase,
 } from '../../contract';
 import { contract, global } from '../../model';
 import { opentracing } from 'jaeger-client';
@@ -46,7 +46,7 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param nowTime 当前时间
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
-     * @param parentSpan 父范围
+     * @param tracerSpan 跟踪范围
      */
     public constructor(
         public userService: UserServiceBase,

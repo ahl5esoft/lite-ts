@@ -162,8 +162,11 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         return new RpcValueService(
             rpc,
             userService,
-            targetTypeData,
-            { userID, } as global.UserTargetValue,
+            {
+                ...targetTypeData,
+                key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
+            },
+            { userID } as global.UserTargetValue,
             enumFactory,
             Container.get<NowTimeBase>(NowTimeBase as any),
         );

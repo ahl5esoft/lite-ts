@@ -11,28 +11,14 @@ export class RedisCache extends CacheBase {
      */
     private m_Cache: { [key: string]: any };
     /**
-     * 缓存时间
-     */
-    private m_CacheOn = 0;
-    /**
      * 当前时间
      */
     private m_Now = moment().unix();
 
     /**
-     * 是否过期
+     * 更新时间
      */
-    public get isExpired() {
-        return new Promise<[boolean, number]>(async (s, f) => {
-            try {
-                const value = await this.m_Redis.hget('cache', this.m_CacheKey);
-                const lastCacheOn = parseInt(value) || this.m_Now;
-                s([this.m_CacheOn != lastCacheOn, lastCacheOn]);
-            } catch (ex) {
-                f(ex);
-            }
-        });
-    }
+    public updateOn = 0;
 
     /**
      * 构造函数
@@ -66,10 +52,11 @@ export class RedisCache extends CacheBase {
      * @param key 键
      */
     public async get<T>(key: string) {
-        const isExpired = await this.isExpired;
-        if (isExpired[0]) {
+        const value = await this.m_Redis.hget('cache', this.m_CacheKey);
+        const lastCacheOn = parseInt(value) || this.m_Now;
+        if (this.updateOn != lastCacheOn) {
             this.m_Cache = await this.m_LoadFunc();
-            this.m_CacheOn = isExpired[1];
+            this.updateOn = lastCacheOn;
         }
 
         return this.m_Cache[key] as T;

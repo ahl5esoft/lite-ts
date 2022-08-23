@@ -18,10 +18,10 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
     public get entry() {
         return new Promise<T>(async (s, f) => {
             try {
-                const entries = await this.m_UserService.associateService.find<T>(this.m_TargetTypeData.key, r => {
-                    return r.no == this.m_Entry.no;
-                });
-                s(entries[0]);
+                const entries = await this.m_UserService.associateService.find<T>(this.m_TargetTypeData.key);
+                s(
+                    entries.length == 1 ? entries[0] : entries.find(r => r.no == this.m_Entry.no)
+                );
             } catch (ex) {
                 f(ex);
             }

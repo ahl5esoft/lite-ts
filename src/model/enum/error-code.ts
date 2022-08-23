@@ -23,6 +23,10 @@ export enum ErrorCode {
      */
     valueTypeNotEnough,
     /**
+     * 重定向
+     */
+    redirect,
+    /**
      * 服务端异常
      */
     panic = 599,

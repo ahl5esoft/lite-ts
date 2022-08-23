@@ -1,7 +1,9 @@
+import { IValue } from '../contract';
+
 /**
  * 用户数值变更模型
  */
-export class UserValueChange {
+export class UserValueChange implements IValue {
     /**
      * 数量
      */
@@ -19,4 +21,12 @@ export class UserValueChange {
      * 数值类型
      */
     public valueType: number;
+    /**
+     * 目标编号
+     */
+    public targetNo?: number;
+    /**
+     * 目标类型
+     */
+    public targetType?: number;
 }

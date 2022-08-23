@@ -46,8 +46,7 @@ describe('src/service/redis/cache.ts', () => {
             strictEqual(loadCount, 1);
 
             const now = Reflect.get(self, 'm_Now');
-            const cacheOn = Reflect.get(self, 'm_CacheOn');
-            strictEqual(now, cacheOn);
+            strictEqual(now, self.updateOn);
         });
     });
 });

@@ -3,7 +3,6 @@ import moment from 'moment';
 
 import { DbValueServiceBase } from './value-service-base';
 import { Mock } from '../assert';
-import { CustomError } from '../error';
 import {
     DbFactoryBase,
     DbRepositoryBase,
@@ -16,6 +15,7 @@ import {
     ValueInterceptorFactoryBase,
 } from '../../contract';
 import { contract, enum_, global } from '../../model';
+import { CustomError } from '../error';
 
 class Self extends DbValueServiceBase<global.UserValue, global.UserValueChange, global.UserValueLog> {
     public entry: any;
@@ -56,7 +56,7 @@ describe('src/service/db/value-service-base.ts', () => {
     describe('.getCount(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, null, null);
+            const self = new Self(null, mockDbFactory.actual, null, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, null, null);
 
             Reflect.set(self, 'findChangeEntries', () => {
                 return [{}];
@@ -88,7 +88,7 @@ describe('src/service/db/value-service-base.ts', () => {
             const mockAssociateService = new Mock<IUserAssociateService>();
             const mockDbFactory = new Mock<DbFactoryBase>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
+            const self = new Self(mockAssociateService.actual, mockDbFactory.actual, null, null, null, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
 
             Reflect.set(self, 'getEntry', () => { });
 
@@ -138,12 +138,194 @@ describe('src/service/db/value-service-base.ts', () => {
             strictEqual(isCalledCreateEntry, true);
         });
 
-        it('IValueTypeData.isPositive = true', async () => {
+        it('IValueTypeData.dailyTime', async () => {
+            const mockDbFactory = new Mock<DbFactoryBase>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, null, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
+
+            const entry = {
+                id: 'uid',
+                values: {
+                    1: 10
+                }
+            } as global.UserValue;
+            self.entry = entry;
+
+            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
+            mockDbFactory.expectReturn(
+                r => r.db(global.UserValue, null),
+                mockValueDbRepo.actual
+            );
+
+            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
+            mockDbFactory.expectReturn(
+                r => r.db(global.UserValueLog, null),
+                mockLogDbRepo.actual
+            );
+
+            const valueChange = {
+                count: 11,
+                source: 'test',
+                valueType: 1
+            } as global.UserValueChange;
+
+            const mockValueInterceptor = new Mock<IValueInterceptor>();
+            mockValueInterceptorFactory.expectReturn(
+                r => r.build(valueChange),
+                mockValueInterceptor.actual
+            );
+
+            mockValueInterceptor.expectReturn(
+                r => r.before(null, self, valueChange),
+                false
+            );
+
+            Reflect.set(self, 'createLogEntry', () => {
+                return {};
+            });
+
+            const logID = 'log-id';
+            mockStringGenerator.expectReturn(
+                r => r.generate(),
+                logID
+            );
+
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
+                allItem: {
+                    1: {
+                        data: {
+                            dailyTime: 2
+                        }
+                    }
+                }
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueType.actual
+            );
+
+            const nowUnix = moment().unix();
+            Reflect.set(self, 'getNow', () => {
+                return nowUnix;
+            });
+
+            mockLogDbRepo.expected.add({
+                count: 11,
+                id: logID,
+                oldCount: 10,
+                source: valueChange.source + '(每日重置)',
+                valueType: 1
+            } as global.UserValueLog);
+
+            mockValueInterceptor.expected.after(null, self, valueChange);
+
+            mockValueDbRepo.expected.save({
+                ...entry,
+                values: {
+                    1: 11,
+                    2: nowUnix
+                }
+            } as global.UserValue);
+
+            await self.update(null, [valueChange]);
+        });
+
+        it('IValueTypeData.isReplace = true', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
             const mockStringGenerator = new Mock<StringGeneratorBase>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, null, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
+
+            const entry = {
+                id: 'uid',
+                values: {
+                    1: 10
+                }
+            } as global.UserValue;
+            self.entry = entry;
+
+            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
+            mockDbFactory.expectReturn(
+                r => r.db(global.UserValue, null),
+                mockValueDbRepo.actual
+            );
+
+            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
+            mockDbFactory.expectReturn(
+                r => r.db(global.UserValueLog, null),
+                mockLogDbRepo.actual
+            );
+
+            const valueChange = {
+                count: 11,
+                source: 'test',
+                valueType: 1
+            } as global.UserValueChange;
+
+            const mockValueInterceptor = new Mock<IValueInterceptor>();
+            mockValueInterceptorFactory.expectReturn(
+                r => r.build(valueChange),
+                mockValueInterceptor.actual
+            );
+
+            mockValueInterceptor.expectReturn(
+                r => r.before(null, self, valueChange),
+                false
+            );
+
+            Reflect.set(self, 'createLogEntry', () => {
+                return {};
+            });
+
+            const logID = 'log-id';
+            mockStringGenerator.expectReturn(
+                r => r.generate(),
+                logID
+            );
+
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
+                allItem: {
+                    1: {
+                        data: {
+                            isReplace: true
+                        }
+                    }
+                }
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueType.actual
+            );
+
+            mockLogDbRepo.expected.add({
+                count: 11,
+                id: logID,
+                oldCount: 10,
+                source: valueChange.source,
+                valueType: 1
+            } as global.UserValueLog);
+
+            mockValueInterceptor.expected.after(null, self, valueChange);
+
+            mockValueDbRepo.expected.save({
+                ...entry,
+                values: {
+                    1: 11
+                }
+            } as global.UserValue);
+
+            await self.update(null, [valueChange]);
+        });
+
+        it('IValueTypeData.isNegative = true', async () => {
+            const mockDbFactory = new Mock<DbFactoryBase>();
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, null, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
 
             const entry = {
                 id: 'uid',
@@ -193,13 +375,95 @@ describe('src/service/db/value-service-base.ts', () => {
             );
 
             const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
-                items: {
+                allItem: {
                     1: {
                         data: {
-                            isPositive: true
+                            isNegative: true
                         }
                     }
                 }
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueType.actual
+            );
+
+            mockLogDbRepo.expected.add({
+                count: -1,
+                id: logID,
+                oldCount: 10,
+                source: valueChange.source,
+                valueType: 1
+            } as global.UserValueLog);
+
+            mockValueInterceptor.expected.after(null, self, valueChange);
+
+            mockValueDbRepo.expected.save({
+                ...entry,
+                values: {
+                    1: -1
+                }
+            } as global.UserValue);
+
+            await self.update(null, [valueChange]);
+        });
+
+        it('ok', async () => {
+            const mockDbFactory = new Mock<DbFactoryBase>();
+            const mockStringGenerator = new Mock<StringGeneratorBase>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
+            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, null, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
+
+            const entry = {
+                id: 'uid',
+                values: {
+                    1: 10
+                }
+            } as global.UserValue;
+            self.entry = entry;
+
+            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
+            mockDbFactory.expectReturn(
+                r => r.db(global.UserValue, null),
+                mockValueDbRepo.actual
+            );
+
+            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
+            mockDbFactory.expectReturn(
+                r => r.db(global.UserValueLog, null),
+                mockLogDbRepo.actual
+            );
+
+            const valueChange = {
+                count: -11,
+                source: 'test',
+                valueType: 1
+            } as global.UserValueChange;
+
+            const mockValueInterceptor = new Mock<IValueInterceptor>();
+            mockValueInterceptorFactory.expectReturn(
+                r => r.build(valueChange),
+                mockValueInterceptor.actual
+            );
+
+            mockValueInterceptor.expectReturn(
+                r => r.before(null, self, valueChange),
+                false
+            );
+
+            Reflect.set(self, 'createLogEntry', () => {
+                return {};
+            });
+
+            const logID = 'log-id';
+            mockStringGenerator.expectReturn(
+                r => r.generate(),
+                logID
+            );
+
+            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
+                allItem: {}
             });
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
@@ -218,188 +482,6 @@ describe('src/service/db/value-service-base.ts', () => {
                 count: 10,
                 valueType: 1
             });
-        });
-
-        it('IValueTypeData.isReplace = true', async () => {
-            const mockDbFactory = new Mock<DbFactoryBase>();
-            const mockStringGenerator = new Mock<StringGeneratorBase>();
-            const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
-
-            const entry = {
-                id: 'uid',
-                values: {
-                    1: 10
-                }
-            } as global.UserValue;
-            self.entry = entry;
-
-            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.UserValue, null),
-                mockValueDbRepo.actual
-            );
-
-            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.UserValueLog, null),
-                mockLogDbRepo.actual
-            );
-
-            const valueChange = {
-                count: 11,
-                source: 'test',
-                valueType: 1
-            } as global.UserValueChange;
-
-            const mockValueInterceptor = new Mock<IValueInterceptor>();
-            mockValueInterceptorFactory.expectReturn(
-                r => r.build(valueChange),
-                mockValueInterceptor.actual
-            );
-
-            mockValueInterceptor.expectReturn(
-                r => r.before(null, self, valueChange),
-                false
-            );
-
-            Reflect.set(self, 'createLogEntry', () => {
-                return {};
-            });
-
-            const logID = 'log-id';
-            mockStringGenerator.expectReturn(
-                r => r.generate(),
-                logID
-            );
-
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
-                items: {
-                    1: {
-                        data: {
-                            isReplace: true
-                        }
-                    }
-                }
-            });
-            mockEnumFactory.expectReturn(
-                r => r.build(enum_.ValueTypeData),
-                mockValueType.actual
-            );
-
-            mockLogDbRepo.expected.add({
-                count: 11,
-                id: logID,
-                oldCount: 10,
-                source: valueChange.source,
-                valueType: 1
-            } as global.UserValueLog);
-
-            mockValueInterceptor.expected.after(null, self, valueChange);
-
-            mockValueDbRepo.expected.save({
-                ...entry,
-                values: {
-                    1: 11
-                }
-            } as global.UserValue);
-
-            await self.update(null, [valueChange]);
-        });
-
-        it('IValueTypeData.dailyTime', async () => {
-            const mockDbFactory = new Mock<DbFactoryBase>();
-            const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const mockStringGenerator = new Mock<StringGeneratorBase>();
-            const mockValueInterceptorFactory = new Mock<ValueInterceptorFactoryBase>();
-            const self = new Self(null, mockDbFactory.actual, mockStringGenerator.actual, mockValueInterceptorFactory.actual, global.UserValue, global.UserValueChange, global.UserValueLog, mockEnumFactory.actual, null);
-
-            const entry = {
-                id: 'uid',
-                values: {
-                    1: 10
-                }
-            } as global.UserValue;
-            self.entry = entry;
-
-            const mockValueDbRepo = new Mock<DbRepositoryBase<global.UserValue>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.UserValue, null),
-                mockValueDbRepo.actual
-            );
-
-            const mockLogDbRepo = new Mock<DbRepositoryBase<global.UserValueLog>>();
-            mockDbFactory.expectReturn(
-                r => r.db(global.UserValueLog, null),
-                mockLogDbRepo.actual
-            );
-
-            const valueChange = {
-                count: 11,
-                source: 'test',
-                valueType: 1
-            } as global.UserValueChange;
-
-            const mockValueInterceptor = new Mock<IValueInterceptor>();
-            mockValueInterceptorFactory.expectReturn(
-                r => r.build(valueChange),
-                mockValueInterceptor.actual
-            );
-
-            mockValueInterceptor.expectReturn(
-                r => r.before(null, self, valueChange),
-                false
-            );
-
-            Reflect.set(self, 'createLogEntry', () => {
-                return {};
-            });
-
-            const logID = 'log-id';
-            mockStringGenerator.expectReturn(
-                r => r.generate(),
-                logID
-            );
-
-            const mockValueType = new Mock<IEnum<enum_.ValueTypeData>>({
-                items: {
-                    1: {
-                        data: {
-                            dailyTime: 2
-                        }
-                    }
-                }
-            });
-            mockEnumFactory.expectReturn(
-                r => r.build(enum_.ValueTypeData),
-                mockValueType.actual
-            );
-
-            const nowUnix = moment().unix();
-            Reflect.set(self, 'getNow', () => {
-                return nowUnix;
-            });
-
-            mockLogDbRepo.expected.add({
-                count: 11,
-                id: logID,
-                oldCount: 10,
-                source: valueChange.source + '(每日重置)',
-                valueType: 1
-            } as global.UserValueLog);
-
-            mockValueInterceptor.expected.after(null, self, valueChange);
-
-            mockValueDbRepo.expected.save({
-                ...entry,
-                values: {
-                    1: 11,
-                    2: nowUnix
-                }
-            } as global.UserValue);
-
-            await self.update(null, [valueChange]);
         });
     });
 });

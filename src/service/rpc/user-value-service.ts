@@ -21,7 +21,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
     /**
      * 变更
      */
-    private m_ChangeValue = {};
+    private m_ChangeValues: contract.IValue[] = [];
 
     /**
      * 实体
@@ -82,20 +82,11 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         const route = ['', this.m_TargetTypeData.app, RpcUserValueService.updateRoute].join('/')
         if (uow) {
-            for (const r of values) {
-                this.m_ChangeValue[r.valueType] ??= 0;
-                this.m_ChangeValue[r.valueType] += r.count;
-            }
+            this.m_ChangeValues.push(...values);
             uow.registerAfter(async () => {
                 await this.m_Rpc.setBody({
                     userID: this.userService.userID,
-                    values: Object.entries(this.m_ChangeValue).map(([k, v]) => {
-                        return {
-                            ...values[0],
-                            count: v,
-                            valueType: parseInt(k),
-                        };
-                    })
+                    values: this.m_ChangeValues
                 }).call<void>(route);
             }, route);
         } else {

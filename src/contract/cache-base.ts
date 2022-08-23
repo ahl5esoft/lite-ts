@@ -3,9 +3,9 @@
  */
 export abstract class CacheBase {
     /**
-     * 是否过期
+     * 更新时间
      */
-    public abstract get isExpired(): Promise<[boolean, number]>;
+    public abstract get updateOn(): number;
     /**
      * 清空
      */

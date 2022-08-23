@@ -21,7 +21,7 @@ export abstract class DbValueServiceBase<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
-    > extends TargetValueServiceBase<T> {
+> extends TargetValueServiceBase<T> {
     /**
      * 构造函数
      * 
@@ -70,16 +70,9 @@ export abstract class DbValueServiceBase<
                 changes: changeEntries
             });
 
-            const values: contract.IValue[] = [];
-            for (const r of changeEntries) {
+            for (const r of changeEntries)
                 await changeDb.remove(r);
-                values.push({
-                    count: r.count,
-                    source: r.source,
-                    valueType: r.valueType
-                });
-            }
-            await this.update(uow, values);
+            await this.update(uow, changeEntries);
         }
 
         const res = await super.getCount(uow, valueType);
@@ -153,17 +146,17 @@ export abstract class DbValueServiceBase<
                 } else {
                     entry.values[r.valueType] += r.count;
                 }
-
-                if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType].data.isNegative) {
-                    entry.values[r.valueType] = logEntry.oldCount;
-                    throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
-                        consume: Math.abs(r.count),
-                        count: logEntry.oldCount,
-                        valueType: r.valueType,
-                    });
-                }
             } else {
                 entry.values[r.valueType] += r.count;
+            }
+
+            if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType]?.data.isNegative) {
+                entry.values[r.valueType] = logEntry.oldCount;
+                throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
+                    consume: Math.abs(r.count),
+                    count: logEntry.oldCount,
+                    valueType: r.valueType,
+                });
             }
 
             logEntry.count = entry.values[r.valueType];
