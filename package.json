@@ -10,7 +10,6 @@
 		"ioredis": "^4.27.3",
 		"jaeger-client": "^3.19.0",
 		"js-yaml": "^4.1.0",
-		"lite-ts": "^13.167.49",
 		"log4js": "^6.4.1",
 		"moment": "^2.29.1",
 		"mongodb": "^4.8.1",
@@ -56,5 +55,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "13.181.55"
+	"version": "13.183.56"
 }

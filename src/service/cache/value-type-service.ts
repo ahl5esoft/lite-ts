@@ -4,7 +4,11 @@ import { enum_ } from '../../model';
 /**
  * 缓存数值类型服务
  */
-export class CacheValueTypeSerivce extends ValueTypeServiceBase {
+export class CacheValueTypeSerivce<T extends enum_.ValueTypeData> extends ValueTypeServiceBase {
+    /**
+     * 缓存
+     */
+    private m_Cahce = {};
     /**
      * 更新时间
      */
@@ -20,17 +24,17 @@ export class CacheValueTypeSerivce extends ValueTypeServiceBase {
     public constructor(
         private m_PropCahce: CacheBase,
         private m_EnumFactory: EnumFactoryBase,
-        private m_ReduceFunc: { [key: string]: (memo: any, item: enum_.ValueTypeData) => any },
+        private m_ReduceFunc: { [key: string]: (memo: any, item: T) => any },
     ) {
         super();
 
-        m_ReduceFunc.openRewards = (memo, r) => {
+        this.m_ReduceFunc.openRewards = (memo, r) => {
             if (r.openRewards)
                 memo[r.value] = r.openRewards;
 
             return memo;
         };
-        m_ReduceFunc.rewardAddition = (memo, r) => {
+        this.m_ReduceFunc.rewardAddition = (memo, r) => {
             if (r.rewardAddition) {
                 memo[r.rewardAddition.valueType] ??= {};
                 memo[r.rewardAddition.valueType][r.rewardAddition.rewardValueType] = r.value;
@@ -47,23 +51,24 @@ export class CacheValueTypeSerivce extends ValueTypeServiceBase {
      */
     public async get<T>(key: string) {
         await this.reset();
-        return this[key] as T;
+        return this.m_Cahce[key] as T;
     }
 
     /**
      * 重置
      */
     private async reset() {
-        if (this.m_UpdateOn == this.m_PropCahce.updateOn)
+        if (this.m_UpdateOn != 0 && this.m_UpdateOn == this.m_PropCahce.updateOn)
             return;
 
         this.m_UpdateOn = this.m_PropCahce.updateOn;
+        this.m_Cahce = {};
 
         const items = await this.m_EnumFactory.build(enum_.ValueTypeData).items;
         for (const r of items) {
             for (const [k, v] of Object.entries(this.m_ReduceFunc)) {
-                this[k] ??= {};
-                this[k] = v(this[k], r.data);
+                this.m_Cahce[k] ??= {};
+                this.m_Cahce[k] = v(this.m_Cahce[k], r.data as T);
             }
         }
     }

@@ -31,4 +31,5 @@ export * from './set-timeout';
 export * from './target';
 export * from './tracer';
 export * from './typedi';
+export * from './user';
 export * from './value';

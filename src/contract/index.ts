@@ -39,6 +39,7 @@ export * from './rpc-base';
 export * from './sms-base';
 export * from './string-generator-base';
 export * from './thread-base';
+export * from './user-activity-service-base';
 export * from './user-service-base';
 export * from './unit-of-work-repository-base';
 export * from './value-interceptor-factory-base';
