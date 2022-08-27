@@ -7,7 +7,7 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
     /**
      * 提交后函数
      */
-    private m_AfterAction: { [key: string]: () => Promise<void> } = {};
+    private m_AfterAction: { [key: string]: () => Promise<void>; } = {};
 
     /**
      * 注册提交后函数
@@ -30,9 +30,7 @@ export abstract class UnitOfWorkRepositoryBase implements IUnitOfWork {
             const tasks = Object.values(this.m_AfterAction).map(r => {
                 return r();
             });
-            Promise.all(tasks).catch(console.error).finally(() => {
-                this.m_AfterAction = {};
-            });
+            await Promise.all(tasks);
         }
     }
 
