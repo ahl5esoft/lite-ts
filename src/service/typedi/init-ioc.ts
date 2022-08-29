@@ -32,6 +32,7 @@ import {
     ValueTypeServiceBase
 } from '../../contract';
 import { config, enum_, global } from '../../model';
+import { UserCustomGiftBagService } from '../user';
 
 /**
  * 初始化IoC
@@ -149,6 +150,9 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         new SetTimeoutThread()
     );
 
+    UserServiceBase.buildCustomGiftBagServiceFunc = (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => {
+        return new UserCustomGiftBagService(dbFactory, entry);
+    };
     UserServiceBase.buildPortraitServiceFunc = (rpc: RpcBase, userID: string) => {
         return new RpcUserPortraitService(rpc, userID);
     };

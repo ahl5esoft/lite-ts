@@ -5,13 +5,13 @@ export interface IRangeActivity {
     /**
      * 关闭时间
      */
-    closeOn: number;
+    readonly closeOn: number;
     /**
      * 隐藏时间
      */
-    hideOn: number;
+    readonly hideOn: number;
     /**
      * 开启时间
      */
-    openOn: number;
+    readonly openOn: number;
 }

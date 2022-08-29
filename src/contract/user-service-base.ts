@@ -1,6 +1,9 @@
+import { DbFactoryBase } from './db-factory-base';
 import { EnumFactoryBase } from './enum-factory-base';
 import { ITargetValueService } from './i-target-value-service';
+import { IUnitOfWork } from './i-unit-of-work';
 import { IUserAssociateService } from './i-user-associate-service';
+import { IUserCustomGiftBagService } from './i-user-custom-gift-bag-service';
 import { IUserPortraitService } from './i-user-portrait-service';
 import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
@@ -18,6 +21,10 @@ export abstract class UserServiceBase {
      */
     public static randSeedRange = {};
     /**
+     * 创建自选礼包服务函数
+     */
+    public static buildCustomGiftBagServiceFunc: (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => IUserCustomGiftBagService;
+    /**
      * 创建画像服务函数
      */
     public static buildPortraitServiceFunc: (rpc: RpcBase, userID: string) => IUserPortraitService;
@@ -30,6 +37,10 @@ export abstract class UserServiceBase {
      */
     public static buildRewardServiceFunc: (userService: UserServiceBase, valueTypeService: ValueTypeServiceBase) => IUserRewardService;
 
+    /**
+     * 自选礼包服务
+     */
+    private m_CustomGiftBagService: IUserCustomGiftBagService;
     /**
      * 随机种子服务
      */
@@ -63,6 +74,7 @@ export abstract class UserServiceBase {
      * 
      * @param associateService 关联服务
      * @param userID 用户ID
+     * @param dbFactory 数据库工厂
      * @param enumFactory 枚举工厂
      * @param rpc 远程过程调用
      * @param valueTypeService 数值类型服务
@@ -70,6 +82,7 @@ export abstract class UserServiceBase {
     public constructor(
         public associateService: IUserAssociateService,
         public userID: string,
+        protected dbFactory: DbFactoryBase,
         protected enumFactory: EnumFactoryBase,
         protected rpc: RpcBase,
         protected valueTypeService: ValueTypeServiceBase,
@@ -84,6 +97,33 @@ export abstract class UserServiceBase {
         const range = UserServiceBase.randSeedRange[scene] ?? [128, 512];
         this.m_RandSeedService[scene] ??= UserServiceBase.buildRandServiceFunc(this.associateService, scene, this.userID, range);
         return this.m_RandSeedService[scene];
+    }
+
+    /**
+     * 获取自选礼包服务
+     * 
+     * @param uow 工作单元
+     * @param scene 场景
+     */
+    public async getCustomGiftBagService(uow: IUnitOfWork, scene: string) {
+        if (!this.m_CustomGiftBagService) {
+            const db = this.dbFactory.db(global.UserCustomGiftBag, uow);
+            const entries = await db.query().where({
+                id: this.userID
+            }).toArray();
+            if (!entries.length) {
+                entries.push({
+                    giftBag: {},
+                    id: this.userID
+                });
+                await db.add(entries[0]);
+            }
+
+            this.m_CustomGiftBagService = UserServiceBase.buildCustomGiftBagServiceFunc(this.dbFactory, entries[0]);
+        }
+
+        this.m_CustomGiftBagService.scene = scene;
+        return this.m_CustomGiftBagService;
     }
 
     /**

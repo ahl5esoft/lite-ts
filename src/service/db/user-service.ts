@@ -49,7 +49,7 @@ export class DbUserService extends UserServiceBase {
             this.nowTime,
             this.stringGenerator,
             this.valueInterceptorFactory,
-            this.parentSpan,
+            this.tracerSpan,
         );
         return this.m_ValueService;
     }
@@ -57,32 +57,32 @@ export class DbUserService extends UserServiceBase {
     /**
      * 构造函数
      * 
-     * @param dbFactory 数据库工厂
      * @param nowTime 当前时间
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
-     * @param parentSpan 父范围
+     * @param tracerSpan 跟踪范围
      * @param nowValueType 当前时间数值类型
      * @param associateService 关联存储服务
+     * @param dbFactory 数据库工厂
      * @param enumFactory 枚举工厂
      * @param rpc 远程过程调用
      * @param valueTypeService 数值类型服务
      * @param userID 用户ID
      */
     public constructor(
-        protected dbFactory: DbFactoryBase,
         protected nowTime: NowTimeBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected nowValueType: number,
-        protected parentSpan: opentracing.Span,
+        protected tracerSpan: opentracing.Span,
         associateService: IUserAssociateService,
+        dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
         rpc: RpcBase,
         valueTypeService: ValueTypeServiceBase,
         userID: string,
     ) {
-        super(associateService, userID, enumFactory, rpc, valueTypeService);
+        super(associateService, userID, dbFactory, enumFactory, rpc, valueTypeService);
     }
 
     /**
