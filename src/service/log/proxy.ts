@@ -28,7 +28,9 @@ export class LogProxy extends LogBase {
     /**
      * 以调试格式输出日志
      */
-    public debug() { }
+    public debug() {
+        this.m_BuildFunc().debug();
+    }
 
     /**
      * 以错误格式输出日志
@@ -42,10 +44,14 @@ export class LogProxy extends LogBase {
     /**
      * 以信息格式输出日志
      */
-    public info() { }
+    public info() {
+        this.m_BuildFunc().info();
+    }
 
     /**
      * 以告警格式输出日志
      */
-    public warning() { }
+    public warning() {
+        this.m_BuildFunc().warning();
+    }
 }

@@ -1,5 +1,4 @@
 import { strictEqual } from 'assert';
-import moment from 'moment';
 
 import { RedisCache as Self } from './cache';
 import { Mock } from '../assert';
@@ -14,7 +13,7 @@ describe('src/service/redis/cache.ts', () => {
             mockRedis.expected.hset(
                 'cache',
                 'test',
-                moment().unix().toString()
+                Date.now().toString()
             );
 
             await self.flush();

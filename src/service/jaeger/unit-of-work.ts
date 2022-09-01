@@ -46,11 +46,11 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
      * 构造函数
      * 
      * @param m_Uow 原工作单元
-     * @param m_ParentSpan 父跟踪范围
+     * @param m_ParentTracerSpan 父跟踪范围
      */
     public constructor(
         private m_Uow: UnitOfWorkRepositoryBase,
-        private m_ParentSpan: opentracing.Span,
+        private m_ParentTracerSpan: opentracing.Span,
     ) {
         super();
     }
@@ -104,10 +104,11 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
         if (!this.m_Queue.length)
             return;
 
-        const span = opentracing.globalTracer().startSpan('db.uow', {
-            childOf: this.m_ParentSpan
-        });
-        span.setTag(opentracing.Tags.DB_STATEMENT, 'commit');
+        const tracerSpan = this.m_ParentTracerSpan ? opentracing.globalTracer().startSpan('db.uow', {
+            childOf: this.m_ParentTracerSpan
+        }) : null;
+
+        tracerSpan?.setTag?.(opentracing.Tags.DB_STATEMENT, 'commit');
 
         try {
             for (const r of this.m_Queue) {
@@ -122,7 +123,8 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
                         this.m_Uow.registerSave(r.model, r.entry);
                         break;
                 }
-                span.log({
+
+                tracerSpan?.log?.({
                     action: 'save',
                     entry: r.entry,
                     table: r.model.name
@@ -131,13 +133,14 @@ export class JaegerUnitOfWork extends UnitOfWorkRepositoryBase {
 
             await this.m_Uow.commit();
         } catch (ex) {
-            span.log({
+            tracerSpan?.log?.({
                 err: ex
-            });
+            })?.setTag?.(opentracing.Tags.ERROR, true);
+
             throw ex;
         } finally {
-            span.finish();
             this.m_Queue = [];
+            tracerSpan?.finish?.();
         }
     }
 }

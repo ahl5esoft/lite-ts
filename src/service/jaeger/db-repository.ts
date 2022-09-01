@@ -22,14 +22,14 @@ export class JaegerDbRepository<T> extends DbRepositoryBase<T> {
      * 构造函数
      * 
      * @param m_OriginDbFactory 原始数据工厂
-     * @param m_ParentSpan 父跟踪范围
+     * @param m_ParentTracerSpan 父跟踪范围
      * @param uow 工作单元
      * @param jaegerDbFactory jeager数据库工厂
      * @param model 模型
      */
     public constructor(
         private m_OriginDbFactory: DbFactoryBase,
-        private m_ParentSpan: opentracing.Span,
+        private m_ParentTracerSpan: opentracing.Span,
         jaegerDbFactory: DbFactoryBase,
         uow: UnitOfWorkRepositoryBase,
         model: new () => T,
@@ -43,8 +43,8 @@ export class JaegerDbRepository<T> extends DbRepositoryBase<T> {
     public query() {
         return new JaegerDbQuery<T>(
             this.repo.query(),
-            this.m_ParentSpan,
-            this.model.name
+            this.model.name,
+            this.m_ParentTracerSpan,
         );
     }
 }

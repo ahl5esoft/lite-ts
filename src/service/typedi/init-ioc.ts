@@ -5,6 +5,7 @@ import { BentRpc } from '../bent';
 import { ConsoleLog } from '../console';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
+import { CustomError } from '../error';
 import { FSIOFactory } from '../fs';
 import { IoredisAdapter } from '../ioredis';
 import { JaegerDbFactory, JeagerRedis } from '../jaeger';
@@ -13,8 +14,10 @@ import { LogProxy } from '../log';
 import { Log4jsLog } from '../log4js';
 import { loadMongoConfigDataSource, MongoDbFactory, MongoEnumDataSource, MongoStringGenerator } from '../mongo';
 import { RedisCache, RedisLock, RedisNowTime } from '../redis';
-import { RpcUserPortraitService, RpcValueService } from '../rpc';
+import { RpcProxy, RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
+import { TracerRpc } from '../tracer';
+import { UserCustomGiftBagService } from '../user';
 import {
     ConfigLoaderBase,
     DbFactoryBase,
@@ -32,7 +35,6 @@ import {
     ValueTypeServiceBase
 } from '../../contract';
 import { config, enum_, global } from '../../model';
-import { UserCustomGiftBagService } from '../user';
 
 /**
  * 初始化IoC
@@ -82,8 +84,13 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     }
 
     if (cfg.gatewayUrl) {
-        const rpc = new BentRpc(cfg.gatewayUrl);
-        Container.set(RpcBase, rpc);
+        Container.set(
+            RpcBase,
+            new RpcProxy(tracerSpan => {
+                const bentRpc = new BentRpc(cfg.gatewayUrl);
+                return tracerSpan ? new TracerRpc(bentRpc, tracerSpan) : bentRpc;
+            })
+        );
     }
 
     const mongo = cfg.distributedMongo || cfg.mongo;
@@ -128,16 +135,14 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         Container.set(enum_.IoC.enumCache, enumCache);
     }
 
-    let buildLogFunc: () => LogBase;
-    if (cfg.log4js) {
+    if (cfg.log4js)
         Log4jsLog.init(cfg.log4js);
-        buildLogFunc = () => new Log4jsLog();
-    } else {
-        buildLogFunc = () => new ConsoleLog();
-    }
+
     Container.set(
         LogBase,
-        new LogProxy(buildLogFunc)
+        new LogProxy(() => {
+            return cfg.log4js ? new Log4jsLog() : new ConsoleLog()
+        })
     );
 
     Container.set(
@@ -149,6 +154,8 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         ThreadBase,
         new SetTimeoutThread()
     );
+
+    RpcBase.buildErrorFunc = (errCode, data) => new CustomError(errCode, data);
 
     UserServiceBase.buildCustomGiftBagServiceFunc = (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => {
         return new UserCustomGiftBagService(dbFactory, entry);

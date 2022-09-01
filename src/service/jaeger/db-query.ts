@@ -6,35 +6,27 @@ import { IDbQuery } from '../..';
  * jaeger数据库查询
  */
 export class JaegerDbQuery<T> implements IDbQuery<T> {
-    private m_Span: opentracing.Span;
-    /**
-     * 跟踪范围
-     */
-    protected get span() {
-        if (!this.m_Span) {
-            this.m_Span = opentracing.globalTracer().startSpan('db.query', {
-                childOf: this.m_ParentSpan,
-                tags: {
-                    table: this.m_Table
-                }
-            });
-        }
-
-        return this.m_Span;
-    }
+    private m_TracerSpan: opentracing.Span;
 
     /**
      * 构造函数
      * 
      * @param m_DbQuery 数据库查询
-     * @param m_ParentSpan 父跟踪范围
      * @param m_Table 模型名
+     * @param parentTracerSpan 父跟踪范围
      */
     public constructor(
         private m_DbQuery: IDbQuery<T>,
-        private m_ParentSpan: opentracing.Span,
-        private m_Table: string
-    ) { }
+        private m_Table: string,
+        parentTracerSpan: opentracing.Span,
+    ) {
+        this.m_TracerSpan = parentTracerSpan ? opentracing.globalTracer().startSpan('db.query', {
+            childOf: parentTracerSpan,
+            tags: {
+                table: this.m_Table
+            }
+        }) : null;
+    }
 
     /**
      * 查询数量
@@ -44,17 +36,20 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
     public async count() {
         try {
             const res = await this.m_DbQuery.count();
-            this.span.log({
+
+            this.m_TracerSpan?.log?.({
                 result: res
             });
+
             return res;
         } catch (ex) {
-            this.span.log({
+            this.m_TracerSpan?.log?.({
                 err: ex
-            }).setTag(opentracing.Tags.ERROR, true);
+            })?.setTag?.(opentracing.Tags.ERROR, true);
+
             throw ex;
         } finally {
-            this.span.setTag(opentracing.Tags.DB_STATEMENT, 'count').finish();
+            this.m_TracerSpan?.setTag?.(opentracing.Tags.DB_STATEMENT, 'count')?.finish?.();
         }
     }
 
@@ -64,10 +59,12 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      * @param fields 字段数组
      */
     public order(...fields: string[]) {
-        this.span.log({
+        this.m_TracerSpan?.log?.({
             order: fields
         });
+
         this.m_DbQuery.order(...fields);
+
         return this;
     }
 
@@ -77,10 +74,12 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      * @param fields 字段数组
      */
     public orderByDesc(...fields: string[]) {
-        this.span.log({
+        this.m_TracerSpan?.log?.({
             orderByDesc: fields
         });
+
         this.m_DbQuery.orderByDesc(...fields);
+
         return this;
     }
 
@@ -90,10 +89,12 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      * @param value 行数
      */
     public skip(value: number): this {
-        this.span.log({
+        this.m_TracerSpan?.log?.({
             skip: value
         });
+
         this.m_DbQuery.skip(value);
+
         return this;
     }
 
@@ -103,10 +104,12 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      * @param value 行数
      */
     public take(value: number): this {
-        this.span.log({
+        this.m_TracerSpan?.log?.({
             take: value
         });
+
         this.m_DbQuery.take(value);
+
         return this;
     }
 
@@ -118,17 +121,20 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
     public async toArray() {
         try {
             const res = await this.m_DbQuery.toArray();
-            this.span.log({
+
+            this.m_TracerSpan?.log?.({
                 result: res
             });
+
             return res;
         } catch (ex) {
-            this.span.log({
+            this.m_TracerSpan?.log?.({
                 err: ex
-            }).setTag(opentracing.Tags.ERROR, true);
+            })?.setTag?.(opentracing.Tags.ERROR, true);
+
             throw ex;
         } finally {
-            this.span.setTag(opentracing.Tags.DB_STATEMENT, 'toArray').finish();
+            this.m_TracerSpan?.setTag?.(opentracing.Tags.DB_STATEMENT, 'toArray')?.finish?.();
         }
     }
 
@@ -138,10 +144,12 @@ export class JaegerDbQuery<T> implements IDbQuery<T> {
      * @param selecor 筛选
      */
     public where(selecor: any) {
-        this.span.log({
+        this.m_TracerSpan?.log?.({
             where: selecor
         });
+
         this.m_DbQuery.where(selecor);
+
         return this;
     }
 }

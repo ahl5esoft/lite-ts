@@ -21,7 +21,7 @@ export abstract class DbValueServiceBase<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
-> extends TargetValueServiceBase<T> {
+    > extends TargetValueServiceBase<T> {
     /**
      * 构造函数
      * 
@@ -59,14 +59,14 @@ export abstract class DbValueServiceBase<
      * @param valueType 数值类型
      */
     public async getCount(uow: IUnitOfWork, valueType: number) {
-        const span = opentracing.globalTracer().startSpan('value.getCount', {
+        const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('value.getCount', {
             childOf: this.tracerSpan,
-        });
+        }) : null;
 
         const changeEntries = await this.findAndClearChangeEntries();
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         if (changeEntries.length) {
-            span.log({
+            tracerSpan?.log?.({
                 changes: changeEntries
             });
 
@@ -76,10 +76,10 @@ export abstract class DbValueServiceBase<
         }
 
         const res = await super.getCount(uow, valueType);
-        span.log({
+        tracerSpan?.log?.({
             valueType,
             result: res,
-        }).finish();
+        })?.finish?.();
         return res;
     }
 
@@ -90,9 +90,9 @@ export abstract class DbValueServiceBase<
      * @param values 数值数据
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        const span = opentracing.globalTracer().startSpan('value.update', {
+        const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('value.update', {
             childOf: this.tracerSpan,
-        });
+        }) : null;
 
         const db = this.dbFactory.db(this.model, uow);
         let entry = await this.entry;
@@ -168,7 +168,7 @@ export abstract class DbValueServiceBase<
 
         await db.save(entry);
 
-        span.log({ values }).finish();
+        tracerSpan?.log?.({ values })?.finish?.();
     }
 
     /**

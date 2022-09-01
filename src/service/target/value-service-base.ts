@@ -95,8 +95,10 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
                 moment.unix(oldUnix),
                 'day'
             );
-            if (!isSameDay)
+            if (!isSameDay) {
                 entry.values[valueType] = 0;
+                entry.values[allValueTypeItem[valueType].data.dailyTime] = nowUnix;
+            }
         }
 
         return entry.values[valueType];

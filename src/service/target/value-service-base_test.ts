@@ -1,4 +1,4 @@
-import { strictEqual } from 'assert';
+import { deepStrictEqual, strictEqual } from 'assert';
 import moment from 'moment';
 
 import { TargetValueServiceBase } from './value-service-base';
@@ -648,7 +648,7 @@ describe('src/service/target/value-service-base.ts', () => {
             const self = new Self(0, mockEnumFactory.actual, mockNowTime.actual);
 
             const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>({
-                items: {
+                allItem: {
                     1: {
                         data: {
                             dailyTime: 2
@@ -669,13 +669,23 @@ describe('src/service/target/value-service-base.ts', () => {
                 }
             });
 
+            const now = moment().unix();
             mockNowTime.expectReturn(
                 r => r.unix(),
-                moment().unix()
+                now
             );
 
             const res = await self.getCount(null, 1);
             strictEqual(res, 0);
+
+            const entry = await self.entry;
+            deepStrictEqual(entry, {
+                id: '',
+                values: {
+                    1: 0,
+                    2: now
+                }
+            });
         });
 
         it('dailyTime(不重置)', async () => {
@@ -684,7 +694,7 @@ describe('src/service/target/value-service-base.ts', () => {
             const self = new Self(0, mockEnumFactory.actual, mockNowTime.actual);
 
             const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>({
-                items: {
+                allItem: {
                     1: {
                         data: {
                             dailyTime: 2

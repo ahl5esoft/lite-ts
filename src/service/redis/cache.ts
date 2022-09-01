@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import { CacheBase, RedisBase } from '../../contract';
 
 /**
@@ -13,7 +11,7 @@ export class RedisCache extends CacheBase {
     /**
      * 当前时间
      */
-    private m_Now = moment().unix();
+    private m_Now = Date.now();
 
     /**
      * 更新时间
@@ -42,7 +40,7 @@ export class RedisCache extends CacheBase {
         await this.m_Redis.hset(
             'cache',
             this.m_CacheKey,
-            moment().unix().toString()
+            Date.now().toString()
         );
     }
 

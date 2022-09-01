@@ -4,8 +4,8 @@ import { opentracing } from 'jaeger-client';
 
 import { CustomError } from '../error';
 import { TracerStrategy } from '../tracer';
-import { IApi, IApiResponse, IApiSession, LogBase } from '../../contract';
-import { enum_ } from '../../model';
+import { IApi, IApiSession, LogBase } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 /**
  * 创建post ExpressOption
@@ -22,18 +22,18 @@ export function buildPostExpressOption(
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
             const tracer = opentracing.globalTracer();
-            const tracerSpan = tracer.startSpan(req.path, {
-                childOf: tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers),
+            const parentSpan = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers);
+            const tracerSpan = parentSpan ? tracer.startSpan(req.path, {
+                childOf: parentSpan,
                 tags: {
                     [opentracing.Tags.SPAN_KIND]: opentracing.Tags.SPAN_KIND_RPC_SERVER,
                     [opentracing.Tags.HTTP_METHOD]: req.method,
                 }
-            });
-            tracerSpan.log({
-                header: req.headers
-            });
+            }) : null;
 
-            let res: IApiResponse = {
+            const cLog = log.addLabel('route', req.path);
+
+            let apiResp: contract.IApiResponse = {
                 data: null,
                 err: 0,
             };
@@ -47,21 +47,18 @@ export function buildPostExpressOption(
                     api[r] = new TracerStrategy(api[r]).withTrace(tracerSpan);
                 });
 
-                if (req.body) {
-                    tracerSpan.log({
-                        body: req.body
-                    });
-                    Object.keys(req.body).forEach(r => {
-                        if (r in api)
-                            return;
-
-                        api[r] = req.body[r];
-                    });
+                for (const r of ['body', 'headers']) {
+                    if (r in req) {
+                        cLog.addLabel(r, req[r]);
+                        tracerSpan?.log?.({
+                            [r]: req[r],
+                        });
+                    }
                 }
 
                 const validationErrors = await validate(api);
                 if (validationErrors.length) {
-                    tracerSpan.log({
+                    tracerSpan?.log?.({
                         validate: validationErrors.map(r => {
                             return {
                                 arg: r.property,
@@ -72,28 +69,31 @@ export function buildPostExpressOption(
                     throw new CustomError(enum_.ErrorCode.verify);
                 }
 
-                res.data = await api.call();
+                apiResp.data = await api.call();
             } catch (ex) {
-                tracerSpan.setTag(opentracing.Tags.ERROR, true);
-
                 if (ex instanceof CustomError) {
-                    res.data = ex.data;
-                    res.err = ex.code;
+                    apiResp.data = ex.data;
+                    apiResp.err = ex.code;
                 } else {
-                    log.addLabel('route', req.path).error(ex);
-                    tracerSpan.log({
+                    apiResp.err = enum_.ErrorCode.panic;
+
+                    cLog.error(ex);
+                    tracerSpan?.log?.({
                         err: ex
                     });
-
-                    res.err = enum_.ErrorCode.panic;
                 }
+
+                tracerSpan?.setTag?.(opentracing.Tags.ERROR, true);
             }
             finally {
-                tracerSpan.log({
-                    result: res
-                }).finish();
+                cLog.addLabel('response', apiResp).info();
+                tracerSpan?.log?.({
+                    result: apiResp
+                });
 
-                resp.json(res);
+                resp.json(apiResp);
+
+                tracerSpan?.finish?.();
             }
         });
     }

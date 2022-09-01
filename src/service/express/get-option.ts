@@ -1,6 +1,6 @@
 import { Express, Request, Response } from 'express';
 
-import { IApiResponse } from '../../contract';
+import { contract } from '../../model';
 
 /**
  * 创建get express选项
@@ -13,7 +13,7 @@ export function buildGetExpressOption(data: any) {
             resp.json({
                 data: data,
                 err: 0,
-            } as IApiResponse);
+            } as contract.IApiResponse);
         });
     }
 }

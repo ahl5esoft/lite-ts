@@ -7,7 +7,6 @@ import { enum_ } from './model';
 import {
     CacheBase,
     EnumFactoryBase,
-    IApiResponse,
     IOFactoryBase,
     LogBase,
     model,
@@ -41,7 +40,7 @@ import {
                 resp.json({
                     data: cfg.version,
                     err: 0,
-                } as IApiResponse);
+                } as model.contract.IApiResponse);
             })
         },
         service.buildPostExpressOption(

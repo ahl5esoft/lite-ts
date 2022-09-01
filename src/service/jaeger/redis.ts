@@ -7,31 +7,23 @@ import { contract } from '../../model';
  * jeager redis
  */
 export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
-    private m_Span: opentracing.Span;
-    /**
-     * 跟踪
-     */
-    protected get span() {
-        if (!this.m_Span) {
-            this.m_Span = opentracing.globalTracer().startSpan('redis', {
-                childOf: this.m_ParentSpan
-            });
-        }
-
-        return this.m_Span;
-    }
+    private m_TracerSpan: opentracing.Span;
 
     /**
      * 构造函数
      * 
      * @param m_Redis redis实例
-     * @param m_ParentSpan 父跟踪范围
+     * @param parentTracerSpan 父跟踪范围
      */
     public constructor(
         private m_Redis: RedisBase,
-        private m_ParentSpan?: opentracing.Span
+        parentTracerSpan?: opentracing.Span
     ) {
         super();
+
+        this.m_TracerSpan = parentTracerSpan ? opentracing.globalTracer().startSpan('redis', {
+            childOf: parentTracerSpan
+        }) : null;
     }
 
     public async blpop(timeout: number, ...keys: string[]) {
@@ -226,18 +218,21 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
     private async exec(cmd: string, args: any[], logData: { [key: string]: any; }) {
         try {
             const res = await this.m_Redis[cmd].bind(this.m_Redis).apply(this.m_Redis, args);
-            this.span.setTag(opentracing.Tags.COMPONENT, cmd).log({
+
+            this.m_TracerSpan?.setTag?.(opentracing.Tags.COMPONENT, cmd)?.log?.({
                 ...logData,
                 result: res
             });
+
             return res;
         } catch (ex) {
-            this.span.log({
+            this.m_TracerSpan?.log?.({
                 err: ex
-            }).setTag(opentracing.Tags.ERROR, true);
+            })?.setTag?.(opentracing.Tags.ERROR, true);
+
             throw ex;
         } finally {
-            this.span.finish();
+            this.m_TracerSpan?.finish?.();
         }
     }
 }

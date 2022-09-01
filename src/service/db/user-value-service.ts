@@ -92,9 +92,9 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param values 数值数组
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        const span = opentracing.globalTracer().startSpan('userValue.update', {
+        const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('userValue.update', {
             childOf: this.tracerSpan,
-        });
+        }) : null;
         const tasks = values.reduce((memo, r) => {
             const item = memo.find(cr => {
                 return cr.targetType == r.targetType;
@@ -121,7 +121,7 @@ export class DbUserValueService extends DbValueServiceBase<
             }
         });
         await Promise.all(tasks);
-        span.finish();
+        tracerSpan?.finish?.();
     }
 
     /**

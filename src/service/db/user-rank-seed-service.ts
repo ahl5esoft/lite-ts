@@ -37,7 +37,7 @@ export class DbUserRandSeedService implements IUserRandSeedService {
 
         return parseInt(
             seeds.splice(offset, len).join('')
-        );
+        ) || 0;
     }
 
     /**
@@ -53,7 +53,7 @@ export class DbUserRandSeedService implements IUserRandSeedService {
 
         const seed = parseInt(
             seeds.splice(0, len).join('')
-        );
+        ) || 0;
         const entries = await this.m_AssociateService.find<global.UserRandSeed>(global.UserRandSeed.name, r => {
             return r.id == this.m_UserID;
         });
