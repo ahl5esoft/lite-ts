@@ -9,7 +9,12 @@ Default:
       sampler:
         type: const
         param: 1
-  port: 9999
+  port: 
+    http: 9999
+    grpc: 10000
   redis:
     host: 127.0.0.1
     port: 6379
+LoadBalance:
+  grpc:
+    test: localhost:10000

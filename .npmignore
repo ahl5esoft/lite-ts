@@ -1,4 +1,5 @@
-sample/
+demo/
+proto/
 src/
 version/
 tsconfig.json

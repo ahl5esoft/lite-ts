@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package rpc;
+
+message CallMessage {
+    string json = 1;
+}
+
+service RpcService {
+    rpc call(CallMessage) returns (CallMessage) {}
+}

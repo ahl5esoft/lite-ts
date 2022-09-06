@@ -15,6 +15,7 @@ export * from './enum';
 export * from './error';
 export * from './express';
 export * from './fs';
+export * from './grpc-js';
 export * from './ioredis';
 export * from './jaeger';
 export * from './js-yaml';

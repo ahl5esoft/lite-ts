@@ -7,6 +7,7 @@ import { IUserCustomGiftBagService } from './i-user-custom-gift-bag-service';
 import { IUserPortraitService } from './i-user-portrait-service';
 import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
+import { IUserSecurityService } from './i-user-security-service';
 import { IUserValueService } from './i-user-value-service';
 import { RpcBase } from './rpc-base';
 import { ValueTypeServiceBase } from './value-type-service-base';
@@ -36,6 +37,10 @@ export abstract class UserServiceBase {
      * 创建奖励服务函数
      */
     public static buildRewardServiceFunc: (userService: UserServiceBase, valueTypeService: ValueTypeServiceBase) => IUserRewardService;
+    /**
+     * 创建安全服务
+     */
+    public static buildSecurityServiceFunc: (rpc: RpcBase, userID: string) => IUserSecurityService;
 
     /**
      * 自选礼包服务
@@ -62,6 +67,15 @@ export abstract class UserServiceBase {
     public get rewardService() {
         this.m_RewardService ??= UserServiceBase.buildRewardServiceFunc(this, this.valueTypeService);
         return this.m_RewardService;
+    }
+
+    private m_SecurityService: IUserSecurityService;
+    /**
+     * 安全服务
+     */
+    public get securityService() {
+        this.m_SecurityService ??= UserServiceBase.buildSecurityServiceFunc(this.rpc, this.userID);
+        return this.m_SecurityService;
     }
 
     /**

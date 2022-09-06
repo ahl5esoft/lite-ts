@@ -49,6 +49,15 @@ export function buildPostExpressOption(
 
                 for (const r of ['body', 'headers']) {
                     if (r in req) {
+                        if (r == 'body') {
+                            Object.keys(req.body).forEach(r => {
+                                if (r in api)
+                                    return;
+
+                                api[r] = req.body[r];
+                            });
+                        }
+
                         cLog.addLabel(r, req[r]);
                         tracerSpan?.log?.({
                             [r]: req[r],
@@ -86,7 +95,9 @@ export function buildPostExpressOption(
                 tracerSpan?.setTag?.(opentracing.Tags.ERROR, true);
             }
             finally {
-                cLog.addLabel('response', apiResp).info();
+                if (!apiResp.err)
+                    cLog.addLabel('response', apiResp).info();
+
                 tracerSpan?.log?.({
                     result: apiResp
                 });

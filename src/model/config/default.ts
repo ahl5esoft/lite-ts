@@ -52,7 +52,16 @@ export class Default {
     /**
      * 端口号
      */
-    public port: number;
+    public port: {
+        /**
+         * grpc地址
+         */
+        grpc: number;
+        /**
+         * http
+         */
+        http: number;
+    };
     public redis: {
         /**
          * ip地址

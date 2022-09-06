@@ -27,7 +27,7 @@ import {
     );
 
     const ioFactory = Container.get<IOFactoryBase>(IOFactoryBase as any);
-    const apiFactory = await service.APIFactory.create(
+    const apiFactory = await service.createApiFactory(
         ioFactory.buildDirectory(__dirname, 'api'),
     );
     await new service.ExpressApiPort([
@@ -49,6 +49,6 @@ import {
             async (req: Request) => {
                 return apiFactory.build(req.params.endpoint, req.params.api);
             }),
-        service.buildPortExpressOption(cfg.name, cfg.port, cfg.version)
+        service.buildPortExpressOption(cfg.name, cfg.port.http, cfg.version)
     ]).listen();
 })();

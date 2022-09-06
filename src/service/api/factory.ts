@@ -1,7 +1,7 @@
 import Container from 'typedi';
 
 import { CustomError } from '../error';
-import { IApi, IODirectoryBase } from '../..';
+import { ApiFactoryBase, IApi, IODirectoryBase } from '../../contract';
 import { enum_ } from '../../model';
 
 const invalidAPIError = new CustomError(enum_.ErrorCode.api);
@@ -14,15 +14,17 @@ const invalidAPI: IApi = {
 /**
  * api工厂
  */
-export class APIFactory {
+class ApiFactory extends ApiFactoryBase {
     /**
      * 构造函数
      * 
      * @param m_APICtors api构造函数
      */
-    private constructor(
+    public constructor(
         private m_APICtors: { [key: string]: { [key: string]: Function; }; }
-    ) { }
+    ) {
+        super();
+    }
 
     /**
      * 创建api实例
@@ -50,30 +52,30 @@ export class APIFactory {
         Container.remove(apiCtor);
         return api;
     }
+}
 
-    /**
-     * 创建APIFactory实例
-     * 
-     * @param dir api所在目录, 默认src/api
-     */
-    public static async create(dir: IODirectoryBase) {
-        let apiCtors = {};
-        const dirs = await dir.findDirectories();
-        for (const r of dirs) {
-            const files = await r.findFiles();
-            apiCtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
-                if (cr.name.includes('_it') || cr.name.includes('_test') || cr.name.includes('.d.ts'))
-                    return memo;
-
-                const api = require(cr.path);
-                if (!api.default)
-                    throw new Error(`未导出default: ${cr.path}`);
-
-                const name = cr.name.split('.')[0];
-                memo[name] = api.default;
+/**
+ * 创建api工厂
+ * 
+ * @param dir api所在目录, 默认src/api
+ */
+export async function createApiFactory(dir: IODirectoryBase) {
+    let apiCtors = {};
+    const dirs = await dir.findDirectories();
+    for (const r of dirs) {
+        const files = await r.findFiles();
+        apiCtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
+            if (cr.name.includes('_it') || cr.name.includes('_test') || cr.name.includes('.d.ts'))
                 return memo;
-            }, {});
-        }
-        return new APIFactory(apiCtors);
+
+            const api = require(cr.path);
+            if (!api.default)
+                throw new Error(`未导出default: ${cr.path}`);
+
+            const name = cr.name.split('.')[0];
+            memo[name] = api.default;
+            return memo;
+        }, {});
     }
+    return new ApiFactory(apiCtors);
 }

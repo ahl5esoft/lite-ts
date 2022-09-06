@@ -1,3 +1,4 @@
+export * from './api-factory-base';
 export * from './cache-base';
 export * from './command-base';
 export * from './config-loader-base';
@@ -21,6 +22,7 @@ export * from './i-user-custom-gift-bag-service';
 export * from './i-user-portrait-service';
 export * from './i-user-rand-seed-service';
 export * from './i-user-reward-service';
+export * from './i-user-security-service';
 export * from './i-user-value-service';
 export * from './i-value-interceptor';
 export * from './i-value-type-service';

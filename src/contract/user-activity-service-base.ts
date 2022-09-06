@@ -42,7 +42,7 @@ export abstract class UserActivityServiceBase {
             await this.initTime(uow);
 
             const now = await this.userService.valueService.getNow(uow);
-            this.m_RemainTime = [
+            this.m_RemainTime = this.openOn > now ? [0, 0] : [
                 this.hideOn - now < 0 ? 0 : this.hideOn - now,
                 this.closeOn - now < 0 ? 0 : this.closeOn - now
             ];

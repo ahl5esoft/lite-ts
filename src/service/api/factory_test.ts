@@ -1,8 +1,8 @@
 import { notStrictEqual } from 'assert';
 
-import { APIFactory as Self } from './factory';
+import { createApiFactory } from './factory';
 import { Mock } from '../assert';
-import { IODirectoryBase } from '../..';
+import { IODirectoryBase } from '../../contract';
 
 describe('src/service/api/factory.ts', () => {
     describe('.build(endpoint: string, apiName: string): IAPI', () => {
@@ -14,7 +14,7 @@ describe('src/service/api/factory.ts', () => {
                 []
             );
 
-            const self = await Self.create(mockDir.actual);
+            const self = await createApiFactory(mockDir.actual);
             const res = self.build('endpoint', 'api');
             let err: Error;
             try {

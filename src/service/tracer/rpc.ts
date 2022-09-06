@@ -7,6 +7,10 @@ import { RpcBase } from '../../contract';
  */
 export class TracerRpc extends RpcBase {
     /**
+     * 跟踪
+     */
+    private m_Tracer = opentracing.globalTracer();
+    /**
      * 跟踪范围
      */
     private m_TracerSpan: opentracing.Span;
@@ -23,7 +27,7 @@ export class TracerRpc extends RpcBase {
     ) {
         super();
 
-        this.m_TracerSpan = tracerSpan ? opentracing.globalTracer().startSpan('rpc', {
+        this.m_TracerSpan = tracerSpan ? this.m_Tracer.startSpan('rpc', {
             childOf: tracerSpan,
         }) : null;
     }
@@ -91,6 +95,9 @@ export class TracerRpc extends RpcBase {
      * @param v 值
      */
     public setHeader(v: { [key: string]: string; }) {
+        if (this.m_TracerSpan)
+            this.m_Tracer.inject(this.m_TracerSpan, opentracing.FORMAT_HTTP_HEADERS, v);
+
         this.m_Rpc.setHeader(v);
 
         this.m_TracerSpan?.log?.({
