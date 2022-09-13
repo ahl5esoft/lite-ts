@@ -1,24 +1,23 @@
 import { deepStrictEqual } from 'assert';
 
-import { loadMongoConfigDataSource as self } from './load-config-data-source';
+import { MongoConfigCache as Self } from './config-cache';
 import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../../contract';
 import { global } from '../../model';
 
-class TestConfig extends global.Config { }
-
-describe('src/service/mongo/load-config-data-source.ts', () => {
-    describe('.loadConfigDataSource(dbFactory: DbFactoryBase)', () => {
+describe('src/service/mongo/config-cache.ts', () => {
+    describe('.load()', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
+            const self = new Self(mockDbFactory.actual, global.Config, null, '');
 
-            const mockDbRepo = new Mock<DbRepositoryBase<TestConfig>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<global.Config>>();
             mockDbFactory.expectReturn(
-                r => r.db(TestConfig),
+                r => r.db(global.Config),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new Mock<IDbQuery<TestConfig>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Config>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
@@ -35,7 +34,8 @@ describe('src/service/mongo/load-config-data-source.ts', () => {
                 }]
             );
 
-            const res = await self(mockDbFactory.actual, TestConfig);
+            const fn = Reflect.get(self, 'load').bind(self) as () => Promise<{ [key: string]: any }>;
+            const res = await fn();
             deepStrictEqual(
                 Object.keys(res),
                 ['id-1', 'id-2']

@@ -4,6 +4,7 @@ import { TracingConfig, TracingOptions } from 'jaeger-client';
  * 默认配置
  */
 export class Default {
+    public cdnUrl: string;
     /**
      * 配置模型
      */
@@ -21,9 +22,9 @@ export class Default {
      */
     public enumSep: string;
     /**
-     * 网关地址
+     * grpc proto文件地址
      */
-    public gatewayUrl: string;
+    public grpcProtoFilePath: string;
     /**
      * log4js配置
      */

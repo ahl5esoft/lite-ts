@@ -1,25 +1,23 @@
 import { deepStrictEqual } from 'assert';
 
-import { MongoEnumDataSource as Self } from './enum-data-source';
+import { MongoEnumCache as Self } from './enum-cache';
 import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../../contract';
 import { contract, global } from '../../model';
 
-class TestEnum extends global.Enum { }
-
-describe('src/service/mongo/load-enum-data-source.ts', () => {
-    describe('.loadEnumDataSource(dbFactory: DbFactoryBase)', () => {
+describe('src/service/mongo/enum-cache.ts', () => {
+    describe('.load()', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockDbFactory.actual, '-', TestEnum);
+            const self = new Self(mockDbFactory.actual, global.Enum, null, '', '-');
 
-            const mockDbRepo = new Mock<DbRepositoryBase<TestEnum>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(
-                r => r.db(TestEnum),
+                r => r.db(global.Enum),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new Mock<IDbQuery<TestEnum>>();
+            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
@@ -40,7 +38,8 @@ describe('src/service/mongo/load-enum-data-source.ts', () => {
                 }]
             );
 
-            const res = await self.findEnums();
+            const fn = Reflect.get(self, 'load').bind(self) as () => Promise<{ [key: string]: any }>;
+            const res = await fn();
             deepStrictEqual(
                 Object.keys(res),
                 ['test']

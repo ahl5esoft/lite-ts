@@ -1,4 +1,3 @@
-export * from './cache';
-export * from './load-config-data-source';
+export * from './config-cache';
 export * from './lock';
 export * from './now-time';

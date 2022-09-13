@@ -212,9 +212,16 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
      * @param parentSpan 父范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new JeagerRedis(this.m_Redis, parentSpan) : this.m_Redis;
+        return parentSpan ? new JeagerRedis(this.m_Redis, parentSpan) : this;
     }
 
+    /**
+     * 执行
+     * 
+     * @param cmd 命令
+     * @param args 参数
+     * @param logData 日志数据
+     */
     private async exec(cmd: string, args: any[], logData: { [key: string]: any; }) {
         try {
             const res = await this.m_Redis[cmd].bind(this.m_Redis).apply(this.m_Redis, args);

@@ -1,3 +1,6 @@
+import { opentracing } from 'jaeger-client';
+import moment from 'moment';
+
 import { DbValueServiceBase } from './value-service-base';
 import {
     DbFactoryBase,
@@ -10,7 +13,6 @@ import {
     ValueInterceptorFactoryBase,
 } from '../../contract';
 import { contract, global } from '../../model';
-import { opentracing } from 'jaeger-client';
 
 /**
  * 用户数值服务
@@ -20,6 +22,11 @@ export class DbUserValueService extends DbValueServiceBase<
     global.UserValueChange,
     global.UserValueLog
 > implements IUserValueService {
+    /**
+     * 当前时间戳
+     */
+    private m_Now: [number, number];
+
     /**
      * 获取用户数值实体
      */
@@ -78,11 +85,16 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param uow 工作单元
      */
     public async getNow(uow: IUnitOfWork) {
-        let now = await this.getCount(uow, this.m_NowValueType);
-        if (!now)
-            now = await this.nowTime.unix();
+        if (!this.m_Now) {
+            this.m_Now = [
+                await this.getCount(uow, this.m_NowValueType),
+                moment().unix()
+            ];
+            if (!this.m_Now[0])
+                this.m_Now[0] = await this.nowTime.unix();
+        }
 
-        return now;
+        return this.m_Now[0] + moment().unix() - this.m_Now[1];
     }
 
     /**

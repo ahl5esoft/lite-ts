@@ -39,10 +39,13 @@ export class GrpcJsRpc extends RpcBase {
     public async callWithoutThrow<T>(route: string) {
         const proto = getRpcProto(this.m_ProtoFilePath);
         const routeArgs = route.split('/');
-        const loadBalance = await this.m_ConfigLoader.load(config.LoadBalance);
+        const cfg = await this.m_ConfigLoader.load(config.LoadBalance);
+        if (!cfg.grpc?.[routeArgs[1]])
+            throw new Error(`缺少grpc负载: ${routeArgs[1]}`);
+
         return new Promise<contract.IApiDyanmicResponse<T>>((s, f) => {
             new proto.RpcService(
-                loadBalance.grpc[routeArgs[1]],
+                cfg.grpc[routeArgs[1]],
                 credentials.createInsecure()
             ).call({
                 json: JSON.stringify({

@@ -1,5 +1,5 @@
 Default:
-  gatewayUrl: http://127.0.0.1:30202
+  # grpcProtoFilePath: src/rpc.proto
   mongo: mongodb://localhost:27017
   name: lite-ts
   openTracing:
@@ -18,3 +18,5 @@ Default:
 LoadBalance:
   grpc:
     test: localhost:10000
+  http:
+    test: http://localhost:9999

@@ -1,19 +1,24 @@
 import { initTracer, opentracing } from 'jaeger-client';
+import moment from 'moment';
+import { join } from 'path';
 import Container from 'typedi';
 
-import { BentRpc } from '../bent';
+import { BentConfigLoader, BentRpc } from '../bent';
+import { CacheConfigLoader } from '../cache';
+import { MultiConfigLoader } from '../config';
 import { ConsoleLog } from '../console';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
 import { CustomError } from '../error';
 import { FSIOFactory } from '../fs';
+import { GrpcJsRpc } from '../grpc-js';
 import { IoredisAdapter } from '../ioredis';
 import { JaegerDbFactory, JeagerRedis } from '../jaeger';
 import { JsYamlConfigLoader } from '../js-yaml';
 import { LogProxy } from '../log';
 import { Log4jsLog } from '../log4js';
-import { loadMongoConfigDataSource, MongoDbFactory, MongoEnumDataSource, MongoStringGenerator } from '../mongo';
-import { RedisCache, RedisLock, RedisNowTime } from '../redis';
+import { MongoConfigCache, MongoDbFactory, MongoEnumCache, MongoStringGenerator } from '../mongo';
+import { RedisLock, RedisNowTime } from '../redis';
 import { RpcProxy, RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
 import { TracerRpc } from '../tracer';
@@ -42,6 +47,12 @@ import { config, enum_, global } from '../../model';
  * @param globalModel 全局模型
  */
 export async function initIoC(globalModel: { [name: string]: any }) {
+    moment.updateLocale('en', {
+        week: {
+            dow: 1,
+        }
+    });
+
     const ioFactory = new FSIOFactory();
     Container.set(IOFactoryBase, ioFactory);
 
@@ -55,20 +66,27 @@ export async function initIoC(globalModel: { [name: string]: any }) {
             break;
         }
     }
-    const configLaoder = new JsYamlConfigLoader(
-        ioFactory.buildFile(
-            process.cwd(),
-            yamlFilename
+    const configLoaders: ConfigLoaderBase[] = [
+        new JsYamlConfigLoader(
+            ioFactory.buildFile(
+                process.cwd(),
+                yamlFilename
+            )
         )
-    );
-    Container.set(ConfigLoaderBase, configLaoder);
+    ];
 
-    const cfg = await configLaoder.load(config.Default);
+    const cfg = await configLoaders[0].load(config.Default);
     const pkg = await ioFactory.buildFile(
         process.cwd(),
         'package.json'
     ).readJSON<{ version: string }>();
     cfg.version = pkg.version;
+
+    if (cfg.cdnUrl) {
+        configLoaders.push(
+            new BentConfigLoader(cfg.cdnUrl)
+        );
+    }
 
     if (cfg.openTracing) {
         cfg.openTracing.config.serviceName = cfg.name;
@@ -83,15 +101,17 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         opentracing.initGlobalTracer(tracer);
     }
 
-    if (cfg.gatewayUrl) {
-        Container.set(
-            RpcBase,
-            new RpcProxy(tracerSpan => {
-                const bentRpc = new BentRpc(cfg.gatewayUrl);
-                return tracerSpan ? new TracerRpc(bentRpc, tracerSpan) : bentRpc;
-            })
-        );
-    }
+    Container.set(
+        RpcBase,
+        new RpcProxy(parentTracerSpan => {
+            const configLoader = Container.get<ConfigLoaderBase>(ConfigLoaderBase as any);
+            const rpc = cfg.grpcProtoFilePath ? new GrpcJsRpc(
+                configLoader,
+                join(__dirname, cfg.grpcProtoFilePath)
+            ) : new BentRpc(configLoader);
+            return parentTracerSpan ? new TracerRpc(rpc, parentTracerSpan) : rpc;
+        })
+    );
 
     const mongo = cfg.distributedMongo || cfg.mongo;
     let dbFactory: DbFactoryBase;
@@ -124,16 +144,34 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     Container.set(NowTimeBase, nowTime);
 
     if (redis && dbFactory?.constructor == MongoDbFactory) {
-        const configCache = new RedisCache(redis, `${cfg.name}:${cfg.configModel ?? global.Config.name}`, () => {
-            return loadMongoConfigDataSource(dbFactory, globalModel[cfg.configModel] ?? global.Config);
-        });
+        const configCache = new MongoConfigCache(
+            dbFactory,
+            globalModel[cfg.configModel] ?? global.Config,
+            redis,
+            `${cfg.name}:${cfg.configModel ?? global.Config.name}`
+        );
         Container.set(enum_.IoC.configCache, configCache);
 
-        const enumCache = new RedisCache(redis, `${cfg.name}:${cfg.enumModel ?? global.Enum.name}`, () => {
-            return new MongoEnumDataSource(dbFactory, '-', globalModel[cfg.enumModel] ?? global.Enum).findEnums();
-        });
-        Container.set(enum_.IoC.enumCache, enumCache);
+        configLoaders.push(
+            new CacheConfigLoader(configCache)
+        );
+
+        Container.set(
+            enum_.IoC.enumCache,
+            new MongoEnumCache(
+                dbFactory,
+                globalModel[cfg.enumModel] ?? global.Enum,
+                redis,
+                `${cfg.name}:${cfg.enumModel ?? global.Enum.name}`,
+                '-'
+            )
+        );
     }
+
+    Container.set(
+        ConfigLoaderBase,
+        new MultiConfigLoader(configLoaders)
+    );
 
     if (cfg.log4js)
         Log4jsLog.init(cfg.log4js);

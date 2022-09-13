@@ -9,14 +9,19 @@ import { contract } from '../../model';
  */
 export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFactoryBase> {
     /**
+     * 枚举
+     */
+    private m_Enums: { [name: string]: any } = {};
+
+    /**
      * 构造函数
      * 
+     * @param m_ParentTracerSpan 父跟踪范围
      * @param m_BuildFuncs 创建枚举函数数组
-     * @param m_ParentSpan 父跟踪范围
      */
     public constructor(
+        private m_ParentTracerSpan: opentracing.Span,
         private m_BuildFuncs: { [key: string]: () => any; },
-        private m_ParentSpan?: opentracing.Span,
     ) {
         super();
     }
@@ -27,11 +32,11 @@ export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFacto
      * @param model 枚举模型
      */
     public build<T extends contract.IEnumItem>(model: new () => T) {
-        if (model.name in this.m_BuildFuncs) {
-            return new TracerStrategy(
-                this.m_BuildFuncs[model.name]()
-            ).withTrace(this.m_ParentSpan);
-        }
+        if (model.name in this.m_BuildFuncs)
+            this.m_Enums[model.name] ??= this.m_BuildFuncs[model.name]();
+
+        if (this.m_Enums[model.name])
+            return new TracerStrategy(this.m_Enums[model.name]).withTrace(this.m_ParentTracerSpan);
 
         throw new Error(`缺少创建函数: ${model.name}`);
     }
@@ -42,6 +47,12 @@ export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFacto
      * @param parentSpan 父跟踪范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new EnumFactory(this.m_BuildFuncs, parentSpan) : this;
+        if (parentSpan) {
+            const enumFactory = new EnumFactory(parentSpan, this.m_BuildFuncs);
+            enumFactory.m_Enums = this.m_Enums;
+            return enumFactory;
+        }
+
+        return this;
     }
 }

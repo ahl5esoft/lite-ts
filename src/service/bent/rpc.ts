@@ -1,7 +1,7 @@
 import bent from 'bent';
 
-import { RpcBase } from '../../contract';
-import { contract } from '../../model';
+import { ConfigLoaderBase, RpcBase } from '../../contract';
+import { config, contract } from '../../model';
 
 /**
  * 远程过程调用对象(基于bent实现)
@@ -19,10 +19,10 @@ export class BentRpc extends RpcBase {
     /**
      * 构造函数
      * 
-     * @param m_Url 服务基地址
+     * @param m_ConfigLoader 配置加载器
      */
     public constructor(
-        private m_Url: string
+        private m_ConfigLoader: ConfigLoaderBase,
     ) {
         super();
     }
@@ -34,10 +34,11 @@ export class BentRpc extends RpcBase {
      */
     public async callWithoutThrow<T>(route: string) {
         const routeArgs = route.split('/');
-        if (routeArgs.length == 3)
-            routeArgs.splice(2, 0, 'ih');
-        route = routeArgs.join('/');
-        const resp = await bent(this.m_Url, 'json', 'POST', 200)(route, this.m_Body, this.m_Header || {});
+        const cfg = await this.m_ConfigLoader.load(config.LoadBalance);
+        if (!cfg.http?.[routeArgs[1]])
+            throw new Error(`缺少http负载: ${routeArgs[1]}`);
+
+        const resp = await bent(cfg.http[routeArgs[1]], 'json', 'POST', 200)(`/ih/${routeArgs.pop()}`, this.m_Body, this.m_Header || {});
         return resp as contract.IApiDyanmicResponse<T>;
     }
 

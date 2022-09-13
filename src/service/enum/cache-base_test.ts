@@ -1,16 +1,20 @@
 import { deepStrictEqual } from 'assert';
 
-import { EnumDataSourceBase } from './data-source-base';
+import { EnumCacheBase } from './cache-base';
 import { global } from '../../model';
 
-class Self extends EnumDataSourceBase {
+class Self extends EnumCacheBase {
     public constructor(
         private m_Entries: global.Enum[]
     ) {
-        super('-');
+        super('-', null, null);
     }
 
-    protected async load() {
+    public withTrace() {
+        return this;
+    }
+
+    protected async find() {
         return this.m_Entries;
     }
 }
@@ -18,14 +22,16 @@ class Self extends EnumDataSourceBase {
 describe('src/service/enum/data-source-base.ts', () => {
     describe('.findEnums()', () => {
         it('ok', async () => {
-            const res = await new Self([{
+            const self = new Self([{
                 id: 'a',
                 items: [{
                     value: 1,
                 }, {
                     value: 2,
                 }]
-            }]).findEnums();
+            }]);
+            const fn = Reflect.get(self, 'load').bind(self) as () => Promise<{ [key: string]: any }>;
+            const res = await fn();
             deepStrictEqual(
                 Object.keys(res),
                 ['a']

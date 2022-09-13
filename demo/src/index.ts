@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Express, Request, Response } from 'express';
+import { Request } from 'express';
 import Container from 'typedi';
 
 import { enum_ } from './model';
@@ -10,7 +10,9 @@ import {
     IOFactoryBase,
     LogBase,
     model,
-    service
+    RpcBase,
+    service,
+    ThreadBase
 } from '../../src';
 
 (async () => {
@@ -23,26 +25,18 @@ import {
             [enum_.CityData.name]: () => {
                 return new service.CacheEnum(enumCache, enum_.CityData.name);
             }
-        })
+        }, null)
     );
 
     const ioFactory = Container.get<IOFactoryBase>(IOFactoryBase as any);
     const apiFactory = await service.createApiFactory(
         ioFactory.buildDirectory(__dirname, 'api'),
     );
-    await new service.ExpressApiPort([
+    new service.ExpressApiPort([
         service.buildCorsExpressOption({}),
         service.buildBodyParserJsonExpressOption({
             limit: '16mb'
         }),
-        (app: Express) => {
-            app.get('/', (_: Request, resp: Response) => {
-                resp.json({
-                    data: cfg.version,
-                    err: 0,
-                } as model.contract.IApiResponse);
-            })
-        },
         service.buildPostExpressOption(
             Container.get<LogBase>(LogBase as any),
             '/:endpoint/:api',
@@ -50,5 +44,10 @@ import {
                 return apiFactory.build(req.params.endpoint, req.params.api);
             }),
         service.buildPortExpressOption(cfg.name, cfg.port.http, cfg.version)
-    ]).listen();
+    ]).listen().catch(console.error);
+
+    await Container.get<ThreadBase>(ThreadBase as any).sleep(1000);
+
+    const res = await Container.get<RpcBase>(RpcBase as any).callWithoutThrow<any>('/test/now-time');
+    console.log(res);
 })();

@@ -1,6 +1,7 @@
 import { Server, ServerCredentials } from '@grpc/grpc-js';
 import { validate } from 'class-validator';
 import { opentracing } from 'jaeger-client';
+import moment from 'moment';
 
 import { getRpcProto } from './proto';
 import { CustomError } from '../error';
@@ -18,11 +19,15 @@ export class GrpcJsApiPort implements IApiPort {
      * 
      * @param m_ApiFactory api工厂
      * @param m_Port 端口
+     * @param m_Project 项目
+     * @param m_Version 版本
      * @param m_ProtoFilePath proto文件路径
      */
     public constructor(
         private m_ApiFactory: ApiFactoryBase,
         private m_Port: number,
+        private m_Project: string,
+        private m_Version: string,
         private m_ProtoFilePath: string,
     ) { }
 
@@ -114,6 +119,7 @@ export class GrpcJsApiPort implements IApiPort {
             );
         });
 
+        console.log(`grpcjs >> ${this.m_Project}(v${this.m_Version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]: ${this.m_Port}`);
         server.start();
     }
 }

@@ -1,4 +1,5 @@
 import { opentracing } from 'jaeger-client';
+
 import { ITraceable, RpcBase } from '../../contract';
 
 /**

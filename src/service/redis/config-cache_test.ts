@@ -1,13 +1,14 @@
 import { deepStrictEqual } from 'assert';
 
-import { loadRedisConfigDataSource as self } from './load-config-data-source';
+import { RedisConfigCache as Self } from './config-cache';
 import { Mock } from '../assert';
 import { RedisBase } from '../../contract';
 
-describe('src/service/redis/load-config-data-source.ts', () => {
-    describe('.loadRedisConfigDataSource(redis: RedisBase, redisKey: string)', () => {
+describe('src/service/redis/config-cache.ts', () => {
+    describe('.load()', () => {
         it('ok', async () => {
             const mockRedis = new Mock<RedisBase>();
+            const self = new Self('redis-key', mockRedis.actual, 'cache-key');
 
             mockRedis.expectReturn(
                 r => r.hgetall('redis-key'),
@@ -23,7 +24,8 @@ describe('src/service/redis/load-config-data-source.ts', () => {
                 }
             );
 
-            const res = await self(mockRedis.actual, 'redis-key');
+            const fn = Reflect.get(self, 'load').bind(self) as () => Promise<{ [key: string]: any }>;
+            const res = await fn();
             deepStrictEqual(res, {
                 a: {
                     a1: 1,

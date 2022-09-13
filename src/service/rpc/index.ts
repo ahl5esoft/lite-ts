@@ -1,4 +1,4 @@
-export * from './enum-data-source';
+export * from './enum-cache';
 export * from './proxy';
 export * from './user-portrait-service';
 export * from './user-service';

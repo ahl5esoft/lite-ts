@@ -10,12 +10,12 @@ export class MongoPool {
      */
     public get client() {
         return new Promise<MongoClient>(async (s, f) => {
-            if (!this.m_Client) {
-                try {
-                    this.m_Client = await new MongoClient(this.m_Url).connect();
-                } catch (ex) {
-                    return f(ex);
-                }
+            this.m_Client ??= new MongoClient(this.m_Url);
+
+            try {
+                await this.m_Client.connect();
+            } catch (ex) {
+                return f(ex);
             }
 
             s(this.m_Client);

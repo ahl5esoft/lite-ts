@@ -7,13 +7,19 @@ type RedisType = Ioredis.Cluster | Ioredis.Redis;
 
 export class IoredisAdapter extends RedisBase {
     private m_Client: RedisType;
+    /**
+     * 客户端
+     */
     protected get client(): RedisType {
-        if (this.m_Client == null)
-            this.m_Client = this.m_Opt instanceof Array ? new Ioredis.Cluster(this.m_Opt) : new Ioredis(this.m_Opt);
-
+        this.m_Client ??= this.m_Opt instanceof Array ? new Ioredis.Cluster(this.m_Opt) : new Ioredis(this.m_Opt);
         return this.m_Client;
     }
 
+    /**
+     * 构造函数
+     * 
+     * @param m_Opt 选项
+     */
     public constructor(
         private m_Opt: Ioredis.RedisOptions | Ioredis.ClusterNode[]
     ) {
