@@ -9,7 +9,9 @@ import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
 import { IUserSecurityService } from './i-user-security-service';
 import { IUserValueService } from './i-user-value-service';
+import { LockBase } from './lock-base';
 import { RpcBase } from './rpc-base';
+import { ThreadBase } from './thread-base';
 import { ValueTypeServiceBase } from './value-type-service-base';
 import { global } from '../model';
 
@@ -17,6 +19,10 @@ import { global } from '../model';
  * 用户服务基类
  */
 export abstract class UserServiceBase {
+    /**
+     * 等待锁失败错误
+     */
+    public static errWaitLockFail: Error;
     /**
      * 随机种子区间
      */
@@ -90,7 +96,9 @@ export abstract class UserServiceBase {
      * @param userID 用户ID
      * @param dbFactory 数据库工厂
      * @param enumFactory 枚举工厂
+     * @param lock 锁
      * @param rpc 远程过程调用
+     * @param thread 线程
      * @param valueTypeService 数值类型服务
      */
     public constructor(
@@ -98,7 +106,9 @@ export abstract class UserServiceBase {
         public userID: string,
         protected dbFactory: DbFactoryBase,
         protected enumFactory: EnumFactoryBase,
+        protected lock: LockBase,
         protected rpc: RpcBase,
+        protected thread: ThreadBase,
         protected valueTypeService: ValueTypeServiceBase,
     ) { }
 
@@ -138,6 +148,29 @@ export abstract class UserServiceBase {
 
         this.m_CustomGiftBagService.scene = scene;
         return this.m_CustomGiftBagService;
+    }
+
+    /**
+     * 等待锁
+     * 
+     * @param uow 工作单元
+     * @param scene 场景, 默认空
+     */
+    public async waitLock(uow: IUnitOfWork, scene?: string) {
+        const key = scene ? [this.userID, scene].join(':') : this.userID;
+        let unlock: () => Promise<void>;
+        for (let i = 0; i < 50; i++) {
+            unlock = await this.lock.lock(key, 10);
+            if (unlock)
+                break;
+
+            await this.thread.sleepRange(100, 300);
+        }
+
+        if (unlock)
+            uow.registerAfter(unlock);
+        else
+            throw UserServiceBase.errWaitLockFail;
     }
 
     /**

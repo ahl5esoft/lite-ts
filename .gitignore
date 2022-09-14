@@ -6,6 +6,7 @@ node_modules/
 src/service/bent/config-loader_test.ts
 src/service/bent/feishu-post-push_it.ts
 src/service/bent/qywx-markdown-push_it.ts
+src/service/bent/rpc_it.ts
 src/service/sequelize/db-factory_it.ts
 src/service/sequelize/db-query_it.ts
 src/service/sequelize/unit-of-work_it.ts

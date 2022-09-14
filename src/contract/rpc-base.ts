@@ -13,6 +13,15 @@ export abstract class RpcBase {
     public static buildErrorFunc: (errorCode: number, data: any) => Error;
 
     /**
+     * 请求体
+     */
+    protected body: any;
+    /**
+     * 头数据
+     */
+    protected header: { [key: string]: string; };
+
+    /**
      * 调用
      * 
      * @param route 路由
@@ -33,6 +42,38 @@ export abstract class RpcBase {
     }
 
     /**
+     * 设置body
+     * 
+     * @param v 值
+     * 
+     * @example
+     * ```typescript
+     *  const rpc: RpcBase;
+     *  rpc.setBody({ ... });
+     * ```
+     */
+    public setBody(v: any) {
+        this.body = v;
+        return this;
+    }
+
+    /**
+     * 设置请求头
+     * 
+     * @param v 值
+     * 
+     * @example
+     * ```typescript
+     *  const rpc: RpcBase;
+     *  rpc.setHeader({ ... });
+     * ```
+     */
+    public setHeader(v: { [key: string]: string; }) {
+        this.header = v;
+        return this;
+    }
+
+    /**
      * 调用(不会抛出异常)
      * 
      * @param route 路由
@@ -45,28 +86,4 @@ export abstract class RpcBase {
      * ```
      */
     public abstract callWithoutThrow<T>(route: string): Promise<contract.IApiDyanmicResponse<T>>;
-    /**
-     * 设置body
-     * 
-     * @param v body值
-     * 
-     * @example
-     * ```typescript
-     *  const rpc: RpcBase;
-     *  rpc.setBody({ ... });
-     * ```
-     */
-    public abstract setBody(v: any): RpcBase;
-    /**
-     * 设置头部
-     * 
-     * @param v 头部值
-     * 
-     * @example
-     * ```typescript
-     *  const rpc: RpcBase;
-     *  rpc.setHeader({ ... });
-     * ```
-     */
-    public abstract setHeader(v: { [key: string]: string }): RpcBase;
 }

@@ -19,7 +19,7 @@ import { LogProxy } from '../log';
 import { Log4jsLog } from '../log4js';
 import { MongoConfigCache, MongoDbFactory, MongoEnumCache, MongoStringGenerator } from '../mongo';
 import { RedisLock, RedisNowTime } from '../redis';
-import { RpcProxy, RpcUserPortraitService, RpcValueService } from '../rpc';
+import { RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
 import { TracerRpc } from '../tracer';
 import { UserCustomGiftBagService } from '../user';
@@ -103,14 +103,13 @@ export async function initIoC(globalModel: { [name: string]: any }) {
 
     Container.set(
         RpcBase,
-        new RpcProxy(parentTracerSpan => {
+        new TracerRpc(() => {
             const configLoader = Container.get<ConfigLoaderBase>(ConfigLoaderBase as any);
-            const rpc = cfg.grpcProtoFilePath ? new GrpcJsRpc(
+            return cfg.grpcProtoFilePath ? new GrpcJsRpc(
+                join(__dirname, cfg.grpcProtoFilePath),
                 configLoader,
-                join(__dirname, cfg.grpcProtoFilePath)
             ) : new BentRpc(configLoader);
-            return parentTracerSpan ? new TracerRpc(rpc, parentTracerSpan) : rpc;
-        })
+        }, null)
     );
 
     const mongo = cfg.distributedMongo || cfg.mongo;

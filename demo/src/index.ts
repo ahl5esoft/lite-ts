@@ -21,11 +21,9 @@ import {
     const enumCache = Container.get<CacheBase>(model.enum_.IoC.enumCache);
     Container.set(
         EnumFactoryBase,
-        new service.EnumFactory({
-            [enum_.CityData.name]: () => {
-                return new service.CacheEnum(enumCache, enum_.CityData.name);
-            }
-        }, null)
+        new service.EnumFactory(null, {
+            [enum_.CityData.name]: new service.CacheEnum(enumCache, enum_.CityData.name)
+        })
     );
 
     const ioFactory = Container.get<IOFactoryBase>(IOFactoryBase as any);
@@ -50,4 +48,6 @@ import {
 
     const res = await Container.get<RpcBase>(RpcBase as any).callWithoutThrow<any>('/test/now-time');
     console.log(res);
+
+    process.exit();
 })();

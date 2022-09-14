@@ -25,7 +25,7 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
      */
     private m_ChangeValues: contract.IValue[] = [];
     /**
-     * 当前时间戳
+     * 当前时间
      */
     private m_Now: [number, number];
 
@@ -73,12 +73,14 @@ export class RpcUserValueService extends TargetValueServiceBase<global.UserValue
      */
     public async getNow(uow: IUnitOfWork) {
         if (!this.m_Now) {
-            this.m_Now = [
+            const now: [number, number] = [
                 await this.getCount(uow, this.m_NowValueType),
                 moment().unix()
             ];
-            if (!this.m_Now[0])
-                this.m_Now[0] = await this.nowTime.unix();
+            if (!now[0])
+                now[0] = await this.nowTime.unix();
+
+            this.m_Now = now;
         }
 
         return this.m_Now[0] + moment().unix() - this.m_Now[1];

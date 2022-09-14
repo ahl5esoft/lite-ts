@@ -4,8 +4,10 @@ import {
     EnumFactoryBase,
     IUserAssociateService,
     IUserValueService,
+    LockBase,
     NowTimeBase,
     RpcBase,
+    ThreadBase,
     UserServiceBase,
     ValueTypeServiceBase,
 } from '../../contract';
@@ -42,7 +44,9 @@ export class RpcUserService extends UserServiceBase {
      * @param associateService 关联服务
      * @param dbFactory 数据库工厂
      * @param enumFactory 枚举工厂
+     * @param lock 锁
      * @param rpc 远程过程调用
+     * @param thread 锁
      * @param valueTypeService 数值类型服务
      * @param userID 用户ID
      */
@@ -53,11 +57,13 @@ export class RpcUserService extends UserServiceBase {
         associateService: IUserAssociateService,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
+        lock: LockBase,
         rpc: RpcBase,
+        thread: ThreadBase,
         valueTypeService: ValueTypeServiceBase,
         userID: string,
     ) {
-        super(associateService, userID, dbFactory, enumFactory, rpc, valueTypeService);
+        super(associateService, userID, dbFactory, enumFactory, lock, rpc, thread, valueTypeService);
     }
 
     /**

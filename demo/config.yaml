@@ -17,6 +17,8 @@ Default:
     port: 6379
 LoadBalance:
   grpc:
-    test: localhost:10000
+    test: 
+      '': localhost:10000
   http:
-    test: http://localhost:9999
+    test:
+      '': http://localhost:9999

@@ -11,7 +11,7 @@ import { model, RpcBase, service } from '../../src';
     const ioFactory = new service.FSIOFactory();
     const apiFactory = await service.createApiFactory(
         ioFactory.buildDirectory(__dirname, 'api')
-    )
+    );
     const protoFilePath = join(__dirname, 'rpc.proto');
     new service.GrpcJsApiPort(apiFactory, cfg.port.grpc, 'lite-ts', cfg.version, protoFilePath).listen().catch(console.error);
 
