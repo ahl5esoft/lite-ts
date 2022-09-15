@@ -108,13 +108,13 @@ export class DbUserValueService extends DbValueServiceBase<
             childOf: this.tracerSpan,
         }) : null;
         const tasks = values.reduce((memo, r) => {
+            r.targetType ??= 0;
             const item = memo.find(cr => {
                 return cr.targetType == r.targetType;
             });
             if (item) {
                 item.values.push(r);
-            }
-            else {
+            } else {
                 memo.push({
                     values: [r],
                     targetType: r.targetType,
