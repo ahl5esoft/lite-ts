@@ -31,6 +31,7 @@ class Self extends UserServiceBase {
             rpc,
             thread,
             valueTypeService,
+            null,
         );
     }
 
@@ -65,7 +66,7 @@ describe('src/contract/user-service-base.ts', () => {
 
             await self.waitLock(mockUow.actual);
         });
-        
+
         it('场景', async () => {
             const mockLock = new Mock<LockBase>();
             const mockThread = new Mock<ThreadBase>();

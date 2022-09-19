@@ -1,3 +1,5 @@
+import { opentracing } from 'jaeger-client';
+
 import { DbFactoryBase } from './db-factory-base';
 import { EnumFactoryBase } from './enum-factory-base';
 import { ITargetValueService } from './i-target-value-service';
@@ -27,6 +29,10 @@ export abstract class UserServiceBase {
      * 随机种子区间
      */
     public static randSeedRange = {};
+    /**
+     * 等待锁后缀
+     */
+    public static waitLockSuffix = '';
     /**
      * 创建自选礼包服务函数
      */
@@ -88,7 +94,6 @@ export abstract class UserServiceBase {
      * 数值服务
      */
     public abstract get valueService(): IUserValueService;
-
     /**
      * 构造函数
      * 
@@ -100,6 +105,7 @@ export abstract class UserServiceBase {
      * @param rpc 远程过程调用
      * @param thread 线程
      * @param valueTypeService 数值类型服务
+     * @param parentTracerSpan 父跟踪范围
      */
     public constructor(
         public associateService: IUserAssociateService,
@@ -110,6 +116,7 @@ export abstract class UserServiceBase {
         protected rpc: RpcBase,
         protected thread: ThreadBase,
         protected valueTypeService: ValueTypeServiceBase,
+        protected parentTracerSpan: opentracing.Span,
     ) { }
 
     /**
@@ -157,7 +164,14 @@ export abstract class UserServiceBase {
      * @param scene 场景, 默认空
      */
     public async waitLock(uow: IUnitOfWork, scene?: string) {
+        const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('user.waitLock', {
+            childOf: this.parentTracerSpan,
+        }) : null;
+
+        scene ??= UserServiceBase.waitLockSuffix;
         const key = scene ? [this.userID, scene].join(':') : this.userID;
+        tracerSpan?.log({ key });
+
         let unlock: () => Promise<void>;
         for (let i = 0; i < 50; i++) {
             unlock = await this.lock.lock(key, 10);
@@ -167,10 +181,17 @@ export abstract class UserServiceBase {
             await this.thread.sleepRange(100, 300);
         }
 
-        if (unlock)
+        if (unlock) {
             uow.registerAfter(unlock);
-        else
+
+            tracerSpan?.finish?.();
+        }
+        else {
+            tracerSpan?.setTag?.(opentracing.Tags.ERROR, true)?.finish?.();
+
+            UserServiceBase.errWaitLockFail ??= new Error(`未配置UserServiceBase.errWaitLockFail`);
             throw UserServiceBase.errWaitLockFail;
+        }
     }
 
     /**

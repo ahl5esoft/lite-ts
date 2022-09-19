@@ -13,7 +13,7 @@ import { CustomError } from '../error';
 import { FSIOFactory } from '../fs';
 import { GrpcJsRpc } from '../grpc-js';
 import { IoredisAdapter } from '../ioredis';
-import { JaegerDbFactory, JeagerRedis } from '../jaeger';
+import { JaegerDbFactory, JeagerRedis, JeagerRpc } from '../jaeger';
 import { JsYamlConfigLoader } from '../js-yaml';
 import { LogProxy } from '../log';
 import { Log4jsLog } from '../log4js';
@@ -21,7 +21,6 @@ import { MongoConfigCache, MongoDbFactory, MongoEnumCache, MongoStringGenerator 
 import { RedisLock, RedisNowTime } from '../redis';
 import { RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
-import { TracerRpc } from '../tracer';
 import { UserCustomGiftBagService } from '../user';
 import {
     ConfigLoaderBase,
@@ -103,7 +102,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
 
     Container.set(
         RpcBase,
-        new TracerRpc(() => {
+        new JeagerRpc(() => {
             const configLoader = Container.get<ConfigLoaderBase>(ConfigLoaderBase as any);
             return cfg.grpcProtoFilePath ? new GrpcJsRpc(
                 join(__dirname, cfg.grpcProtoFilePath),

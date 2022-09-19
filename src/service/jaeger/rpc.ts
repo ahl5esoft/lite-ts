@@ -5,7 +5,7 @@ import { ITraceable, RpcBase } from '../../contract';
 /**
  * 包装器
  */
-export class TracerRpc extends RpcBase implements ITraceable<RpcBase> {
+export class JeagerRpc extends RpcBase implements ITraceable<RpcBase> {
     /**
      * 跟踪
      */
@@ -98,6 +98,6 @@ export class TracerRpc extends RpcBase implements ITraceable<RpcBase> {
      * @param parentSpan 父范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new TracerRpc(this.m_BuildRpcFunc, parentSpan) : this;
+        return parentSpan ? new JeagerRpc(this.m_BuildRpcFunc, parentSpan) : this;
     }
 }

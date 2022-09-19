@@ -71,6 +71,7 @@ export class DbUserService extends UserServiceBase {
      * @param rpc 远程过程调用
      * @param thread 锁
      * @param valueTypeService 数值类型服务
+     * @param parentTracerSpan 父跟踪范围
      * @param userID 用户ID
      */
     public constructor(
@@ -86,9 +87,10 @@ export class DbUserService extends UserServiceBase {
         rpc: RpcBase,
         thread: ThreadBase,
         valueTypeService: ValueTypeServiceBase,
+        parentTracerSpan: opentracing.Span,
         userID: string,
     ) {
-        super(associateService, userID, dbFactory, enumFactory, lock, rpc, thread, valueTypeService);
+        super(associateService, userID, dbFactory, enumFactory, lock, rpc, thread, valueTypeService, parentTracerSpan);
     }
 
     /**

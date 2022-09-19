@@ -38,6 +38,7 @@ export abstract class CacheBase implements ITraceable<CacheBase> {
      * 刷新
      */
     public async flush() {
+        this.m_NextCheckOn = Date.now();
         await this.redis.hset(
             'cache',
             this.cacheKey,
