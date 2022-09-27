@@ -29,7 +29,6 @@ export * from './redis';
 export * from './rpc';
 export * from './sequelize';
 export * from './set-timeout';
-export * from './target';
 export * from './tracer';
 export * from './typedi';
 export * from './user';

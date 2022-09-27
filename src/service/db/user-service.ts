@@ -4,16 +4,16 @@ import { DbUserValueService } from './user-value-service';
 import {
     DbFactoryBase,
     EnumFactoryBase,
-    ITargetValueService,
     IUserAssociateService,
-    IUserValueService,
     LockBase,
     NowTimeBase,
     RpcBase,
     StringGeneratorBase,
     ThreadBase,
     UserServiceBase,
+    UserValueServiceBase,
     ValueInterceptorFactoryBase,
+    ValueServiceBase,
     ValueTypeServiceBase,
 } from '../../contract';
 import { enum_, global } from '../../model';
@@ -31,27 +31,27 @@ export class DbUserService extends UserServiceBase {
         userService: UserServiceBase,
         targetTypeData: enum_.TargetTypeData,
         userID: string,
-    ) => ITargetValueService<global.UserTargetValue>;
+    ) => ValueServiceBase<global.UserTargetValue>;
 
     /**
      * 目标数值服务
      */
-    private m_TargetTypeValueService: { [targetType: number]: ITargetValueService<global.UserTargetValue> } = {};
+    private m_TargetTypeValueService: { [targetType: number]: ValueServiceBase<global.UserTargetValue> } = {};
 
-    private m_ValueService: IUserValueService;
+    private m_ValueService: UserValueServiceBase;
     /**
      * 用户数值服务
      */
     public get valueService() {
         this.m_ValueService ??= new DbUserValueService(
             this,
-            this.nowValueType,
             this.dbFactory,
-            this.enumFactory,
-            this.nowTime,
             this.stringGenerator,
             this.valueInterceptorFactory,
-            this.tracerSpan,
+            this.parentTracerSpan,
+            this.enumFactory,
+            this.nowTime,
+            this.nowValueType,
         );
         return this.m_ValueService;
     }
@@ -62,7 +62,7 @@ export class DbUserService extends UserServiceBase {
      * @param nowTime 当前时间
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
-     * @param tracerSpan 跟踪范围
+     * @param parentTracerSpan 跟踪范围
      * @param nowValueType 当前时间数值类型
      * @param associateService 关联存储服务
      * @param dbFactory 数据库工厂
@@ -71,7 +71,6 @@ export class DbUserService extends UserServiceBase {
      * @param rpc 远程过程调用
      * @param thread 锁
      * @param valueTypeService 数值类型服务
-     * @param parentTracerSpan 父跟踪范围
      * @param userID 用户ID
      */
     public constructor(
@@ -79,7 +78,7 @@ export class DbUserService extends UserServiceBase {
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected nowValueType: number,
-        protected tracerSpan: opentracing.Span,
+        protected parentTracerSpan: opentracing.Span,
         associateService: IUserAssociateService,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
@@ -87,7 +86,6 @@ export class DbUserService extends UserServiceBase {
         rpc: RpcBase,
         thread: ThreadBase,
         valueTypeService: ValueTypeServiceBase,
-        parentTracerSpan: opentracing.Span,
         userID: string,
     ) {
         super(associateService, userID, dbFactory, enumFactory, lock, rpc, thread, valueTypeService, parentTracerSpan);

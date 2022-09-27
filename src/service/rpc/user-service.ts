@@ -5,12 +5,12 @@ import {
     DbFactoryBase,
     EnumFactoryBase,
     IUserAssociateService,
-    IUserValueService,
     LockBase,
     NowTimeBase,
     RpcBase,
     ThreadBase,
     UserServiceBase,
+    UserValueServiceBase,
     ValueTypeServiceBase,
 } from '../../contract';
 import { enum_ } from '../../model';
@@ -19,19 +19,19 @@ import { enum_ } from '../../model';
  * 用户服务(远程)
  */
 export class RpcUserService extends UserServiceBase {
-    private m_ValueService: IUserValueService;
+    private m_ValueService: UserValueServiceBase;
     /**
      * 数值服务
      */
     public get valueService() {
         if (!this.m_ValueService) {
             this.m_ValueService = new RpcUserValueService(
-                this,
                 this.rpc,
                 this.m_TargetTypeData,
-                this.m_NowValueType,
                 this.enumFactory,
                 this.nowTime,
+                this,
+                this.m_NowValueType,
             );
         }
 

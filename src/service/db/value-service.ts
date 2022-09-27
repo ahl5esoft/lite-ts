@@ -2,53 +2,69 @@ import { opentracing } from 'jaeger-client';
 import moment from 'moment';
 
 import { CustomError } from '../error';
-import { TargetValueServiceBase } from '../target';
 import {
     DbFactoryBase,
+    DbRepositoryBase,
     EnumFactoryBase,
     IUnitOfWork,
-    IUserAssociateService,
-    NowTimeBase,
     StringGeneratorBase,
+    UserServiceBase,
     ValueInterceptorFactoryBase,
+    ValueServiceBase,
 } from '../../contract';
 import { contract, enum_, global } from '../../model';
 
 /**
  * 数据库数值服务
  */
-export abstract class DbValueServiceBase<
+export class DbValueService<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
-    > extends TargetValueServiceBase<T> {
+> extends ValueServiceBase<T> {
+    /**
+     * 实体
+     */
+    public get entry() {
+        return this.m_GetEntryFunc();
+    }
+
+    /**
+     * 获取当前时间
+     */
+    public get now() {
+        return this.userService.valueService.now;
+    }
+
     /**
      * 构造函数
      * 
-     * @param associateService 关联存储服务
+     * @param userService 用户服务
      * @param dbFactory 数据库工厂
      * @param stringGenerator 字符串生成器
      * @param valueInterceptorFactory 数值拦截器工厂
-     * @param tracerSpan 跟踪范围
-     * @param model 数值模型
+     * @param parentTracerSpan 跟踪范围
      * @param changeModel 数值变更模型
-     * @param logModel 数值日志模型
+     * @param m_CreateEntryFunc 创建实体函数
+     * @param m_CreateLogEntryFunc 创建日志实体函数
+     * @param m_FindAndClearChangeEntriesPredicate 查询并清除变更数据断言
+     * @param m_GetEntryFunc 获取实体函数
      * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间
      */
     public constructor(
-        protected associateService: IUserAssociateService,
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
+        protected userService: UserServiceBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
-        protected tracerSpan: opentracing.Span,
-        protected model: new () => T,
+        protected parentTracerSpan: opentracing.Span,
         protected changeModel: new () => TChange,
-        protected logModel: new () => TLog,
+        private m_CreateEntryFunc: () => T,
+        private m_CreateLogEntryFunc: () => TLog,
+        private m_FindAndClearChangeEntriesPredicate: (r: TChange) => boolean,
+        private m_GetEntryFunc: () => Promise<T>,
         enumFactory: EnumFactoryBase,
-        nowTime: NowTimeBase,
     ) {
-        super(enumFactory, nowTime);
+        super(enumFactory);
     }
 
     /**
@@ -59,11 +75,11 @@ export abstract class DbValueServiceBase<
      * @param valueType 数值类型
      */
     public async getCount(uow: IUnitOfWork, valueType: number) {
-        const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('value.getCount', {
-            childOf: this.tracerSpan,
+        const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('value.getCount', {
+            childOf: this.parentTracerSpan,
         }) : null;
 
-        const changeEntries = await this.findAndClearChangeEntries();
+        const changeEntries = await this.userService.associateService.findAndClear<TChange>(this.changeModel.name, this.m_FindAndClearChangeEntriesPredicate);
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         if (changeEntries.length) {
             tracerSpan?.log?.({
@@ -90,23 +106,24 @@ export abstract class DbValueServiceBase<
      * @param values 数值数据
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('value.update', {
-            childOf: this.tracerSpan,
+        const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('value.update', {
+            childOf: this.parentTracerSpan,
         }) : null;
 
-        const db = this.dbFactory.db(this.model, uow);
+        const newEntry = this.m_CreateEntryFunc();
+        const db = this.dbFactory.db(newEntry.constructor as any, uow);
         let entry = await this.entry;
         if (!entry) {
-            entry = this.createEntry();
+            entry = newEntry;
             entry.values = {};
             await db.add(entry);
 
-            this.associateService.add(this.model.name, entry);
+            this.userService.associateService.add(newEntry.constructor.name, entry);
         }
 
-        const logDb = this.dbFactory.db(this.logModel, uow);
+        let logDb: DbRepositoryBase<TLog>;
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
-        const nowUnix = await this.getNow(uow);
+        const nowUnix = await this.now;
         for (const r of values) {
             if (typeof r.valueType != 'number' || typeof r.count != 'number' || isNaN(r.count))
                 continue;
@@ -121,7 +138,10 @@ export abstract class DbValueServiceBase<
             if (isIntercepted)
                 continue;
 
-            const logEntry = this.createLogEntry();
+            const logEntry = this.m_CreateLogEntryFunc();
+            if (!logDb)
+                logDb = this.dbFactory.db(logEntry.constructor as any, uow);
+
             logEntry.id = await this.stringGenerator.generate();
             logEntry.oldCount = entry.values[r.valueType];
             logEntry.source = r.source;
@@ -170,17 +190,4 @@ export abstract class DbValueServiceBase<
 
         tracerSpan?.log?.({ values })?.finish?.();
     }
-
-    /**
-     * 创建T
-     */
-    protected abstract createEntry(): T;
-    /**
-     * 创建TLog
-     */
-    protected abstract createLogEntry(): TLog;
-    /**
-     * 获取并清除变更数据
-     */
-    protected abstract findAndClearChangeEntries(): Promise<TChange[]>;
 }

@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserRewardService as Self } from './user-reward-service';
 import { Mock } from '../assert';
-import { IUnitOfWork, IUserRandSeedService, IUserValueService, UserServiceBase, ValueTypeServiceBase } from '../../contract';
+import { IUnitOfWork, IUserRandSeedService, UserServiceBase, UserValueServiceBase, ValueTypeServiceBase } from '../../contract';
 import { contract } from '../../model';
 
 describe('src/service/db/user-reward-service.ts', () => {
@@ -170,7 +170,7 @@ describe('src/service/db/user-reward-service.ts', () => {
 
     describe('.findOpenRewards(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
-            const mockUserValueService = new Mock<IUserValueService>();
+            const mockUserValueService = new Mock<UserValueServiceBase>();
             const mockUserService = new Mock<UserServiceBase>({
                 valueService: mockUserValueService.actual
             });

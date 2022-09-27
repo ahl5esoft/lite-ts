@@ -2,7 +2,6 @@ import { opentracing } from 'jaeger-client';
 
 import { DbFactoryBase } from './db-factory-base';
 import { EnumFactoryBase } from './enum-factory-base';
-import { ITargetValueService } from './i-target-value-service';
 import { IUnitOfWork } from './i-unit-of-work';
 import { IUserAssociateService } from './i-user-associate-service';
 import { IUserCustomGiftBagService } from './i-user-custom-gift-bag-service';
@@ -10,10 +9,11 @@ import { IUserPortraitService } from './i-user-portrait-service';
 import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
 import { IUserSecurityService } from './i-user-security-service';
-import { IUserValueService } from './i-user-value-service';
 import { LockBase } from './lock-base';
 import { RpcBase } from './rpc-base';
 import { ThreadBase } from './thread-base';
+import { UserValueServiceBase } from './user-value-service-base';
+import { ValueServiceBase } from './value-service-base';
 import { ValueTypeServiceBase } from './value-type-service-base';
 import { global } from '../model';
 
@@ -93,7 +93,7 @@ export abstract class UserServiceBase {
     /**
      * 数值服务
      */
-    public abstract get valueService(): IUserValueService;
+    public abstract get valueService(): UserValueServiceBase;
     /**
      * 构造函数
      * 
@@ -199,5 +199,5 @@ export abstract class UserServiceBase {
      * 
      * @param targetType 目标类型
      */
-    public abstract getTargetValueService(targetType: number): Promise<ITargetValueService<global.UserValue>>;
+    public abstract getTargetValueService(targetType: number): Promise<ValueServiceBase<global.UserValue>>;
 }

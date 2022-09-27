@@ -17,10 +17,7 @@ export class RedisConfigCache extends CacheBase {
         redis: RedisBase,
         cacheKey: string,
     ) {
-        super(
-            redis,
-            cacheKey,
-        );
+        super(redis, cacheKey);
     }
 
     /**

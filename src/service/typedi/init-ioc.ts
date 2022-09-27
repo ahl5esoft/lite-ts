@@ -215,7 +215,6 @@ export async function initIoC(globalModel: { [name: string]: any }) {
             },
             { userID } as global.UserTargetValue,
             enumFactory,
-            Container.get<NowTimeBase>(NowTimeBase as any),
         );
     }
 

@@ -1,17 +1,16 @@
-import { TargetValueServiceBase } from '../target';
 import {
     EnumFactoryBase,
     IUnitOfWork,
-    NowTimeBase,
     RpcBase,
-    UserServiceBase
+    UserServiceBase,
+    ValueServiceBase
 } from '../../contract';
 import { contract, enum_, global } from '../../model';
 
 /**
  * 用户其他数值服务
  */
-export class RpcValueService<T extends global.UserTargetValue> extends TargetValueServiceBase<T>{
+export class RpcValueService<T extends global.UserTargetValue> extends ValueServiceBase<T>{
     /**
      * 实体
      */
@@ -29,6 +28,13 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
     }
 
     /**
+     * 当前时间
+     */
+    public get now() {
+        return this.m_UserService.valueService.now;
+    }
+
+    /**
      * 构造函数
      * 
      * @param m_Rpc 远程过程调用
@@ -36,7 +42,6 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
      * @param m_TargetTypeData 目标类型数据
      * @param m_Entry 实体
      * @param enumFactory 数值枚举
-     * @param nowTime 当前时间
      */
     public constructor(
         private m_Rpc: RpcBase,
@@ -44,9 +49,8 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
         private m_TargetTypeData: enum_.TargetTypeData,
         private m_Entry: T,
         enumFactory: EnumFactoryBase,
-        nowTime: NowTimeBase,
     ) {
-        super(enumFactory, nowTime);
+        super(enumFactory);
     }
 
     /**
@@ -60,14 +64,5 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
             ...this.m_Entry,
             values: values
         }).call<void>(`/${this.m_TargetTypeData.app}/update-values-by-user-id`);
-    }
-
-    /**
-     * 获取当前时间
-     * 
-     * @param uow 工作单元
-     */
-    protected async getNow(uow: IUnitOfWork) {
-        return this.m_UserService.valueService.getNow(uow);
     }
 }

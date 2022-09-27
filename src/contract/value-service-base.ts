@@ -1,31 +1,29 @@
 import moment from 'moment';
 
-import {
-    EnumFactoryBase,
-    ITargetValueService,
-    IUnitOfWork,
-    NowTimeBase,
-} from '../../contract';
-import { contract, enum_, global } from '../../model';
+import { EnumFactoryBase } from './enum-factory-base';
+import { IUnitOfWork } from './i-unit-of-work';
+import { contract, enum_, global } from '../model';
 
 /**
  * 目标数值服务基类
  */
-export abstract class TargetValueServiceBase<T extends global.UserValue> implements ITargetValueService<T> {
+export abstract class ValueServiceBase<T extends global.UserValue> {
     /**
      * 目标数值数据
      */
     public abstract get entry(): Promise<T>;
+    /**
+     * 当前时间
+     */
+    public abstract get now(): Promise<number>;
 
     /**
      * 构造函数
      * 
      * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间
      */
     public constructor(
         protected enumFactory: EnumFactoryBase,
-        protected nowTime: NowTimeBase,
     ) { }
 
     /**
@@ -38,7 +36,7 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
         if (!conditions?.length)
             return true;
 
-        const now = await this.getNow(uow);
+        const now = await this.now;
         for (const r of conditions) {
             const tasks = r.map(async cr => {
                 let aCount = await this.getCount(uow, cr.valueType);
@@ -89,15 +87,15 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
 
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
         if (allValueTypeItem[valueType]?.data.dailyTime) {
-            const nowUnix = await this.nowTime.unix();
-            const oldUnix = entry.values[allValueTypeItem[valueType].data.dailyTime] || 0;
-            const isSameDay = moment.unix(nowUnix).isSame(
-                moment.unix(oldUnix),
+            const now = await this.now;
+            const oldNow = entry.values[allValueTypeItem[valueType].data.dailyTime] || 0;
+            const isSameDay = moment.unix(now).isSame(
+                moment.unix(oldNow),
                 'day'
             );
             if (!isSameDay) {
                 entry.values[valueType] = 0;
-                entry.values[allValueTypeItem[valueType].data.dailyTime] = nowUnix;
+                entry.values[allValueTypeItem[valueType].data.dailyTime] = now;
             }
         }
 
@@ -111,11 +109,4 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
      * @param values 数值数据
      */
     public abstract update(uow: IUnitOfWork, values: contract.IValue[]): Promise<void>;
-
-    /**
-     * 获取当前时间
-     * 
-     * @param uow 工作单元
-     */
-    protected abstract getNow(uow: IUnitOfWork): Promise<number>;
 }

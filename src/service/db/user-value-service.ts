@@ -1,31 +1,54 @@
 import { opentracing } from 'jaeger-client';
-import moment from 'moment';
 
-import { DbValueServiceBase } from './value-service-base';
+import { DbValueService } from './value-service';
 import {
     DbFactoryBase,
     EnumFactoryBase,
     IUnitOfWork,
-    IUserValueService,
     NowTimeBase,
     StringGeneratorBase,
     UserServiceBase,
+    UserValueServiceBase,
     ValueInterceptorFactoryBase,
+    ValueServiceBase,
 } from '../../contract';
 import { contract, global } from '../../model';
 
 /**
  * 用户数值服务
  */
-export class DbUserValueService extends DbValueServiceBase<
-    global.UserValue,
-    global.UserValueChange,
-    global.UserValueLog
-> implements IUserValueService {
+export class DbUserValueService extends UserValueServiceBase {
+    private m_ValueService: ValueServiceBase<global.UserValue>;
     /**
-     * 当前时间戳
+     * 数值服务
      */
-    private m_Now: [number, number];
+    protected get valueService() {
+        this.m_ValueService ??= new DbValueService<global.UserValue, global.UserValueChange, global.UserValueLog>(
+            this.m_DbFactory,
+            this.m_StringGenerator,
+            this.userService,
+            this.m_ValueInterceptorFactory,
+            this.m_ParentTracerSpan,
+            global.UserValueChange,
+            () => {
+                return {
+                    id: this.userService.userID
+                } as global.UserValue;
+            },
+            () => {
+                return {
+                    userID: this.userService.userID
+                } as global.UserValueLog;
+            },
+            r => {
+                return r.userID == this.userService.userID;
+            },
+            () => this.entry,
+            this.enumFactory,
+        );
+        return this.m_ValueService;
+    }
+
 
     /**
      * 获取用户数值实体
@@ -33,7 +56,7 @@ export class DbUserValueService extends DbValueServiceBase<
     public get entry() {
         return new Promise<global.UserValue>(async (s, f) => {
             try {
-                const rows = await this.associateService.find<global.UserValue>(this.model.name, r => {
+                const rows = await this.userService.associateService.find<global.UserValue>(global.UserValue.name, r => {
                     return r.id == this.userService.userID;
                 });
                 s(rows[0]);
@@ -47,54 +70,35 @@ export class DbUserValueService extends DbValueServiceBase<
      * 构造函数
      * 
      * @param userService 用户服务
-     * @param m_NowValueType 当前时间数值类型
-     * @param dbFactory 数据库工厂
+     * @param m_DbFactory 数据库工厂
+     * @param m_StringGenerator 字符串生成器
+     * @param m_ValueInterceptorFactory 数值拦截器工厂
+     * @param m_ParentTracerSpan 父跟踪范围
      * @param enumFactory 枚举工厂
      * @param nowTime 当前时间
-     * @param stringGenerator 字符串生成器
-     * @param valueInterceptorFactory 数值拦截器工厂
-     * @param tracerSpan 跟踪范围
+     * @param nowValueType 当前时间数值类型
      */
     public constructor(
         public userService: UserServiceBase,
-        private m_NowValueType: number,
-        dbFactory: DbFactoryBase,
+        private m_DbFactory: DbFactoryBase,
+        private m_StringGenerator: StringGeneratorBase,
+        private m_ValueInterceptorFactory: ValueInterceptorFactoryBase,
+        private m_ParentTracerSpan: opentracing.Span,
         enumFactory: EnumFactoryBase,
         nowTime: NowTimeBase,
-        stringGenerator: StringGeneratorBase,
-        valueInterceptorFactory: ValueInterceptorFactoryBase,
-        tracerSpan: opentracing.Span,
+        nowValueType: number,
     ) {
-        super(
-            userService?.associateService,
-            dbFactory,
-            stringGenerator,
-            valueInterceptorFactory,
-            tracerSpan,
-            global.UserValue,
-            global.UserValueChange,
-            global.UserValueLog,
-            enumFactory,
-            nowTime,
-        );
+        super(userService, nowTime, nowValueType, enumFactory);
     }
 
     /**
-     * 获取当前unix
+     * 获取数量
      * 
      * @param uow 工作单元
+     * @param valueType 数值类型
      */
-    public async getNow(uow: IUnitOfWork) {
-        if (!this.m_Now) {
-            this.m_Now = [
-                await this.getCount(uow, this.m_NowValueType),
-                moment().unix()
-            ];
-            if (!this.m_Now[0])
-                this.m_Now[0] = await this.nowTime.unix();
-        }
-
-        return this.m_Now[0] + moment().unix() - this.m_Now[1];
+    public async getCount(uow: IUnitOfWork, valueType: number) {
+        return this.valueService.getCount(uow, valueType);
     }
 
     /**
@@ -104,8 +108,8 @@ export class DbUserValueService extends DbValueServiceBase<
      * @param values 数值数组
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('userValue.update', {
-            childOf: this.tracerSpan,
+        const tracerSpan = this.m_ParentTracerSpan ? opentracing.globalTracer().startSpan('userValue.update', {
+            childOf: this.m_ParentTracerSpan,
         }) : null;
         const tasks = values.reduce((memo, r) => {
             r.targetType ??= 0;
@@ -129,37 +133,10 @@ export class DbUserValueService extends DbValueServiceBase<
                 const targetValueService = await this.userService.getTargetValueService(r.targetType);
                 return targetValueService.update(uow, r.values);
             } else {
-                return super.update(uow, r.values);
+                return this.valueService.update(uow, r.values);
             }
         });
         await Promise.all(tasks);
         tracerSpan?.finish?.();
-    }
-
-    /**
-     * 创建用户数值实体
-     */
-    protected createEntry() {
-        return {
-            id: this.userService.userID
-        } as global.UserValue;
-    }
-
-    /**
-     * 创建用户数值变更日志实体
-     */
-    protected createLogEntry() {
-        return {
-            userID: this.userService.userID
-        } as global.UserValueLog;
-    }
-
-    /**
-     * 查找并清除关联用户数值变更数据
-     */
-    protected async findAndClearChangeEntries() {
-        return this.associateService.findAndClear<global.UserValueChange>(this.changeModel.name, r => {
-            return r.userID == this.userService.userID;
-        });
     }
 }

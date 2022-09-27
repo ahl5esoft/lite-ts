@@ -3,16 +3,16 @@ import { DbFactoryBase } from './db-factory-base';
 import { EnumFactoryBase } from './enum-factory-base';
 import { IUnitOfWork } from './i-unit-of-work';
 import { IUserAssociateService } from './i-user-associate-service';
-import { IUserValueService } from './i-user-value-service';
 import { LockBase } from './lock-base';
 import { RpcBase } from './rpc-base';
 import { ThreadBase } from './thread-base';
 import { UserServiceBase } from './user-service-base';
+import { UserValueServiceBase } from './user-value-service-base';
 import { ValueTypeServiceBase } from './value-type-service-base';
 
 class Self extends UserServiceBase {
     public constructor(
-        public valueService: IUserValueService,
+        public valueService: UserValueServiceBase,
         associateService: IUserAssociateService,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,

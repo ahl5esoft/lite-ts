@@ -19,7 +19,7 @@ describe('src/service/rpc/value-service.ts', () => {
                 value: 1
             } as enum_.TargetTypeData, {
                 no: 2
-            } as global.UserTargetValue, null, null);
+            } as global.UserTargetValue, null);
 
             mockAssociateService.expectReturn(
                 r => r.find(`${global.UserTargetValue.name}-1`, mockAny),

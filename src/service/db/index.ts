@@ -4,4 +4,4 @@ export * from './user-rank-seed-service';
 export * from './user-reward-service';
 export * from './user-service';
 export * from './user-value-service';
-export * from './value-service-base';
+export * from './value-service';
