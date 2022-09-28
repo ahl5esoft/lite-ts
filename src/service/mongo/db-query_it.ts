@@ -15,7 +15,7 @@ describe('src/service/mongo/db-query.ts', () => {
         await client.close();
     });
 
-    describe('.count(): Promise<number>', () => {
+    describe('.count()', () => {
         const table = 'test-query-count';
         it('empty', async () => {
             const count = await new Self(pool, table).count();

@@ -41,7 +41,7 @@ export class MongoDbQuery<T> implements IDbQuery<T> {
      */
     public async count() {
         const db = await this.m_Pool.db;
-        return db.collection(this.m_Table).countDocuments(this.m_Where);
+        return db.collection(this.m_Table).count(this.m_Where);
     }
 
     /**
