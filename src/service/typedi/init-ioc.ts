@@ -5,7 +5,7 @@ import Container from 'typedi';
 
 import { BentConfigLoader, BentRpc } from '../bent';
 import { CacheConfigLoader } from '../cache';
-import { MultiConfigLoader } from '../config';
+import { ConfigLoadBalance, MultiConfigLoader } from '../config';
 import { ConsoleLog } from '../console';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
@@ -105,9 +105,11 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         new JeagerRpc(() => {
             const configLoader = Container.get<ConfigLoaderBase>(ConfigLoaderBase as any);
             return cfg.grpcProtoFilePath ? new GrpcJsRpc(
+                new ConfigLoadBalance(configLoader, 'grpc'),
                 join(__dirname, cfg.grpcProtoFilePath),
-                configLoader,
-            ) : new BentRpc(configLoader);
+            ) : new BentRpc(
+                new ConfigLoadBalance(configLoader, 'http')
+            );
         }, null)
     );
 

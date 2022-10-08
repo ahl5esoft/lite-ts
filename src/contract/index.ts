@@ -28,7 +28,7 @@ export * from './io-directory-base';
 export * from './io-factory-base';
 export * from './io-file-base';
 export * from './io-node-base';
-export * from './load-balance-rpc-base';
+export * from './load-balance-base';
 export * from './lock-base';
 export * from './log-base';
 export * from './now-time-base';

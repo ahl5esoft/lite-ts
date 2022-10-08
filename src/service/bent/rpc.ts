@@ -1,21 +1,13 @@
 import bent from 'bent';
 
-import { ConfigLoaderBase, LoadBalanceRpcBase } from '../../contract';
-import { contract } from '../../model';
+import { LoadBalanceBase, RpcBase } from '../../contract';
+import { contract, enum_ } from '../../model';
 
-/**
- * 远程过程调用对象(基于bent实现)
- */
-export class BentRpc extends LoadBalanceRpcBase {
-    /**
-     * 构造函数
-     * 
-     * @param configLoader 配置加载器
-     */
+export class BentRpc extends RpcBase {
     public constructor(
-        configLoader: ConfigLoaderBase,
+        private m_LoadBalance: LoadBalanceBase,
     ) {
-        super(configLoader, 'http');
+        super();
     }
 
     /**
@@ -25,7 +17,7 @@ export class BentRpc extends LoadBalanceRpcBase {
      */
     public async callWithoutThrow<T>(route: string) {
         const routeArgs = route.split('/');
-        const url = await this.getUrl(routeArgs[1]);
+        const url = await this.m_LoadBalance.getUrl(routeArgs[1], this.header?.[enum_.Header.env]);
         const resp = await bent<bent.Json>(url, 'json', 'POST', 200)(`/ih/${routeArgs.pop()}`, this.body, this.header);
         return resp as contract.IApiDyanmicResponse<T>;
     }

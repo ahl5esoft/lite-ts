@@ -2,24 +2,15 @@ import { credentials } from '@grpc/grpc-js';
 
 import { getRpcProto } from './proto';
 import { IGrpcJsRequset } from './request';
-import { ConfigLoaderBase, LoadBalanceRpcBase } from '../../contract';
-import { contract } from '../../model';
+import { LoadBalanceBase, RpcBase } from '../../contract';
+import { contract, enum_ } from '../../model';
 
-/**
- * grpc
- */
-export class GrpcJsRpc extends LoadBalanceRpcBase {
-    /**
-     * 构造函数
-     * 
-     * @param m_ProtoFilePath proto文件地址
-     * @param configLoader 配置加载器
-     */
+export class GrpcJsRpc extends RpcBase {
     public constructor(
+        private m_LoadBalance: LoadBalanceBase,
         private m_ProtoFilePath: string,
-        configLoader: ConfigLoaderBase,
     ) {
-        super(configLoader, 'grpc');
+        super();
     }
 
     /**
@@ -30,7 +21,7 @@ export class GrpcJsRpc extends LoadBalanceRpcBase {
     public async callWithoutThrow<T>(route: string) {
         const proto = getRpcProto(this.m_ProtoFilePath);
         const routeArgs = route.split('/');
-        const url = await this.getUrl(routeArgs[1])
+        const url = await this.m_LoadBalance.getUrl(routeArgs[1], this.header?.[enum_.Header.env])
         return new Promise<contract.IApiDyanmicResponse<T>>((s, f) => {
             new proto.RpcService(
                 url,
