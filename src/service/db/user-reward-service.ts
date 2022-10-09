@@ -25,7 +25,7 @@ export class DbUserRewardService implements IUserRewardService {
      * @param scene 场景
      */
     public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
-        const values: contract.IValue[] = [];
+        const values: { [valueType: number]: contract.IValue; } = {};
         const randSeedService = this.m_UserService.getRandSeedService(scene);
         for (const r of rewards) {
             if (!r?.length)
@@ -53,19 +53,35 @@ export class DbUserRewardService implements IUserRewardService {
             if (openRewards) {
                 for (let i = 0; i < reward.count; i++) {
                     const res = await this.findResults(uow, openRewards, source, scene);
-                    values.push(...res);
+                    for (const item of res) {
+                        if (values[item.valueType]) {
+                            values[item.valueType].count += item.count;
+                        } else {
+                            values[item.valueType] = {
+                                count: item.count,
+                                source: item.source ?? source,
+                                targetNo: item.targetNo,
+                                targetType: item.targetType,
+                                valueType: item.valueType,
+                            };
+                        }
+                    }
                 }
             } else {
-                values.push({
-                    count: reward.count,
-                    source: reward.source ?? source,
-                    targetNo: reward.targetNo,
-                    targetType: reward.targetType,
-                    valueType: reward.valueType,
-                });
+                if (values[reward.valueType]) {
+                    values[reward.valueType].count += reward.count;
+                } else {
+                    values[reward.valueType] = {
+                        count: reward.count,
+                        source: reward.source ?? source,
+                        targetNo: reward.targetNo,
+                        targetType: reward.targetType,
+                        valueType: reward.valueType,
+                    };
+                }
             }
         }
-        return values;
+        return Object.values(values);
     }
 
     /**
@@ -75,11 +91,11 @@ export class DbUserRewardService implements IUserRewardService {
      * @param rewardsGroup 奖励组
      * @param scene 场景
      */
-    public async preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '') {
+    public async preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][]; }, scene = '') {
         let offset = 0;
         const res = {};
         for (const [k, v] of Object.entries(rewardsGroup)) {
-            const values: contract.IValue[] = [];
+            const values: { [valueType: number]: contract.IValue; } = {};
             const randSeedService = this.m_UserService.getRandSeedService(scene);
             let rewardsQueue = [...v];
             while (rewardsQueue.length) {
@@ -109,13 +125,17 @@ export class DbUserRewardService implements IUserRewardService {
                     for (let i = 0; i < reward.count; i++)
                         rewardsQueue.splice(openRewards.length * i, 0, ...openRewards);
                 } else {
-                    values.push({
-                        count: reward.count,
-                        valueType: reward.valueType
-                    });
+                    if (values[reward.valueType]) {
+                        values[reward.valueType].count += reward.count;
+                    } else {
+                        values[reward.valueType] = {
+                            count: reward.count,
+                            valueType: reward.valueType,
+                        };
+                    }
                 }
             }
-            res[k] = values;
+            res[k] = Object.values(values);
         }
         return res;
     }
@@ -127,14 +147,14 @@ export class DbUserRewardService implements IUserRewardService {
      * @param valueType 数值
      */
     private async findOpenRewards(uow: IUnitOfWork, valueType: number) {
-        const allOpenReward = await this.m_ValueTypeService.get<{ [valueType: number]: contract.IReward[][] }>('openRewards');
+        const allOpenReward = await this.m_ValueTypeService.get<{ [valueType: number]: contract.IReward[][]; }>('openRewards');
         if (!allOpenReward[valueType])
             return;
 
         const rewardAddition = await this.m_ValueTypeService.get<{
             [valueType: number]: {
-                [rewardValueType: number]: number
-            }
+                [rewardValueType: number]: number;
+            };
         }>('rewardAddition');
         if (!rewardAddition[valueType])
             return allOpenReward[valueType];
