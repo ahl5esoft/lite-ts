@@ -27,18 +27,16 @@ describe('src/service/rpc/value-service.ts', () => {
             );
 
             mockRpc.expectReturn(
-                r => r.setBody({
-                    no: 2,
-                    values: [{
-                        count: 1,
-                        valueType: 11
-                    }]
+                r => r.call({
+                    body: {
+                        no: 2,
+                        values: [{
+                            count: 1,
+                            valueType: 11
+                        }]
+                    },
+                    route: '/test/update-values-by-user-id'
                 }),
-                mockRpc.actual
-            );
-
-            mockRpc.expectReturn(
-                r => r.call('/test/update-values-by-user-id'),
                 {}
             );
 

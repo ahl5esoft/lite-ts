@@ -6,9 +6,10 @@ import Container from 'typedi';
 import { enum_ } from './model';
 import {
     CacheBase,
+    CryptoBase,
     EnumFactoryBase,
     IOFactoryBase,
-    LogBase,
+    LogFactoryBase,
     model,
     RpcBase,
     service,
@@ -31,22 +32,27 @@ import {
         ioFactory.buildDirectory(__dirname, 'api'),
     );
     new service.ExpressApiPort([
-        service.buildCorsExpressOption({}),
-        service.buildBodyParserJsonExpressOption({
+        service.corsExpressOption({}),
+        service.bodyParserJsonExpressOption({
             limit: '16mb'
         }),
-        service.buildPostExpressOption(
-            Container.get<LogBase>(LogBase as any),
+        service.expressPostOption(
+            Container.get<CryptoBase>(model.enum_.IoC.authCrypto),
+            Container.get<LogFactoryBase>(LogFactoryBase as any),
             '/:endpoint/:api',
             async (req: Request) => {
                 return apiFactory.build(req.params.endpoint, req.params.api);
-            }),
-        service.buildPortExpressOption(cfg.name, cfg.port.http, cfg.version)
+            },
+            null,
+        ),
+        service.expressPortOption(cfg.name, cfg.port.http, cfg.version)
     ]).listen().catch(console.error);
 
     await Container.get<ThreadBase>(ThreadBase as any).sleep(1000);
 
-    const res = await Container.get<RpcBase>(RpcBase as any).callWithoutThrow<any>('/test/now-time');
+    const res = await Container.get<RpcBase>(RpcBase as any).callWithoutThrow<any>({
+        route: '/test/now-time'
+    });
     console.log(res);
 
     process.exit();

@@ -60,9 +60,12 @@ export class RpcValueService<T extends global.UserTargetValue> extends ValueServ
      * @param values 数值数组
      */
     public async update(_: IUnitOfWork, values: contract.IValue[]) {
-        await this.m_Rpc.setBody({
-            ...this.m_Entry,
-            values: values
-        }).call<void>(`/${this.m_TargetTypeData.app}/update-values-by-user-id`);
+        await this.m_Rpc.call<void>({
+            body: {
+                ...this.m_Entry,
+                values: values
+            },
+            route: `/${this.m_TargetTypeData.app}/update-values-by-user-id`
+        });
     }
 }

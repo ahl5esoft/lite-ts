@@ -15,9 +15,12 @@ import { model, RpcBase, service } from '../../src';
     const protoFilePath = join(__dirname, 'rpc.proto');
     new service.GrpcJsApiPort(apiFactory, cfg.port.grpc, 'lite-ts', cfg.version, protoFilePath).listen().catch(console.error);
 
-    const res = await Container.get<RpcBase>(RpcBase as any).setBody({
-        name: 'test'
-    }).callWithoutThrow<any>('/test/now-time');
+    const res = await Container.get<RpcBase>(RpcBase as any).callWithoutThrow<any>({
+        body: {
+            name: 'test'
+        },
+        route: '/test/now-time'
+    });
     console.log(res);
 
     process.exit();

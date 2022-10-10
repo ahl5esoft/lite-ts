@@ -80,9 +80,11 @@ describe('src/service/mongo/db-repository.ts', () => {
             const collection = db.collection(TestQuery.name);
             await collection.insertMany(rows);
 
-            const res = await new Self(pool, null, dbFactory, TestQuery).query().where({
-                id: rows[0]._id
-            }).toArray();
+            const res = await new Self(pool, null, dbFactory, TestQuery).query().toArray({
+                where: {
+                    id: rows[0]._id
+                }
+            });
 
             await collection.deleteMany(null);
 

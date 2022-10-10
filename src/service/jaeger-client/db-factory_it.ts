@@ -1,7 +1,7 @@
 import { strictEqual } from 'assert';
 import { initTracer, opentracing } from 'jaeger-client';
 
-import { JaegerDbFactory as Self } from './db-factory';
+import { JaegerClientDbFactory as Self } from './db-factory';
 import { MongoDbFactory } from '../mongo';
 import { DbFactoryBase } from '../../contract';
 
@@ -68,11 +68,13 @@ describe('src/service/jaeger/db-factory.ts', () => {
             }
 
             const ages = [1, 3, 5, 7, 9];
-            const res = await self.db(TestJaeger).query().where({
-                age: {
-                    $in: ages
+            const res = await self.db(TestJaeger).query().toArray({
+                where: {
+                    age: {
+                        $in: ages
+                    }
                 }
-            }).toArray();
+            });
             strictEqual(res.length, ages.length);
         });
     });

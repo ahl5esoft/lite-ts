@@ -1,8 +1,8 @@
 import log4js from 'log4js';
 
-import { LogBase } from '../../contract';
+import { ILog } from '../../contract';
 
-export class Log4jsLog extends LogBase {
+export class Log4jsLog implements ILog {
     /**
      * 标签
      */

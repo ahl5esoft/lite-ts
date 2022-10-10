@@ -2,16 +2,11 @@ import { Express, Request, Response } from 'express';
 
 import { contract } from '../../model';
 
-/**
- * 创建get express选项
- * 
- * @param data 下发数据
- */
-export function buildGetExpressOption(data: any) {
+export function expressGetOption(v: any) {
     return function (app: Express) {
         app.get('/', (_: Request, resp: Response) => {
             resp.json({
-                data: data,
+                data: v,
                 err: 0,
             } as contract.IApiResponse);
         });

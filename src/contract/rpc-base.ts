@@ -1,3 +1,4 @@
+import { IRpcCallOption } from './i-rpc-call-option';
 import { contract } from '../model';
 
 /**
@@ -13,19 +14,6 @@ export abstract class RpcBase {
     public static buildErrorFunc: (errorCode: number, data: any) => Error;
 
     /**
-     * 请求体
-     */
-    protected body: any;
-    /**
-     * 头数据
-     */
-    protected header: { [key: string]: string; };
-
-    /**
-     * 调用
-     * 
-     * @param route 路由
-     * 
      * @example
      * ```typescript
      *  const rpc: RpcBase;
@@ -33,8 +21,8 @@ export abstract class RpcBase {
      *  // resp is IApiDyanmicResponse<T>, 如果resp.err有效则会抛错
      * ```
      */
-    public async call<T>(route: string) {
-        const resp = await this.callWithoutThrow<T>(route);
+    public async call<T>(v: IRpcCallOption) {
+        const resp = await this.callWithoutThrow<T>(v);
         if (resp.err)
             throw RpcBase.buildErrorFunc(resp.err, resp.data);
 
@@ -42,42 +30,6 @@ export abstract class RpcBase {
     }
 
     /**
-     * 设置body
-     * 
-     * @param v 值
-     * 
-     * @example
-     * ```typescript
-     *  const rpc: RpcBase;
-     *  rpc.setBody({ ... });
-     * ```
-     */
-    public setBody(v: any) {
-        this.body = v;
-        return this;
-    }
-
-    /**
-     * 设置请求头
-     * 
-     * @param v 值
-     * 
-     * @example
-     * ```typescript
-     *  const rpc: RpcBase;
-     *  rpc.setHeader({ ... });
-     * ```
-     */
-    public setHeader(v: { [key: string]: string; }) {
-        this.header = v;
-        return this;
-    }
-
-    /**
-     * 调用(不会抛出异常)
-     * 
-     * @param route 路由
-     * 
      * @example
      * ```typescript
      *  const rpc: RpcBase;
@@ -85,5 +37,5 @@ export abstract class RpcBase {
      *  // resp is IApiDyanmicResponse<T>
      * ```
      */
-    public abstract callWithoutThrow<T>(route: string): Promise<contract.IApiDyanmicResponse<T>>;
+    public abstract callWithoutThrow<T>(v: IRpcCallOption): Promise<contract.IApiDyanmicResponse<T>>;
 }

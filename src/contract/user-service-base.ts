@@ -139,9 +139,11 @@ export abstract class UserServiceBase {
     public async getCustomGiftBagService(uow: IUnitOfWork, scene: string) {
         if (!this.m_CustomGiftBagService) {
             const db = this.dbFactory.db(global.UserCustomGiftBag, uow);
-            const entries = await db.query().where({
-                id: this.userID
-            }).toArray();
+            const entries = await db.query().toArray({
+                where: {
+                    id: this.userID
+                }
+            });
             if (!entries.length) {
                 entries.push({
                     giftBag: {},

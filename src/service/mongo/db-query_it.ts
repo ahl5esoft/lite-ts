@@ -40,110 +40,9 @@ describe('src/service/mongo/db-query.ts', () => {
         });
     });
 
-    describe('.order(...fields)', () => {
-        const table = 'test-query-order';
-        it('ok', async () => {
-            const rows: any = [{
-                _id: `${table}-3`,
-                index: 1,
-            }, {
-                _id: `${table}-4`,
-                index: 0,
-            }, {
-                _id: `${table}-5`,
-                index: -1,
-            }];
-            const db = await pool.db;
-            const collection = db.collection(table);
-            await collection.insertMany(rows);
-
-            const res = await new Self(pool, table).order('index').toArray();
-
-            await collection.deleteMany(null);
-
-            deepStrictEqual(
-                res,
-                toEntries([rows[2], rows[1], rows[0]])
-            );
-        });
-    });
-
-    describe('.orderByDesc(...fields)', () => {
-        const table = 'test-query-orderByDesc';
-        it('ok', async () => {
-            const rows: any = [{
-                _id: `${table}-6`,
-                index: 1,
-            }, {
-                _id: `${table}-7`,
-                index: 2,
-            }];
-            const db = await pool.db;
-            const collection = db.collection(table);
-            await collection.insertMany(rows);
-
-            const res = await new Self(pool, table).orderByDesc('index').toArray();
-
-            await collection.deleteMany(null);
-
-            deepStrictEqual(
-                res,
-                toEntries([rows[1], rows[0]])
-            );
-        });
-    });
-
-    describe('.skip(skip)', () => {
-        const table = 'test-query-skip';
-        it('ok', async () => {
-            const rows: any = [{
-                _id: `${table}-8`,
-            }, {
-                _id: `${table}-9`,
-            }];
-            const db = await pool.db;
-            const collection = db.collection(table);
-            await collection.insertMany(rows);
-
-            const res = await new Self(pool, table).skip(1).toArray();
-
-            await collection.deleteMany(null);
-
-            deepStrictEqual(
-                res,
-                toEntries([rows[1]])
-            );
-        });
-    });
-
-    describe('.take(take)', () => {
-        const table = 'test-query-take';
-        it('ok', async () => {
-            const rows: any = [{
-                _id: `${table}-10`,
-            }, {
-                _id: `${table}-11`,
-            }, {
-                _id: `${table}-12`,
-            }];
-            const db = await pool.db;
-            const collection = db.collection(table);
-            await collection.insertMany(rows);
-
-            const res = await new Self(pool, table).take(1).toArray();
-
-            await collection.deleteMany(null);
-
-            deepStrictEqual(
-                res,
-                toEntries([rows[0]])
-            );
-        });
-    });
-
     describe('.toArray()', () => {
-        const table = 'test-query-toArray';
         it('ok', async () => {
+            const table = 'test-query-toArray';
             const rows: any = [{
                 _id: `${table}-1`,
             }, {
@@ -162,11 +61,110 @@ describe('src/service/mongo/db-query.ts', () => {
                 toEntries(rows)
             );
         });
-    });
 
-    describe('.where(selector)', () => {
-        const table = 'test-query-where';
-        it('ok', async () => {
+        it('order', async () => {
+            const table = 'test-query-order';
+            const rows: any = [{
+                _id: `${table}-3`,
+                index: 1,
+            }, {
+                _id: `${table}-4`,
+                index: 0,
+            }, {
+                _id: `${table}-5`,
+                index: -1,
+            }];
+            const db = await pool.db;
+            const collection = db.collection(table);
+            await collection.insertMany(rows);
+
+            const res = await new Self(pool, table).toArray({
+                order: ['index']
+            });
+
+            await collection.deleteMany(null);
+
+            deepStrictEqual(
+                res,
+                toEntries([rows[2], rows[1], rows[0]])
+            );
+        });
+
+        it('orderByDesc', async () => {
+            const table = 'test-query-orderByDesc';
+            const rows: any = [{
+                _id: `${table}-6`,
+                index: 1,
+            }, {
+                _id: `${table}-7`,
+                index: 2,
+            }];
+            const db = await pool.db;
+            const collection = db.collection(table);
+            await collection.insertMany(rows);
+
+            const res = await new Self(pool, table).toArray({
+                orderByDesc: ['index']
+            });
+
+            await collection.deleteMany(null);
+
+            deepStrictEqual(
+                res,
+                toEntries([rows[1], rows[0]])
+            );
+        });
+
+        it('skip', async () => {
+            const table = 'test-query-skip';
+            const rows: any = [{
+                _id: `${table}-8`,
+            }, {
+                _id: `${table}-9`,
+            }];
+            const db = await pool.db;
+            const collection = db.collection(table);
+            await collection.insertMany(rows);
+
+            const res = await new Self(pool, table).toArray({
+                skip: 1
+            });
+
+            await collection.deleteMany(null);
+
+            deepStrictEqual(
+                res,
+                toEntries([rows[1]])
+            );
+        });
+
+        it('take', async () => {
+            const table = 'test-query-take';
+            const rows: any = [{
+                _id: `${table}-10`,
+            }, {
+                _id: `${table}-11`,
+            }, {
+                _id: `${table}-12`,
+            }];
+            const db = await pool.db;
+            const collection = db.collection(table);
+            await collection.insertMany(rows);
+
+            const res = await new Self(pool, table).toArray({
+                take: 1
+            });
+
+            await collection.deleteMany(null);
+
+            deepStrictEqual(
+                res,
+                toEntries([rows[0]])
+            );
+        });
+
+        it('where', async () => {
+            const table = 'test-query-where';
             let rows: any = [{
                 _id: `${table}-13`,
                 type: 1,
@@ -181,9 +179,11 @@ describe('src/service/mongo/db-query.ts', () => {
             let collection = db.collection(table);
             await collection.insertMany(rows);
 
-            let res = await new Self(pool, table).where({
-                type: 1,
-            }).toArray();
+            let res = await new Self(pool, table).toArray({
+                where: {
+                    type: 1,
+                }
+            });
 
             await collection.deleteMany(null);
 

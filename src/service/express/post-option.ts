@@ -4,40 +4,42 @@ import { opentracing } from 'jaeger-client';
 
 import { CustomError } from '../error';
 import { TracerStrategy } from '../tracer';
-import { IApi, IApiSession, LogBase } from '../../contract';
+import { CryptoBase, IApi, IApiSession, LogFactoryBase } from '../../contract';
 import { contract, enum_ } from '../../model';
 
-/**
- * 创建post ExpressOption
- * 
- * @param log 日志
- * @param routeRule 路由规则
- * @param getApiFunc 获取api函数
- */
-export function buildPostExpressOption(
-    log: LogBase,
+export function expressPostOption(
+    authCrypt: CryptoBase,
+    logFactory: LogFactoryBase,
     routeRule: string,
     getApiFunc: (req: any) => Promise<IApi>,
+    getAuthDataFunc: (token: string) => Promise<any>,
 ) {
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
             const tracer = opentracing.globalTracer();
-            const parentSpan = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers);
-            const tracerSpan = parentSpan ? tracer.startSpan(req.path, {
-                childOf: parentSpan,
+            const tracerSpan = tracer.startSpan(req.path, {
+                childOf: tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers),
                 tags: {
                     [opentracing.Tags.SPAN_KIND]: opentracing.Tags.SPAN_KIND_RPC_SERVER,
                     [opentracing.Tags.HTTP_METHOD]: req.method,
                 }
-            }) : null;
-
-            const cLog = log.addLabel('route', req.path);
+            });
+            const log = logFactory.build().addLabel('route', req.path);
 
             let apiResp: contract.IApiResponse = {
                 data: null,
                 err: 0,
             };
             try {
+                const authToken = req.header(enum_.Header.authToken);
+                if (authToken) {
+                    const userAuth = await getAuthDataFunc(authToken);
+                    req.headers[enum_.Header.authData] = await authCrypt.encrypt(
+                        JSON.stringify(userAuth)
+                    );
+                    req.headers[enum_.Header.authToken] = '';
+                }
+
                 const api = await getApiFunc(req);
                 const session = api as any as IApiSession;
                 if (session.initSession)
@@ -49,17 +51,21 @@ export function buildPostExpressOption(
 
                 for (const r of ['body', 'headers']) {
                     if (r in req) {
+                        const keys = Object.keys(req[r]);
+                        if (!keys.length)
+                            continue;
+
                         if (r == 'body') {
-                            Object.keys(req.body).forEach(r => {
-                                if (r in api)
+                            Object.keys(req[r]).forEach(cr => {
+                                if (cr in api)
                                     return;
 
-                                api[r] = req.body[r];
+                                api[cr] = req[r][cr];
                             });
                         }
 
-                        cLog.addLabel(r, req[r]);
-                        tracerSpan?.log?.({
+                        log.addLabel(r, req[r]);
+                        tracerSpan.log({
                             [r]: req[r],
                         });
                     }
@@ -67,7 +73,7 @@ export function buildPostExpressOption(
 
                 const validationErrors = await validate(api);
                 if (validationErrors.length) {
-                    tracerSpan?.log?.({
+                    tracerSpan.log({
                         validate: validationErrors.map(r => {
                             return {
                                 arg: r.property,
@@ -86,25 +92,25 @@ export function buildPostExpressOption(
                 } else {
                     apiResp.err = enum_.ErrorCode.panic;
 
-                    cLog.error(ex);
-                    tracerSpan?.log?.({
+                    log.error(ex);
+                    tracerSpan.log({
                         err: ex
                     });
                 }
 
-                tracerSpan?.setTag?.(opentracing.Tags.ERROR, true);
+                tracerSpan.setTag(opentracing.Tags.ERROR, true);
             }
             finally {
                 if (!apiResp.err)
-                    cLog.addLabel('response', apiResp).info();
+                    log.addLabel('response', apiResp).info();
 
-                tracerSpan?.log?.({
+                tracerSpan.log({
                     result: apiResp
                 });
 
                 resp.json(apiResp);
 
-                tracerSpan?.finish?.();
+                tracerSpan.finish();
             }
         });
     }

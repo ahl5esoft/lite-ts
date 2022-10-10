@@ -3,18 +3,9 @@ import { opentracing } from 'jaeger-client';
 import { ITraceable, RedisBase } from '../../contract';
 import { contract } from '../../model';
 
-/**
- * jeager redis
- */
-export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
+export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase> {
     private m_TracerSpan: opentracing.Span;
 
-    /**
-     * 构造函数
-     * 
-     * @param m_Redis redis实例
-     * @param parentTracerSpan 父跟踪范围
-     */
     public constructor(
         private m_Redis: RedisBase,
         parentTracerSpan?: opentracing.Span
@@ -206,13 +197,8 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         return this.m_Redis.ttl(key);
     }
 
-    /**
-     * 跟踪
-     * 
-     * @param parentSpan 父范围
-     */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new JeagerRedis(this.m_Redis, parentSpan) : this;
+        return parentSpan ? new JaegerClientRedis(this.m_Redis, parentSpan) : this;
     }
 
     /**

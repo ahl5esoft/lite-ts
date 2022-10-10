@@ -35,7 +35,10 @@ export class RpcUserPortraitService implements IUserPortraitService {
         this.m_Cache[userID] ??= {};
 
         if (!this.m_Cache[userID][field]) {
-            const resp = await this.m_Rpc.setBody({ field, userID }).callWithoutThrow<T[]>('/portrait/get');
+            const resp = await this.m_Rpc.callWithoutThrow<T[]>({
+                body: { field, userID },
+                route: '/portrait/get'
+            });
             if (!resp.err)
                 this.m_Cache[userID][field] = resp.data;
         }
@@ -53,7 +56,10 @@ export class RpcUserPortraitService implements IUserPortraitService {
         userID ??= this.m_UserID;
         this.m_Cache[userID] ??= {};
 
-        await this.m_Rpc.setBody({ field, userID }).callWithoutThrow<void>('/portrait/remove');
+        await this.m_Rpc.callWithoutThrow<void>({
+            body: { field, userID },
+            route: '/portrait/remove'
+        });
         delete this.m_Cache[userID][field];
     }
 }

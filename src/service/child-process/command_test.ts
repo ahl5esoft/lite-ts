@@ -3,52 +3,54 @@ import { notStrictEqual, strictEqual } from 'assert';
 import { ChildProcessCommand as Self } from './command';
 
 describe('src/service/child-process/command.ts', () => {
-    describe('.exec(name: string, ...args: any[])', () => {
+    describe('.exec(v: IChildProcessCommandOption)', () => {
         it('ok', async () => {
-            const res = await new Self().exec('node', '-v');
+            const res = await new Self().exec({
+                args: ['node', '-v']
+            });
             strictEqual(res.code, 0);
-            strictEqual(res.err, '');
-            notStrictEqual(res.out, '');
+            strictEqual(res.stderr, '');
+            notStrictEqual(res.stdout, '');
         });
 
         it('ignore return', async () => {
-            const res = await new Self().setExtra({
-                ignoreReturn: true
-            }).exec('node', '-v');
+            const res = await new Self().exec({
+                args: ['node', '-v'],
+                ignoreStdout: true,
+                ignoreStderr: true
+            });
             strictEqual(res.code, 0);
-            strictEqual(res.err, '');
-            strictEqual(res.out, '');
+            strictEqual(res.stderr, '');
+            strictEqual(res.stdout, '');
         });
 
         it('pipe', async () => {
-            const res = await new Self().exec('tasklist', '|', 'find', '');
+            const res = await new Self().exec({
+                args: ['tasklist', '|', 'find', '']
+            });
             strictEqual(res.code, 1);
-            strictEqual(res.err, '');
-            strictEqual(res.out, '');
+            strictEqual(res.stderr, '');
+            strictEqual(res.stdout, '');
         });
 
         it('timeout', async () => {
-            const res = await new Self().setTimeout(1000).exec('node');
+            const res = await new Self().exec({
+                args: ['node'],
+                timeout: 1000
+            });
             strictEqual(res.code, -1);
-            strictEqual(res.err, '');
-            strictEqual(res.out, '');
+            strictEqual(res.stderr, '');
+            strictEqual(res.stdout, '');
         });
 
-        it('npm', async () => {
-            await new Self().setDir(
-                process.cwd()
-            ).exec('npm.cmd', 'i');
-        });
-    });
-
-    describe('.setDir(v: string)', () => {
-        it('ok', async () => {
-            const res = await new Self().setDir(
-                process.cwd()
-            ).exec('more', 'README.md');
+        it('cwd', async () => {
+            const res = await new Self().exec({
+                args: ['more', 'README.md'],
+                cwd: process.cwd()
+            });
             strictEqual(res.code, 0);
-            strictEqual(res.err, '');
-            notStrictEqual(res.out, '');
+            strictEqual(res.stderr, '');
+            notStrictEqual(res.stdout, '');
         });
     });
 });

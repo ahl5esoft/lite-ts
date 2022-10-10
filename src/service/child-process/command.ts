@@ -1,23 +1,37 @@
 import { ChildProcessWithoutNullStreams, CommonSpawnOptions, spawn } from 'child_process';
 
-import { CommandBase } from '../../contract';
-import { response } from '../../model';
+import { CommandBase, ICommandOption, ICommandResult } from '../../contract';
 
-class CommandWrapper implements CommandBase {
-    private m_Dir: string;
-    private m_Extra: any;
-    private m_Timeout: number;
+interface IChildProcessCommandOption extends ICommandOption {
+    ignoreStderr?: boolean;
+    ignoreStdout?: boolean;
+}
 
-    public async exec(...args: string[]) {
+class CommandResult implements ICommandResult {
+    public code: number;
+    public errBf: string[] = [];
+    public outBf: string[] = [];
+
+    public get stderr() {
+        return this.errBf.join('');
+    }
+
+    public get stdout() {
+        return this.outBf.join('');
+    }
+}
+
+export class ChildProcessCommand extends CommandBase {
+    public async exec(v: IChildProcessCommandOption) {
         const opt: CommonSpawnOptions = {};
-        if (this.m_Dir)
-            opt.cwd = this.m_Dir;
-        if (this.m_Timeout)
-            opt.timeout = this.m_Timeout;
+        if (v.cwd)
+            opt.cwd = v.cwd;
+        if (v.timeout)
+            opt.timeout = v.timeout;
 
-        const res = new response.CommandResult();
+        const res = new CommandResult();
         let child: ChildProcessWithoutNullStreams;
-        child = args.reduce((memo, r) => {
+        child = v.args.reduce((memo, r) => {
             if (r == '|')
                 memo.push([]);
             else
@@ -38,7 +52,7 @@ class CommandWrapper implements CommandBase {
             return cp;
         }, child);
         child.stderr.setEncoding('utf8').on('data', chunk => {
-            if (this.m_Extra?.ignoreReturn)
+            if (v.ignoreStderr)
                 return;
 
             res.errBf.push(
@@ -46,7 +60,7 @@ class CommandWrapper implements CommandBase {
             );
         });
         child.stdout.setEncoding('utf8').on('data', chunk => {
-            if (this.m_Extra?.ignoreReturn)
+            if (v.ignoreStdout)
                 return;
 
             res.outBf.push(
@@ -55,14 +69,14 @@ class CommandWrapper implements CommandBase {
         });
 
         let timeout: NodeJS.Timeout;
-        if (this.m_Timeout > 0) {
+        if (v.timeout > 0) {
             timeout = setTimeout(() => {
                 res.code = -1;
                 child.kill('SIGKILL');
-            }, this.m_Timeout);
+            }, v.timeout);
         }
 
-        return new Promise<response.CommandResult>((s, f) => {
+        return new Promise<ICommandResult>((s, f) => {
             child.on('error', err => {
                 if (timeout)
                     clearTimeout(timeout);
@@ -78,86 +92,5 @@ class CommandWrapper implements CommandBase {
                 s(res);
             });
         });
-    }
-
-    public setDir(v: string) {
-        this.m_Dir = v;
-        return this;
-    }
-
-    public setExtra(v: any) {
-        this.m_Extra = v;
-        return this;
-    }
-
-    public setTimeout(v: number) {
-        this.m_Timeout = v;
-        return this;
-    }
-}
-
-/**
- * 命令对象(基于child_process实现)
- */
-export class ChildProcessCommand extends CommandBase {
-    /**
-     * 执行命令
-     * 
-     * @example
-     * ```typescript
-     *  const cmdFactory: CommandFactoryBase;
-     *  const res = await cmdFactory.build(类型, ['node', '-v']).setTimeout(1000).exec();
-     *  // res = { code: 0, out: 'node版本号', err: '系统未安装node时报错内容' }
-     * ```
-     */
-    public async exec(...args: string[]) {
-        return await new CommandWrapper().exec(...args);
-    }
-
-    /**
-     * 设置目录路径
-     * 
-     * @param v 目录路径
-     * 
-     * @example
-     * ```typescript
-     *  const cmdFactory: CommandFactoryBase;
-     *  const res = await cmdFactory.build(类型, ['ls']).setDir('/usr/local').exec();
-     *  // res = { code: 0, out: '/usr/local下文件列表' }
-     * ```
-     */
-    public setDir(v: string) {
-        const wrapper = new CommandWrapper();
-        wrapper.setDir(v);
-        return wrapper;
-    }
-
-    /**
-     * 设置扩展对象
-     * 
-     * @param v 扩展对象
-     */
-    public setExtra(v: any) {
-        const wrapper = new CommandWrapper();
-        wrapper.setExtra(v);
-        return wrapper;
-    }
-
-    /**
-     * 设置超时时间
-     * 
-     * @param v 超时时间, 单位: ms
-     * 
-     * @example
-     * ```typescript
-     *  const cmdFactory: CommandFactoryBase;
-     *  const res = await cmdFactory.build(类型, ['node']).setTimeout(1000).exec();
-     *  // 1秒后完成, res = { code: -1 }
-     * ```
-     */
-    public setTimeout(v: number) {
-        const wrapper = new CommandWrapper();
-        wrapper.setTimeout(v);
-        return wrapper;
     }
 }

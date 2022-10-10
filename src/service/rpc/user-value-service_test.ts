@@ -16,18 +16,16 @@ describe('src/service/rpc/user-value-service.ts', () => {
             } as enum_.TargetTypeData, null, null, mockUserService.actual, 0);
 
             mockRpc.expectReturn(
-                r => r.setBody({
-                    userID,
-                    values: [{
-                        count: 1,
-                        valueType: 11
-                    }]
+                r => r.call({
+                    body: {
+                        userID,
+                        values: [{
+                            count: 1,
+                            valueType: 11
+                        }]
+                    },
+                    route: `/prop/${Self.updateRoute}`
                 }),
-                mockRpc.actual
-            );
-
-            mockRpc.expectReturn(
-                r => r.call(`/prop/${Self.updateRoute}`),
                 {}
             );
 

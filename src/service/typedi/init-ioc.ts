@@ -1,3 +1,4 @@
+import cryptoJs from 'crypto-js';
 import { initTracer, opentracing } from 'jaeger-client';
 import moment from 'moment';
 import { join } from 'path';
@@ -7,15 +8,15 @@ import { BentConfigLoader, BentRpc } from '../bent';
 import { CacheConfigLoader } from '../cache';
 import { ConfigLoadBalance, MultiConfigLoader } from '../config';
 import { ConsoleLog } from '../console';
+import { CryptoJsAESCrypto } from '../crypto-js';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
 import { CustomError } from '../error';
 import { FSIOFactory } from '../fs';
 import { GrpcJsRpc } from '../grpc-js';
 import { IoredisAdapter } from '../ioredis';
-import { JaegerDbFactory, JeagerRedis, JeagerRpc } from '../jaeger';
+import { JaegerClientDbFactory, JaegerClientRedis, JaegerClientRpc } from '../jaeger-client';
 import { JsYamlConfigLoader } from '../js-yaml';
-import { LogProxy } from '../log';
 import { Log4jsLog } from '../log4js';
 import { MongoConfigCache, MongoDbFactory, MongoEnumCache, MongoStringGenerator } from '../mongo';
 import { RedisLock, RedisNowTime } from '../redis';
@@ -24,12 +25,13 @@ import { SetTimeoutThread } from '../set-timeout';
 import { UserCustomGiftBagService } from '../user';
 import {
     ConfigLoaderBase,
+    CryptoBase,
     DbFactoryBase,
     EnumFactoryBase,
     IOFactoryBase,
     IUserAssociateService,
     LockBase,
-    LogBase,
+    LogFactoryBase,
     NowTimeBase,
     RedisBase,
     RpcBase,
@@ -60,7 +62,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         if (r.includes('.yaml')) {
             yamlFilename = r;
             break;
-        } else if (r.endsWith('mocha')) {
+        } else if (r.includes('mocha')) {
             yamlFilename = 'config-it.yaml';
             break;
         }
@@ -80,6 +82,29 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         'package.json'
     ).readJSON<{ version: string }>();
     cfg.version = pkg.version;
+
+    if (cfg.authCrypto) {
+        const aesCfg = {
+            iv: cryptoJs.enc.Utf8.parse(cfg.authCrypto.iv),
+            key: cryptoJs.enc.Utf8.parse(cfg.authCrypto.key),
+            mode: cryptoJs.mode[cfg.authCrypto.mode],
+            padding: cryptoJs.pad[cfg.authCrypto.pad]
+        };
+        const crypto = new CryptoJsAESCrypto(async () => {
+            return aesCfg;
+        });
+        Container.set(enum_.IoC.authCrypto, {
+            compare(plaintext, cipherText) {
+                return crypto.compare(plaintext, cipherText);
+            },
+            decrypt(cipherText) {
+                return crypto.decrypt(cipherText);
+            },
+            encrypt(plaintext) {
+                return crypto.encrypt(plaintext);
+            },
+        } as CryptoBase);
+    }
 
     if (cfg.cdnUrl) {
         configLoaders.push(
@@ -102,7 +127,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
 
     Container.set(
         RpcBase,
-        new JeagerRpc(() => {
+        new JaegerClientRpc(() => {
             const configLoader = Container.get<ConfigLoaderBase>(ConfigLoaderBase as any);
             return cfg.grpcProtoFilePath ? new GrpcJsRpc(
                 new ConfigLoadBalance(configLoader, 'grpc'),
@@ -119,7 +144,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         dbFactory = new MongoDbFactory(!!cfg.distributedMongo, cfg.name, mongo);
         Container.set(
             DbFactoryBase,
-            new JaegerDbFactory(dbFactory)
+            new JaegerClientDbFactory(dbFactory)
         );
     }
 
@@ -129,7 +154,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         redis = new IoredisAdapter(cfg.redis);
         Container.set(
             RedisBase,
-            new JeagerRedis(redis)
+            new JaegerClientRedis(redis)
         );
 
         nowTime = new RedisNowTime(redis);
@@ -176,12 +201,11 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     if (cfg.log4js)
         Log4jsLog.init(cfg.log4js);
 
-    Container.set(
-        LogBase,
-        new LogProxy(() => {
+    Container.set(LogFactoryBase, {
+        build() {
             return cfg.log4js ? new Log4jsLog() : new ConsoleLog()
-        })
-    );
+        },
+    } as LogFactoryBase);
 
     Container.set(
         StringGeneratorBase,

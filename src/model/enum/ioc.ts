@@ -1,13 +1,5 @@
-/**
- * 依赖注入
- */
- export enum IoC {
-    /**
-     * 配置缓存
-     */
+export enum IoC {
+    authCrypto = 'auth-crypto',
     configCache = 'config-cache',
-    /**
-     * 枚举缓存
-     */
     enumCache = 'enum-cache',
 }

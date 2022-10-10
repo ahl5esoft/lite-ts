@@ -12,7 +12,9 @@ describe('src/service/rpc/enum-cache.ts', () => {
             const self = new Self(mockRpc.actual, 'app', null, '', '');
 
             mockRpc.expectReturn(
-                r => r.call<global.Enum[]>(`/app/find-all-enums`),
+                r => r.call<global.Enum[]>({
+                    route: `/app/find-all-enums`
+                }),
                 {
                     err: 0,
                     data: [{

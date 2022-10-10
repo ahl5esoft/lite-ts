@@ -9,12 +9,12 @@ describe('src/model/config/load-balance.ts', () => {
     describe('.getUrl(app: string, env: string)', () => {
         it('ok', async () => {
             const mockConfigLoader = new Mock<ConfigLoaderBase>();
-            const self = new Self(mockConfigLoader.actual, 'test');
+            const self = new Self(mockConfigLoader.actual, 'http');
 
             mockConfigLoader.expectReturn(
                 r => r.load(config.LoadBalance),
                 {
-                    test: {
+                    http: {
                         app: {
                             '': 'url'
                         }
@@ -28,12 +28,12 @@ describe('src/model/config/load-balance.ts', () => {
 
         it('mod(false)', async () => {
             const mockConfigLoader = new Mock<ConfigLoaderBase>();
-            const self = new Self(mockConfigLoader.actual, 'test');
+            const self = new Self(mockConfigLoader.actual, 'http');
 
             mockConfigLoader.expectReturn(
                 r => r.load(config.LoadBalance),
                 {
-                    test: {
+                    http: {
                         app: {
                             '': {
                                 default: 'd-url',
@@ -54,12 +54,12 @@ describe('src/model/config/load-balance.ts', () => {
 
         it('mod(true)', async () => {
             const mockConfigLoader = new Mock<ConfigLoaderBase>();
-            const self = new Self(mockConfigLoader.actual, 'test');
+            const self = new Self(mockConfigLoader.actual, 'http');
 
             mockConfigLoader.expectReturn(
                 r => r.load(config.LoadBalance),
                 {
-                    test: {
+                    http: {
                         app: {
                             '': {
                                 default: 'd-url',

@@ -12,15 +12,13 @@ describe('src/service/rpc/user-portrait-service.ts', () => {
             const self = new Self(mockRpc.actual, 'user-id');
 
             mockRpc.expectReturn(
-                r => r.setBody({
-                    field: 'prop',
-                    userID: 'uid',
+                r => r.callWithoutThrow({
+                    body: {
+                        field: 'prop',
+                        userID: 'uid',
+                    },
+                    route: '/portrait/get'
                 }),
-                mockRpc.actual
-            );
-
-            mockRpc.expectReturn(
-                r => r.callWithoutThrow('/portrait/get'),
                 {
                     data: []
                 }
@@ -50,15 +48,13 @@ describe('src/service/rpc/user-portrait-service.ts', () => {
             })
 
             mockRpc.expectReturn(
-                r => r.setBody({
-                    field: 'prop',
-                    userID: 'user-id',
+                r => r.callWithoutThrow({
+                    body: {
+                        field: 'prop',
+                        userID: 'user-id',
+                    },
+                    route: '/portrait/remove'
                 }),
-                mockRpc.actual
-            );
-
-            mockRpc.expectReturn(
-                r => r.callWithoutThrow('/portrait/remove'),
                 {
                     data: []
                 }

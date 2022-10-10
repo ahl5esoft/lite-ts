@@ -27,8 +27,12 @@ export default class DbQueryApi implements IApi {
     public take: number;
 
     public async call() {
-        return this.dbFactory.db(model.global.Enum).query().where({
-            id: 'enum-name'
-        }).skip(this.skip).take(this.take).toArray();
+        return this.dbFactory.db(model.global.Enum).query().toArray({
+            skip: this.skip,
+            take: this.take,
+            where: {
+                id: 'enum-name'
+            }
+        });
     }
 }

@@ -12,14 +12,8 @@ import { contract, enum_ } from '../../model';
  * 用户数值服务(远程)
  */
 export class RpcUserValueService extends UserValueServiceBase {
-    /**
-     * 更新数值路由
-     */
     public static updateRoute = 'update-values-by-user-id';
 
-    /**
-     * 变更
-     */
     private m_ChangeValues: contract.IValue[] = [];
 
     /**
@@ -43,27 +37,27 @@ export class RpcUserValueService extends UserValueServiceBase {
         super(userService, nowTime, nowValueType, enumFactory);
     }
 
-    /**
-     * 更新
-     * 
-     * @param uow 工作单元
-     * @param values 数值数组
-     */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         const route = ['', this.m_TargetTypeData.app, RpcUserValueService.updateRoute].join('/')
         if (uow) {
             this.m_ChangeValues.push(...values);
             uow.registerAfter(async () => {
-                await this.m_Rpc.setBody({
-                    userID: this.userService.userID,
-                    values: this.m_ChangeValues
-                }).call<void>(route);
+                await this.m_Rpc.call<void>({
+                    body: {
+                        userID: this.userService.userID,
+                        values: this.m_ChangeValues
+                    },
+                    route
+                });
             }, route);
         } else {
-            await this.m_Rpc.setBody({
-                userID: this.userService.userID,
-                values: values
-            }).call<void>(route);
+            await this.m_Rpc.call<void>({
+                body: {
+                    userID: this.userService.userID,
+                    values: values
+                },
+                route
+            });
         }
     }
 }

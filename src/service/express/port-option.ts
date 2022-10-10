@@ -1,14 +1,7 @@
 import { Express } from 'express';
 import moment from 'moment';
 
-/**
- * 创建端口ExpressOption
- * 
- * @param project 项目名
- * @param port 项目端口号
- * @param version 项目版本
- */
-export function buildPortExpressOption(project: string, port: number, version: string) {
+export function expressPortOption(project: string, port: number, version: string) {
     return function (app: Express) {
         const args: any[] = [port, () => {
             console.log(`express >> ${project}(v${version})[${moment().format('YYYY-MM-DD HH:mm:ss')}]: ${port}`);

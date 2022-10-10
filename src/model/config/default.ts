@@ -1,9 +1,12 @@
 import { TracingConfig, TracingOptions } from 'jaeger-client';
 
-/**
- * 默认配置
- */
 export class Default {
+    public authCrypto: {
+        iv: string;
+        key: string;
+        mode: string;
+        pad: string;
+    };
     public cdnUrl: string;
     /**
      * 配置模型

@@ -1,6 +1,6 @@
 import { opentracing } from 'jaeger-client';
 
-import { JaegerUnitOfWork as Self } from './unit-of-work';
+import { JaegerClientUnitOfWork as Self } from './unit-of-work';
 import { Mock } from '../assert';
 import { UnitOfWorkRepositoryBase } from '../..';
 

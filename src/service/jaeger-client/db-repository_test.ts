@@ -1,8 +1,8 @@
 import { strictEqual } from 'assert';
 
-import { JaegerDbRepository as Self } from './db-repository';
+import { JaegerClientDbRepository as Self } from './db-repository';
 import { Mock } from '../assert';
-import { DbFactoryBase, DbRepositoryBase } from '../..';
+import { DbFactoryBase, DbRepositoryBase } from '../../contract';
 
 class TestDbRepository { }
 
@@ -10,7 +10,7 @@ describe('src/service/jaeger/db-repository.ts', () => {
     describe('.repo[proctected]', () => {
         it('ok', () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockDbFactory.actual, null, 'uow' as any, null, TestDbRepository);
+            const self = new Self(mockDbFactory.actual, null, null, 'uow' as any, TestDbRepository);
 
             const mockDbRepo = new Mock<DbRepositoryBase<TestDbRepository>>();
             mockDbFactory.expectReturn(
