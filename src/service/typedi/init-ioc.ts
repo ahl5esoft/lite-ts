@@ -60,7 +60,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         if (r.includes('.yaml')) {
             yamlFilename = r;
             break;
-        } else if (r.endsWith('mocha')) {
+        } else if (r.includes('mocha')) {
             yamlFilename = 'config-it.yaml';
             break;
         }
