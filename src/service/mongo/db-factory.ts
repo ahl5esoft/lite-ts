@@ -1,7 +1,9 @@
-import { MongoPool } from './pool';
+import { BulkWriteOptions } from 'mongodb';
+
 import { MongoDbRepository } from './db-repository';
 import { MongoDefaultUnitOfWork } from './default-unit-of-work';
 import { MongoDistributedUnitOfWork } from './distributed-unit-of-work';
+import { MongoPool } from './pool';
 import { DbFactoryBase, UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
@@ -19,15 +21,20 @@ export class MongoDbFactory extends DbFactoryBase {
      * @param m_IsDistributed 是否分布式
      * @param name 数据库名
      * @param url 连接地址
+     * @param bulkWriteOptions 批量写入配置
      */
     public constructor(
         private m_IsDistributed: boolean,
         name: string,
         url: string,
+        private bulkWriteOptions?: BulkWriteOptions,
     ) {
         super();
 
         this.m_Pool = new MongoPool(name, url);
+        this.bulkWriteOptions ??= {
+            ordered: false,
+        };
     }
 
     /**
@@ -45,6 +52,6 @@ export class MongoDbFactory extends DbFactoryBase {
      */
     public uow() {
         const ctor = this.m_IsDistributed ? MongoDistributedUnitOfWork : MongoDefaultUnitOfWork;
-        return new ctor(this.m_Pool);
+        return new ctor(this.m_Pool, this.bulkWriteOptions);
     }
 }

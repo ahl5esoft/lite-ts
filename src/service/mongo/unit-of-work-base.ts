@@ -1,7 +1,7 @@
-import { AnyBulkWriteOperation, ClientSession } from 'mongodb';
+import { AnyBulkWriteOperation, BulkWriteOptions, ClientSession } from 'mongodb';
 
-import { MongoPool } from './pool';
 import { toDoc } from './helper';
+import { MongoPool } from './pool';
 import { UnitOfWorkRepositoryBase } from '../../contract';
 
 /**
@@ -11,15 +11,17 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
     /**
      * 批量
      */
-    private m_Bulk: { [model: string]: AnyBulkWriteOperation[] } = {};
+    private m_Bulk: { [model: string]: AnyBulkWriteOperation[]; } = {};
 
     /**
      * 构造函数
      * 
      * @param pool 连接池
+     * @param bulkWriteOptions 批量写入配置
      */
     public constructor(
         protected pool: MongoPool,
+        protected bulkWriteOptions: BulkWriteOptions
     ) {
         super();
     }
