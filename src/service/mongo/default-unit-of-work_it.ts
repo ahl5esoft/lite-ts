@@ -21,7 +21,7 @@ describe('src/service/mongo/default-unit-of-work.ts', () => {
             public name: string;
         }
         it('ok', async () => {
-            const self = new Self(pool);
+            const self = new Self(null, pool);
             const entry = {
                 id: `${RegisterAdd.name}-1`,
                 name: 'test',
@@ -52,7 +52,7 @@ describe('src/service/mongo/default-unit-of-work.ts', () => {
             const collection = db.collection(RegisterRemove.name);
             await collection.insertMany(rows);
 
-            const self = new Self(pool);
+            const self = new Self(null, pool);
             self.registerRemove(
                 RegisterRemove,
                 toEntries(rows)[0],
@@ -78,7 +78,7 @@ describe('src/service/mongo/default-unit-of-work.ts', () => {
             const collection = db.collection(RegisterSave.name);
             await collection.insertMany(rows);
 
-            const self = new Self(pool);
+            const self = new Self(null, pool);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
             self.registerSave(RegisterSave, entry);

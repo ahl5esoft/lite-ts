@@ -1,3 +1,5 @@
+import { BulkWriteOptions } from 'mongodb';
+
 import { MongoPool } from './pool';
 import { MongoDbRepository } from './db-repository';
 import { MongoDefaultUnitOfWork } from './default-unit-of-work';
@@ -11,6 +13,7 @@ export class MongoDbFactory extends DbFactoryBase {
         private m_IsDistributed: boolean,
         name: string,
         url: string,
+        private m_BlukWriteOptions?: BulkWriteOptions,
     ) {
         super();
 
@@ -23,6 +26,6 @@ export class MongoDbFactory extends DbFactoryBase {
 
     public uow() {
         const ctor = this.m_IsDistributed ? MongoDistributedUnitOfWork : MongoDefaultUnitOfWork;
-        return new ctor(this.m_Pool);
+        return new ctor(this.m_BlukWriteOptions, this.m_Pool);
     }
 }

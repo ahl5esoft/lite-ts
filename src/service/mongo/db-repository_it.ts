@@ -18,7 +18,7 @@ describe('src/service/mongo/db-repository.ts', () => {
     describe('.add(entry: any): Promise<void>', () => {
         class TestAdd { }
         it('m_IsTx = true', async () => {
-            const uow = new MongoDefaultUnitOfWork(pool);
+            const uow = new MongoDefaultUnitOfWork(null, pool);
             const self = new Self(pool, uow, dbFactory, TestAdd);
             const entry = {
                 id: `${TestAdd.name}-1`,
@@ -105,7 +105,7 @@ describe('src/service/mongo/db-repository.ts', () => {
             const collection = db.collection(TestRemove.name);
             await collection.insertMany(rows);
 
-            const uow = new MongoDefaultUnitOfWork(pool);
+            const uow = new MongoDefaultUnitOfWork(null, pool);
             const self = new Self(pool, uow, dbFactory, TestRemove);
             await self.remove({
                 id: rows[0]._id,
@@ -146,7 +146,7 @@ describe('src/service/mongo/db-repository.ts', () => {
             const collection = db.collection(TestSave.name);
             await collection.insertMany(rows);
 
-            const uow = new MongoDefaultUnitOfWork(pool);
+            const uow = new MongoDefaultUnitOfWork(null, pool);
             const self = new Self(pool, uow, dbFactory, TestSave);
             let entry = toEntries(rows)[0];
             entry.name = 'two';
