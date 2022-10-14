@@ -1,15 +1,7 @@
 import { IApi } from './i-api';
 
-/**
- * api工厂
- */
 export abstract class ApiFactoryBase {
     /**
-     * 创建api实例
-     * 
-     * @param endpoint 端
-     * @param apiName api名
-     * 
      * @example
      * ```typescript
      *  const apiFactory: ApiFactory;

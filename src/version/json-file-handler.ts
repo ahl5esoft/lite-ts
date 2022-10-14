@@ -14,7 +14,7 @@ export class JsonFileHandler extends HandlerBase {
     }
 
     public async handle(): Promise<void> {
-        const isExist = await this.m_File.exists();
+        const isExist = await this.m_File.fileEntry.exists();
         if (!isExist)
             return;
 

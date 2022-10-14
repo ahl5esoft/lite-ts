@@ -1,5 +1,6 @@
 import { basename } from 'path';
 
+import { QiniuFileFactory } from './file-factory';
 import { IFileEntry } from '../../contract';
 
 export class QiniuFileEntry implements IFileEntry {
@@ -7,7 +8,21 @@ export class QiniuFileEntry implements IFileEntry {
 
     public constructor(
         public path: string,
+        protected fileFactory: QiniuFileFactory,
+        protected bucket: string,
     ) {
         this.name = basename(path);
+    }
+
+    public async exists() {
+        const bucketManager = await this.fileFactory.bucketManager;
+        return new Promise<boolean>((s, f) => {
+            bucketManager.stat(this.bucket, this.path, (err, _, resInfo) => {
+                if (err)
+                    return f(err);
+
+                s(resInfo.statusCode == 200);
+            });
+        });
     }
 }

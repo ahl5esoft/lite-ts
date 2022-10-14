@@ -6,39 +6,18 @@ import { enum_ } from '../../model';
 
 const invalidAPIError = new CustomError(enum_.ErrorCode.api);
 const invalidAPI: IApi = {
-    call: async () => {
+    call() {
         throw invalidAPIError;
-    }
+    },
 };
 
-/**
- * api工厂
- */
 class ApiFactory extends ApiFactoryBase {
-    /**
-     * 构造函数
-     * 
-     * @param m_APICtors api构造函数
-     */
     public constructor(
         private m_APICtors: { [key: string]: { [key: string]: Function; }; }
     ) {
         super();
     }
 
-    /**
-     * 创建api实例
-     * 
-     * @param endpoint 端
-     * @param apiName api名
-     * 
-     * @example
-     * ```typescript
-     *  const apiFactory: ApiFactory;
-     *  const res = apiFactory.build('endpoint', 'api');
-     *  // res = IApi实例, src/api/endpoint/api.ts
-     * ```
-     */
     public build(endpoint: string, apiName: string) {
         const apiCtors = this.m_APICtors[endpoint];
         if (!apiCtors)
@@ -54,25 +33,20 @@ class ApiFactory extends ApiFactoryBase {
     }
 }
 
-/**
- * 创建api工厂
- * 
- * @param dir api所在目录, 默认src/api
- */
 export async function createApiFactory(dir: IODirectoryBase) {
     let apiCtors = {};
     const dirs = await dir.findDirectories();
     for (const r of dirs) {
         const files = await r.findFiles();
-        apiCtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
-            if (cr.name.includes('_it') || cr.name.includes('_test') || cr.name.includes('.d.ts'))
+        apiCtors[r.fileEntry.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
+            if (cr.fileEntry.name.includes('_it') || cr.fileEntry.name.includes('_test') || cr.fileEntry.name.includes('.d.ts'))
                 return memo;
 
-            const api = require(cr.path);
+            const api = require(cr.fileEntry.path);
             if (!api.default)
-                throw new Error(`未导出default: ${cr.path}`);
+                throw new Error(`未导出default: ${cr.fileEntry.path}`);
 
-            const name = cr.name.split('.')[0];
+            const name = cr.fileEntry.name.split('.')[0];
             memo[name] = api.default;
             return memo;
         }, {});

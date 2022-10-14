@@ -1,9 +1,9 @@
-import { createReadStream, createWriteStream, existsSync, readFile, unlink, writeFile } from 'fs';
+import { createReadStream, createWriteStream, readFile, unlink, writeFile } from 'fs';
 import { dirname } from 'path';
 import { promisify } from 'util';
 
-import { FSIOFactory } from '.';
-import { IOFileBase } from '../..';
+import { FSIOFactory } from './io-factory';
+import { IFileEntry, IOFileBase } from '../../contract';
 
 const readFileFunc = promisify(readFile);
 const unlinkAction = promisify(unlink);
@@ -12,21 +12,17 @@ const writeFileAction = promisify(writeFile);
 export class IOFile extends IOFileBase {
     public constructor(
         private m_IOFactory: FSIOFactory,
-        paths: string[]
+        fileEntry: IFileEntry,
     ) {
-        super(paths);
-    }
-
-    public async exists() {
-        return existsSync(this.path);
+        super(fileEntry);
     }
 
     public async copyTo(dstFilePath: string) {
-        let isExist = await this.exists();
+        let isExist = await this.fileEntry.exists();
         if (!isExist)
             return;
 
-        isExist = await this.m_IOFactory.buildFile(dstFilePath).exists();
+        isExist = await this.m_IOFactory.buildFile(dstFilePath).fileEntry.exists();
         if (isExist)
             return;
 
@@ -35,14 +31,14 @@ export class IOFile extends IOFileBase {
         ).create();
 
         await new Promise<void>((s, f) => {
-            createReadStream(this.path).on('err', f).on('end', s).pipe(
+            createReadStream(this.fileEntry.path).on('err', f).on('end', s).pipe(
                 createWriteStream(dstFilePath)
             );
         });
     }
 
     public async move(dstFilePath: string) {
-        let isExist = await this.exists();
+        let isExist = await this.fileEntry.exists();
         if (!isExist)
             return;
 
@@ -57,18 +53,18 @@ export class IOFile extends IOFileBase {
     }
 
     public async readString() {
-        return await readFileFunc(this.path, 'utf8');
+        return await readFileFunc(this.fileEntry.path, 'utf8');
     }
 
     public async remove() {
-        const isExist = await this.exists();
+        const isExist = await this.fileEntry.exists();
         if (isExist)
-            await unlinkAction(this.path);
+            await unlinkAction(this.fileEntry.path);
     }
 
     public async write(content: any) {
         if (typeof content != 'string')
             content = JSON.stringify(content, null, '\t');
-        await writeFileAction(this.path, content);
+        await writeFileAction(this.fileEntry.path, content);
     }
 }

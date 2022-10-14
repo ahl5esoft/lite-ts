@@ -1,13 +1,16 @@
 import { JsonFileHandler } from './json-file-handler';
-import { IOFileBase } from '../contract';
-import { Mock } from '../service/assert';
+import { IFileEntry, IOFileBase } from '../contract';
+import { Mock } from '../service';
 
 describe('src/tool/version/json-file-handler.ts', (): void => {
     describe('.handle(): Promise<void>', (): void => {
         it('ok', async (): Promise<void> => {
-            const mockFile = new Mock<IOFileBase>();
+            const mockFileEntry = new Mock<IFileEntry>();
+            const mockFile = new Mock<IOFileBase>({
+                fileEntry: mockFileEntry.actual
+            });
 
-            mockFile.expectReturn(
+            mockFileEntry.expectReturn(
                 r => r.exists(),
                 true
             );

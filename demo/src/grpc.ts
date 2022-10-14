@@ -3,12 +3,12 @@ import 'reflect-metadata';
 import { join } from 'path';
 import Container from 'typedi';
 
-import { model, RpcBase, service } from '../../src';
+import { IOFactoryBase, model, RpcBase, service } from '../../src';
 
 (async () => {
     const cfg = await service.initIoC(model.global);
 
-    const ioFactory = new service.FSIOFactory();
+    const ioFactory = Container.get<IOFactoryBase>(IOFactoryBase as any);
     const apiFactory = await service.createApiFactory(
         ioFactory.buildDirectory(__dirname, 'api')
     );

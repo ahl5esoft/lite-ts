@@ -12,7 +12,7 @@ import { CryptoJsAESCrypto } from '../crypto-js';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
 import { CustomError } from '../error';
-import { FSIOFactory } from '../fs';
+import { FsFileFactory, FSIOFactory } from '../fs';
 import { GrpcJsRpc } from '../grpc-js';
 import { IoredisAdapter } from '../ioredis';
 import { JaegerClientDbFactory, JaegerClientRedis, JaegerClientRpc } from '../jaeger-client';
@@ -28,6 +28,7 @@ import {
     CryptoBase,
     DbFactoryBase,
     EnumFactoryBase,
+    FileFactoryBase,
     IOFactoryBase,
     IUserAssociateService,
     LockBase,
@@ -54,7 +55,10 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         }
     });
 
-    const ioFactory = new FSIOFactory();
+    const fileFactory = new FsFileFactory();
+    Container.set(FileFactoryBase, fileFactory);
+
+    const ioFactory: IOFactoryBase = new FSIOFactory(fileFactory);
     Container.set(IOFactoryBase, ioFactory);
 
     let yamlFilename = 'config.yaml';

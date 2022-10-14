@@ -8,7 +8,7 @@ import { CryptoBase, IApi, IApiSession, LogFactoryBase } from '../../contract';
 import { contract, enum_ } from '../../model';
 
 export function expressPostOption(
-    authCrypt: CryptoBase,
+    authCrypto: CryptoBase,
     logFactory: LogFactoryBase,
     routeRule: string,
     getApiFunc: (req: any) => Promise<IApi>,
@@ -32,9 +32,9 @@ export function expressPostOption(
             };
             try {
                 const authToken = req.header(enum_.Header.authToken);
-                if (authToken) {
+                if (authToken && authCrypto) {
                     const userAuth = await getAuthDataFunc(authToken);
-                    req.headers[enum_.Header.authData] = await authCrypt.encrypt(
+                    req.headers[enum_.Header.authData] = await authCrypto.encrypt(
                         JSON.stringify(userAuth)
                     );
                     req.headers[enum_.Header.authToken] = '';

@@ -1,10 +1,10 @@
-import { existsSync, mkdir, readdir, rmdir } from 'fs';
+import { mkdir, readdir, rmdir } from 'fs';
 import { dirname, join } from 'path';
 import { promisify } from 'util';
 
-import { FSIOFactory } from '.';
+import { FSIOFactory } from './io-factory';
 import { IOFile } from './io-file';
-import { IODirectoryBase, IONodeBase } from '../..';
+import { IFileEntry, IODirectoryBase, IONodeBase } from '../../contract';
 
 const mkdirAction = promisify(mkdir);
 const readdirFunc = promisify(readdir);
@@ -13,25 +13,21 @@ const rmdirAction = promisify(rmdir);
 export class IODirectory extends IODirectoryBase {
     public constructor(
         private m_IOFactory: FSIOFactory,
-        paths: string[]
+        fileEntry: IFileEntry,
     ) {
-        super(paths);
+        super(fileEntry);
     }
 
     public async create() {
-        const isExist = await this.exists();
+        const isExist = await this.fileEntry.exists();
         if (isExist)
             return;
 
         await this.m_IOFactory.buildDirectory(
-            dirname(this.path),
+            dirname(this.fileEntry.path),
         ).create();
 
-        await mkdirAction(this.path);
-    }
-
-    public async exists() {
-        return existsSync(this.path);
+        await mkdirAction(this.fileEntry.path);
     }
 
     public async findDirectories() {
@@ -44,11 +40,11 @@ export class IODirectory extends IODirectoryBase {
 
     public async copyTo(dstDirPath: string) {
         const dstDir = this.m_IOFactory.buildDirectory(dstDirPath);
-        let isExist = await dstDir.exists();
+        let isExist = await dstDir.fileEntry.exists();
         if (isExist)
             throw new Error(`目录已经存在: ${dstDirPath}`);
 
-        isExist = await this.exists();
+        isExist = await this.fileEntry.exists();
         if (!isExist)
             return;
 
@@ -57,14 +53,14 @@ export class IODirectory extends IODirectoryBase {
         const directories = await this.findDirectories();
         for (const r of directories) {
             await r.copyTo(
-                join(dstDirPath, r.name)
+                join(dstDirPath, r.fileEntry.name)
             );
         }
 
         const files = await this.findFiles();
         for (const r of files) {
             await r.copyTo(
-                join(dstDirPath, r.name)
+                join(dstDirPath, r.fileEntry.name)
             );
         }
     }
@@ -76,7 +72,7 @@ export class IODirectory extends IODirectoryBase {
     }
 
     public async remove() {
-        let ok = await this.exists();
+        let ok = await this.fileEntry.exists();
         if (!ok)
             return;
 
@@ -88,18 +84,18 @@ export class IODirectory extends IODirectoryBase {
         for (const r of files)
             await r.remove();
 
-        await rmdirAction(this.path);
+        await rmdirAction(this.fileEntry.path);
     }
 
     private async findChildren<T extends IONodeBase>(ctor: new (...args: any[]) => T) {
-        const isExist = await this.exists();
+        const isExist = await this.fileEntry.exists();
         if (!isExist)
             return [];
 
         let children: T[] = [];
-        const files = await readdirFunc(this.path);
+        const files = await readdirFunc(this.fileEntry.path);
         for (const r of files) {
-            const node = await this.m_IOFactory.build(this.path, r);
+            const node = await this.m_IOFactory.build(this.fileEntry.path, r);
             if (node instanceof ctor)
                 children.push(node);
         }
