@@ -14,43 +14,19 @@ import {
 } from '../../contract';
 import { contract, enum_, global } from '../../model';
 
-/**
- * 数据库数值服务
- */
 export class DbValueService<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
 > extends ValueServiceBase<T> {
-    /**
-     * 实体
-     */
     public get entry() {
         return this.m_GetEntryFunc();
     }
 
-    /**
-     * 获取当前时间
-     */
     public get now() {
         return this.userService.valueService.now;
     }
 
-    /**
-     * 构造函数
-     * 
-     * @param userService 用户服务
-     * @param dbFactory 数据库工厂
-     * @param stringGenerator 字符串生成器
-     * @param valueInterceptorFactory 数值拦截器工厂
-     * @param parentTracerSpan 跟踪范围
-     * @param changeModel 数值变更模型
-     * @param m_CreateEntryFunc 创建实体函数
-     * @param m_CreateLogEntryFunc 创建日志实体函数
-     * @param m_FindAndClearChangeEntriesPredicate 查询并清除变更数据断言
-     * @param m_GetEntryFunc 获取实体函数
-     * @param enumFactory 枚举工厂
-     */
     public constructor(
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
@@ -67,13 +43,6 @@ export class DbValueService<
         super(enumFactory);
     }
 
-    /**
-     * 获取数值数量
-     * 获取数值变更数据并清理缓存
-     * 
-     * @param uow 工作单元
-     * @param valueType 数值类型
-     */
     public async getCount(uow: IUnitOfWork, valueType: number) {
         const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('value.getCount', {
             childOf: this.parentTracerSpan,
@@ -99,13 +68,9 @@ export class DbValueService<
         return res;
     }
 
-    /**
-     * 更新数值
-     * 
-     * @param uow 工作单元
-     * @param values 数值数据
-     */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        this.updateValues = values;
+
         const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('value.update', {
             childOf: this.parentTracerSpan,
         }) : null;

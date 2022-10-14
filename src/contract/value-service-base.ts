@@ -4,34 +4,16 @@ import { EnumFactoryBase } from './enum-factory-base';
 import { IUnitOfWork } from './i-unit-of-work';
 import { contract, enum_, global } from '../model';
 
-/**
- * 目标数值服务基类
- */
 export abstract class ValueServiceBase<T extends global.UserValue> {
-    /**
-     * 目标数值数据
-     */
+    public updateValues: contract.IValue[];
+
     public abstract get entry(): Promise<T>;
-    /**
-     * 当前时间
-     */
     public abstract get now(): Promise<number>;
 
-    /**
-     * 构造函数
-     * 
-     * @param enumFactory 枚举工厂
-     */
     public constructor(
         protected enumFactory: EnumFactoryBase,
     ) { }
 
-    /**
-     * 验证条件
-     * 
-     * @param uow 工作单元
-     * @param conditions 条件
-     */
     public async checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[][]) {
         if (!conditions?.length)
             return true;
@@ -72,12 +54,6 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         return false;
     }
 
-    /**
-     * 获取数量
-     * 
-     * @param _ 工作单元(忽略)
-     * @param valueType 数值类型
-     */
     public async getCount(_: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
         entry ??= {
@@ -102,11 +78,5 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         return entry.values[valueType];
     }
 
-    /**
-     * 更新
-     * 
-     * @param uow 工作单元
-     * @param values 数值数据
-     */
     public abstract update(uow: IUnitOfWork, values: contract.IValue[]): Promise<void>;
 }
