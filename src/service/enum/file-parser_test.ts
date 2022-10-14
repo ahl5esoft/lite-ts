@@ -2,18 +2,18 @@ import { deepStrictEqual } from 'assert';
 
 import { EnumFileParser as Self } from './file-parser';
 import { Mock } from '../assert';
-import { IOFactoryBase, IOFileBase } from '../..';
+import { FileFactoryBase, IFile } from '../../contract';
 
 describe('src/service/enum/parser.ts', () => {
     describe('.parse<T>(text: string)', () => {
         it('ok', async () => {
-            const mockIOFactory = new Mock<IOFactoryBase>();
-            const self = new Self(mockIOFactory.actual);
+            const mockFileFactory = new Mock<FileFactoryBase>();
+            const self = new Self(mockFileFactory.actual);
             self.stringAttrReg = /^\[(\w+)='([\w-]+)'\]/;
 
-            const mockFile = new Mock<IOFileBase>();
+            const mockFile = new Mock<IFile>();
             const filePath = 'file-path';
-            mockIOFactory.expectReturn(
+            mockFileFactory.expectReturn(
                 r => r.buildFile(filePath),
                 mockFile.actual
             );
@@ -76,12 +76,12 @@ enum ValueType {
         });
 
         it('多个标签', async () => {
-            const mockIOFactory = new Mock<IOFactoryBase>();
-            const self = new Self(mockIOFactory.actual);
+            const mockFileFactory = new Mock<FileFactoryBase>();
+            const self = new Self(mockFileFactory.actual);
 
-            const mockFile = new Mock<IOFileBase>();
+            const mockFile = new Mock<IFile>();
             const filePath = 'file-path';
-            mockIOFactory.expectReturn(
+            mockFileFactory.expectReturn(
                 r => r.buildFile(filePath),
                 mockFile.actual
             );
@@ -112,12 +112,12 @@ enum ValueType {
         });
 
         it('对象标签', async () => {
-            const mockIOFactory = new Mock<IOFactoryBase>();
-            const self = new Self(mockIOFactory.actual);
+            const mockFileFactory = new Mock<FileFactoryBase>();
+            const self = new Self(mockFileFactory.actual);
 
-            const mockFile = new Mock<IOFileBase>();
+            const mockFile = new Mock<IFile>();
             const filePath = 'file-path';
-            mockIOFactory.expectReturn(
+            mockFileFactory.expectReturn(
                 r => r.buildFile(filePath),
                 mockFile.actual
             );

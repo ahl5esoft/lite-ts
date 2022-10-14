@@ -12,7 +12,7 @@ import { CryptoJsAESCrypto } from '../crypto-js';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
 import { CustomError } from '../error';
-import { FsFileFactory, FSIOFactory } from '../fs';
+import { FsFileFactory } from '../fs';
 import { GrpcJsRpc } from '../grpc-js';
 import { IoredisAdapter } from '../ioredis';
 import { JaegerClientDbFactory, JaegerClientRedis, JaegerClientRpc } from '../jaeger-client';
@@ -29,7 +29,6 @@ import {
     DbFactoryBase,
     EnumFactoryBase,
     FileFactoryBase,
-    IOFactoryBase,
     IUserAssociateService,
     LockBase,
     LogFactoryBase,
@@ -58,9 +57,6 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     const fileFactory = new FsFileFactory();
     Container.set(FileFactoryBase, fileFactory);
 
-    const ioFactory: IOFactoryBase = new FSIOFactory(fileFactory);
-    Container.set(IOFactoryBase, ioFactory);
-
     let yamlFilename = 'config.yaml';
     for (const r of process.argv) {
         if (r.includes('.yaml')) {
@@ -73,7 +69,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     }
     const configLoaders: ConfigLoaderBase[] = [
         new JsYamlConfigLoader(
-            ioFactory.buildFile(
+            fileFactory.buildFile(
                 process.cwd(),
                 yamlFilename
             )
@@ -81,10 +77,10 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     ];
 
     const cfg = await configLoaders[0].load(config.Default);
-    const pkg = await ioFactory.buildFile(
+    const pkg = await fileFactory.buildFile(
         process.cwd(),
         'package.json'
-    ).readJSON<{ version: string }>();
+    ).read<{ version: string }>();
     cfg.version = pkg.version;
 
     if (cfg.authCrypto) {

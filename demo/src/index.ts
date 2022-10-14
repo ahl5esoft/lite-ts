@@ -8,7 +8,7 @@ import {
     CacheBase,
     CryptoBase,
     EnumFactoryBase,
-    IOFactoryBase,
+    FileFactoryBase,
     LogFactoryBase,
     model,
     RpcBase,
@@ -27,9 +27,9 @@ import {
         })
     );
 
-    const ioFactory = Container.get<IOFactoryBase>(IOFactoryBase as any);
+    const fileFactory = Container.get<FileFactoryBase>(FileFactoryBase as any);
     const apiFactory = await service.createApiFactory(
-        ioFactory.buildDirectory(__dirname, 'api'),
+        fileFactory.buildDirectory(__dirname, 'api'),
     );
     new service.ExpressApiPort([
         service.corsExpressOption({}),

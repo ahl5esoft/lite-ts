@@ -11,7 +11,7 @@ export function expressPostOption(
     authCrypto: CryptoBase,
     logFactory: LogFactoryBase,
     routeRule: string,
-    getApiFunc: (req: any) => Promise<IApi>,
+    getApiFunc: (req: Request) => Promise<IApi>,
     getAuthDataFunc: (token: string) => Promise<any>,
 ) {
     return function (app: Express) {

@@ -93,6 +93,10 @@ export class QiniuFileFactory extends FileFactoryBase {
         );
     }
 
+    public buildDirectory() {
+        return null;
+    }
+
     public async getToken(bucket: string, filePath: string) {
         const mac = await this.mac;
         return new qiniu.rs.PutPolicy({

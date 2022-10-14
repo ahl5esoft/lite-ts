@@ -1,32 +1,16 @@
 import { load } from 'js-yaml';
 
-import { ConfigLoaderBase, IOFileBase } from '../..';
+import { ConfigLoaderBase, IFile } from '../../contract';
 
-/**
- * js-yaml配置加载器
- */
 export class JsYamlConfigLoader extends ConfigLoaderBase {
-    /**
-     * yaml文档
-     */
     private m_Doc: any;
 
-    /**
-     * 构造函数
-     * 
-     * @param m_File yaml文件
-     */
     public constructor(
-        private m_File: IOFileBase,
+        private m_File: IFile,
     ) {
         super();
     }
 
-    /**
-     * 加载配置
-     * 
-     * @param ctor 构造函数
-     */
     public async load<T>(ctor: new () => T) {
         if (!this.m_Doc) {
             const yml = await this.m_File.readString();

@@ -1,25 +1,25 @@
 import { HandlerBase } from './handler-base';
-import { IOFileBase } from '../contract';
-
-class Entry {
-    public version: string;
-}
+import { IFile } from '../contract';
 
 export class JsonFileHandler extends HandlerBase {
     public constructor(
-        private m_File: IOFileBase,
+        private m_File: IFile,
         version: string
     ) {
         super(version);
     }
 
     public async handle(): Promise<void> {
-        const isExist = await this.m_File.fileEntry.exists();
+        const isExist = await this.m_File.exists();
         if (!isExist)
             return;
 
-        const entry = await this.m_File.readJSON<Entry>();
+        const entry = await this.m_File.read<{
+            version: string
+        }>();
         entry.version = this.getVersion(entry.version);
-        await this.m_File.write(entry);
+        await this.m_File.write(
+            JSON.stringify(entry, null, '\t'),
+        );
     }
 }

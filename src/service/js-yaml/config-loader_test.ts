@@ -2,14 +2,14 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { JsYamlConfigLoader as Self } from './config-loader';
 import { Mock } from '../assert';
-import { IOFileBase } from '../..';
+import { IFile } from '../../contract';
 
 class Test { }
 
 describe('src/service/js-yaml/config-loader.ts', () => {
     describe('.load<T>(ctor: new () => T)', () => {
         it('延迟加载', async () => {
-            const mockFile = new Mock<IOFileBase>();
+            const mockFile = new Mock<IFile>();
             const self = new Self(mockFile.actual);
 
             mockFile.expectReturn(

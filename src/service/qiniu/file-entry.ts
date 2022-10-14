@@ -4,6 +4,8 @@ import { QiniuFileFactory } from './file-factory';
 import { IFileEntry } from '../../contract';
 
 export class QiniuFileEntry implements IFileEntry {
+    public static errNotImplemented = new Error('未实现');
+
     public name: string;
 
     public constructor(
@@ -24,5 +26,13 @@ export class QiniuFileEntry implements IFileEntry {
                 s(resInfo.statusCode == 200);
             });
         });
+    }
+
+    public async moveTo() {
+        throw QiniuFileEntry.errNotImplemented;
+    }
+
+    public async remove() {
+        throw QiniuFileEntry.errNotImplemented;
     }
 }

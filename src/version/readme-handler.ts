@@ -1,10 +1,10 @@
 import { HandlerBase } from './handler-base';
-import { IOFileBase } from '../contract';
+import { IFile } from '../contract';
 
 const reg = /version-(\d+\.\d+\.\d+)-green/;
 
 export class ReadmeHandler extends HandlerBase {
-    public constructor(private m_File: IOFileBase, version: string) {
+    public constructor(private m_File: IFile, version: string) {
         super(version);
     }
 

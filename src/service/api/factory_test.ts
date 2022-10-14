@@ -2,12 +2,12 @@ import { notStrictEqual } from 'assert';
 
 import { createApiFactory } from './factory';
 import { Mock } from '../assert';
-import { IODirectoryBase } from '../../contract';
+import { IDirectory } from '../../contract';
 
 describe('src/service/api/factory.ts', () => {
-    describe('.build(endpoint: string, apiName: string): IAPI', () => {
+    describe('.build(endpoint: string, apiName: string)', () => {
         it('不存在', async () => {
-            const mockDir = new Mock<IODirectoryBase>();
+            const mockDir = new Mock<IDirectory>();
 
             mockDir.expectReturn(
                 r => r.findDirectories(),

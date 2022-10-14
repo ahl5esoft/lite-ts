@@ -21,6 +21,21 @@ export class QiniuFile extends QiniuFileEntry implements IFile {
         super(path, fileFactory, bucket);
     }
 
+    public async read() {
+        throw QiniuFileEntry.errNotImplemented;
+        return null;
+    }
+
+    public async readString() {
+        throw QiniuFileEntry.errNotImplemented;
+        return '';
+    }
+
+    public async readYaml() {
+        throw QiniuFileEntry.errNotImplemented;
+        return null;
+    }
+
     public async write(v: any) {
         const name = await this.fileFactory.stringGenerator.generate();
         const ext = extname(this.path);

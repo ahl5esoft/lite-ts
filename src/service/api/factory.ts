@@ -1,7 +1,7 @@
 import Container from 'typedi';
 
 import { CustomError } from '../error';
-import { ApiFactoryBase, IApi, IODirectoryBase } from '../../contract';
+import { ApiFactoryBase, IApi, IDirectory } from '../../contract';
 import { enum_ } from '../../model';
 
 const invalidAPIError = new CustomError(enum_.ErrorCode.api);
@@ -33,20 +33,20 @@ class ApiFactory extends ApiFactoryBase {
     }
 }
 
-export async function createApiFactory(dir: IODirectoryBase) {
+export async function createApiFactory(dir: IDirectory) {
     let apiCtors = {};
     const dirs = await dir.findDirectories();
     for (const r of dirs) {
         const files = await r.findFiles();
-        apiCtors[r.fileEntry.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
-            if (cr.fileEntry.name.includes('_it') || cr.fileEntry.name.includes('_test') || cr.fileEntry.name.includes('.d.ts'))
+        apiCtors[r.name] = files.reduce((memo: { [key: string]: Function; }, cr) => {
+            if (cr.name.includes('_it') || cr.name.includes('_test') || cr.name.includes('.d.ts'))
                 return memo;
 
-            const api = require(cr.fileEntry.path);
+            const api = require(cr.path);
             if (!api.default)
-                throw new Error(`未导出default: ${cr.fileEntry.path}`);
+                throw new Error(`未导出default: ${cr.path}`);
 
-            const name = cr.fileEntry.name.split('.')[0];
+            const name = cr.name.split('.')[0];
             memo[name] = api.default;
             return memo;
         }, {});

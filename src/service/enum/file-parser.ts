@@ -1,66 +1,38 @@
-import { IOFactoryBase, IParser } from '../../contract';
+import { FileFactoryBase, IParser } from '../../contract';
 import { contract } from '../../model';
 
-/**
- * 枚举文件解析器
- */
 export class EnumFileParser implements IParser {
     private m_BoolAttrReg = /^\[([a-zA-Z.]+)\]/;
-    /**
-     * bool特性正则
-     */
     public set boolAttrReg(v: RegExp) {
         this.m_BoolAttrReg = v;
     }
 
     private m_IntAttrReg = /^\[([a-zA-Z.]+)=([0-9_]+)\]/;
-    /**
-     * int特性正则
-     */
     public set intAttrReg(v: RegExp) {
         this.m_IntAttrReg = v;
     }
 
     private m_KeyValueReg = /^\s+(\w+)\s=\s([0-9_]+),?$/;
-    /**
-     * 枚举键值正则
-     */
     public set keyValueReg(v: RegExp) {
         this.m_KeyValueReg = v;
     }
 
     private m_StringAttrReg = /^\[([a-zA-Z.]+)='(\w+)'\]/;
-    /**
-     * string特性正则
-     */
     public set stringAttrReg(v: RegExp) {
         this.m_StringAttrReg = v;
     }
 
     private m_TextReg = /^\s+\*\s+(\[.+\])*(.+)$/;
-    /**
-     * 枚举文本正则
-     */
     public set textReg(v: RegExp) {
         this.m_TextReg = v;
     }
 
-    /**
-     * 构造函数
-     * 
-     * @param m_IOFactory io工厂
-     */
     public constructor(
-        private m_IOFactory: IOFactoryBase
+        private m_FileFactory: FileFactoryBase,
     ) { }
 
-    /**
-     * 解析
-     * 
-     * @param filePath 文件
-     */
     public async parse(filePath: string) {
-        const file = this.m_IOFactory.buildFile(filePath);
+        const file = this.m_FileFactory.buildFile(filePath);
         const content = await file.readString();
         const lines = content.split(/[\r\n]+/g);
         const res: contract.IEnumItem[] = [];
@@ -140,13 +112,6 @@ export class EnumFileParser implements IParser {
         }
     }
 
-    /**
-     * 设置特性
-     * 
-     * @param entry 实体
-     * @param k 键
-     * @param v 值
-     */
     private setAtttr(entry: contract.IEnumItem, k: string, v: any) {
         const keys = k.split('.');
         let temp = entry;
