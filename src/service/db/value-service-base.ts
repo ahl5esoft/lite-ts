@@ -14,28 +14,11 @@ import {
 } from '../../contract';
 import { contract, enum_, global } from '../../model';
 
-/**
- * 数据库数值服务
- */
 export abstract class DbValueServiceBase<
     T extends global.UserValue,
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
-    > extends TargetValueServiceBase<T> {
-    /**
-     * 构造函数
-     * 
-     * @param associateService 关联存储服务
-     * @param dbFactory 数据库工厂
-     * @param stringGenerator 字符串生成器
-     * @param valueInterceptorFactory 数值拦截器工厂
-     * @param tracerSpan 跟踪范围
-     * @param model 数值模型
-     * @param changeModel 数值变更模型
-     * @param logModel 数值日志模型
-     * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间
-     */
+> extends TargetValueServiceBase<T> {
     public constructor(
         protected associateService: IUserAssociateService,
         protected dbFactory: DbFactoryBase,
@@ -83,13 +66,9 @@ export abstract class DbValueServiceBase<
         return res;
     }
 
-    /**
-     * 更新数值
-     * 
-     * @param uow 工作单元
-     * @param values 数值数据
-     */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        this.updateValues = values;
+
         const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('value.update', {
             childOf: this.tracerSpan,
         }) : null;
@@ -171,16 +150,7 @@ export abstract class DbValueServiceBase<
         tracerSpan?.log?.({ values })?.finish?.();
     }
 
-    /**
-     * 创建T
-     */
     protected abstract createEntry(): T;
-    /**
-     * 创建TLog
-     */
     protected abstract createLogEntry(): TLog;
-    /**
-     * 获取并清除变更数据
-     */
     protected abstract findAndClearChangeEntries(): Promise<TChange[]>;
 }

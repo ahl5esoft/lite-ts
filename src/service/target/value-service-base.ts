@@ -8,32 +8,16 @@ import {
 } from '../../contract';
 import { contract, enum_, global } from '../../model';
 
-/**
- * 目标数值服务基类
- */
 export abstract class TargetValueServiceBase<T extends global.UserValue> implements ITargetValueService<T> {
-    /**
-     * 目标数值数据
-     */
+    public updateValues: contract.IValue[];
+
     public abstract get entry(): Promise<T>;
 
-    /**
-     * 构造函数
-     * 
-     * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间
-     */
     public constructor(
         protected enumFactory: EnumFactoryBase,
         protected nowTime: NowTimeBase,
     ) { }
 
-    /**
-     * 验证条件
-     * 
-     * @param uow 工作单元
-     * @param conditions 条件
-     */
     public async checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[][]) {
         if (!conditions?.length)
             return true;
@@ -74,12 +58,6 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
         return false;
     }
 
-    /**
-     * 获取数量
-     * 
-     * @param _ 工作单元(忽略)
-     * @param valueType 数值类型
-     */
     public async getCount(_: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
         entry ??= {
@@ -104,18 +82,6 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
         return entry.values[valueType];
     }
 
-    /**
-     * 更新
-     * 
-     * @param uow 工作单元
-     * @param values 数值数据
-     */
     public abstract update(uow: IUnitOfWork, values: contract.IValue[]): Promise<void>;
-
-    /**
-     * 获取当前时间
-     * 
-     * @param uow 工作单元
-     */
     protected abstract getNow(uow: IUnitOfWork): Promise<number>;
 }
