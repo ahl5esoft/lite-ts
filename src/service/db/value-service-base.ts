@@ -67,7 +67,8 @@ export abstract class DbValueServiceBase<
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        this.updateValues = values;
+        this.updateValues ??= [];
+        this.updateValues.push(...values);
 
         const tracerSpan = this.tracerSpan ? opentracing.globalTracer().startSpan('value.update', {
             childOf: this.tracerSpan,
