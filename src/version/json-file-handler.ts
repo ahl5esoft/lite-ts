@@ -9,7 +9,7 @@ export class JsonFileHandler extends HandlerBase {
         super(version);
     }
 
-    public async handle(): Promise<void> {
+    public async handle() {
         const isExist = await this.m_File.exists();
         if (!isExist)
             return;

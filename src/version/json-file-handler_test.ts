@@ -2,9 +2,9 @@ import { JsonFileHandler } from './json-file-handler';
 import { IFile } from '../contract';
 import { Mock } from '../service';
 
-describe('src/tool/version/json-file-handler.ts', (): void => {
-    describe('.handle(): Promise<void>', (): void => {
-        it('ok', async (): Promise<void> => {
+describe('src/version/json-file-handler.ts', () => {
+    describe('.handle()', () => {
+        it('ok', async () => {
             const mockFile = new Mock<IFile>();
             mockFile.expectReturn(
                 r => r.exists(),

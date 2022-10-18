@@ -1,31 +1,25 @@
 import { IUnitOfWork, IUserRewardService, UserServiceBase, ValueTypeServiceBase } from '../../contract';
 import { contract } from '../../model';
 
-/**
- * 用户奖励服务
- */
 export class DbUserRewardService implements IUserRewardService {
-    /**
-     * 构造函数
-     * 
-     * @param m_UserService 用户服务
-     * @param m_ValueTypeService 数值类型服务
-     */
     public constructor(
         private m_UserService: UserServiceBase,
         private m_ValueTypeService: ValueTypeServiceBase,
     ) { }
 
-    /**
-     * 获取结果
-     * 
-     * @param uow 工作单元
-     * @param rewards 奖励
-     * @param source 来源
-     * @param scene 场景
-     */
     public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
-        const values: contract.IValue[] = [];
+        const res = await this.findResultsWithIndex(uow, rewards, source, scene);
+        return res[0];
+    }
+
+    public async findResultsWithIndex(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
+        const res: {
+            index: number,
+            value: { [valueType: number]: contract.IValue; },
+        } = {
+            index: 0,
+            value: {},
+        };
         const randSeedService = this.m_UserService.getRandSeedService(scene);
         for (const r of rewards) {
             if (!r?.length)
@@ -43,43 +37,71 @@ export class DbUserRewardService implements IUserRewardService {
                     total.toString().length
                 );
                 let rand = seed % total + 1;
-                reward = r.find(cr => {
+                reward = r.find((cr, ci) => {
                     rand -= cr.weight;
-                    return rand <= 0;
+                    if (rand > 0)
+                        return;
+
+                    res.index = ci;
+                    return true;
                 });
             }
 
             const openRewards = await this.findOpenRewards(uow, reward.valueType);
             if (openRewards) {
                 for (let i = 0; i < reward.count; i++) {
-                    const res = await this.findResults(uow, openRewards, source, scene);
-                    values.push(...res);
+                    const resRewards = await this.findResults(uow, openRewards, source, scene);
+                    for (const item of resRewards) {
+                        res.value[item.valueType] ??= {
+                            count: 0,
+                            source: item.source ?? source,
+                            targetNo: item.targetNo,
+                            targetType: item.targetType,
+                            valueType: item.valueType,
+                        };
+                        res.value[item.valueType].count += item.count;
+                    }
                 }
             } else {
-                values.push({
-                    count: reward.count,
+                res.value[reward.valueType] ??= {
+                    count: 0,
                     source: reward.source ?? source,
                     targetNo: reward.targetNo,
                     targetType: reward.targetType,
                     valueType: reward.valueType,
-                });
+                };
+                res.value[reward.valueType].count += reward.count;
             }
         }
-        return values;
+
+        return [
+            Object.values(res.value),
+            res.index
+        ] as [contract.IValue[], number];
     }
 
-    /**
-     * 预览
-     * 
-     * @param uow 工作单元
-     * @param rewardsGroup 奖励组
-     * @param scene 场景
-     */
-    public async preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '') {
+    public async preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][]; }, scene = '') {
+        const res = await this.previewWithIndex(uow, rewardsGroup, scene);
+        return Object.entries(res).reduce((memo, [k, v]) => {
+            memo[k] = v[0];
+            return memo;
+        }, {});
+    }
+
+    public async previewWithIndex(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][]; }, scene = '') {
         let offset = 0;
-        const res = {};
+        const res: {
+            [key: string]: {
+                index: number,
+                value: { [valueType: number]: contract.IValue; },
+            }
+        } = {};
         for (const [k, v] of Object.entries(rewardsGroup)) {
-            const values: contract.IValue[] = [];
+            res[k] = {
+                index: v.length == 1 ? 0 : -1,
+                value: {}
+            };
+
             const randSeedService = this.m_UserService.getRandSeedService(scene);
             let rewardsQueue = [...v];
             while (rewardsQueue.length) {
@@ -98,8 +120,13 @@ export class DbUserRewardService implements IUserRewardService {
                     const seed = await randSeedService.get(uow, len, offset);
                     offset += len;
                     let rand = seed % total + 1;
-                    reward = childRewards.find(r => {
+                    reward = childRewards.find((r, i) => {
                         rand -= r.weight;
+                        if (rand > 0)
+                            return;
+
+                        if (res[k].index == -1)
+                            res[k].index = i;
                         return rand <= 0;
                     });
                 }
@@ -109,32 +136,32 @@ export class DbUserRewardService implements IUserRewardService {
                     for (let i = 0; i < reward.count; i++)
                         rewardsQueue.splice(openRewards.length * i, 0, ...openRewards);
                 } else {
-                    values.push({
-                        count: reward.count,
-                        valueType: reward.valueType
-                    });
+                    res[k].value[reward.valueType] ??= {
+                        count: 0,
+                        valueType: reward.valueType,
+                    };
+                    res[k].value[reward.valueType].count += reward.count;
                 }
             }
-            res[k] = values;
         }
-        return res;
+        return Object.entries(res).reduce((memo, [k, v]) => {
+            memo[k] = [
+                Object.values(v.value),
+                v.index
+            ];
+            return memo;
+        }, {});
     }
 
-    /**
-     * 获取开启奖励
-     * 
-     * @param uow 工作单元
-     * @param valueType 数值
-     */
     private async findOpenRewards(uow: IUnitOfWork, valueType: number) {
-        const allOpenReward = await this.m_ValueTypeService.get<{ [valueType: number]: contract.IReward[][] }>('openRewards');
+        const allOpenReward = await this.m_ValueTypeService.get<{ [valueType: number]: contract.IReward[][]; }>('openRewards');
         if (!allOpenReward[valueType])
             return;
 
         const rewardAddition = await this.m_ValueTypeService.get<{
             [valueType: number]: {
-                [rewardValueType: number]: number
-            }
+                [rewardValueType: number]: number;
+            };
         }>('rewardAddition');
         if (!rewardAddition[valueType])
             return allOpenReward[valueType];

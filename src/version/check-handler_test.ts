@@ -6,13 +6,13 @@ import { CORBase } from '../contract';
 let count = 0;
 
 class NextHandler extends CORBase {
-    public async handle(): Promise<void> {
+    public async handle() {
         count = 100;
     }
 }
 
 describe('src/tool/version/check-handler.ts', () => {
-    describe('.handle(): Promise<void>', () => {
+    describe('.handle()', () => {
         it('无效版本号', async () => {
             const self = new Self('a');
             let err: Error;

@@ -2,9 +2,9 @@ import { ReadmeHandler } from './readme-handler';
 import { IFile } from '../contract';
 import { Mock } from '../service/assert';
 
-describe('src/tool/version/readme-handler.ts', () => {
-    describe('.handle(): Promise<void>', () => {
-        it('ok', async (): Promise<void> => {
+describe('src/version/readme-handler.ts', () => {
+    describe('.handle()', () => {
+        it('ok', async () => {
             const mockFile = new Mock<IFile>();
 
             mockFile.expectReturn(

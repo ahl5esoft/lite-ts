@@ -3,7 +3,9 @@ import { CORBase } from '../contract';
 const reg = /\d+\.\d+\.\d+/;
 
 export class CheckHandler extends CORBase {
-    public constructor(private m_Version: string) {
+    public constructor(
+        private m_Version: string,
+    ) {
         super();
     }
 

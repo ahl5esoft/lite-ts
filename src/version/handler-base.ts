@@ -1,11 +1,13 @@
 import { CORBase } from '../contract';
 
 export abstract class HandlerBase extends CORBase {
-    public constructor(private m_Version: string) {
+    public constructor(
+        private m_Version: string,
+    ) {
         super();
     }
 
-    protected getVersion(version: string): string {
+    protected getVersion(version: string) {
         const parts = this.m_Version.split('.').map(r => {
             return parseInt(r);
         });

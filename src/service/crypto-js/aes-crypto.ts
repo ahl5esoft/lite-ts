@@ -2,17 +2,8 @@ import cryptoJs from 'crypto-js';
 
 import { CryptoBase } from '../../contract';
 
-interface IConfig {
-    iv: cryptoJs.lib.WordArray;
-    key: cryptoJs.lib.WordArray;
-    mode: any;
-    padding: any;
-}
-
 export class CryptoJsAESCrypto extends CryptoBase {
-    public constructor(
-        private m_GetConfigFunc: () => Promise<IConfig>,
-    ) {
+    public constructor(private m_SecretKey: string) {
         super();
     }
 
@@ -22,20 +13,10 @@ export class CryptoJsAESCrypto extends CryptoBase {
     }
 
     public async encrypt(plaintext: string) {
-        const cfg = await this.m_GetConfigFunc();
-        return cryptoJs.AES.encrypt(plaintext, cfg.key, {
-            iv: cfg.iv,
-            mode: cfg.mode,
-            padding: cfg.padding
-        }).toString();
+        return cryptoJs.AES.encrypt(plaintext, this.m_SecretKey).toString();
     }
 
     public async decrypt(cipherText: string) {
-        const cfg = await this.m_GetConfigFunc();
-        return cryptoJs.AES.decrypt(cipherText, cfg.key, {
-            iv: cfg.iv,
-            mode: cfg.mode,
-            padding: cfg.padding
-        }).toString(cryptoJs.enc.Utf8);
+        return cryptoJs.AES.decrypt(cipherText, this.m_SecretKey).toString(cryptoJs.enc.Utf8);
     }
 }

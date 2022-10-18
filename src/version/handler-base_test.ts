@@ -10,8 +10,8 @@ class Handler extends HandlerBase {
     }
 }
 
-describe('src/tool/version/handler-base.ts', () => {
-    describe('getVersion(version: string): string', () => {
+describe('src/version/handler-base.ts', () => {
+    describe('getVersion(version: string)', () => {
         it('最后一位(升级)', async () => {
             const self = new Handler('0.0.1');
             await self.handle();

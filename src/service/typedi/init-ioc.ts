@@ -1,4 +1,3 @@
-import cryptoJs from 'crypto-js';
 import { initTracer, opentracing } from 'jaeger-client';
 import moment from 'moment';
 import { join } from 'path';
@@ -25,7 +24,6 @@ import { SetTimeoutThread } from '../set-timeout';
 import { UserCustomGiftBagService } from '../user';
 import {
     ConfigLoaderBase,
-    CryptoBase,
     DbFactoryBase,
     EnumFactoryBase,
     FileFactoryBase,
@@ -83,27 +81,11 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     ).read<{ version: string }>();
     cfg.version = pkg.version;
 
-    if (cfg.authCrypto) {
-        const aesCfg = {
-            iv: cryptoJs.enc.Utf8.parse(cfg.authCrypto.iv),
-            key: cryptoJs.enc.Utf8.parse(cfg.authCrypto.key),
-            mode: cryptoJs.mode[cfg.authCrypto.mode],
-            padding: cryptoJs.pad[cfg.authCrypto.pad]
-        };
-        const crypto = new CryptoJsAESCrypto(async () => {
-            return aesCfg;
-        });
-        Container.set(enum_.IoC.authCrypto, {
-            compare(plaintext, cipherText) {
-                return crypto.compare(plaintext, cipherText);
-            },
-            decrypt(cipherText) {
-                return crypto.decrypt(cipherText);
-            },
-            encrypt(plaintext) {
-                return crypto.encrypt(plaintext);
-            },
-        } as CryptoBase);
+    if (cfg.authSecretKey) {
+        Container.set(
+            enum_.IoC.authCrypto,
+            new CryptoJsAESCrypto(cfg.authSecretKey),
+        );
     }
 
     if (cfg.cdnUrl) {
