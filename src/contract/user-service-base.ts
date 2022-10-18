@@ -158,13 +158,12 @@ export abstract class UserServiceBase {
     }
 
     /**
-     * 等待锁
+     * 获取等待锁
      * 
-     * @param uow 工作单元
-     * @param scene 场景, 默认空
-     * @param registerUnlock 注册释放锁，默认 true
+     * @param scene 场景值，默认空
+     * @returns 等待锁
      */
-    public async waitLock(uow: IUnitOfWork, scene?: string, registerUnlock: boolean = true) {
+    public async getWaitLock(scene?: string) {
         const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('user.waitLock', {
             childOf: this.parentTracerSpan,
         }) : null;
@@ -183,18 +182,26 @@ export abstract class UserServiceBase {
         }
 
         if (unlock) {
-            if (registerUnlock)
-                uow.registerAfter(unlock);
-
             tracerSpan?.finish?.();
-        }
-        else {
+        } else {
             tracerSpan?.setTag?.(opentracing.Tags.ERROR, true)?.finish?.();
 
             UserServiceBase.errWaitLockFail ??= new Error(`未配置UserServiceBase.errWaitLockFail`);
             throw UserServiceBase.errWaitLockFail;
         }
         return unlock;
+    }
+
+    /**
+     * 等待锁
+     * 
+     * @param uow 工作单元
+     * @param scene 场景, 默认空
+     */
+    public async waitLock(uow: IUnitOfWork, scene?: string) {
+        const unlock = await this.getWaitLock(scene);
+        if (unlock)
+            uow.registerAfter(unlock);
     }
 
     /**

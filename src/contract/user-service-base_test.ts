@@ -91,8 +91,10 @@ describe('src/contract/user-service-base.ts', () => {
 
             await self.waitLock(mockUow.actual, 'test');
         });
+    });
 
-        it('不释放锁', async () => {
+    describe('.getWaitLock(scene?: string)', () => {
+        it('获取等待锁', async () => {
             const mockLock = new Mock<LockBase>();
             const mockThread = new Mock<ThreadBase>();
             const self = new Self(null, null, null, null, mockLock.actual, null, mockThread.actual, null, 'user-id');
@@ -110,9 +112,7 @@ describe('src/contract/user-service-base.ts', () => {
                 unlock
             );
 
-            const mockUow = new Mock<IUnitOfWork>();
-
-            await self.waitLock(mockUow.actual, '', false);
+            await self.getWaitLock();
         });
     });
 });
