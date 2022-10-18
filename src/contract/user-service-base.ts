@@ -61,7 +61,7 @@ export abstract class UserServiceBase {
     /**
      * 随机种子服务
      */
-    private m_RandSeedService: { [scene: string]: IUserRandSeedService } = {};
+    private m_RandSeedService: { [scene: string]: IUserRandSeedService; } = {};
 
     private m_PortraitService: IUserPortraitService;
     /**
@@ -162,8 +162,9 @@ export abstract class UserServiceBase {
      * 
      * @param uow 工作单元
      * @param scene 场景, 默认空
+     * @param registerUnlock 注册释放锁，默认 true
      */
-    public async waitLock(uow: IUnitOfWork, scene?: string) {
+    public async waitLock(uow: IUnitOfWork, scene?: string, registerUnlock: boolean = true) {
         const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('user.waitLock', {
             childOf: this.parentTracerSpan,
         }) : null;
@@ -182,7 +183,8 @@ export abstract class UserServiceBase {
         }
 
         if (unlock) {
-            uow.registerAfter(unlock);
+            if (registerUnlock)
+                uow.registerAfter(unlock);
 
             tracerSpan?.finish?.();
         }
@@ -192,6 +194,7 @@ export abstract class UserServiceBase {
             UserServiceBase.errWaitLockFail ??= new Error(`未配置UserServiceBase.errWaitLockFail`);
             throw UserServiceBase.errWaitLockFail;
         }
+        return unlock;
     }
 
     /**
