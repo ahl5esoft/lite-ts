@@ -92,4 +92,27 @@ describe('src/contract/user-service-base.ts', () => {
             await self.waitLock(mockUow.actual, 'test');
         });
     });
+
+    describe('.getWaitLock(scene?: string)', () => {
+        it('获取等待锁', async () => {
+            const mockLock = new Mock<LockBase>();
+            const mockThread = new Mock<ThreadBase>();
+            const self = new Self(null, null, null, null, mockLock.actual, null, mockThread.actual, null, 'user-id');
+
+            mockLock.expectReturn(
+                r => r.lock('user-id', 10),
+                null
+            );
+
+            mockThread.expected.sleepRange(100, 300);
+
+            const unlock = async () => { };
+            mockLock.expectReturn(
+                r => r.lock('user-id', 10),
+                unlock
+            );
+
+            await self.getWaitLock();
+        });
+    });
 });
