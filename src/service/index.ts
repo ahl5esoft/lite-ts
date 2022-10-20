@@ -1,6 +1,7 @@
 export * from './api';
 export * from './assert';
 export * from './bcryptjs';
+export * from './class-transformer';
 export * from './crypto-js';
 export * from './bent';
 export * from './body-parser';
