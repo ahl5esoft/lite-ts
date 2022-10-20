@@ -5,6 +5,7 @@ export * from './bent';
 export * from './body-parser';
 export * from './cache';
 export * from './child-process';
+export * from './class-transfomer';
 export * from './config';
 export * from './console';
 export * from './cors';
