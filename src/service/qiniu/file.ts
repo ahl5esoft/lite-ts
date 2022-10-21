@@ -13,6 +13,12 @@ const extOfMimeType = {
 };
 
 export class QiniuFile extends QiniuFileEntry implements IFile {
+    private m_Ext: string;
+    public get ext() {
+        this.m_Ext ??= extname(this.path);
+        return this.m_Ext;
+    }
+
     public constructor(
         fileFactory: QiniuFileFactory,
         bucket: string,
