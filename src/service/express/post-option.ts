@@ -12,7 +12,7 @@ export function expressPostOption(
     logFactory: LogFactoryBase,
     routeRule: string,
     getApiFunc: (req: Request) => Promise<IApi>,
-    getAuthDataFunc: (token: string) => Promise<any>,
+    getAuthDataFunc: (req: Request, token: string) => Promise<any>,
 ) {
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
@@ -33,7 +33,7 @@ export function expressPostOption(
             try {
                 const authToken = req.header(enum_.Header.authToken);
                 if (authToken && authCrypto) {
-                    const userAuth = await getAuthDataFunc(authToken);
+                    const userAuth = await getAuthDataFunc(req, authToken);
                     req.headers[enum_.Header.authData] = await authCrypto.encrypt(
                         JSON.stringify(userAuth)
                     );

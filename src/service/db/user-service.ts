@@ -5,7 +5,6 @@ import {
     DbFactoryBase,
     EnumFactoryBase,
     IUserAssociateService,
-    LockBase,
     NowTimeBase,
     RpcBase,
     StringGeneratorBase,
@@ -18,13 +17,7 @@ import {
 } from '../../contract';
 import { enum_, global } from '../../model';
 
-/**
- * 用户服务
- */
 export class DbUserService extends UserServiceBase {
-    /**
-     * 创建目标数值服务函数
-     */
     public static buildTargetValueServiceFunc: (
         enumFactory: EnumFactoryBase,
         rpc: RpcBase,
@@ -33,15 +26,9 @@ export class DbUserService extends UserServiceBase {
         userID: string,
     ) => ValueServiceBase<global.UserTargetValue>;
 
-    /**
-     * 目标数值服务
-     */
     private m_TargetTypeValueService: { [targetType: number]: ValueServiceBase<global.UserTargetValue> } = {};
 
     private m_ValueService: UserValueServiceBase;
-    /**
-     * 用户数值服务
-     */
     public get valueService() {
         this.m_ValueService ??= new DbUserValueService(
             this,
@@ -56,23 +43,6 @@ export class DbUserService extends UserServiceBase {
         return this.m_ValueService;
     }
 
-    /**
-     * 构造函数
-     * 
-     * @param nowTime 当前时间
-     * @param stringGenerator 字符串生成器
-     * @param valueInterceptorFactory 数值拦截器工厂
-     * @param parentTracerSpan 跟踪范围
-     * @param nowValueType 当前时间数值类型
-     * @param associateService 关联存储服务
-     * @param dbFactory 数据库工厂
-     * @param enumFactory 枚举工厂
-     * @param lock 锁
-     * @param rpc 远程过程调用
-     * @param thread 锁
-     * @param valueTypeService 数值类型服务
-     * @param userID 用户ID
-     */
     public constructor(
         protected nowTime: NowTimeBase,
         protected stringGenerator: StringGeneratorBase,
@@ -82,20 +52,14 @@ export class DbUserService extends UserServiceBase {
         associateService: IUserAssociateService,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
-        lock: LockBase,
         rpc: RpcBase,
         thread: ThreadBase,
         valueTypeService: ValueTypeServiceBase,
         userID: string,
     ) {
-        super(associateService, userID, dbFactory, enumFactory, lock, rpc, thread, valueTypeService, parentTracerSpan);
+        super(associateService, userID, dbFactory, enumFactory, rpc, thread, valueTypeService, parentTracerSpan);
     }
 
-    /**
-     * 获取目标数值服务
-     * 
-     * @param targetType 目标类型
-     */
     public async getTargetValueService(targetType: number) {
         if (targetType == 0)
             throw new Error('无法用此方法获取用户数值服务');

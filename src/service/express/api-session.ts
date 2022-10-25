@@ -17,9 +17,11 @@ export class ExpressApiSession<T> implements IApiSession {
     public async initSession(req: Request) {
         const cipherText = req.header(enum_.Header.authData);
         if (cipherText) {
-            const plaintext = await this.authCrypt.decrypt(cipherText);
-            this.authData = JSON.parse(plaintext) as T;
-            return;
+            try {
+                const plaintext = await this.authCrypt.decrypt(cipherText);
+                this.authData = JSON.parse(plaintext) as T;
+                return;
+            } catch { }
         }
 
         throw ExpressApiSession.errAuth;

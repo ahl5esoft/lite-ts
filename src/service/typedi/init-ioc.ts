@@ -18,7 +18,7 @@ import { JaegerClientDbFactory, JaegerClientRedis, JaegerClientRpc } from '../ja
 import { JsYamlConfigLoader } from '../js-yaml';
 import { Log4jsLog } from '../log4js';
 import { MongoConfigCache, MongoDbFactory, MongoEnumCache, MongoStringGenerator } from '../mongo';
-import { RedisLock, RedisNowTime } from '../redis';
+import { RedisMutex, RedisNowTime } from '../redis';
 import { RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
 import { UserCustomGiftBagService } from '../user';
@@ -28,8 +28,8 @@ import {
     EnumFactoryBase,
     FileFactoryBase,
     IUserAssociateService,
-    LockBase,
     LogFactoryBase,
+    MutexBase,
     NowTimeBase,
     RedisBase,
     RpcBase,
@@ -130,6 +130,9 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         );
     }
 
+    const thread = new SetTimeoutThread();
+    Container.set(ThreadBase, thread);
+
     let redis: RedisBase;
     let nowTime: NowTimeBase;
     if (cfg.redis) {
@@ -142,8 +145,8 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         nowTime = new RedisNowTime(redis);
 
         Container.set(
-            LockBase,
-            new RedisLock(redis)
+            MutexBase,
+            new RedisMutex(redis, thread),
         );
     } else {
         nowTime = new DateNowTime();
@@ -194,11 +197,6 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         new MongoStringGenerator()
     );
 
-    Container.set(
-        ThreadBase,
-        new SetTimeoutThread()
-    );
-
     RpcBase.buildErrorFunc = (errCode, data) => new CustomError(errCode, data);
 
     UserServiceBase.buildCustomGiftBagServiceFunc = (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => {
@@ -214,16 +212,12 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         return new DbUserRewardService(userService, valueTypeService);
     };
     DbUserService.buildTargetValueServiceFunc = (enumFactory: EnumFactoryBase, rpc: RpcBase, userService: UserServiceBase, targetTypeData: enum_.TargetTypeData, userID: string) => {
-        return new RpcValueService(
-            rpc,
-            userService,
-            {
-                ...targetTypeData,
-                key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
-            },
-            { userID } as global.UserTargetValue,
-            enumFactory,
-        );
+        return new RpcValueService(rpc, userService, {
+            ...targetTypeData,
+            key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
+        }, {
+            userID
+        } as global.UserTargetValue, enumFactory);
     }
 
     return cfg;
