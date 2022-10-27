@@ -13,7 +13,6 @@ import { RpcBase } from './rpc-base';
 import { ThreadBase } from './thread-base';
 import { UserValueServiceBase } from './user-value-service-base';
 import { ValueServiceBase } from './value-service-base';
-import { ValueTypeServiceBase } from './value-type-service-base';
 import { global } from '../model';
 
 export abstract class UserServiceBase {
@@ -21,7 +20,7 @@ export abstract class UserServiceBase {
     public static buildCustomGiftBagServiceFunc: (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => IUserCustomGiftBagService;
     public static buildPortraitServiceFunc: (rpc: RpcBase, userID: string) => IUserPortraitService;
     public static buildRandServiceFunc: (associateService: IUserAssociateService, scene: string, userID: string, range: [number, number]) => IUserRandSeedService;
-    public static buildRewardServiceFunc: (userService: UserServiceBase, valueTypeService: ValueTypeServiceBase) => IUserRewardService;
+    public static buildRewardServiceFunc: (enumFactory: EnumFactoryBase, userService: UserServiceBase) => IUserRewardService;
     public static buildSecurityServiceFunc: (rpc: RpcBase, userID: string) => IUserSecurityService;
 
     private m_CustomGiftBagService: IUserCustomGiftBagService;
@@ -35,7 +34,7 @@ export abstract class UserServiceBase {
 
     private m_RewardService: IUserRewardService;
     public get rewardService() {
-        this.m_RewardService ??= UserServiceBase.buildRewardServiceFunc(this, this.valueTypeService);
+        this.m_RewardService ??= UserServiceBase.buildRewardServiceFunc(this.enumFactory, this);
         return this.m_RewardService;
     }
 
@@ -54,7 +53,6 @@ export abstract class UserServiceBase {
         protected enumFactory: EnumFactoryBase,
         protected rpc: RpcBase,
         protected thread: ThreadBase,
-        protected valueTypeService: ValueTypeServiceBase,
         protected parentTracerSpan: opentracing.Span,
     ) { }
 
@@ -72,7 +70,11 @@ export abstract class UserServiceBase {
                     id: this.userID
                 }
             });
-            if (!entries.length) {
+            if (entries.length) {
+                for (let i = 1; i < entries.length; i++) {
+                    await db.remove(entries[i])
+                }
+            } else {
                 entries.push({
                     giftBag: {},
                     id: this.userID

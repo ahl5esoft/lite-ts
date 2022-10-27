@@ -2,14 +2,14 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserRewardService as Self } from './user-reward-service';
 import { Mock } from '../assert';
-import { IUnitOfWork, IUserRandSeedService, UserServiceBase, UserValueServiceBase, ValueTypeServiceBase } from '../../contract';
-import { contract } from '../../model';
+import { EnumFactoryBase, IEnum, IUnitOfWork, IUserRandSeedService, UserServiceBase, UserValueServiceBase } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 describe('src/service/db/user-reward-service.ts', () => {
     describe('.findResults(uow: IUnitOfWork, rewards: IRewardData[][], scene?: string)', () => {
         it('固定', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, null);
+            const self = new Self(null, mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -53,7 +53,7 @@ describe('src/service/db/user-reward-service.ts', () => {
 
         it('权重', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, null);
+            const self = new Self(null, mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -96,7 +96,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe('.findResultsWithIndex(uow: IUnitOfWork, rewards: IRewardData[][], scene?: string)', () => {
         it('固定', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, null);
+            const self = new Self(null, mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -143,7 +143,7 @@ describe('src/service/db/user-reward-service.ts', () => {
 
         it('权重', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, null);
+            const self = new Self(null, mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -189,7 +189,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe(`.preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '')`, () => {
         it('ok', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, null);
+            const self = new Self(null, mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -259,7 +259,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe(`.previewWithIndex(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '')`, () => {
         it('ok', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, null);
+            const self = new Self(null, mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -330,15 +330,21 @@ describe('src/service/db/user-reward-service.ts', () => {
 
     describe('.findOpenRewards(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockUserValueService = new Mock<UserValueServiceBase>();
             const mockUserService = new Mock<UserServiceBase>({
                 valueService: mockUserValueService.actual
             });
-            const mockValueTypeService = new Mock<ValueTypeServiceBase>();
-            const self = new Self(mockUserService.actual, mockValueTypeService.actual);
+            const self = new Self(mockEnumFactory.actual, mockUserService.actual);
 
-            mockValueTypeService.expectReturn(
-                r => r.get('openRewards'),
+            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockEnum.actual
+            );
+
+            mockEnum.expectReturn(
+                r => r.getReduce(enum_.ValueTypeOpenRewards),
                 {
                     1: [
                         [{
@@ -354,8 +360,8 @@ describe('src/service/db/user-reward-service.ts', () => {
                 }
             );
 
-            mockValueTypeService.expectReturn(
-                r => r.get('rewardAddition'),
+            mockEnum.expectReturn(
+                r => r.getReduce(enum_.ValueTypeRewardAddition),
                 {
                     1: {
                         3: 6

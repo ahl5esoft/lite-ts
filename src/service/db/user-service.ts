@@ -13,7 +13,6 @@ import {
     UserValueServiceBase,
     ValueInterceptorFactoryBase,
     ValueServiceBase,
-    ValueTypeServiceBase,
 } from '../../contract';
 import { enum_, global } from '../../model';
 
@@ -54,10 +53,9 @@ export class DbUserService extends UserServiceBase {
         enumFactory: EnumFactoryBase,
         rpc: RpcBase,
         thread: ThreadBase,
-        valueTypeService: ValueTypeServiceBase,
         userID: string,
     ) {
-        super(associateService, userID, dbFactory, enumFactory, rpc, thread, valueTypeService, parentTracerSpan);
+        super(associateService, userID, dbFactory, enumFactory, rpc, thread, parentTracerSpan);
     }
 
     public async getTargetValueService(targetType: number) {

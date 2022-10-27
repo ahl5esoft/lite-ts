@@ -1,6 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 
 import { CacheEnum as Self } from './enum';
+import { valueTypeOpenRewardsReduce } from '../value-type';
 import { Mock } from '../assert';
 import { CacheBase } from '../../contract';
 import { enum_ } from '../../model';
@@ -24,7 +25,7 @@ describe('src/service/cache/enum.ts', () => {
     describe('.get(predicate: (data: global.IEnumItemData) => boolean)', () => {
         it('ok', async () => {
             const mockCache = new Mock<CacheBase>();
-            const self = new Self(mockCache.actual, enum_.ValueTypeData.name);
+            const self = new Self(mockCache.actual, enum_.ValueTypeData.name,);
 
             mockCache.expectReturn(
                 r => r.get(enum_.ValueTypeData.name),
@@ -35,6 +36,34 @@ describe('src/service/cache/enum.ts', () => {
                 return r.key == '';
             });
             strictEqual(res, undefined);
+        });
+    });
+
+    describe('.getReduce<TReduce>(typer: new () => TReduce)', () => {
+        it('ok', async () => {
+            const mockCache = new Mock<CacheBase>({
+                updateOn: 11
+            });
+            const self = new Self(mockCache.actual, enum_.ValueTypeData.name, {
+                [enum_.ValueTypeOpenRewards.name]: valueTypeOpenRewardsReduce,
+            });
+
+            mockCache.expectReturn(
+                r => r.get(enum_.ValueTypeData.name),
+                {
+                    1: {
+                        data: {
+                            openRewards: [{}],
+                            value: 1,
+                        } as enum_.ValueTypeData
+                    }
+                }
+            );
+
+            const res = await self.getReduce(enum_.ValueTypeOpenRewards);
+            deepStrictEqual(res, {
+                1: [{}]
+            });
         });
     });
 });

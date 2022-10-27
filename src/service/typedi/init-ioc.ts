@@ -36,7 +36,6 @@ import {
     StringGeneratorBase,
     ThreadBase,
     UserServiceBase,
-    ValueTypeServiceBase
 } from '../../contract';
 import { config, enum_, global } from '../../model';
 
@@ -208,8 +207,8 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     UserServiceBase.buildRandServiceFunc = (associateService: IUserAssociateService, scene: string, userID: string, range: [number, number]) => {
         return new DbUserRandSeedService(associateService, dbFactory, scene, userID, range);
     };
-    UserServiceBase.buildRewardServiceFunc = (userService: UserServiceBase, valueTypeService: ValueTypeServiceBase) => {
-        return new DbUserRewardService(userService, valueTypeService);
+    UserServiceBase.buildRewardServiceFunc = (enumFactory: EnumFactoryBase, userService: UserServiceBase) => {
+        return new DbUserRewardService(enumFactory, userService);
     };
     DbUserService.buildTargetValueServiceFunc = (enumFactory: EnumFactoryBase, rpc: RpcBase, userService: UserServiceBase, targetTypeData: enum_.TargetTypeData, userID: string) => {
         return new RpcValueService(rpc, userService, {

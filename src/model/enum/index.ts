@@ -7,3 +7,5 @@ export * from './log-type';
 export * from './relation-operator';
 export * from './target-type-data';
 export * from './value-type-data';
+export * from './value-type-open-rewards';
+export * from './value-type-reward-addition';

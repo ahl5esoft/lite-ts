@@ -1,10 +1,10 @@
-import { IUnitOfWork, IUserRewardService, UserServiceBase, ValueTypeServiceBase } from '../../contract';
-import { contract } from '../../model';
+import { EnumFactoryBase, IUnitOfWork, IUserRewardService, UserServiceBase } from '../../contract';
+import { contract, enum_ } from '../../model';
 
 export class DbUserRewardService implements IUserRewardService {
     public constructor(
+        private m_EnummFactory: EnumFactoryBase,
         private m_UserService: UserServiceBase,
-        private m_ValueTypeService: ValueTypeServiceBase,
     ) { }
 
     public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
@@ -154,15 +154,12 @@ export class DbUserRewardService implements IUserRewardService {
     }
 
     private async findOpenRewards(uow: IUnitOfWork, valueType: number) {
-        const allOpenReward = await this.m_ValueTypeService.get<{ [valueType: number]: contract.IReward[][]; }>('openRewards');
+        const valueTypeEnum = this.m_EnummFactory.build(enum_.ValueTypeData);
+        const allOpenReward = await valueTypeEnum.getReduce<enum_.ValueTypeOpenRewards>(enum_.ValueTypeOpenRewards);
         if (!allOpenReward[valueType])
             return;
 
-        const rewardAddition = await this.m_ValueTypeService.get<{
-            [valueType: number]: {
-                [rewardValueType: number]: number;
-            };
-        }>('rewardAddition');
+        const rewardAddition = await valueTypeEnum.getReduce<enum_.ValueTypeRewardAddition>(enum_.ValueTypeRewardAddition);
         if (!rewardAddition[valueType])
             return allOpenReward[valueType];
 

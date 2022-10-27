@@ -72,7 +72,11 @@ export class DbUserRandSeedService implements IUserRandSeedService {
             return r.id == this.m_UserID;
         });
         const db = this.m_DbFactory.db(global.UserRandSeed, uow);
-        if (!entries.length) {
+        if (entries.length) {
+            for (let i = 1; i < entries.length; i++) {
+                await db.remove(entries[i]);
+            }
+        } else {
             entries.push({
                 id: this.m_UserID,
                 seed: {}

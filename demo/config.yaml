@@ -1,9 +1,5 @@
 Default:
-  authCrypto:
-    iv: demo-iv-12345678
-    key: demo-key-1234567
-    mode: CBC
-    pad: Pkcs7
+  authSecretKey: demo-key-1234567
   # grpcProtoFilePath: src/rpc.proto
   mongo: mongodb://localhost:27017
   name: lite-ts

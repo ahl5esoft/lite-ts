@@ -51,4 +51,3 @@ export * from './user-service-base';
 export * from './user-value-service-base';
 export * from './value-interceptor-factory-base';
 export * from './value-service-base';
-export * from './value-type-service-base';

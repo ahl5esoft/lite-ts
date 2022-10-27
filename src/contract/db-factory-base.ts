@@ -1,9 +1,6 @@
 import { DbRepositoryBase } from './db-repository-base';
 import { IUnitOfWork } from './i-unit-of-work';
 
-/**
- * 数据库工厂
- */
 export abstract class DbFactoryBase {
     /**
      * 创建表数据仓储

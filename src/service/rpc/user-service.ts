@@ -10,7 +10,6 @@ import {
     ThreadBase,
     UserServiceBase,
     UserValueServiceBase,
-    ValueTypeServiceBase,
 } from '../../contract';
 import { enum_ } from '../../model';
 
@@ -40,11 +39,10 @@ export class RpcUserService extends UserServiceBase {
         enumFactory: EnumFactoryBase,
         rpc: RpcBase,
         thread: ThreadBase,
-        valueTypeService: ValueTypeServiceBase,
         parentTracerSpan: opentracing.Span,
         userID: string,
     ) {
-        super(associateService, userID, dbFactory, enumFactory, rpc, thread, valueTypeService, parentTracerSpan);
+        super(associateService, userID, dbFactory, enumFactory, rpc, thread, parentTracerSpan);
     }
 
     public async getTargetValueService() {
