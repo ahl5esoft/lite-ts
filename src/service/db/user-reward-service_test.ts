@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserRewardService as Self } from './user-reward-service';
 import { Mock } from '../assert';
-import { EnumFactoryBase, IEnum, IUnitOfWork, IUserRandSeedService, UserServiceBase, UserValueServiceBase } from '../../contract';
+import { EnumBase, EnumFactoryBase, IUnitOfWork, IUserRandSeedService, UserServiceBase, UserValueServiceBase } from '../../contract';
 import { contract, enum_ } from '../../model';
 
 describe('src/service/db/user-reward-service.ts', () => {
@@ -337,7 +337,7 @@ describe('src/service/db/user-reward-service.ts', () => {
             });
             const self = new Self(mockEnumFactory.actual, mockUserService.actual);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<EnumBase<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual

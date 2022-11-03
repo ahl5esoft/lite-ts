@@ -5,11 +5,11 @@ import { ValueInterceptorFactory as Self } from './interceptor-factory';
 import { valueInterceptorMetadata } from './interceptor-metadata';
 import { NullValueInterceptor } from './null-interceptor';
 import { Mock } from '../assert';
-import { EnumFactoryBase, IEnum, IValueInterceptor } from '../../contract';
+import { EnumBase, EnumFactoryBase, IValueInterceptor } from '../../contract';
 import { contract, enum_ } from '../../model';
 
-@ValueIntercept((data: enum_.ValueTypeData) => {
-    return data.value == 10;
+@ValueIntercept((entry: enum_.ValueTypeData) => {
+    return entry.value == 10;
 })
 class PredicateValueInterceptor implements IValueInterceptor {
     public async after() { }
@@ -34,10 +34,10 @@ describe('src/service/value/interceptor-factory.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>({
-                items: {
+            const mockEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
+                allItem: {
                     10: {
-                        data: {
+                        entry: {
                             value: 10
                         }
                     }

@@ -17,7 +17,7 @@ export default class EnumApi implements IApi {
     public async call() {
         const res = await this.enumFactory.build(enum_.CityData).items;
         return res.map(r => {
-            return r.data;
+            return r.entry;
         });
     }
 }

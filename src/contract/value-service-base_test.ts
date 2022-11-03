@@ -1,8 +1,8 @@
 import { deepStrictEqual, strictEqual } from 'assert';
 import moment from 'moment';
 
+import { EnumBase } from './enum-base';
 import { EnumFactoryBase } from './enum-factory-base';
-import { IEnum } from './i-enum';
 import { IUnitOfWork } from './i-unit-of-work';
 import { ValueServiceBase } from './value-service-base';
 import { contract, enum_, global } from '../model';
@@ -583,7 +583,7 @@ describe('src/contract/value-service-base.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(0, mockEnumFactory.actual);
 
-            const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {}
             });
             mockEnumFactory.expectReturn(
@@ -599,7 +599,7 @@ describe('src/contract/value-service-base.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(0, mockEnumFactory.actual);
 
-            const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {}
             });
             mockEnumFactory.expectReturn(
@@ -620,10 +620,10 @@ describe('src/contract/value-service-base.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(0, mockEnumFactory.actual);
 
-            const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {
                     1: {
-                        data: {}
+                        entry: {}
                     }
                 }
             });
@@ -647,10 +647,10 @@ describe('src/contract/value-service-base.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(99, mockEnumFactory.actual);
 
-            const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 allItem: {
                     1: {
-                        data: {
+                        entry: {
                             dailyTime: 2
                         }
                     }
@@ -689,10 +689,10 @@ describe('src/contract/value-service-base.ts', () => {
                 mockEnumFactory.actual
             );
 
-            const mockValueTypeEnum = new Mock<IEnum<enum_.ValueTypeData>>({
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 allItem: {
                     1: {
-                        data: {
+                        entry: {
                             dailyTime: 2
                         }
                     }

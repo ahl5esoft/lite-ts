@@ -74,7 +74,7 @@ export class ValueConditionParser implements IParser {
             res[res.length - 1].push({
                 count,
                 op,
-                valueType: enumItem.data.value
+                valueType: enumItem.entry.value
             });
         }
         return res;

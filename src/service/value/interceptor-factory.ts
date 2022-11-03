@@ -41,7 +41,7 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
             const allValueTypeItem = await this.m_EnumFactory.build(enum_.ValueTypeData).allItem;
             if (allValueTypeItem[value.valueType]) {
                 for (const r of valueInterceptorMetadata.predicates) {
-                    const ok = r.predicate(allValueTypeItem[value.valueType].data);
+                    const ok = r.predicate(allValueTypeItem[value.valueType].entry);
                     if (ok)
                         valueInterceptorMetadata.valueType[value.valueType] = r.ctor;
                 }

@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 
 import { ValueConditionParser as Self } from './condition-parser';
 import { Mock, mockAny } from '../assert';
-import { EnumFactoryBase, IEnum } from '../../contract';
+import { EnumBase, EnumFactoryBase } from '../../contract';
 import { enum_ } from '../../model';
 
 describe('src/service/value/condition-parser.ts', () => {
@@ -11,7 +11,7 @@ describe('src/service/value/condition-parser.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<EnumBase<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
@@ -24,7 +24,7 @@ describe('src/service/value/condition-parser.ts', () => {
             mockEnum.expectReturn(
                 r => r.get(mockAny),
                 {
-                    data: itemA
+                    entry: itemA
                 }
             );
 
@@ -42,7 +42,7 @@ describe('src/service/value/condition-parser.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<EnumBase<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
@@ -55,7 +55,7 @@ describe('src/service/value/condition-parser.ts', () => {
             mockEnum.expectReturn(
                 r => r.get(mockAny),
                 {
-                    data: itemA
+                    entry: itemA
                 }
             );
 
@@ -73,7 +73,7 @@ describe('src/service/value/condition-parser.ts', () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual);
 
-            const mockEnum = new Mock<IEnum<enum_.ValueTypeData>>();
+            const mockEnum = new Mock<EnumBase<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(
                 r => r.build(enum_.ValueTypeData),
                 mockEnum.actual
@@ -86,7 +86,7 @@ describe('src/service/value/condition-parser.ts', () => {
             mockEnum.expectReturn(
                 r => r.get(mockAny),
                 {
-                    data: itemA
+                    entry: itemA
                 }
             );
 
@@ -97,7 +97,7 @@ describe('src/service/value/condition-parser.ts', () => {
             mockEnum.expectReturn(
                 r => r.get(mockAny),
                 {
-                    data: itemB
+                    entry: itemB
                 }
             );
 
@@ -108,7 +108,7 @@ describe('src/service/value/condition-parser.ts', () => {
             mockEnum.expectReturn(
                 r => r.get(mockAny),
                 {
-                    data: itemC
+                    entry: itemC
                 }
             );
 
@@ -119,7 +119,7 @@ describe('src/service/value/condition-parser.ts', () => {
             mockEnum.expectReturn(
                 r => r.get(mockAny),
                 {
-                    data: itemD
+                    entry: itemD
                 }
             );
 

@@ -4,7 +4,7 @@ import { contract, enum_ } from '../../model';
 /**
  * 数值数据解析器
  */
-export class ValueDataParser implements IParser {
+export class ValueParser implements IParser {
     /**
      * 构造函数
      * 
@@ -55,7 +55,7 @@ export class ValueDataParser implements IParser {
 
             res.push({
                 count,
-                valueType: enumItem.data.value
+                valueType: enumItem.entry.value
             });
         }
         return res;

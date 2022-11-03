@@ -66,7 +66,7 @@ export class DbUserService extends UserServiceBase {
         if (!allItem[targetType])
             throw new Error(`无效目标类型: ${targetType}`);
 
-        this.m_TargetTypeValueService[targetType] ??= DbUserService.buildTargetValueServiceFunc(this.enumFactory, this.rpc, this, allItem[targetType].data, this.userID);
+        this.m_TargetTypeValueService[targetType] ??= DbUserService.buildTargetValueServiceFunc(this.enumFactory, this.rpc, this, allItem[targetType].entry, this.userID);
         return this.m_TargetTypeValueService[targetType];
     }
 }

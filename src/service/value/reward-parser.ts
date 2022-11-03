@@ -72,7 +72,7 @@ export class ValueRewardParser implements IParser {
 
             res[res.length - 1].push({
                 count,
-                valueType: enumItem.data.value,
+                valueType: enumItem.entry.value,
                 weight: weight
             });
         }

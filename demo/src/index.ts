@@ -23,7 +23,7 @@ import {
     Container.set(
         EnumFactoryBase,
         new service.EnumFactory(null, {
-            [enum_.CityData.name]: new service.CacheEnum(enumCache, enum_.CityData.name)
+            [enum_.CityData.name]: new service.CacheEnum(enumCache, enum_.CityData)
         })
     );
 

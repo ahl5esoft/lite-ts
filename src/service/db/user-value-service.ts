@@ -31,14 +31,14 @@ export class DbUserValueService extends UserValueServiceBase {
             this.m_ParentTracerSpan,
             global.UserValueChange,
             () => {
-                return {
-                    id: this.userService.userID
-                } as global.UserValue;
+                const entry = new global.UserValue();
+                entry.id = this.userService.userID;
+                return entry;
             },
             () => {
-                return {
-                    userID: this.userService.userID
-                } as global.UserValueLog;
+                const entry = new global.UserValueLog();
+                entry.userID = this.userService.userID;
+                return entry;
             },
             r => {
                 return r.userID == this.userService.userID;

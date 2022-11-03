@@ -95,7 +95,7 @@ export class DbValueService<
 
             entry.values[r.valueType] ??= 0;
 
-            if (!allValueTypeItem[r.valueType]?.data.isReplace && r.count == 0)
+            if (!allValueTypeItem[r.valueType]?.entry.isReplace && r.count == 0)
                 continue;
 
             const interceptor = await this.valueInterceptorFactory.build(r);
@@ -113,10 +113,10 @@ export class DbValueService<
             logEntry.valueType = r.valueType;
 
             if (allValueTypeItem[r.valueType]) {
-                if (allValueTypeItem[r.valueType].data.isReplace) {
+                if (allValueTypeItem[r.valueType].entry.isReplace) {
                     entry.values[r.valueType] = r.count;
-                } else if (allValueTypeItem[r.valueType].data.dailyTime > 0) {
-                    const oldUnix = entry.values[allValueTypeItem[r.valueType].data.dailyTime] || 0;
+                } else if (allValueTypeItem[r.valueType].entry.dailyTime > 0) {
+                    const oldUnix = entry.values[allValueTypeItem[r.valueType].entry.dailyTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
                         'day'
@@ -126,7 +126,7 @@ export class DbValueService<
                         logEntry.source += '(每日重置)';
                     }
 
-                    entry.values[allValueTypeItem[r.valueType].data.dailyTime] = nowUnix;
+                    entry.values[allValueTypeItem[r.valueType].entry.dailyTime] = nowUnix;
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;
@@ -135,7 +135,7 @@ export class DbValueService<
                 entry.values[r.valueType] += r.count;
             }
 
-            if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType]?.data.isNegative) {
+            if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType]?.entry.isNegative) {
                 entry.values[r.valueType] = logEntry.oldCount;
                 throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
                     consume: Math.abs(r.count),

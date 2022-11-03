@@ -3,28 +3,28 @@ import { strictEqual } from 'assert';
 import { EnumItem as Self } from './item';
 
 describe('src/service/mongo/enum-item.ts', () => {
-    describe('.encodingKey', () => {
+    describe('.langKey', () => {
         it('ok', () => {
-            const data = {
+            const entry = {
                 key: 'k',
                 value: 1
             };
             const enumName = 'test';
-            const res = new Self(data, enumName, '_').encodingKey;
-            strictEqual(res, `${enumName}_${data.value}`);
+            const res = new Self(entry, enumName, '_').langKey;
+            strictEqual(res, `${enumName}_${entry.value}`);
         });
     });
 
     describe('.getCustomEncodingKey(attr: string)', () => {
         it('ok', () => {
-            const data = {
+            const entry = {
                 key: 'k',
                 value: 1
             };
             const enumName = 'test';
             const attr = 'att';
-            const res = new Self(data, enumName, '_').getCustomEncodingKey(attr);
-            strictEqual(res, `${enumName}_${data.value}_${attr}`);
+            const res = new Self(entry, enumName, '_').getCustomLangKey(attr);
+            strictEqual(res, `${enumName}_${entry.value}_${attr}`);
         });
     });
 });

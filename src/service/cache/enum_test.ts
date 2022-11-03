@@ -10,7 +10,7 @@ describe('src/service/cache/enum.ts', () => {
     describe('.items', () => {
         it('ok', async () => {
             const mockCache = new Mock<CacheBase>();
-            const self = new Self(mockCache.actual, enum_.ValueTypeData.name);
+            const self = new Self(mockCache.actual, enum_.ValueTypeData);
 
             mockCache.expectReturn(
                 r => r.get(enum_.ValueTypeData.name),
@@ -25,7 +25,7 @@ describe('src/service/cache/enum.ts', () => {
     describe('.get(predicate: (data: global.IEnumItemData) => boolean)', () => {
         it('ok', async () => {
             const mockCache = new Mock<CacheBase>();
-            const self = new Self(mockCache.actual, enum_.ValueTypeData.name,);
+            const self = new Self(mockCache.actual, enum_.ValueTypeData);
 
             mockCache.expectReturn(
                 r => r.get(enum_.ValueTypeData.name),
@@ -44,7 +44,7 @@ describe('src/service/cache/enum.ts', () => {
             const mockCache = new Mock<CacheBase>({
                 updateOn: 11
             });
-            const self = new Self(mockCache.actual, enum_.ValueTypeData.name, {
+            const self = new Self(mockCache.actual, enum_.ValueTypeData, {
                 [enum_.ValueTypeOpenRewards.name]: valueTypeOpenRewardsReduce,
             });
 
@@ -52,7 +52,7 @@ describe('src/service/cache/enum.ts', () => {
                 r => r.get(enum_.ValueTypeData.name),
                 {
                     1: {
-                        data: {
+                        entry: {
                             openRewards: [{}],
                             value: 1,
                         } as enum_.ValueTypeData
