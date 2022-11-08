@@ -2,11 +2,11 @@ import { opentracing } from 'jaeger-client';
 
 import { JaegerClientUnitOfWork as Self } from './unit-of-work';
 import { Mock } from '../assert';
-import { UnitOfWorkRepositoryBase } from '../..';
+import { UnitOfWorkRepositoryBase } from '../../contract';
 
 class TestUnitOfWorkModel { }
 
-describe('src/service/jaeger/unit-of-work.ts', () => {
+describe('src/service/jaeger-client/unit-of-work.ts', () => {
     describe('.commit()', () => {
         it('ok', async () => {
             const mockUow = new Mock<UnitOfWorkRepositoryBase>();

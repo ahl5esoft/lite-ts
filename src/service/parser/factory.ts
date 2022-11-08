@@ -1,4 +1,4 @@
-import { IParser, ParserFactoryBase } from '../..';
+import { IParser, ParserFactoryBase } from '../../contract';
 
 export class ParserFactory extends ParserFactoryBase {
     public constructor(

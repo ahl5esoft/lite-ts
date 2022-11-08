@@ -2,7 +2,7 @@ import { deepStrictEqual } from 'assert';
 
 import { DbMultiFactory as Self } from './multi-factory';
 import { Mock } from '../assert';
-import { DbFactoryBase } from '../..';
+import { DbFactoryBase } from '../../contract';
 
 class Test { }
 

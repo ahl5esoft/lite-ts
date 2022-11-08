@@ -2,7 +2,7 @@ import { notStrictEqual } from 'assert';
 
 import { MultiUnitOfWork as Self } from './multi-unit-of-work';
 import { Mock } from '../assert';
-import { IUnitOfWork } from '../..';
+import { IUnitOfWork } from '../../contract';
 
 describe('src/service/db/multi-unit-of-work.ts', () => {
     describe('.commit()', () => {

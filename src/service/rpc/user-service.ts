@@ -13,9 +13,6 @@ import {
 } from '../../contract';
 import { enum_ } from '../../model';
 
-/**
- * 用户服务(远程)
- */
 export class RpcUserService extends UserServiceBase {
     private m_ValueService: UserValueServiceBase;
     public get valueService() {

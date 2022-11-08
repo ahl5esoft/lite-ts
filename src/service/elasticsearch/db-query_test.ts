@@ -70,68 +70,16 @@ describe('src/service/elasticsearch/db-query.ts', () => {
                 refresh: true
             });
 
-            const res = await new Self(pool, TestDbQueryModel).where({
+            const res = await new Self(pool, TestDbQueryModel).count({
                 match: {
                     no: 0
                 }
-            }).count();
+            });
             strictEqual(res, 4);
         });
     });
 
-    describe('.order(...fields: string[])', () => {
-        it('ok', async () => {
-            const self = new Self(null, TestDbQueryModel);
-            self.order('a', 'b');
-            const res = Reflect.get(self, 'm_Sorts');
-            deepStrictEqual(res, [{
-                a: {
-                    order: 'asc'
-                }
-            }, {
-                b: {
-                    order: 'asc'
-                }
-            }]);
-        });
-    });
-
-    describe('.orderByDesc(...fields: string[])', () => {
-        it('ok', async () => {
-            const self = new Self(null, TestDbQueryModel);
-            self.orderByDesc('a', 'b');
-            const res = Reflect.get(self, 'm_Sorts');
-            deepStrictEqual(res, [{
-                a: {
-                    order: 'desc'
-                }
-            }, {
-                b: {
-                    order: 'desc'
-                }
-            }]);
-        });
-    });
-
-    describe('.skip(value: number)', () => {
-        it('ok', async () => {
-            const self = new Self(null, TestDbQueryModel);
-            self.skip(5);
-            const res = Reflect.get(self, 'm_Skip');
-            strictEqual(res, 5);
-        });
-    });
-
-    describe('.take(value: number)', () => {
-        it('ok', async () => {
-            const self = new Self(null, TestDbQueryModel);
-            self.take(15);
-            const res = Reflect.get(self, 'm_Take');
-            strictEqual(res, 15);
-        });
-    });
-
-    describe('.toArray()', () => {
+    describe('.toArray(v?: Partial<IDbQueryOption<any>>)', () => {
         it('ok', async () => {
             const rows = [];
             for (let i = 0; i < 3; i++) {
@@ -179,7 +127,9 @@ describe('src/service/elasticsearch/db-query.ts', () => {
                 refresh: true
             });
 
-            const res = await new Self(pool, TestDbQueryModel).order('no').toArray();
+            const res = await new Self(pool, TestDbQueryModel).toArray({
+                order: ['no']
+            });
             deepStrictEqual(
                 res,
                 [
@@ -212,7 +162,9 @@ describe('src/service/elasticsearch/db-query.ts', () => {
                 refresh: true
             });
 
-            const res = await new Self(pool, TestDbQueryModel).orderByDesc('no').toArray();
+            const res = await new Self(pool, TestDbQueryModel).toArray({
+                orderByDesc: ['no']
+            });
             deepStrictEqual(
                 res,
                 [
@@ -245,7 +197,9 @@ describe('src/service/elasticsearch/db-query.ts', () => {
                 refresh: true
             });
 
-            const res = await new Self(pool, TestDbQueryModel).skip(2).toArray();
+            const res = await new Self(pool, TestDbQueryModel).toArray({
+                skip: 2
+            });
             deepStrictEqual(
                 res,
                 [
@@ -276,7 +230,9 @@ describe('src/service/elasticsearch/db-query.ts', () => {
                 refresh: true
             });
 
-            const res = await new Self(pool, TestDbQueryModel).take(1).toArray();
+            const res = await new Self(pool, TestDbQueryModel).toArray({
+                take: 1
+            });
             deepStrictEqual(
                 res,
                 [
@@ -306,11 +262,13 @@ describe('src/service/elasticsearch/db-query.ts', () => {
                 refresh: true
             });
 
-            const res = await new Self(pool, TestDbQueryModel).where({
-                match: {
-                    no: 1
+            const res = await new Self(pool, TestDbQueryModel).toArray({
+                where: {
+                    match: {
+                        no: 1
+                    }
                 }
-            }).toArray();
+            });
             deepStrictEqual(
                 res,
                 [

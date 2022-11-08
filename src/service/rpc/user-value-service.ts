@@ -27,9 +27,10 @@ export class RpcUserValueService extends UserValueServiceBase {
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         const route = ['', this.m_TargetTypeData.app, RpcUserValueService.updateRoute].join('/')
         if (uow) {
+            this.m_ChangeValues ??= [];
             this.m_ChangeValues.push(...values);
             uow.registerAfter(async () => {
-                await this.m_Rpc.call<void>({
+                await this.m_Rpc.callWithoutThrow<void>({
                     body: {
                         userID: this.userService.userID,
                         values: this.m_ChangeValues

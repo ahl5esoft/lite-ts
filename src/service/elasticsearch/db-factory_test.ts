@@ -3,7 +3,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { ElasticSearchDbFactory as Self } from './db-factory';
 import { ElasticSearchPool } from './pool';
-import { DbFactoryBase } from '../..';
+import { DbFactoryBase } from '../../contract';
 
 class TestDbFactoryModel {
     public id: string;

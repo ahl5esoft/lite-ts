@@ -3,7 +3,7 @@ import moment from 'moment';
 import { join } from 'path';
 import Container from 'typedi';
 
-import { BentConfigLoader, BentRpc } from '../bent';
+import { BentLoadBalanceRpc } from '../bent';
 import { CacheConfigLoader } from '../cache';
 import { ConfigLoadBalance, MultiConfigLoader } from '../config';
 import { ConsoleLog } from '../console';
@@ -12,7 +12,7 @@ import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
 import { CustomError } from '../error';
 import { FsFileFactory } from '../fs';
-import { GrpcJsRpc } from '../grpc-js';
+import { GrpcJsLoadBalanceRpc } from '../grpc-js';
 import { IoredisAdapter } from '../ioredis';
 import { JaegerClientDbFactory, JaegerClientRedis, JaegerClientRpc } from '../jaeger-client';
 import { JsYamlConfigLoader } from '../js-yaml';
@@ -87,12 +87,6 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         );
     }
 
-    if (cfg.cdnUrl) {
-        configLoaders.push(
-            new BentConfigLoader(cfg.cdnUrl)
-        );
-    }
-
     if (cfg.openTracing) {
         cfg.openTracing.config.serviceName = cfg.name;
 
@@ -110,10 +104,10 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         RpcBase,
         new JaegerClientRpc(() => {
             const configLoader = Container.get<ConfigLoaderBase>(ConfigLoaderBase as any);
-            return cfg.grpcProtoFilePath ? new GrpcJsRpc(
+            return cfg.grpcProtoFilePath ? new GrpcJsLoadBalanceRpc(
                 new ConfigLoadBalance(configLoader, 'grpc'),
                 join(__dirname, cfg.grpcProtoFilePath),
-            ) : new BentRpc(
+            ) : new BentLoadBalanceRpc(
                 new ConfigLoadBalance(configLoader, 'http')
             );
         }, null)
