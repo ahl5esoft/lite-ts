@@ -123,6 +123,19 @@ export abstract class DbValueServiceBase<
 
                     entry.values[allValueTypeItem[r.valueType].data.dailyTime] = nowUnix;
                     entry.values[r.valueType] += r.count;
+                } else if (allValueTypeItem[r.valueType].data.time?.valueType > 0) {
+                    const oldUnix = entry.values[allValueTypeItem[r.valueType].data.time.valueType] || 0;
+                    const isSame = moment.unix(nowUnix).isSame(
+                        moment.unix(oldUnix),
+                        allValueTypeItem[allValueTypeItem[r.valueType].data.time.valueType].data.time.momentType
+                    );
+                    if (!isSame) {
+                        entry.values[r.valueType] = 0;
+                        logEntry.source += '(每周期重置)';
+                    }
+
+                    entry.values[allValueTypeItem[r.valueType].data.time.valueType] = nowUnix;
+                    entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;
                 }

@@ -1,3 +1,5 @@
+import { unitOfTime } from 'moment';
+
 import { IEnumItem, IReward } from '../contract';
 
 /**
@@ -117,5 +119,51 @@ export class ValueTypeData implements IEnumItem {
          * 数值类型
          */
         valueType: number;
-    }
+    };
+    /**
+     * 重置数值类型, 值有效的情况下, 目标数值更新时会根据该值对应的目标数值是否与当前时间同一时间周期（momentType）,如果不同日则目标数值会重置为0
+     * 
+     * @example
+     * ```typescript
+     * conts valueTypes: IValueTypeData[] = [{
+     *     value: 1,
+     *     text: '周活跃度',
+     *     time: {
+     *         valueType: 2
+     *     }
+     * }, {
+     *     value: 2,
+     *     text: '周活跃度更新时间',
+     *     time: {
+     *         momentType: 'isoWeek'
+     *     }
+     * }];
+     * 
+     * const valueService: ITargetValueService;
+     * valueService.data = {
+     *      id: '目标ID',
+     *      values: [{
+     *          1: 50,
+     *          2: 周活跃度更新时间的时间戳
+     *      }]
+     *  };
+     * 
+     *  await valueService.update(工作单元, [{
+     *      count: 1,
+     *      valueType: 1
+     *  }]);
+     *  const res = await valueService.getCount(工作单元, 1);
+     *  // res = 当上次更新登录次数的时间戳与本周是同一周则为6 如果不同周则为1
+     * ```
+     */
+    public time?: {
+        /**
+         * 数值类型
+         */
+        valueType?: number;
+        /**
+         * 时间类型
+         */
+        momentType?: unitOfTime.StartOf;
+    };
 }
