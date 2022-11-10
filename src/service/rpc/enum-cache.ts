@@ -45,9 +45,8 @@ export class RpcEnumCache extends EnumCacheBase {
      * 查询
      */
     protected async find() {
-        const resp = await this.m_Rpc.call<global.Enum[]>({
+        return await this.m_Rpc.call<global.Enum[]>({
             route: `/${this.m_App}/find-all-enums`
         });
-        return resp.data;
     }
 }

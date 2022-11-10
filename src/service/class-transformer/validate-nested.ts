@@ -11,6 +11,9 @@ export function ClassTransformerValidateNested(typer: new () => any, validationO
             options: validationOptions,
             validator: {
                 async validate(value: any) {
+                    if (!value)
+                        return false;
+
                     if (!Array.isArray(value))
                         value = [value];
 

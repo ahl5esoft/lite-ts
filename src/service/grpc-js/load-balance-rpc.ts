@@ -9,10 +9,13 @@ export class GrpcJsLoadBalanceRpc extends GrpcJsDelegateRpc {
     ) {
         super(protoFilePath, async v => {
             const routeArgs = v.route.split('/');
+            if (routeArgs.length == 3)
+                routeArgs.splice(0, 2, 'ih');
             return {
-                api: routeArgs.pop(),
+                api: routeArgs[3],
                 app: routeArgs[1],
-                baseUrl: await loadBalance.getUrl(routeArgs[1], v.header?.[enum_.Header.env])
+                baseUrl: await loadBalance.getUrl(routeArgs[1], v.header?.[enum_.Header.env]),
+                endpoint: routeArgs[2],
             }
         });
     }

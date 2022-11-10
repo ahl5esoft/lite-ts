@@ -9,7 +9,7 @@ export abstract class RpcBase {
      * ```typescript
      *  const rpc: RpcBase;
      *  const resp = await rpc.call<T>('/服务名/端/api名');
-     *  // resp is IApiDyanmicResponse<T>, 如果resp.err有效则会抛错
+     *  // res is T, 如果resp.err!=0则会抛错
      * ```
      */
     public async call<T>(v: IRpcCallOption) {
@@ -17,7 +17,7 @@ export abstract class RpcBase {
         if (resp.err)
             throw RpcBase.buildErrorFunc(resp.err, resp.data);
 
-        return resp;
+        return resp.data;
     }
 
     /**

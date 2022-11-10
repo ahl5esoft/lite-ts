@@ -106,7 +106,10 @@ export async function initIoC(globalModel: { [name: string]: any }) {
             const configLoader = Container.get<ConfigLoaderBase>(ConfigLoaderBase as any);
             return cfg.grpcProtoFilePath ? new GrpcJsLoadBalanceRpc(
                 new ConfigLoadBalance(configLoader, 'grpc'),
-                join(__dirname, cfg.grpcProtoFilePath),
+                join(
+                    process.cwd(),
+                    cfg.grpcProtoFilePath,
+                ),
             ) : new BentLoadBalanceRpc(
                 new ConfigLoadBalance(configLoader, 'http')
             );

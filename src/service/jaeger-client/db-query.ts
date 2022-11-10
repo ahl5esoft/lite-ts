@@ -26,7 +26,7 @@ export class JaegerClientDbQuery<T> implements IDbQuery<T> {
                 });
             }
 
-            const res = await this.m_DbQuery.count();
+            const res = await this.m_DbQuery.count(where);
 
             this.m_TracerSpan?.log?.({
                 result: res

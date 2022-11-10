@@ -15,7 +15,7 @@ describe('src/service/mongo/db-query.ts', () => {
         await client.close();
     });
 
-    describe('.count(): Promise<number>', () => {
+    describe('.count()', () => {
         const table = 'test-query-count';
         it('empty', async () => {
             const count = await new Self(pool, table).count();
@@ -37,6 +37,27 @@ describe('src/service/mongo/db-query.ts', () => {
             await collection.deleteMany(null);
 
             strictEqual(count, rows.length);
+        });
+
+        it.only('where', async () => {
+            const rows: any = [{
+                _id: `${table}-1`,
+            }, {
+                _id: `${table}-2`,
+            }];
+            const db = await pool.db;
+            const collection = db.collection(table);
+            await collection.insertMany(rows);
+
+            const count = await new Self(pool, table).count({
+                _id: {
+                    $regex: '1'
+                }
+            });
+
+            await collection.deleteMany(null);
+
+            strictEqual(count, 1);
         });
     });
 

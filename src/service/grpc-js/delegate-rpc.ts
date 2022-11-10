@@ -1,7 +1,6 @@
 import { credentials } from '@grpc/grpc-js';
 
 import { getRpcProto } from './proto';
-import { IGrpcJsRequset } from './request';
 import { IRpcCallOption, RpcBase } from '../../contract';
 import { contract } from '../../model';
 
@@ -9,8 +8,6 @@ export class GrpcJsDelegateRpc extends RpcBase {
     public constructor(
         private m_ProtoFilePath: string,
         private m_GetRequestFunc: (v: IRpcCallOption) => Promise<{
-            api: string;
-            app: string;
             baseUrl: string;
         }>,
     ) {
@@ -26,11 +23,10 @@ export class GrpcJsDelegateRpc extends RpcBase {
                 credentials.createInsecure()
             ).call({
                 json: JSON.stringify({
-                    api: req.api,
-                    app: req.app,
+                    ...req,
                     body: v.body,
                     header: v.header
-                } as IGrpcJsRequset)
+                })
             }, (err: Error, resp: any) => {
                 if (err)
                     return f(err);

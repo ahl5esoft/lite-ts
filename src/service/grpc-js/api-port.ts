@@ -5,24 +5,19 @@ import moment from 'moment';
 
 import { getRpcProto } from './proto';
 import { CustomError } from '../error';
-import { IGrpcJsRequset } from './request';
 import { TracerStrategy } from '../tracer';
 import { ApiFactoryBase, IApiPort } from '../../contract';
 import { contract, enum_ } from '../../model';
 
-/**
- * api端
- */
+interface IRequset {
+    api: string;
+    app: string;
+    endpoint: string;
+    header: { [key: string]: string };
+    body: { [key: string]: any };
+}
+
 export class GrpcJsApiPort implements IApiPort {
-    /**
-     * 构造函数
-     * 
-     * @param m_ApiFactory api工厂
-     * @param m_Port 端口
-     * @param m_Project 项目
-     * @param m_Version 版本
-     * @param m_ProtoFilePath proto文件路径
-     */
     public constructor(
         private m_ApiFactory: ApiFactoryBase,
         private m_Port: number,
@@ -31,9 +26,6 @@ export class GrpcJsApiPort implements IApiPort {
         private m_ProtoFilePath: string,
     ) { }
 
-    /**
-     * 监听
-     */
     public async listen() {
         const server = new Server();
 
@@ -46,18 +38,21 @@ export class GrpcJsApiPort implements IApiPort {
                     err: 0,
                 };
                 try {
-                    const req = JSON.parse(msg.request.json) as IGrpcJsRequset;
+                    const req = JSON.parse(msg.request.json) as IRequset;
                     const tracer = opentracing.globalTracer();
                     const parentSpan = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.header);
-                    tracerSpan = parentSpan ? tracer.startSpan(`/${req.app}/ih/${req.api}`, {
-                        childOf: parentSpan,
-                        tags: {
-                            [opentracing.Tags.SPAN_KIND]: opentracing.Tags.SPAN_KIND_RPC_CLIENT,
-                            [opentracing.Tags.HTTP_METHOD]: 'gRpc',
+                    tracerSpan = tracer.startSpan(
+                        ['', req.app, req.endpoint, req.api].join('/'),
+                        {
+                            childOf: parentSpan,
+                            tags: {
+                                [opentracing.Tags.SPAN_KIND]: opentracing.Tags.SPAN_KIND_RPC_CLIENT,
+                                [opentracing.Tags.HTTP_METHOD]: 'gRpc',
+                            }
                         }
-                    }) : null;
+                    );
 
-                    const api = this.m_ApiFactory.build('ih', req.api);
+                    const api = this.m_ApiFactory.build(req.endpoint, req.api);
                     Object.keys(api).forEach(r => {
                         api[r] = new TracerStrategy(api[r]).withTrace(tracerSpan);
                     });
@@ -91,7 +86,7 @@ export class GrpcJsApiPort implements IApiPort {
                     } else {
                         apiResp.err = enum_.ErrorCode.panic;
 
-                        tracerSpan?.log?.({
+                        tracerSpan.log({
                             err: ex
                         });
                     }
@@ -102,7 +97,7 @@ export class GrpcJsApiPort implements IApiPort {
                         json: JSON.stringify(apiResp)
                     });
 
-                    tracerSpan?.finish?.();
+                    tracerSpan.finish();
                 }
             }
         });

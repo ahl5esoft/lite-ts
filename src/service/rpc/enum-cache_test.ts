@@ -15,17 +15,14 @@ describe('src/service/rpc/enum-cache.ts', () => {
                 r => r.call<global.Enum[]>({
                     route: `/app/find-all-enums`
                 }),
-                {
-                    err: 0,
-                    data: [{
-                        id: 'a',
-                        items: [{
-                            value: 1,
-                        }, {
-                            value: 2
-                        }]
+                [{
+                    id: 'a',
+                    items: [{
+                        value: 1,
+                    }, {
+                        value: 2
                     }]
-                }
+                }]
             );
 
             const fn = Reflect.get(self, 'load').bind(self) as () => Promise<{ [key: string]: any }>;

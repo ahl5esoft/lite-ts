@@ -14,7 +14,7 @@ export default class RpcApi implements IApi {
     public rpc: RpcBase;
 
     public async call() {
-        const resp = await this.rpc.call({
+        const resp = await this.rpc.callWithoutThrow<any>({
             header: {
                 [model.enum_.Header.authData]: decodeURIComponent(
                     JSON.stringify({
