@@ -40,7 +40,7 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
                     case enum_.RelationOperator.ge:
                         return aCount >= bCount;
                     case enum_.RelationOperator.gt:
-                        return aCount > bCount
+                        return aCount > bCount;
                     case enum_.RelationOperator.le:
                         return aCount <= bCount;
                     case enum_.RelationOperator.lt:
@@ -76,6 +76,17 @@ export abstract class TargetValueServiceBase<T extends global.UserValue> impleme
             if (!isSameDay) {
                 entry.values[valueType] = 0;
                 entry.values[allValueTypeItem[valueType].data.dailyTime] = nowUnix;
+            }
+        } else if (allValueTypeItem[valueType]?.data.time?.valueType) {
+            const nowUnix = await this.nowTime.unix();
+            const oldUnix = entry.values[allValueTypeItem[valueType].data.time.valueType] || 0;
+            const isSame = moment.unix(nowUnix).isSame(
+                moment.unix(oldUnix),
+                allValueTypeItem[allValueTypeItem[valueType].data.time.valueType].data.time.momentType
+            );
+            if (!isSame) {
+                entry.values[valueType] = 0;
+                entry.values[allValueTypeItem[valueType].data.time.valueType] = nowUnix;
             }
         }
 
