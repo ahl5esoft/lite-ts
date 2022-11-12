@@ -23,6 +23,10 @@ export class FsDirectory extends FsFileEntryBase implements IDirectory {
         });
     }
 
+    public async read() {
+        return readdir(this.path);
+    }
+
     public async remove() {
         await rm(this.path, {
             force: true,

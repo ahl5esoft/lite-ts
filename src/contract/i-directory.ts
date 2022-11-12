@@ -5,4 +5,5 @@ export interface IDirectory extends IFileEntry {
     create(): Promise<void>;
     findDirectories(): Promise<IDirectory[]>;
     findFiles(): Promise<IFile[]>;
+    read(): Promise<string[]>;
 }

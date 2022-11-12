@@ -1,4 +1,4 @@
-import { ok, strictEqual } from 'assert';
+import { deepStrictEqual, ok, strictEqual } from 'assert';
 import { existsSync } from 'fs';
 import { mkdir, rm, rmdir, writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -68,6 +68,28 @@ describe('src/service/fs/directory.ts', () => {
                 force: true,
                 recursive: true,
             });
+        });
+    });
+
+    describe('.read()', () => {
+        it('ok', async () => {
+            const dirname = 'read-it';
+            await mkdir(dirname);
+            await mkdir(
+                join(dirname, 'a')
+            );
+            await writeFile(
+                join(dirname, 'b.txt'),
+                'test'
+            );
+
+            const res = await new Self(dirname).read();
+            await rm(dirname, {
+                force: true,
+                recursive: true,
+            });
+
+            deepStrictEqual(res, ['a', 'b.txt']);
         });
     });
 

@@ -31,7 +31,6 @@ export class Ssh2Directory extends Ssh2FileEntryBase implements IDirectory {
 
     public async moveTo(v: IFileEntryMoveToOption) {
         if (v.isLocal) {
-            console.log(v.paths)
             await this.fileFactory.fsFileFactory.buildDirectory(...v.paths).create();
             await this.scan<void>(async (stats, path) => {
                 const fileEntry = stats.isDirectory() ? new Ssh2Directory(this.fileFactory, path) : new Ssh2File(this.fileFactory, path);
@@ -44,6 +43,11 @@ export class Ssh2Directory extends Ssh2FileEntryBase implements IDirectory {
         } else {
             throw new Error(`${this.constructor.name}.moveTo: 暂不支持isLocal=false`);
         }
+    }
+
+    public async read() {
+        const entries = await this.fileFactory.invokeSftp<FileEntry[]>(r => r.readdir, this.path);
+        return entries.map(r => r.filename);
     }
 
     public async remove() {

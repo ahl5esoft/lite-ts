@@ -54,6 +54,23 @@ describe('src/service/ssh2/directory.ts', () => {
         });
     });
 
+    describe('.read()', () => {
+        it('ok', async () => {
+            const path = '/mnt/fengling/devops/read-it';
+            await fileFactory.invokeSftp<void>(r => r.mkdir, path);
+            await fileFactory.invokeSftp<void>(r => r.mkdir, `${path}/a`);
+            await fileFactory.invokeSftp<void>(r => r.writeFile, `${path}/b.txt`, 'is b');
+
+            const res = await fileFactory.buildDirectory(path).read();
+
+            await fileFactory.invokeSftp<void>(r => r.unlink, `${path}/b.txt`);
+            await fileFactory.invokeSftp<void>(r => r.rmdir, `${path}/a`);
+            await fileFactory.invokeSftp<void>(r => r.rmdir, path);
+
+            deepStrictEqual(res, ['a', 'b.txt']);
+        });
+    });
+
     describe('.moveTo(v: IFileEntryMoveToOption)', () => {
         it('isLocal = true', async () => {
             const remoteDir = '/mnt/fengling/devops/dir-move-to-it';
