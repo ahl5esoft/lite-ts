@@ -1,7 +1,7 @@
 import * as qiniu from 'qiniu';
 
 import { QiniuFile } from './file';
-import { FileFactoryBase, StringGeneratorBase } from '../../contract';
+import { FileFactoryBase } from '../../contract';
 import { config } from '../../model';
 
 export class QiniuFileFactory extends FileFactoryBase {
@@ -75,7 +75,6 @@ export class QiniuFileFactory extends FileFactoryBase {
     }
 
     public constructor(
-        public stringGenerator: StringGeneratorBase,
         private m_GetConfigFunc: () => Promise<config.Qiniu>,
     ) {
         super();

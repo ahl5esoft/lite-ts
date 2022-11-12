@@ -1,6 +1,4 @@
-import { existsSync } from 'fs';
-import { unlink, writeFile } from 'fs/promises';
-import { extname, join } from 'path';
+import { extname } from 'path';
 import * as qiniu from 'qiniu';
 
 import { QiniuFileEntry } from './file-entry';
@@ -43,34 +41,21 @@ export class QiniuFile extends QiniuFileEntry implements IFile {
     }
 
     public async write(v: any) {
-        const name = await this.fileFactory.stringGenerator.generate();
         const ext = extname(this.path);
-        const tempPath = join(__dirname, name + ext);
-        try {
-            if (typeof v == 'string')
-                await writeFile(tempPath, v);
+        const uploader = await this.fileFactory.formUploader;
+        const token = await this.fileFactory.getToken(this.bucket, this.path);
+        const putExtra = new qiniu.form_up.PutExtra();
+        putExtra.mimeType = extOfMimeType[ext];
+        await new Promise<void>((s, f) => {
+            uploader.put(token, this.path, v, putExtra, (err, _, resInfo) => {
+                if (err)
+                    return f(err);
 
-            const isExist = existsSync(tempPath);
-            if (!isExist)
-                return;
+                if (resInfo.statusCode != 200)
+                    return f(`上传七牛失败: ${this.bucket}, ${this.path}`);
 
-            const uploader = await this.fileFactory.formUploader;
-            const token = await this.fileFactory.getToken(this.bucket, this.path);
-            const putExtra = new qiniu.form_up.PutExtra();
-            putExtra.mimeType = extOfMimeType[ext];
-            await new Promise<void>((s, f) => {
-                uploader.putFile(token, this.path, tempPath, putExtra, (err, _, resInfo) => {
-                    if (err)
-                        return f(err);
-
-                    if (resInfo.statusCode != 200)
-                        return f(`上传七牛失败: ${this.bucket}, ${this.path}`);
-
-                    s();
-                });
+                s();
             });
-        } finally {
-            await unlink(tempPath);
-        }
+        });
     }
 }

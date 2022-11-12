@@ -2,12 +2,16 @@ import { deepStrictEqual } from 'assert';
 
 import { MongoEnumCache as Self } from './enum-cache';
 import { Mock } from '../assert';
-import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../../contract';
+import { DbFactoryBase, DbRepositoryBase, EnumCacheBase, IDbQuery } from '../../contract';
 import { contract, global } from '../../model';
 
 describe('src/service/mongo/enum-cache.ts', () => {
     describe('.load()', () => {
         it('ok', async () => {
+            EnumCacheBase.buildItemFunc = () => {
+                return null;
+            }
+
             const mockDbFactory = new Mock<DbFactoryBase>();
             const self = new Self(mockDbFactory.actual, global.Enum, null, '', '-');
 

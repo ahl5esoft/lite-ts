@@ -21,6 +21,7 @@
 		"qiniu": "^7.7.0",
 		"reflect-metadata": "^0.1.13",
 		"sequelize": "^6.16.2",
+		"ssh2": "^1.11.0",
 		"typedi": "^0.8.0"
 	},
 	"description": "基础库(typescript)",
@@ -37,6 +38,7 @@
 		"@types/mocha": "^8.2.2",
 		"@types/mongodb": "^3.6.17",
 		"@types/node": "^17.0.21",
+		"@types/ssh2": "^1.11.6",
 		"@types/supertest": "^2.0.11",
 		"supertest": "^6.1.6",
 		"ts-node": "^9.1.1",
@@ -61,5 +63,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "15.213.68"
+	"version": "15.215.68"
 }

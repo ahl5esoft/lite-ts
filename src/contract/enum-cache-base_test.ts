@@ -1,7 +1,7 @@
-import { deepStrictEqual } from 'assert';
+import { deepStrictEqual, strictEqual } from 'assert';
 
-import { EnumCacheBase } from './cache-base';
-import { global } from '../../model';
+import { EnumCacheBase } from './enum-cache-base';
+import { global } from '../model';
 
 class Self extends EnumCacheBase {
     public constructor(
@@ -19,9 +19,24 @@ class Self extends EnumCacheBase {
     }
 }
 
-describe('src/service/enum/data-source-base.ts', () => {
+describe('src/contract/enum-cache-base.ts', () => {
     describe('.findEnums()', () => {
         it('ok', async () => {
+            const arg3Expects = [{
+                value: 1,
+            }, {
+                value: 2
+            }];
+            EnumCacheBase.buildItemFunc = (arg1: string, arg2: string, arg3: any) => {
+                strictEqual(arg1, 'a');
+                strictEqual(arg2, '-');
+                deepStrictEqual(
+                    arg3,
+                    arg3Expects.shift()
+                );
+                return null;
+            };
+
             const self = new Self([{
                 id: 'a',
                 items: [{

@@ -2,12 +2,16 @@ import { deepStrictEqual } from 'assert';
 
 import { RpcEnumCache as Self } from './enum-cache';
 import { Mock } from '../assert';
-import { RpcBase } from '../../contract';
+import { EnumCacheBase, RpcBase } from '../../contract';
 import { global } from '../../model';
 
 describe('src/service/rpc/enum-cache.ts', () => {
     describe('.load()', () => {
         it('ok', async () => {
+            EnumCacheBase.buildItemFunc = () => {
+                return null;
+            };
+
             const mockRpc = new Mock<RpcBase>();
             const self = new Self(mockRpc.actual, 'app', null, '', '');
 

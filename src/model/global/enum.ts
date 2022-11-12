@@ -1,14 +1,6 @@
-/**
- * 枚举模型
- */
-export class Enum {
-    /**
-     * 标识, 枚举名
-     */
-    public id: string;
+import { IEnumItem } from '../contract';
 
-    /**
-     * 枚举项数组
-     */
-    public items: any[];
+export class Enum {
+    public id: string;
+    public items: IEnumItem[];
 }

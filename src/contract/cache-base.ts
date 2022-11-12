@@ -2,7 +2,6 @@ import { RedisBase } from './redis-base';
 
 export abstract class CacheBase {
     private m_NextCheckOn = 0;
-    private m_Now = Date.now();
     private m_Value: { [key: string]: any };
 
     public updateOn = 0;
@@ -13,7 +12,7 @@ export abstract class CacheBase {
     ) { }
 
     public async flush() {
-        this.m_NextCheckOn = Date.now();
+        this.m_NextCheckOn = 0;
         await this.redis.hset(
             'cache',
             this.cacheKey,
@@ -24,16 +23,16 @@ export abstract class CacheBase {
     public async get<T>(key: string) {
         const now = Date.now();
         if (this.m_NextCheckOn < now) {
+            this.m_NextCheckOn = now + 5_000 + Math.floor(
+                Math.random() * 55_000
+            );
+
             const value = await this.redis.hget('cache', this.cacheKey);
-            const lastCacheOn = parseInt(value) || this.m_Now;
+            const lastCacheOn = parseInt(value) || now;
             if (this.updateOn != lastCacheOn) {
                 this.m_Value = await this.load();
                 this.updateOn = lastCacheOn;
             }
-
-            this.m_NextCheckOn = now + 5_000 + Math.floor(
-                Math.random() * 55_000
-            );
         }
 
         return this.m_Value[key] as T;

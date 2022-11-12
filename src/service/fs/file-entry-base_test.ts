@@ -20,7 +20,9 @@ describe('src/service/fs/file-entry-base.ts', () => {
             );
 
             const dstDirname = 'dir-move-to-dst';
-            await new Self(srcDirname).moveTo(dstDirname);
+            await new Self(srcDirname).moveTo({
+                paths: [dstDirname]
+            });
 
             strictEqual(
                 existsSync(srcDirname),
@@ -42,7 +44,9 @@ describe('src/service/fs/file-entry-base.ts', () => {
             await writeFile(srcFilename, 'src');
 
             const dstFilename = 'file-move-to-dst';
-            await new Self(srcFilename).moveTo(dstFilename);
+            await new Self(srcFilename).moveTo({
+                paths: [dstFilename]
+            });
 
             strictEqual(
                 existsSync(srcFilename),

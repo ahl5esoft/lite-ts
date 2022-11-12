@@ -2,7 +2,7 @@ import { existsSync } from 'fs';
 import { rename } from 'fs/promises';
 import { basename, join } from 'path';
 
-import { IFileEntry } from '../../contract';
+import { IFileEntry, IFileEntryMoveToOption } from '../../contract';
 
 export abstract class FsFileEntryBase implements IFileEntry {
     public name: string;
@@ -17,10 +17,10 @@ export abstract class FsFileEntryBase implements IFileEntry {
         return existsSync(this.path);
     }
 
-    public async moveTo(...paths: string[]) {
+    public async moveTo(v: IFileEntryMoveToOption) {
         await rename(
             this.path,
-            join(...paths)
+            join(...v.paths),
         );
     }
 
