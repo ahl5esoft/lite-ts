@@ -21,7 +21,7 @@ describe('src/service/ssh2/file-entry-base.ts', () => {
             const path = '/mnt/fengling/devops/exists-dir-it';
             await fileFactory.invokeSftp<void>(r => r.mkdir, path);
 
-            const self = new Self(path, fileFactory);
+            const self = new Self(fileFactory, path);
             let res = await self.exists();
             strictEqual(res, true);
 
@@ -35,7 +35,7 @@ describe('src/service/ssh2/file-entry-base.ts', () => {
             const path = '/mnt/fengling/devops/exists-file-it';
             await fileFactory.invokeSftp<void>(r => r.writeFile, path, 'it');
 
-            const self = new Self(path, fileFactory);
+            const self = new Self(fileFactory, path);
             let res = await self.exists();
             strictEqual(res, true);
 

@@ -21,7 +21,6 @@ export * from './i-directory';
 export * from './i-enum-item';
 export * from './i-file';
 export * from './i-file-entry';
-export * from './i-file-entry-move-to-option';
 export * from './i-log';
 export * from './i-parser';
 export * from './i-rpc-call-option';

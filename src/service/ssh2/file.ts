@@ -2,30 +2,30 @@ import { extname } from 'path';
 
 import { Ssh2FileEntryBase } from './file-entry-base';
 import { Ssh2FileFactory } from './file-factory';
-import { IFile, IFileEntryMoveToOption } from '../../contract';
+import { IFile } from '../../contract';
 
 export class Ssh2File extends Ssh2FileEntryBase implements IFile {
     public ext: string;
 
     public constructor(
-        fileFactory: Ssh2FileFactory,
+        factory: Ssh2FileFactory,
         path: string,
     ) {
-        super(path, fileFactory);
+        super(factory, path);
 
         this.ext = extname(this.path);
     }
 
-    public async moveTo(v: IFileEntryMoveToOption) {
-        if (v.isLocal) {
-            await this.fileFactory.invokeSftp<void>(
+    public async moveTo(v: any) {
+        if (v.constructor.name == 'FsFile') {
+            await this.factory.invokeSftp<void>(
                 r => r.fastGet,
                 this.path,
-                this.fileFactory.fsFileFactory.buildFile(...v.paths).path,
+                (v as IFile).path,
             );
             await this.remove();
         } else {
-            throw new Error(`${this.constructor.name}.moveTo: 暂不支持isLocal=false`);
+            throw new Error(`${this.constructor.name}.moveTo: 暂不支持`);
         }
     }
 
@@ -50,7 +50,7 @@ export class Ssh2File extends Ssh2FileEntryBase implements IFile {
     }
 
     public remove() {
-        return this.fileFactory.invokeSftp<void>(r => r.unlink, this.path);
+        return this.factory.invokeSftp<void>(r => r.unlink, this.path);
     }
 
     public async write() {

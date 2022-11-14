@@ -1,8 +1,9 @@
 import { strictEqual } from 'assert';
-import { readFile, unlink } from 'fs/promises';
+import { readFile } from 'fs/promises';
 
 import { Ssh2FileFactory } from './file-factory';
 import { FsFileFactory } from '../fs';
+import { FsFile } from '../fs/file';
 
 const fsFileFileFactory = new FsFileFactory();
 const fileFactory = new Ssh2FileFactory(fsFileFileFactory, {
@@ -11,22 +12,19 @@ const fileFactory = new Ssh2FileFactory(fsFileFileFactory, {
 });
 
 describe('src/service/ssh2/file.ts', () => {
-    describe('.moveTo(v: IFileEntryMoveToOption)', () => {
-        it('isLocal = true', async () => {
-            const filename = 'move-to_it.json';
-            await fileFactory.invokeSftp<void>(r => r.writeFile, `/mnt/fengling/devops/${filename}`, 'test');
+    describe('.moveTo(v: any)', () => {
+        it.only(FsFile.name, async () => {
+            const file = fsFileFileFactory.buildFile('move-to-it.json');
+            await fileFactory.invokeSftp<void>(r => r.writeFile, `/mnt/fengling/devops/${file.name}`, 'test');
 
-            const self = fileFactory.buildFile(`/mnt/fengling/devops/${filename}`);
-            await self.moveTo({
-                isLocal: true,
-                paths: [filename],
-            });
+            const self = fileFactory.buildFile(`/mnt/fengling/devops/${file.name}`);
+            await self.moveTo(file);
 
-            const res = await readFile(filename, 'utf-8');
-            await unlink(filename);
+            const res = await readFile(file.name, 'utf-8');
+            await file.remove();
             strictEqual(res, 'test');
 
-            const isExist = await fileFactory.invokeSftp<boolean>(r => r.exists, `/mnt/fengling/devops/${filename}`);
+            const isExist = await fileFactory.invokeSftp<boolean>(r => r.exists, `/mnt/fengling/devops/${file.name}`);
             strictEqual(isExist, false);
         });
     });

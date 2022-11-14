@@ -1,5 +1,6 @@
 import * as qiniu from 'qiniu';
 
+import { QiniuDirectory } from './directory';
 import { QiniuFile } from './file';
 import { FileFactoryBase } from '../../contract';
 import { config } from '../../model';
@@ -81,19 +82,11 @@ export class QiniuFileFactory extends FileFactoryBase {
     }
 
     public buildFile(...paths: string[]) {
-        if (paths.length == 1)
-            paths = paths[0].split('/');
-
-        const bucket = paths.shift();
-        return new QiniuFile(
-            this,
-            bucket,
-            paths.join('/'),
-        );
+        return new QiniuFile(this, paths);
     }
 
-    public buildDirectory() {
-        return null;
+    public buildDirectory(...paths: string[]) {
+        return new QiniuDirectory(this, paths);
     }
 
     public async getToken(bucket: string, filePath: string) {

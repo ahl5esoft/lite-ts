@@ -10,8 +10,8 @@ class Self extends FsFileEntryBase {
 }
 
 describe('src/service/fs/file-entry-base.ts', () => {
-    describe('.moveTo(...paths: string[])', () => {
-        it('dir', async () => {
+    describe('.moveTo(v: any)', () => {
+        it('dir: string[]', async () => {
             const srcDirname = 'dir-move-to-src';
             await mkdir(srcDirname);
             await writeFile(
@@ -20,9 +20,7 @@ describe('src/service/fs/file-entry-base.ts', () => {
             );
 
             const dstDirname = 'dir-move-to-dst';
-            await new Self(srcDirname).moveTo({
-                paths: [dstDirname]
-            });
+            await new Self(null, srcDirname).moveTo([dstDirname]);
 
             strictEqual(
                 existsSync(srcDirname),
@@ -39,14 +37,12 @@ describe('src/service/fs/file-entry-base.ts', () => {
             });
         });
 
-        it('file', async () => {
+        it('file: string[]', async () => {
             const srcFilename = 'file-move-to-src';
             await writeFile(srcFilename, 'src');
 
             const dstFilename = 'file-move-to-dst';
-            await new Self(srcFilename).moveTo({
-                paths: [dstFilename]
-            });
+            await new Self(null, srcFilename).moveTo([dstFilename]);
 
             strictEqual(
                 existsSync(srcFilename),
