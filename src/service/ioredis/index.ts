@@ -159,4 +159,80 @@ export class IoredisAdapter extends RedisBase {
     public async ttl(key: string) {
         return this.client.ttl(key);
     }
+
+    public async zadd(key: string,member:string[]) {
+        return this.client.zadd(key,member);
+    }
+
+    public async zcard(key: string) {
+        return this.client.zcard(key);
+    }
+
+    public async zcount(key: string,min:number,max:number) {
+        return this.client.zcount(key,min,max);
+    }
+
+    public async zincrby(key: string,increment: number, member: string) {
+        return this.client.zincrby(key,increment,member);
+    }
+
+    public async zinterstore(key: string, ...args: string[]) {
+        return this.client.zinterstore(key,...args);
+    }
+
+    public async zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
+        return this.client.zrange(key,start,stop,withScores);
+    }
+
+    public async zrangebylex(
+        key: string,
+        min: string,
+        max: string,
+        limit: 'LIMIT',
+        offset: number,
+        count: number,) {
+        return this.client.zrangebylex(key,min,max,limit,offset,count);
+    }
+
+    public async zrangebyscore(
+        key: string,
+        min: string,
+        max: string,
+        limit: 'LIMIT',
+        offset: number,
+        count: number,) {
+        return this.client.zrangebyscore(key,min,max,limit,offset,count);
+    }
+
+    public async zrank(key: string, member:string) {
+        return this.client.zrank(key,member);
+    }
+
+    public async zrem(key: string,...args: string[]) {
+        return this.client.zrem(key,args);
+    }
+
+    public async zremrangebyrank(key: string,start: number, stop: number) {
+        return this.client.zremrangebyrank(key,start,stop);
+    }
+
+    public async zremrangebyscore(key: string,min: number, max: number) {
+        return this.client.zremrangebyscore(key,min,max);
+    }
+
+    public async zrevrange(key: string,start: number, stop: number, withScores?: "WITHSCORES") {
+        return this.client.zrevrange(key,start,stop,withScores);
+    }
+
+    public async zrevrank(key: string,menber:string) {
+        return this.client.zrevrank(key,menber);
+    }
+
+    public async zscore(key: string,menber:string) {
+        return this.client.zscore(key,menber);
+    }
+
+    public async zunionstore(key: string,...args: string[]) {
+        return this.client.zunionstore(key,args);
+    }
 }
