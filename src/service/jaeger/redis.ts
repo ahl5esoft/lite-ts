@@ -206,10 +206,10 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         return this.m_Redis.ttl(key);
     }
 
-    public async zadd(key: string,member:string[]) {
+    public async zadd(key: string, member: string[]) {
         return await this.exec('zadd', [key, member], {
-           key,
-           member
+            key,
+            member
         });
     }
 
@@ -217,32 +217,32 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         return this.m_Redis.zcard(key)
     }
 
-    public async zcount(key: string,min:number,max:number) {
-        return this.m_Redis.zcount(key,min,max)
+    public async zcount(key: string, min: number, max: number) {
+        return this.m_Redis.zcount(key, min, max)
     }
 
-    public async zincrby(key: string,increment: number, member: string) {
-        return await this.exec('zincrby', [key,increment, member], {
+    public async zincrby(key: string, increment: number, member: string) {
+        return await this.exec('zincrby', [key, increment, member], {
             key,
             increment,
             member
-         });
+        });
     }
 
     public async zinterstore(key: string, ...args: string[]) {
-        return await this.exec('zinterstore', [key,args], {
+        return await this.exec('zinterstore', [key, args], {
             key,
             args
-         });
+        });
     }
 
     public async zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
-        return await this.exec('zrange', [key,start,stop,withScores], {
+        return await this.exec('zrange', [key, start, stop, withScores], {
             key,
             start,
             stop,
             withScores
-         });
+        });
     }
 
     public async zrangebylex(
@@ -252,14 +252,14 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         limit: 'LIMIT',
         offset: number,
         count: number,) {
-            return await this.exec('zrangebylex', [key,min,max,limit,offset,count], {
-                key,
-                min,
-                max,
-                limit,
-                offset,
-                count
-             });
+        return await this.exec('zrangebylex', [key, min, max, limit, offset, count], {
+            key,
+            min,
+            max,
+            limit,
+            offset,
+            count
+        });
     }
 
     public async zrangebyscore(
@@ -269,60 +269,60 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         limit: 'LIMIT',
         offset: number,
         count: number,) {
-            return await this.exec('zrangebyscore', [key,min,max,limit,offset,count], {
-                key,
-                min,
-                max,
-                limit,
-                offset,
-                count
-             });
+        return await this.exec('zrangebyscore', [key, min, max, limit, offset, count], {
+            key,
+            min,
+            max,
+            limit,
+            offset,
+            count
+        });
     }
 
-    public async zrank(key: string, member:string) {
-        return this.m_Redis.zrank(key,member);
+    public async zrank(key: string, member: string) {
+        return this.m_Redis.zrank(key, member);
     }
 
-    public async zrem(key: string,...args: string[]) {
-        return this.m_Redis.zrem(key,args);
+    public async zrem(key: string, ...args: string[]) {
+        return this.m_Redis.zrem(key, args);
     }
 
-    public async zremrangebyrank(key: string,start: number, stop: number) {
-        return this.m_Redis.zremrangebyrank(key,start,stop);
+    public async zremrangebyrank(key: string, start: number, stop: number) {
+        return this.m_Redis.zremrangebyrank(key, start, stop);
     }
 
-    public async zremrangebyscore(key: string,min: number, max: number) {
-        return this.m_Redis.zremrangebyscore(key,min,max);
+    public async zremrangebyscore(key: string, min: number, max: number) {
+        return this.m_Redis.zremrangebyscore(key, min, max);
     }
 
-    public async zrevrange(key: string,start: number, stop: number, withScores?: "WITHSCORES") {
-        return await this.exec('zrevrange', [key,start,stop,withScores], {
+    public async zrevrange(key: string, start: number, stop: number, withScores?: "WITHSCORES") {
+        return await this.exec('zrevrange', [key, start, stop, withScores], {
             key,
             start,
             stop,
             withScores
-         });
+        });
     }
 
-    public async zrevrank(key: string,member:string) {
+    public async zrevrank(key: string, member: string) {
         return await this.exec('zrevrank', [key, member], {
             key,
             member
-         });
+        });
     }
 
-    public async zscore(key: string,member:string) {
+    public async zscore(key: string, member: string) {
         return await this.exec('zscore', [key, member], {
             key,
             member
-         });
+        });
     }
 
-    public async zunionstore(key: string,...args: string[]) {
-        return await this.exec('zunionstore', [key,args], {
+    public async zunionstore(key: string, ...args: string[]) {
+        return await this.exec('zunionstore', [key, args], {
             key,
             args
-         });
+        });
     }
 
     /**
