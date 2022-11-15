@@ -193,7 +193,8 @@ export class IoredisAdapter extends RedisBase {
         max: string,
         limit?: 'LIMIT',
         offset?: number,
-        count?: number,) {
+        count?: number
+    ) {
         if (limit)
             return this.client.zrangebylex(key, min, max, limit, offset, count);
         else
@@ -206,7 +207,8 @@ export class IoredisAdapter extends RedisBase {
         max: string,
         limit?: 'LIMIT',
         offset?: number,
-        count?: number,) {
+        count?: number
+    ) {
         if (limit)
             return this.client.zrangebyscore(key, min, max, limit, offset, count);
         else
@@ -229,7 +231,7 @@ export class IoredisAdapter extends RedisBase {
         return this.client.zremrangebyscore(key, min, max);
     }
 
-    public async zrevrange(key: string, start: number, stop: number, withScores?: "WITHSCORES") {
+    public async zrevrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
         if (withScores)
             return this.client.zrevrange(key, start, stop, withScores);
         else

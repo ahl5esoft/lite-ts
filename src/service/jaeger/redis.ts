@@ -251,7 +251,8 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         max: string,
         limit: 'LIMIT',
         offset: number,
-        count: number,) {
+        count: number
+    ) {
         return await this.exec('zrangebylex', [key, min, max, limit, offset, count], {
             key,
             min,
@@ -268,7 +269,8 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         max: string,
         limit: 'LIMIT',
         offset: number,
-        count: number,) {
+        count: number
+    ) {
         return await this.exec('zrangebyscore', [key, min, max, limit, offset, count], {
             key,
             min,
@@ -295,7 +297,7 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         return this.m_Redis.zremrangebyscore(key, min, max);
     }
 
-    public async zrevrange(key: string, start: number, stop: number, withScores?: "WITHSCORES") {
+    public async zrevrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
         return await this.exec('zrevrange', [key, start, stop, withScores], {
             key,
             start,

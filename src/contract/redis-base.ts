@@ -320,7 +320,7 @@ export abstract class RedisBase {
      * @param stop 结束区间（包括等于）
      * @param withScores withScores 选项(是否返回分数)
      */
-    public abstract zrevrange(key: string, start: number, stop: number, withScores?: "WITHSCORES"): Promise<string[]>;
+    public abstract zrevrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES'): Promise<string[]>;
 
     /**
      * 返回有序集合中成员的排名(降序)
