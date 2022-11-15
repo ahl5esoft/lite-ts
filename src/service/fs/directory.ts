@@ -36,13 +36,14 @@ export class FsDirectory extends FsFileEntryBase implements IDirectory {
             }
 
             const childFiles = await this.findFiles();
-            for (const r of childFiles) {
-                await r.moveTo(
+            const tasks = childFiles.map(r => {
+                return r.moveTo(
                     dir.factory.buildFile(
                         [dir.path, r.name].join('/')
                     )
                 );
-            }
+            });
+            await Promise.all(tasks);
 
             await this.remove();
         } else {

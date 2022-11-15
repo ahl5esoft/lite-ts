@@ -10,6 +10,7 @@ import { ConsoleLog } from '../console';
 import { CryptoJsAESCrypto } from '../crypto-js';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
+import { EnumItem } from '../enum';
 import { CustomError } from '../error';
 import { FsFileFactory } from '../fs';
 import { GrpcJsLoadBalanceRpc } from '../grpc-js';
@@ -25,6 +26,7 @@ import { UserCustomGiftBagService } from '../user';
 import {
     ConfigLoaderBase,
     DbFactoryBase,
+    EnumCacheBase,
     EnumFactoryBase,
     FileFactoryBase,
     IUserAssociateService,
@@ -50,6 +52,10 @@ export async function initIoC(globalModel: { [name: string]: any }) {
             dow: 1,
         }
     });
+
+    EnumCacheBase.buildItemFunc = (name, sep, entry) => {
+        return new EnumItem(entry, name, sep);
+    };
 
     const fileFactory = new FsFileFactory();
     Container.set(FileFactoryBase, fileFactory);
