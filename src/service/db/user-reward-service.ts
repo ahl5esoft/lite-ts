@@ -93,13 +93,13 @@ export class DbUserRewardService implements IUserRewardService {
         const res: {
             [key: string]: {
                 index: number,
-                value: { [valueType: number]: contract.IValue; },
-            }
+                value: contract.IValue[],
+            };
         } = {};
         for (const [k, v] of Object.entries(rewardsGroup)) {
             res[k] = {
                 index: v.length == 1 ? 0 : -1,
-                value: {}
+                value: []
             };
 
             const randSeedService = this.m_UserService.getRandSeedService(scene);
@@ -136,17 +136,16 @@ export class DbUserRewardService implements IUserRewardService {
                     for (let i = 0; i < reward.count; i++)
                         rewardsQueue.splice(openRewards.length * i, 0, ...openRewards);
                 } else {
-                    res[k].value[reward.valueType] ??= {
-                        count: 0,
+                    res[k].value.push({
+                        count: reward.count,
                         valueType: reward.valueType,
-                    };
-                    res[k].value[reward.valueType].count += reward.count;
+                    });
                 }
             }
         }
         return Object.entries(res).reduce((memo, [k, v]) => {
             memo[k] = [
-                Object.values(v.value),
+                v.value,
                 v.index
             ];
             return memo;
