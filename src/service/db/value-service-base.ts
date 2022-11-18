@@ -109,7 +109,14 @@ export abstract class DbValueServiceBase<
 
             if (allValueTypeItem[r.valueType]) {
                 if (allValueTypeItem[r.valueType].data.isReplace) {
-                    entry.values[r.valueType] = r.count;
+                    if (allValueTypeItem[r.valueType].data.range) {
+                        if (r.count > allValueTypeItem[r.valueType].data.range.max)
+                            entry.values[r.valueType] = allValueTypeItem[r.valueType].data.range.max;
+                        else if (r.count < allValueTypeItem[r.valueType].data.range.min)
+                            entry.values[r.valueType] = allValueTypeItem[r.valueType].data.range.min;
+                    } else {
+                        entry.values[r.valueType] = r.count;
+                    }
                 } else if (allValueTypeItem[r.valueType].data.dailyTime > 0) {
                     const oldUnix = entry.values[allValueTypeItem[r.valueType].data.dailyTime] || 0;
                     const isSameDay = moment.unix(nowUnix).isSame(
@@ -136,8 +143,16 @@ export abstract class DbValueServiceBase<
 
                     entry.values[allValueTypeItem[r.valueType].data.time.valueType] = nowUnix;
                     entry.values[r.valueType] += r.count;
-                } else {
-                    entry.values[r.valueType] += r.count;
+                }
+                else {
+                    if (allValueTypeItem[r.valueType].data.range) {
+                        if (entry.values[r.valueType] + r.count > allValueTypeItem[r.valueType].data.range.max)
+                            entry.values[r.valueType] += allValueTypeItem[r.valueType].data.range.max - entry.values[r.valueType];
+                        else if (entry.values[r.valueType] + r.count < allValueTypeItem[r.valueType].data.range.min)
+                            entry.values[r.valueType] += allValueTypeItem[r.valueType].data.range.min - entry.values[r.valueType];
+                    } else {
+                        entry.values[r.valueType] += r.count;
+                    }
                 }
             } else {
                 entry.values[r.valueType] += r.count;
