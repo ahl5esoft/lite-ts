@@ -30,8 +30,8 @@ export function Field(define: DataType | ModelAttributeColumnOptions<any>): Prop
  * 
  * @param name 字段定义
  */
-export function Table(name: string): PropertyDecorator {
-    return (target: any) => {
-        tables[target.constructor.name] = name;
+export function Table(name: string): ClassDecorator {
+    return (target: Function) => {
+        tables[target.name] = name;
     };
 }
