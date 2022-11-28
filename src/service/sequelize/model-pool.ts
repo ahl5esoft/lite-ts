@@ -31,7 +31,7 @@ export class SequelizeModelPool {
             if (!fields)
                 throw new Error(`缺少模型: ${modelName}`);
 
-            this.m_Models[modelName] = this.m_Seq.define(modelName, fields, {
+            this.m_Models[modelName] = this.m_Seq.define(model.sequelize.tables[modelName] ?? modelName, fields, {
                 timestamps: false
             });
         }
