@@ -1,6 +1,6 @@
 import { DataType, ModelAttributeColumnOptions } from 'sequelize';
 
-import { defines } from './defines';
+import { defines, tables } from './defines';
 
 /**
  * Sequelize字段定义装饰器
@@ -22,5 +22,16 @@ export function Field(define: DataType | ModelAttributeColumnOptions<any>): Prop
         }
 
         defines[target.constructor.name][field] = define;
+    };
+}
+
+/**
+ * Sequelize表定义装饰器
+ * 
+ * @param name 字段定义
+ */
+export function Table(name: string): ClassDecorator {
+    return (target: Function) => {
+        tables[target.name] = name;
     };
 }
