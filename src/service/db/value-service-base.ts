@@ -146,7 +146,8 @@ export abstract class DbValueServiceBase<
             if (allValueTypeItem[r.valueType]?.data.range) {
                 if (entry.values[r.valueType] > allValueTypeItem[r.valueType].data.range.max)
                     entry.values[r.valueType] = allValueTypeItem[r.valueType].data.range.max;
-                else if (entry.values[r.valueType] < allValueTypeItem[r.valueType].data.range.min)
+
+                if (entry.values[r.valueType] < allValueTypeItem[r.valueType].data.range.min)
                     entry.values[r.valueType] = allValueTypeItem[r.valueType].data.range.min;
             }
 

@@ -541,7 +541,7 @@ describe('src/service/db/value-service-base.ts', () => {
             );
 
             const valueChange = {
-                count: -10,
+                count: 100,
                 source: 'test',
                 valueType: 1
             } as global.UserValueChange;
@@ -572,7 +572,7 @@ describe('src/service/db/value-service-base.ts', () => {
                     1: {
                         data: {
                             range: {
-                                max: 20,
+                                max: 100,
                                 min: 1
                             }
                         }
@@ -585,7 +585,7 @@ describe('src/service/db/value-service-base.ts', () => {
             );
 
             mockLogDbRepo.expected.add({
-                count: 1,
+                count: 100,
                 id: logID,
                 oldCount: 10,
                 source: valueChange.source,
@@ -597,7 +597,7 @@ describe('src/service/db/value-service-base.ts', () => {
             mockValueDbRepo.expected.save({
                 ...entry,
                 values: {
-                    1: 1
+                    1: 100
                 }
             } as global.UserValue);
 
