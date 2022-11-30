@@ -62,16 +62,16 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         entry.values[valueType] ??= 0;
 
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
-        if (allValueTypeItem[valueType]?.entry.dailyTime) {
+        if (allValueTypeItem[valueType]?.entry?.time?.valueType) {
             const now = await this.now;
-            const oldNow = entry.values[allValueTypeItem[valueType].entry.dailyTime] || 0;
-            const isSameDay = moment.unix(now).isSame(
+            const oldNow = entry.values[allValueTypeItem[valueType].entry.time.valueType] || 0;
+            const ok = moment.unix(now).isSame(
                 moment.unix(oldNow),
-                'day'
+                allValueTypeItem[allValueTypeItem[valueType].entry.time.valueType]?.entry?.time?.momentType ?? 'day'
             );
-            if (!isSameDay) {
+            if (!ok) {
                 entry.values[valueType] = 0;
-                entry.values[allValueTypeItem[valueType].entry.dailyTime] = now;
+                entry.values[allValueTypeItem[valueType].entry.time.valueType] = now;
             }
         }
 

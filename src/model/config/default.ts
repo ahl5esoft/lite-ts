@@ -1,7 +1,10 @@
 import { TracingConfig, TracingOptions } from 'jaeger-client';
 
 export class Default {
-    public authSecretKey: string;
+    public auth: {
+        [endpoint: string]: string;
+        secretKey: string;
+    };
     public configModel: string;
     public distributedMongo: string;
     public enumModel: string;

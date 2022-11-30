@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-15.220.69-green.svg)
+# ![Version](https://img.shields.io/badge/version-15.224.71-green.svg)
 
 服务端通用库
 

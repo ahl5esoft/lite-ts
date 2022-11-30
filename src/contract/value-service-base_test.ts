@@ -616,7 +616,7 @@ describe('src/contract/value-service-base.ts', () => {
             strictEqual(res, 0);
         });
 
-        it('枚举存在但dailyTime无效', async () => {
+        it('枚举存在但time无效', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(0, mockEnumFactory.actual);
 
@@ -643,7 +643,7 @@ describe('src/contract/value-service-base.ts', () => {
             strictEqual(res, 11);
         });
 
-        it('dailyTime(重置)', async () => {
+        it('time(重置)', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(99, mockEnumFactory.actual);
 
@@ -651,7 +651,16 @@ describe('src/contract/value-service-base.ts', () => {
                 allItem: {
                     1: {
                         entry: {
-                            dailyTime: 2
+                            time: {
+                                valueType: 2
+                            }
+                        }
+                    },
+                    2: {
+                        entry: {
+                            time: {
+                                momentType: 'day'
+                            }
                         }
                     }
                 }
@@ -665,7 +674,7 @@ describe('src/contract/value-service-base.ts', () => {
                 id: '',
                 values: {
                     1: 11,
-                    2: moment().unix()
+                    2: moment().add(-1, 'day').unix()
                 }
             });
 
@@ -682,7 +691,7 @@ describe('src/contract/value-service-base.ts', () => {
             });
         });
 
-        it('dailyTime(不重置)', async () => {
+        it('time(不重置)', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(
                 moment().unix(),
@@ -693,7 +702,16 @@ describe('src/contract/value-service-base.ts', () => {
                 allItem: {
                     1: {
                         entry: {
-                            dailyTime: 2
+                            time: {
+                                valueType: 2
+                            }
+                        }
+                    },
+                    2: {
+                        entry: {
+                            time: {
+                                momentType: 'hour'
+                            }
                         }
                     }
                 }

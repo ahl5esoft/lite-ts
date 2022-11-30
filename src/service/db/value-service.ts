@@ -113,20 +113,28 @@ export class DbValueService<
             logEntry.valueType = r.valueType;
 
             if (allValueTypeItem[r.valueType]) {
+                // 兼容
+                if (allValueTypeItem[r.valueType].entry['dailyTime']) {
+                    allValueTypeItem[r.valueType].entry.time = {
+                        momentType: 'day',
+                        valueType: allValueTypeItem[r.valueType].entry['dailyTime']
+                    };
+                }
+
                 if (allValueTypeItem[r.valueType].entry.isReplace) {
                     entry.values[r.valueType] = r.count;
-                } else if (allValueTypeItem[r.valueType].entry.dailyTime > 0) {
-                    const oldUnix = entry.values[allValueTypeItem[r.valueType].entry.dailyTime] || 0;
-                    const isSameDay = moment.unix(nowUnix).isSame(
+                } else if (allValueTypeItem[r.valueType].entry.time?.valueType > 0) {
+                    const oldUnix = entry.values[allValueTypeItem[r.valueType].entry.time.valueType] || 0;
+                    const isSame = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
-                        'day'
+                        allValueTypeItem[allValueTypeItem[r.valueType].entry.time.valueType].entry.time.momentType
                     );
-                    if (!isSameDay) {
+                    if (!isSame) {
                         entry.values[r.valueType] = 0;
-                        logEntry.source += '(每日重置)';
+                        logEntry.source += '(每周期重置)';
                     }
 
-                    entry.values[allValueTypeItem[r.valueType].entry.dailyTime] = nowUnix;
+                    entry.values[allValueTypeItem[r.valueType].entry.time.valueType] = nowUnix;
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;

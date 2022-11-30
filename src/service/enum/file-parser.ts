@@ -1,5 +1,5 @@
 import { FileFactoryBase, IParser } from '../../contract';
-import { contract } from '../../model';
+import { enum_ } from '../../model';
 
 export class EnumFileParser implements IParser {
     private m_BoolAttrReg = /^\[([a-zA-Z.]+)\]/;
@@ -35,7 +35,7 @@ export class EnumFileParser implements IParser {
         const file = this.m_FileFactory.buildFile(filePath);
         const content = await file.readString();
         const lines = content.split(/[\r\n]+/g);
-        const res: contract.IEnumItem[] = [];
+        const res: enum_.ItemData[] = [];
         let isBegin = false;
         for (const r of lines) {
             if (!isBegin) {
@@ -69,13 +69,7 @@ export class EnumFileParser implements IParser {
         return res;
     }
 
-    /**
-     * 解析特性
-     * 
-     * @param entry 实体
-     * @param attr 特性
-     */
-    private parseAttr(entry: contract.IEnumItem, attr: string) {
+    private parseAttr(entry: enum_.ItemData, attr: string) {
         if (!attr)
             return;
 
@@ -112,7 +106,7 @@ export class EnumFileParser implements IParser {
         }
     }
 
-    private setAtttr(entry: contract.IEnumItem, k: string, v: any) {
+    private setAtttr(entry: enum_.ItemData, k: string, v: any) {
         const keys = k.split('.');
         let temp = entry;
         keys.forEach((r, i) => {

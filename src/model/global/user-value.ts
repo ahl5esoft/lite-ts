@@ -1,13 +1,10 @@
-/**
- * 用户数值模型
- */
+import { ArrayMinSize, Length, ValidateNested } from 'class-validator';
+
 export class UserValue {
-    /**
-     * 用户ID
-     */
+    @Length(20, 32)
     public id: string;
-    /**
-     * 数值数据
-     */
+
+    @ArrayMinSize(1)
+    @ValidateNested()
     public values: { [valueType: number]: number };
 }

@@ -86,10 +86,10 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     ).read<{ version: string }>();
     cfg.version = pkg.version;
 
-    if (cfg.authSecretKey) {
+    if (cfg.auth?.secretKey) {
         Container.set(
             enum_.IoC.authCrypto,
-            new CryptoJsAESCrypto(cfg.authSecretKey),
+            new CryptoJsAESCrypto(cfg.auth.secretKey),
         );
     }
 

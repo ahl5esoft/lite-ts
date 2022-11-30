@@ -1,19 +1,5 @@
-import { IEnumItem } from '../contract';
+import { ItemData } from './item-data';
 
-/**
- * 目标类型枚举
- */
-export class TargetTypeData implements IEnumItem {
-    /**
-     * 应用名
-     */
+export class TargetTypeData extends ItemData {
     public app: string;
-    /**
-     * 键
-     */
-    public key: string;
-    /**
-     * 值
-     */
-    public value: number;
 }

@@ -3,7 +3,7 @@ import { deepStrictEqual } from 'assert';
 import { MongoEnumCache as Self } from './enum-cache';
 import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, EnumCacheBase, IDbQuery } from '../../contract';
-import { contract, global } from '../../model';
+import { enum_, global } from '../../model';
 
 describe('src/service/mongo/enum-cache.ts', () => {
     describe('.load()', () => {
@@ -33,7 +33,7 @@ describe('src/service/mongo/enum-cache.ts', () => {
             }, {
                 text: 'b',
                 value: 2
-            }] as contract.IEnumItem[]
+            }] as enum_.ItemData[]
             mockDbQuery.expectReturn(
                 r => r.toArray(),
                 [{

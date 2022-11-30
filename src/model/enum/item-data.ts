@@ -1,5 +1,5 @@
 export class ItemData {
-    value: number;
-    key?: string;
-    text?: string;
+    public value: number;
+    public key?: string;
+    public text?: string;
 }

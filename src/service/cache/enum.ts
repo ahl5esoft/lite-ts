@@ -1,7 +1,7 @@
 import { CacheBase, EnumBase, IEnumItem } from '../../contract';
-import { contract } from '../../model';
+import { enum_ } from '../../model';
 
-export class CacheEnum<T extends contract.IEnumItem> extends EnumBase<T> {
+export class CacheEnum<T extends enum_.ItemData> extends EnumBase<T> {
     private m_ReduceCahce = {};
     private m_UpdateOn = 0;
 
@@ -29,12 +29,11 @@ export class CacheEnum<T extends contract.IEnumItem> extends EnumBase<T> {
             this.m_ReduceCahce = {};
 
             const items = await this.items;
-            for (const r of items) {
-                Object.entries(reduceFunc).forEach(([k, v]) => {
-                    this.m_ReduceCahce[k] ??= {};
-                    this.m_ReduceCahce[k] = v(this.m_ReduceCahce[k], r.entry as T);
-                });
-            }
+            Object.entries(reduceFunc).forEach(([k, v]) => {
+                this.m_ReduceCahce[k] = items.reduce((memo, r) => {
+                    return v(memo, r.entry);
+                }, {});
+            });
 
             return this.m_ReduceCahce[key];
         });

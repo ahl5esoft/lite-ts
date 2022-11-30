@@ -19,9 +19,8 @@ describe('src/service/express/api-session.ts', () => {
             );
 
             await self.initSession({
-                header: (key: string) => {
-                    strictEqual(key, enum_.Header.authData);
-                    return 'cipher-text';
+                headers: {
+                    [enum_.Header.authData]: 'cipher-text'
                 }
             } as any);
         });
@@ -31,11 +30,9 @@ describe('src/service/express/api-session.ts', () => {
 
             let err: Error;
             try {
+
                 await self.initSession({
-                    header: (key: string) => {
-                        strictEqual(key, enum_.Header.authData);
-                        return '';
-                    }
+                    headers: {}
                 } as any);
             } catch (ex) {
                 err = ex;

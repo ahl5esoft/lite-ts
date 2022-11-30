@@ -3,6 +3,14 @@
  */
 export enum ErrorCode {
     /**
+     * 提示
+     */
+    tip = 1,
+    /**
+     * 警告
+     */
+    warning = 2,
+    /**
      * api不存在
      */
     api = 501,

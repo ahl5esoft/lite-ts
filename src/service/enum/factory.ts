@@ -2,7 +2,7 @@ import { opentracing } from 'jaeger-client';
 
 import { TracerStrategy } from '../tracer';
 import { EnumFactoryBase, ITraceable } from '../../contract';
-import { contract } from '../../model';
+import { enum_ } from '../../model';
 
 export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFactoryBase> {
     public constructor(
@@ -12,7 +12,7 @@ export class EnumFactory extends EnumFactoryBase implements ITraceable<EnumFacto
         super();
     }
 
-    public build<T extends contract.IEnumItem>(model: new () => T) {
+    public build<T extends enum_.ItemData>(model: new () => T) {
         if (this.m_Enum[model.name])
             return new TracerStrategy(this.m_Enum[model.name]).withTrace(this.m_ParentTracerSpan);
 
