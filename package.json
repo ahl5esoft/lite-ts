@@ -3,6 +3,7 @@
 		"@elastic/elasticsearch": "^8.0.0",
 		"@grpc/grpc-js": "^1.6.12",
 		"@grpc/proto-loader": "^0.7.2",
+		"async-mutex": "^0.4.0",
 		"bcryptjs": "^2.4.3",
 		"bent": "^7.3.12",
 		"body-parser": "^1.19.0",
@@ -63,5 +64,5 @@
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "15.224.71"
+	"version": "15.225.71"
 }

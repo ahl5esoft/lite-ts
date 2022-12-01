@@ -3,6 +3,7 @@ import moment from 'moment';
 import { join } from 'path';
 import Container from 'typedi';
 
+import { AsyncMutexMutex } from '../async-mutex';
 import { BentLoadBalanceRpc } from '../bent';
 import { CacheConfigLoader } from '../cache';
 import { ConfigLoadBalance, MultiConfigLoader } from '../config';
@@ -24,6 +25,7 @@ import { RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
 import { UserCustomGiftBagService } from '../user';
 import {
+    CacheBase,
     ConfigLoaderBase,
     DbFactoryBase,
     EnumCacheBase,
@@ -52,6 +54,8 @@ export async function initIoC(globalModel: { [name: string]: any }) {
             dow: 1,
         }
     });
+
+    CacheBase.mutex = new AsyncMutexMutex();
 
     EnumCacheBase.buildItemFunc = (name, sep, entry) => {
         return new EnumItem(entry, name, sep);

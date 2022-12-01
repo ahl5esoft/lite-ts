@@ -1,5 +1,6 @@
 export * from './api';
 export * from './assert';
+export * from './async-mutex';
 export * from './bcryptjs';
 export * from './class-transformer';
 export * from './crypto-js';
