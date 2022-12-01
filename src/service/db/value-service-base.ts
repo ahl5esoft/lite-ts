@@ -143,6 +143,14 @@ export abstract class DbValueServiceBase<
                 entry.values[r.valueType] += r.count;
             }
 
+            if (allValueTypeItem[r.valueType]?.data.range) {
+                if (entry.values[r.valueType] > allValueTypeItem[r.valueType].data.range.max)
+                    entry.values[r.valueType] = allValueTypeItem[r.valueType].data.range.max;
+
+                if (entry.values[r.valueType] < allValueTypeItem[r.valueType].data.range.min)
+                    entry.values[r.valueType] = allValueTypeItem[r.valueType].data.range.min;
+            }
+
             if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType]?.data.isNegative) {
                 entry.values[r.valueType] = logEntry.oldCount;
                 throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {

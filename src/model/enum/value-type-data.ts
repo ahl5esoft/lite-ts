@@ -108,6 +108,13 @@ export class ValueTypeData implements IEnumItem {
      */
     public openRewards?: IReward[][];
     /**
+     * 范围
+     */
+    public range?: {
+        max: number,
+        min: number;
+    };
+    /**
      * 奖励附加
      */
     public rewardAddition?: {
