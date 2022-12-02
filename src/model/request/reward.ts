@@ -1,12 +1,12 @@
-import { IsNumber, IsOptional, Min } from 'class-validator';
+import { IsOptional, IsPositive, Min } from 'class-validator';
 
 import { IReward } from '../contract';
 
 export class Reward implements IReward {
-    @Min(1)
+    @Min(0)
     public count: number;
 
-    @IsNumber()
+    @IsPositive()
     public valueType: number;
 
     @IsOptional()

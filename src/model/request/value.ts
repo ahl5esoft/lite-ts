@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, Max } from 'class-validator';
+import { IsNumber, IsOptional, IsPositive, Length } from 'class-validator';
 
 import { IValue } from '../contract';
 
@@ -6,11 +6,11 @@ export class Value implements IValue {
     @IsNumber()
     public count: number;
 
-    @IsNumber()
+    @IsPositive()
     public valueType: number;
 
     @IsOptional()
-    @Max(32)
+    @Length(1, 32)
     public source?: string;
 
     @IsNumber()
