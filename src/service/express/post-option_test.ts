@@ -3,7 +3,7 @@ import express from 'express';
 import supertest from 'supertest';
 
 import { buildPostExpressOption as self } from './post-option';
-import { Mock } from '../assert';
+import { Mock, mockAny } from '../assert';
 import { IApi, LogBase } from '../../contract';
 
 describe('src/service/express/post-option.ts', () => {
@@ -14,13 +14,19 @@ describe('src/service/express/post-option.ts', () => {
             });
             const mockLog = new Mock<LogBase>();
             const app = express();
-            self(mockLog.actual, '/:route', async (_: any) => {
+            self(mockLog.actual, '/mh/:route', async (_: any) => {
                 return mockApi.actual;
+            }, (route: string) => {
+                return ['/mh/', '/bg/'].some(r => route.startsWith(r));
             })(app);
 
-            const route = '/test';
+            const route = '/mh/test';
             mockLog.expectReturn(
                 r => r.addLabel('route', route),
+                mockLog.actual
+            );
+            mockLog.expectReturn(
+                r => r.addLabel('headers', mockAny),
                 mockLog.actual
             );
 

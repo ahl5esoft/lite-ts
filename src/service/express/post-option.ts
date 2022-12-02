@@ -13,11 +13,13 @@ import { contract, enum_ } from '../../model';
  * @param log 日志
  * @param routeRule 路由规则
  * @param getApiFunc 获取api函数
+ * @param logFilterFunc 日志过滤函数
  */
 export function buildPostExpressOption(
     log: LogBase,
     routeRule: string,
     getApiFunc: (req: any) => Promise<IApi>,
+    logFilterFunc?: (route: string) => boolean,
 ) {
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
@@ -93,10 +95,11 @@ export function buildPostExpressOption(
                 }
 
                 tracerSpan?.setTag?.(opentracing.Tags.ERROR, true);
-            }
-            finally {
-                if (!apiResp.err)
-                    cLog.addLabel('response', apiResp).info();
+            } finally {
+                if (!apiResp.err) {
+                    if (!logFilterFunc || !logFilterFunc(req.path))
+                        cLog.addLabel('response', apiResp).info();
+                }
 
                 tracerSpan?.log?.({
                     result: apiResp
@@ -107,5 +110,5 @@ export function buildPostExpressOption(
                 tracerSpan?.finish?.();
             }
         });
-    }
+    };
 }
