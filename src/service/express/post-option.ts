@@ -19,7 +19,6 @@ export function buildPostExpressOption(
     log: LogBase,
     routeRule: string,
     getApiFunc: (req: any) => Promise<IApi>,
-    logFilterFunc?: (route: string) => boolean,
 ) {
     return function (app: Express) {
         app.post(routeRule, async (req: Request, resp: Response) => {
@@ -96,10 +95,8 @@ export function buildPostExpressOption(
 
                 tracerSpan?.setTag?.(opentracing.Tags.ERROR, true);
             } finally {
-                if (!apiResp.err) {
-                    if (!logFilterFunc || !logFilterFunc(req.path))
-                        cLog.addLabel('response', apiResp).info();
-                }
+                if (!apiResp.err)
+                    cLog.addLabel('response', apiResp).info();
 
                 tracerSpan?.log?.({
                     result: apiResp

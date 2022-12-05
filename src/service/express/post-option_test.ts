@@ -16,8 +16,6 @@ describe('src/service/express/post-option.ts', () => {
             const app = express();
             self(mockLog.actual, '/mh/:route', async (_: any) => {
                 return mockApi.actual;
-            }, (route: string) => {
-                return ['/mh/', '/bg/'].some(r => route.startsWith(r));
             })(app);
 
             const route = '/mh/test';
