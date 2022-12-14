@@ -1,11 +1,7 @@
 import { opentracing } from 'jaeger-client';
 
-import { ITraceable, RedisBase } from '../../contract';
-import { contract } from '../../model';
+import { IRedisGeo, IRedisZRangeByLexOption, IRedisZRangeByScoreOption, ITraceable, RedisBase } from '../../contract';
 
-/**
- * jeager redis
- */
 export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
     private m_TracerSpan: opentracing.Span;
 
@@ -69,7 +65,7 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         });
     }
 
-    public async geoadd(key: string, ...values: contract.IRedisGeo[]) {
+    public async geoadd(key: string, ...values: IRedisGeo[]) {
         return await this.exec('geoadd', [key, ...values], {
             key,
             values
@@ -245,40 +241,12 @@ export class JeagerRedis extends RedisBase implements ITraceable<RedisBase> {
         });
     }
 
-    public async zrangebylex(
-        key: string,
-        min: string,
-        max: string,
-        limit: 'LIMIT',
-        offset: number,
-        count: number
-    ) {
-        return await this.exec('zrangebylex', [key, min, max, limit, offset, count], {
-            key,
-            min,
-            max,
-            limit,
-            offset,
-            count
-        });
+    public async zrangebylex(opt: IRedisZRangeByLexOption) {
+        return await this.exec('zrangebylex', [opt], opt);
     }
 
-    public async zrangebyscore(
-        key: string,
-        min: string,
-        max: string,
-        limit: 'LIMIT',
-        offset: number,
-        count: number
-    ) {
-        return await this.exec('zrangebyscore', [key, min, max, limit, offset, count], {
-            key,
-            min,
-            max,
-            limit,
-            offset,
-            count
-        });
+    public async zrangebyscore(opt: IRedisZRangeByScoreOption) {
+        return await this.exec('zrangebyscore', [opt], opt);
     }
 
     public async zrank(key: string, member: string) {

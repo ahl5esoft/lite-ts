@@ -3,7 +3,7 @@ import Ioredis from 'ioredis';
 
 import { IoredisAdapter as Self } from './index';
 import { SetTimeoutThread } from '../set-timeout';
-import { contract } from '../../model';
+import { IRedisGeo, IRedisZMember } from '../../contract';
 
 const cfg = {
     host: '127.0.0.1',
@@ -36,7 +36,7 @@ describe('src/service/ioredis/index.ts', () => {
             await client.del(key);
         });
 
-        it.only('不存在', async () => {
+        it('不存在', async () => {
             const key = 'test-blpop-not-exists';
             const res = await self.blpop(2, key);
             strictEqual(res, null);
@@ -118,7 +118,7 @@ describe('src/service/ioredis/index.ts', () => {
     describe('.geoadd(key: string, ...entries: IRedisGeo[]): Promise<number>', () => {
         it('ok', async () => {
             const key = 'test-geoadd';
-            const message: contract.IRedisGeo = {
+            const message: IRedisGeo = {
                 longitude: 0.10000079870223999,
                 latitude: 0.20000090571705442,
                 member: 'a',
@@ -135,7 +135,7 @@ describe('src/service/ioredis/index.ts', () => {
     describe('.geopos(key: string, ...members: string[]): Promise<[number, number][]>', () => {
         it('ok', async () => {
             const key = 'test-geopos';
-            const entry: contract.IRedisGeo = {
+            const entry: IRedisGeo = {
                 longitude: 0.10000079870223999,
                 latitude: 0.20000090571705442,
                 member: 'c',
@@ -479,6 +479,104 @@ describe('src/service/ioredis/index.ts', () => {
             await client.del(key);
 
             ok(res > 0 && res <= 10);
+        });
+    });
+
+    describe('.zrangebylex(opt: IRedisZRangeByLexOption)', async () => {
+        const key = 'zrangebylex';
+        it('default', async () => {
+            await client.zadd(key, 0, 'b', 0, 'a', 1, 'd', 0, 'c', 1, 'e');
+
+            const res = await self.zrangebylex({
+                key,
+                min: '-',
+                max: '+',
+            });
+            deepStrictEqual(res, ['a', 'b', 'c', 'd', 'e']);
+
+            await client.del(key);
+        });
+
+        it('limit', async () => {
+            await client.zadd(key, 0, 'b', 0, 'a', 1, 'd', 0, 'c', 1, 'e');
+
+            const res = await self.zrangebyscore({
+                key,
+                min: 0,
+                max: 2,
+                limit: {
+                    offset: 1,
+                    count: 2
+                }
+            });
+            deepStrictEqual(res, [{
+                member: 'b',
+            }, {
+                member: 'c',
+            }] as IRedisZMember[]);
+
+            await client.del(key);
+        });
+    });
+
+    describe('.zrangebyscore(opt: IRedisZRangeByScoreOption)', async () => {
+        const key = 'zrangebyscore';
+        it('default', async () => {
+            await client.zadd(key, 1, 'a', 2, 'b', 3, 'c', 4, 'd', 5, 'e');
+
+            const res = await self.zrangebyscore({
+                key,
+                min: 2,
+                max: 3
+            });
+            deepStrictEqual(res, [{
+                member: 'b',
+            }, {
+                member: 'c',
+            }] as IRedisZMember[]);
+
+            await client.del(key);
+        });
+
+        it('withscores', async () => {
+            await client.zadd(key, 1, 'a', 2, 'b', 3, 'c', 4, 'd', 5, 'e');
+
+            const res = await self.zrangebyscore({
+                key,
+                min: 2,
+                max: 3,
+                withScores: true,
+            });
+            deepStrictEqual(res, [{
+                member: 'b',
+                score: 2,
+            }, {
+                member: 'c',
+                score: 3
+            }] as IRedisZMember[]);
+
+            await client.del(key);
+        });
+
+        it('limit', async () => {
+            await client.zadd(key, 1, 'a', 2, 'b', 3, 'c', 4, 'd', 5, 'e');
+
+            const res = await self.zrangebyscore({
+                key,
+                min: 2,
+                max: 100,
+                limit: {
+                    offset: 1,
+                    count: 2
+                }
+            });
+            deepStrictEqual(res, [{
+                member: 'c',
+            }, {
+                member: 'd',
+            }] as IRedisZMember[]);
+
+            await client.del(key);
         });
     });
 });

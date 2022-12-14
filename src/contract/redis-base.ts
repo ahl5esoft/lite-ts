@@ -1,8 +1,28 @@
-import { contract } from '../model';
+export interface IRedisGeo {
+    latitude: number;
+    longitude: number;
+    member: string;
+}
 
-/**
- * Redis接口
- */
+export interface IRedisZMember {
+    member: string;
+    score?: number;
+}
+
+export interface IRedisZRangeByLexOption {
+    key: string;
+    max: number | string;
+    min: number | string;
+    limit?: {
+        count: number;
+        offset: number;
+    };
+}
+
+export interface IRedisZRangeByScoreOption extends IRedisZRangeByLexOption {
+    withScores?: boolean;
+}
+
 export abstract class RedisBase {
     /**
      * 弹出列表左边项(阻塞)
@@ -60,7 +80,7 @@ export abstract class RedisBase {
      * @param key 键
      * @param datas geo数据数组 
      */
-    public abstract geoadd(key: string, ...datas: contract.IRedisGeo[]): Promise<number>;
+    public abstract geoadd(key: string, ...datas: IRedisGeo[]): Promise<number>;
 
     /**
      * 获取坐标
@@ -266,17 +286,9 @@ export abstract class RedisBase {
      */
     public abstract zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES'): Promise<string[]>;
 
-    /**
-     * 返回有序集合中指定区间内的成员
-     * 
-     * @param key 键 
-     * @param min 位置最小的成员
-     * @param max 位置最大的成员
-     * @param limit 分页
-     * @param offset 偏移量
-     * @param count 数量
-     */
-    public abstract zrangebylex(key: string, min: string, max: string, limit?: 'LIMIT', offset?: number, count?: number): Promise<string[]>;
+    public abstract zrangebylex(opt: IRedisZRangeByLexOption): Promise<string[]>;
+
+    public abstract zrangebyscore(opt: IRedisZRangeByScoreOption): Promise<IRedisZMember[]>;
 
     /**
      * 返回有序集中成员的排名
