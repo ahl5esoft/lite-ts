@@ -105,7 +105,7 @@ export class DbUserRewardService implements IUserRewardService {
             const randSeedService = this.m_UserService.getRandSeedService(scene);
             let rewardsQueue = [...v];
             while (rewardsQueue.length) {
-                const childRewards = rewardsQueue.pop();
+                const childRewards = rewardsQueue.shift();
                 if (!childRewards?.length)
                     continue;
 
