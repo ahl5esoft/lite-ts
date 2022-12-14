@@ -29,15 +29,26 @@ export class DbUserRewardService implements IUserRewardService {
             if (r.length == 1) {
                 reward = r[0];
             } else {
-                const total = r.reduce((memo, cr) => {
-                    return memo + cr.weight * 1;
-                }, 0);
+                let total = 0;
+                const toBeSortedItems: {
+                    item: contract.IReward;
+                    rand: number;
+                }[] = [];
+                for (const cr of r) {
+                    total += cr.weight * 1;
+                    toBeSortedItems.push({
+                        item: cr,
+                        rand: await randSeedService.use(uow, 1),
+                    });
+                }
                 const seed = await randSeedService.use(
                     uow,
                     total.toString().length
                 );
                 let rand = seed % total + 1;
-                reward = r.find((cr, ci) => {
+                reward = toBeSortedItems.sort((a, b) => {
+                    return a.rand - b.rand;
+                }).map(cr => cr.item).find((cr, ci) => {
                     rand -= cr.weight;
                     if (rand > 0)
                         return;
@@ -113,14 +124,25 @@ export class DbUserRewardService implements IUserRewardService {
                 if (childRewards.length == 1) {
                     reward = childRewards[0];
                 } else {
-                    const total = childRewards.reduce((memo, r) => {
-                        return memo + r.weight * 1;
-                    }, 0);
+                    let total = 0;
+                    const toBeSortedItems: {
+                        item: contract.IReward;
+                        rand: number;
+                    }[] = [];
+                    for (const r of childRewards) {
+                        total += r.weight * 1;
+                        toBeSortedItems.push({
+                            item: r,
+                            rand: await randSeedService.get(uow, 1, offset++),
+                        });
+                    }
                     const len = total.toString().length;
                     const seed = await randSeedService.get(uow, len, offset);
                     offset += len;
                     let rand = seed % total + 1;
-                    reward = childRewards.find((r, i) => {
+                    reward = toBeSortedItems.sort((a, b) => {
+                        return a.rand - b.rand;
+                    }).map(r => r.item).find((r, i) => {
                         rand -= r.weight;
                         if (rand > 0)
                             return;
