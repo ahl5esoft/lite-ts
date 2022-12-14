@@ -2,6 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { Ssh2FileFactory } from './file-factory';
 import { FsFileFactory } from '../fs';
+import { FsDirectory } from '../fs/directory';
 
 const fsFileFileFactory = new FsFileFactory();
 const fileFactory = new Ssh2FileFactory(fsFileFileFactory, {
@@ -71,25 +72,22 @@ describe('src/service/ssh2/directory.ts', () => {
         });
     });
 
-    describe('.moveTo(v: IFileEntryMoveToOption)', () => {
-        it('isLocal = true', async () => {
+    describe('.moveTo(v: any)', () => {
+        it(FsDirectory.name, async () => {
             const remoteDir = '/mnt/fengling/devops/dir-move-to-it';
             await fileFactory.invokeSftp<void>(r => r.mkdir, remoteDir);
             await fileFactory.invokeSftp<void>(r => r.mkdir, `${remoteDir}/a`);
             await fileFactory.invokeSftp<void>(r => r.writeFile, `${remoteDir}/a/a.txt`, 'is a');
             await fileFactory.invokeSftp<void>(r => r.writeFile, `${remoteDir}/b.txt`, 'is b');
 
-            const localPath = 'move-to-it';
-            await fileFactory.buildDirectory(remoteDir).moveTo({
-                isLocal: true,
-                paths: [localPath],
-            });
+            const localDir = fsFileFileFactory.buildDirectory('move-to-it');
+            await fileFactory.buildDirectory(remoteDir).moveTo(localDir);
 
-            const aIsExist = await fsFileFileFactory.buildFile(localPath, 'a', 'a.txt').exists();
-            const bIsExist = await fsFileFileFactory.buildFile(localPath, 'b.txt').exists();
+            const aIsExist = await fsFileFileFactory.buildFile(localDir.path, 'a', 'a.txt').exists();
+            const bIsExist = await fsFileFileFactory.buildFile(localDir.path, 'b.txt').exists();
             const isExist = await fileFactory.invokeSftp<boolean>(r => r.exists, remoteDir);
 
-            await fsFileFileFactory.buildDirectory(localPath).remove();
+            await localDir.remove();
 
             strictEqual(aIsExist, true);
             strictEqual(bIsExist, true);

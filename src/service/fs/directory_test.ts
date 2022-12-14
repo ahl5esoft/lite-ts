@@ -10,7 +10,7 @@ describe('src/service/fs/directory.ts', () => {
     describe('.create()', () => {
         it('ok', async () => {
             const dirname = 'dir-create';
-            const self = new Self(dirname);
+            const self = new Self(null, dirname);
 
             await self.create();
 
@@ -35,7 +35,7 @@ describe('src/service/fs/directory.ts', () => {
                 join(dirname, 'dir')
             );
 
-            const res = await new Self(dirname).findDirectories();
+            const res = await new Self(null, dirname).findDirectories();
             strictEqual(res.length, 1);
             strictEqual(res[0].constructor, Self);
 
@@ -60,7 +60,7 @@ describe('src/service/fs/directory.ts', () => {
                 join(dirname, 'dir')
             );
 
-            const res = await new Self(dirname).findFiles();
+            const res = await new Self(null, dirname).findFiles();
             strictEqual(res.length, 1);
             strictEqual(res[0].constructor, FsFile);
 
@@ -83,7 +83,7 @@ describe('src/service/fs/directory.ts', () => {
                 'test'
             );
 
-            const res = await new Self(dirname).read();
+            const res = await new Self(null, dirname).read();
             await rm(dirname, {
                 force: true,
                 recursive: true,
@@ -107,7 +107,7 @@ describe('src/service/fs/directory.ts', () => {
                 join(dirname, 'dir')
             );
 
-            const self = new Self(dirname);
+            const self = new Self(null, dirname);
             await self.remove();
 
             const ok = existsSync(dirname);

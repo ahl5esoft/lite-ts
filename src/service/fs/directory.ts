@@ -12,15 +12,43 @@ export class FsDirectory extends FsFileEntryBase implements IDirectory {
     }
 
     public async findDirectories() {
-        return this.scan<IDirectory>((fileStat, filePath) => {
-            return fileStat.isDirectory() ? new FsDirectory(filePath) : null;
+        return await this.scan<IDirectory>((fileStat, filePath) => {
+            return fileStat.isDirectory() ? new FsDirectory(this.factory, filePath) : null;
         });
     }
 
     public async findFiles() {
-        return this.scan<IFile>((fileStat, filePath) => {
-            return fileStat.isFile() ? new FsFile(filePath) : null;
+        return await this.scan<IFile>((fileStat, filePath) => {
+            return fileStat.isFile() ? new FsFile(this.factory, filePath) : null;
         });
+    }
+
+    public async moveTo(v: any) {
+        const dir = v as IDirectory;
+        if (typeof dir.moveTo == 'function') {
+            const childDirs = await this.findDirectories();
+            for (const r of childDirs) {
+                await r.moveTo(
+                    dir.factory.buildDirectory(
+                        [dir.path, r.name].join('/')
+                    )
+                );
+            }
+
+            const childFiles = await this.findFiles();
+            const tasks = childFiles.map(r => {
+                return r.moveTo(
+                    dir.factory.buildFile(
+                        [dir.path, r.name].join('/')
+                    )
+                );
+            });
+            await Promise.all(tasks);
+
+            await this.remove();
+        } else {
+            await super.moveTo(v);
+        }
     }
 
     public async read() {

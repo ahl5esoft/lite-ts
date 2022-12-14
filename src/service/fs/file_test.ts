@@ -8,7 +8,7 @@ describe('src/service/fs/file.ts', () => {
     describe('.read<T>()', () => {
         it('ok', async () => {
             const filename = 'file-read-string';
-            const self = new Self(filename);
+            const self = new Self(null, filename);
 
             Reflect.set(self, 'readString', () => {
                 return JSON.stringify({
@@ -31,7 +31,7 @@ describe('src/service/fs/file.ts', () => {
     describe('.readString()', () => {
         it('ok', async () => {
             const filename = 'file-read-string';
-            const self = new Self(filename);
+            const self = new Self(null, filename);
 
             try {
                 await unlink(filename);
@@ -48,7 +48,7 @@ describe('src/service/fs/file.ts', () => {
     describe('.readYaml<T>()', () => {
         it('ok', async () => {
             const filename = 'file-read-string';
-            const self = new Self(filename);
+            const self = new Self(null, filename);
 
             Reflect.set(self, 'readString', () => {
                 return `number: 100
@@ -69,7 +69,7 @@ string: hello`
     describe('.remove()', () => {
         it('ok', async () => {
             const filename = 'file-remove';
-            const self = new Self(filename);
+            const self = new Self(null, filename);
 
             await writeFile(filename, 'hello');
 
@@ -83,7 +83,7 @@ string: hello`
     describe('.write(v: any)', () => {
         it('string', async () => {
             const filePath = 'test-file-write-string';
-            const self = new Self(filePath);
+            const self = new Self(null, filePath);
 
             await self.write('str');
 

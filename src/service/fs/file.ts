@@ -12,6 +12,14 @@ export class FsFile extends FsFileEntryBase implements IFile {
         return this.m_Ext;
     }
 
+    public async moveTo(v: any) {
+        const file = v as IFile;
+        if (typeof file.moveTo == 'function')
+            await file.write(this);
+        else
+            await super.moveTo(v);
+    }
+
     public async read<T>() {
         const res = await this.readString();
         return JSON.parse(res) as T;

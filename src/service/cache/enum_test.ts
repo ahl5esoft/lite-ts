@@ -65,5 +65,22 @@ describe('src/service/cache/enum.ts', () => {
                 1: [{}]
             });
         });
+
+        it('无数据', async () => {
+            const mockCache = new Mock<CacheBase>({
+                updateOn: 11
+            });
+            const self = new Self(mockCache.actual, enum_.ValueTypeData, {
+                [enum_.ValueTypeOpenRewards.name]: valueTypeOpenRewardsReduce,
+            });
+
+            mockCache.expectReturn(
+                r => r.get(enum_.ValueTypeData.name),
+                {}
+            );
+
+            const res = await self.getReduce(enum_.ValueTypeOpenRewards);
+            deepStrictEqual(res, {});
+        });
     });
 });

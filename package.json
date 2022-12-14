@@ -3,6 +3,7 @@
 		"@elastic/elasticsearch": "^8.0.0",
 		"@grpc/grpc-js": "^1.6.12",
 		"@grpc/proto-loader": "^0.7.2",
+		"async-mutex": "^0.4.0",
 		"bcryptjs": "^2.4.3",
 		"bent": "^7.3.12",
 		"body-parser": "^1.19.0",
@@ -57,11 +58,11 @@
 	"scripts": {
 		"build": "tsc -p tsconfig.prod.json",
 		"doc": "typedoc src/index.ts",
-		"login": "npm config delete registry && npm login",
-		"release": "npm run build && npm config delete registry && npm publish && npm config set registry=https://registry.npm.taobao.org",
+		"login": "npm config delete registry && npm config set https-proxy http://127.0.0.1:4780 && npm login",
+		"release": "npm run build && npm publish && npm config delete https-proxy && npm config set registry=https://registry.npm.taobao.org",
 		"test": "mocha -t 30s -r ./node_modules/ts-node/register/index.js --exit",
 		"version": "ts-node version"
 	},
 	"typeings": "./dist/index.d.ts",
-	"version": "15.216.68"
+	"version": "15.225.72"
 }

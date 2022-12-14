@@ -1,7 +1,7 @@
 import { IEnumItem } from '../../contract';
-import { contract } from '../../model';
+import { enum_ } from '../../model';
 
-export class EnumItem<T extends contract.IEnumItem> implements IEnumItem<T> {
+export class EnumItem<T extends enum_.ItemData> implements IEnumItem<T> {
     private m_LangKey: string;
     public get langKey() {
         return this.m_LangKey;

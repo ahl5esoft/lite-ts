@@ -1,15 +1,4 @@
-import { contract } from '../../../../src/model';
+import { model } from '../../../../src';
 
-/**
- * 城市
- */
-export class CityData implements contract.IEnumItem {
-    /**
-     * 英文名
-     */
-    public key: string;
-    /**
-     * 城市编号
-     */
-    public value: number;
+export class CityData extends model.enum_.ItemData {
 }

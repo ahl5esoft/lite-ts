@@ -6,6 +6,12 @@ import { contract } from '../../model';
 export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase> {
     private m_TracerSpan: opentracing.Span;
 
+    /**
+     * 构造函数
+     * 
+     * @param m_Redis redis实例
+     * @param parentTracerSpan 父跟踪范围
+     */
     public constructor(
         private m_Redis: RedisBase,
         parentTracerSpan?: opentracing.Span
@@ -197,10 +203,17 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
         return this.m_Redis.ttl(key);
     }
 
+<<<<<<< HEAD
     public async zadd(key: string,member:string[]) {
         return await this.exec('zadd', [key, member], {
            key,
            member
+=======
+    public async zadd(key: string, member: string[]) {
+        return await this.exec('zadd', [key, member], {
+            key,
+            member
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
         });
     }
 
@@ -208,6 +221,7 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
         return this.m_Redis.zcard(key)
     }
 
+<<<<<<< HEAD
     public async zcount(key: string,min:number,max:number) {
         return this.m_Redis.zcount(key,min,max)
     }
@@ -229,11 +243,38 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
 
     public async zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
         return await this.exec('zrange', [key,start,stop,withScores], {
+=======
+    public async zcount(key: string, min: number, max: number) {
+        return this.m_Redis.zcount(key, min, max)
+    }
+
+    public async zincrby(key: string, increment: number, member: string) {
+        return await this.exec('zincrby', [key, increment, member], {
+            key,
+            increment,
+            member
+        });
+    }
+
+    public async zinterstore(key: string, ...args: string[]) {
+        return await this.exec('zinterstore', [key, args], {
+            key,
+            args
+        });
+    }
+
+    public async zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
+        return await this.exec('zrange', [key, start, stop, withScores], {
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
             key,
             start,
             stop,
             withScores
+<<<<<<< HEAD
          });
+=======
+        });
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
     }
 
     public async zrangebylex(
@@ -242,6 +283,7 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
         max: string,
         limit: 'LIMIT',
         offset: number,
+<<<<<<< HEAD
         count: number,) {
             return await this.exec('zrangebylex', [key,min,max,limit,offset,count], {
                 key,
@@ -251,6 +293,18 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
                 offset,
                 count
              });
+=======
+        count: number
+    ) {
+        return await this.exec('zrangebylex', [key, min, max, limit, offset, count], {
+            key,
+            min,
+            max,
+            limit,
+            offset,
+            count
+        });
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
     }
 
     public async zrangebyscore(
@@ -259,6 +313,7 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
         max: string,
         limit: 'LIMIT',
         offset: number,
+<<<<<<< HEAD
         count: number,) {
             return await this.exec('zrangebyscore', [key,min,max,limit,offset,count], {
                 key,
@@ -288,10 +343,43 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
 
     public async zrevrange(key: string,start: number, stop: number, withScores?: "WITHSCORES") {
         return await this.exec('zrevrange', [key,start,stop,withScores], {
+=======
+        count: number
+    ) {
+        return await this.exec('zrangebyscore', [key, min, max, limit, offset, count], {
+            key,
+            min,
+            max,
+            limit,
+            offset,
+            count
+        });
+    }
+
+    public async zrank(key: string, member: string) {
+        return this.m_Redis.zrank(key, member);
+    }
+
+    public async zrem(key: string, ...args: string[]) {
+        return this.m_Redis.zrem(key, args);
+    }
+
+    public async zremrangebyrank(key: string, start: number, stop: number) {
+        return this.m_Redis.zremrangebyrank(key, start, stop);
+    }
+
+    public async zremrangebyscore(key: string, min: number, max: number) {
+        return this.m_Redis.zremrangebyscore(key, min, max);
+    }
+
+    public async zrevrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
+        return await this.exec('zrevrange', [key, start, stop, withScores], {
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
             key,
             start,
             stop,
             withScores
+<<<<<<< HEAD
          });
     }
 
@@ -316,6 +404,37 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
          });
     }
 
+=======
+        });
+    }
+
+    public async zrevrank(key: string, member: string) {
+        return await this.exec('zrevrank', [key, member], {
+            key,
+            member
+        });
+    }
+
+    public async zscore(key: string, member: string) {
+        return await this.exec('zscore', [key, member], {
+            key,
+            member
+        });
+    }
+
+    public async zunionstore(key: string, ...args: string[]) {
+        return await this.exec('zunionstore', [key, args], {
+            key,
+            args
+        });
+    }
+
+    /**
+     * 跟踪
+     * 
+     * @param parentSpan 父范围
+     */
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
     public withTrace(parentSpan: any) {
         return parentSpan ? new JaegerClientRedis(this.m_Redis, parentSpan) : this;
     }

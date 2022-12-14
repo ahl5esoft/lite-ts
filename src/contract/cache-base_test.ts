@@ -1,6 +1,7 @@
-import { strictEqual } from 'assert';
+import { notStrictEqual, strictEqual } from 'assert';
 
 import { CacheBase } from './cache-base';
+import { MutexBase } from './mutex-base';
 import { RedisBase } from './redis-base';
 import { Mock } from '../service';
 
@@ -40,12 +41,20 @@ describe('src/contract/redis-cache-base.ts', () => {
 
     describe('.get<T>(key: string)', () => {
         it('ok', async () => {
+            const mockMutex = new Mock<MutexBase>();
+            CacheBase.mutex = mockMutex.actual;
+
             const mockRedis = new Mock<RedisBase>();
             let loadCount = 0;
             const self = new Self(async () => {
                 loadCount++;
                 return { a: 1 };
             }, mockRedis.actual, 'test');
+
+            mockMutex.expectReturn(
+                r => r.lock(),
+                async () => { }
+            );
 
             mockRedis.expectReturn(
                 r => r.hget('cache', 'test'),
@@ -62,8 +71,8 @@ describe('src/contract/redis-cache-base.ts', () => {
             strictEqual(res, 1);
             strictEqual(loadCount, 1);
 
-            const now = Reflect.get(self, 'm_Now');
-            strictEqual(now, self.updateOn);
+            const nextCheckOn = Reflect.get(self, 'm_NextCheckOn');
+            notStrictEqual(nextCheckOn, 0);
         });
     });
 });

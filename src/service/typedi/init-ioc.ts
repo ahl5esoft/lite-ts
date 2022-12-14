@@ -3,6 +3,7 @@ import moment from 'moment';
 import { join } from 'path';
 import Container from 'typedi';
 
+import { AsyncMutexMutex } from '../async-mutex';
 import { BentLoadBalanceRpc } from '../bent';
 import { CacheConfigLoader } from '../cache';
 import { ConfigLoadBalance, MultiConfigLoader } from '../config';
@@ -10,6 +11,7 @@ import { ConsoleLog } from '../console';
 import { CryptoJsAESCrypto } from '../crypto-js';
 import { DateNowTime } from '../date';
 import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
+import { EnumItem } from '../enum';
 import { CustomError } from '../error';
 import { FsFileFactory } from '../fs';
 import { GrpcJsLoadBalanceRpc } from '../grpc-js';
@@ -23,8 +25,10 @@ import { RpcUserPortraitService, RpcValueService } from '../rpc';
 import { SetTimeoutThread } from '../set-timeout';
 import { UserCustomGiftBagService } from '../user';
 import {
+    CacheBase,
     ConfigLoaderBase,
     DbFactoryBase,
+    EnumCacheBase,
     EnumFactoryBase,
     FileFactoryBase,
     IUserAssociateService,
@@ -50,6 +54,12 @@ export async function initIoC(globalModel: { [name: string]: any }) {
             dow: 1,
         }
     });
+
+    CacheBase.mutex = new AsyncMutexMutex();
+
+    EnumCacheBase.buildItemFunc = (name, sep, entry) => {
+        return new EnumItem(entry, name, sep);
+    };
 
     const fileFactory = new FsFileFactory();
     Container.set(FileFactoryBase, fileFactory);
@@ -80,10 +90,10 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     ).read<{ version: string }>();
     cfg.version = pkg.version;
 
-    if (cfg.authSecretKey) {
+    if (cfg.auth?.secretKey) {
         Container.set(
             enum_.IoC.authCrypto,
-            new CryptoJsAESCrypto(cfg.authSecretKey),
+            new CryptoJsAESCrypto(cfg.auth.secretKey),
         );
     }
 

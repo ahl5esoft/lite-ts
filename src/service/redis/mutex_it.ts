@@ -16,34 +16,44 @@ describe('src/service/redis/lock.ts', () => {
         redis.close();
     });
 
-    describe('.lock(key: string, time: number)', () => {
-        it('ok', async () => {
+    describe('.lock(opt: RedisMutexOption)', () => {
+        it('once', async () => {
             const self = new Self(redis, null);
-            let unlock = await self.lock('ok', 5);
+            let unlock = await self.lock({
+                key: 'ok',
+                timeoutSeconds: 5
+            });
             ok(unlock);
 
-            unlock = await self.lock('ok', 5);
+            unlock = await self.lock({
+                key: 'ok',
+                timeoutSeconds: 5
+            });
             strictEqual(unlock, null);
         });
 
-        it('ok and unlock', async () => {
+        it('once and unlock', async () => {
             const self = new Self(redis, null);
-            let unlock = await self.lock('ok and unlock', 5);
+            let unlock = await self.lock({
+                key: 'ok and unlock',
+                timeoutSeconds: 5
+            });
             ok(unlock);
 
             await unlock();
 
-            unlock = await self.lock('ok and unlock', 5);
+            unlock = await self.lock({
+                key: 'ok and unlock',
+                timeoutSeconds: 5
+            });
             ok(unlock);
         });
-    });
 
-    describe('.waitLock(opt: IMutexWaitLockOption)', () => {
-        it('ok', async () => {
+        it('wait', async () => {
             const mockThread = new Mock<ThreadBase>();
             const self = new Self(redis, mockThread.actual);
 
-            const res = await self.waitLock({
+            const res = await self.lock({
                 key: 'test-wait-lock'
             });
             ok(res);
@@ -54,7 +64,7 @@ describe('src/service/redis/lock.ts', () => {
             await redis.del('test-wait-lock');
         });
 
-        it('err', async () => {
+        it('wait err', async () => {
             const mockThread = new Mock<ThreadBase>();
             const self = new Self(redis, mockThread.actual);
 
@@ -64,9 +74,8 @@ describe('src/service/redis/lock.ts', () => {
 
             let err: Error;
             try {
-                await self.waitLock({
+                await self.lock({
                     key: 'test-wait-lock-err',
-                    timeoutSecond: 3,
                     tryCount: 1,
                 });
             } catch (ex) {

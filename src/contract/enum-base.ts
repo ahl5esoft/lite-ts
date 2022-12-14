@@ -1,7 +1,7 @@
 import { IEnumItem } from './i-enum-item';
-import { contract } from '../model';
+import { enum_ } from '../model';
 
-export abstract class EnumBase<T extends contract.IEnumItem> {
+export abstract class EnumBase<T extends enum_.ItemData> {
     public get items() {
         return new Promise<IEnumItem<T>[]>(async (s, f) => {
             try {

@@ -91,7 +91,7 @@ export abstract class RedisBase {
      * 
      * @param key 键
      */
-    public abstract hgetall(key: string): Promise<{ [key: string]: string }>;
+    public abstract hgetall(key: string): Promise<{ [key: string]: string; }>;
 
     /**
      * hash长度
@@ -220,129 +220,129 @@ export abstract class RedisBase {
      * @param key 键 
      * @param member 成员
      */
-     public abstract zadd(key:string,member:any[]): Promise<any>;
+    public abstract zadd(key: string, member: any[]): Promise<any>;
 
-     /**
-      * 返回有序集的成员数量
-      * 
-      * @param key 键 
-      * @param member 成员
-      */
-      public abstract zcard(key:string): Promise<number>;
- 
-     /**
-      * 统计有序集分值区间内的成员数量
-      * 
-      * @param key 键 
-      * @param min 最小分值（包括等于）
-      * @param max 最大分值（包括等于）
-      */
-      public abstract zcount(key: string,min:number,max:number): Promise<number>;
+    /**
+     * 返回有序集的成员数量
+     * 
+     * @param key 键 
+     * @param member 成员
+     */
+    public abstract zcard(key: string): Promise<number>;
 
-     /**
-      * 改变有序集内给定的成员增加相应的分值
-      * 
-      * @param key 键 
-      * @param increment 改变值（可正可负）
-      * @param member 成员
-      */
-      public abstract zincrby(key: string,increment: number, member: string): Promise<string>;
-      
-     /**
-      * 返回两个集合的交集到一个新的有序集
-      * 
-      * @param key 键 
-      * @param args 有序集
-      */
-      public abstract zinterstore(key: string, ...args: string[]): Promise<number>;
+    /**
+     * 统计有序集分值区间内的成员数量
+     * 
+     * @param key 键 
+     * @param min 最小分值（包括等于）
+     * @param max 最大分值（包括等于）
+     */
+    public abstract zcount(key: string, min: number, max: number): Promise<number>;
 
-     /**
-      * 返回有序集合中指定区间内的成员(升序，若相等按字典排)
-      * 
-      * @param key 键 
-      * @param start 区间开始值
-      * @param stop 区间结束值
-      * @param withScores 选项(是否返回分数)
-      */
-      public abstract zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES'): Promise<string[]>;
+    /**
+     * 改变有序集内给定的成员增加相应的分值
+     * 
+     * @param key 键 
+     * @param increment 改变值（可正可负）
+     * @param member 成员
+     */
+    public abstract zincrby(key: string, increment: number, member: string): Promise<string>;
 
-     /**
-      * 返回有序集合中指定区间内的成员
-      * 
-      * @param key 键 
-      * @param min 位置最小的成员
-      * @param max 位置最大的成员
-      * @param limit 分页
-      * @param offset 偏移量
-      * @param count 数量
-      */
-      public abstract zrangebylex(key: string,min: string,max: string,limit: 'LIMIT',offset: number,count: number): Promise<string[]>;
+    /**
+     * 返回两个集合的交集到一个新的有序集
+     * 
+     * @param key 键 
+     * @param args 有序集
+     */
+    public abstract zinterstore(key: string, ...args: string[]): Promise<number>;
 
-     /**
-      * 返回有序集中成员的排名
-      *
-      * @param key 键 
-      * @param member 成员
-      */
-      public abstract zrank(key: string, member:string): Promise<number>;
+    /**
+     * 返回有序集合中指定区间内的成员(升序，若相等按字典排)
+     * 
+     * @param key 键 
+     * @param start 区间开始值
+     * @param stop 区间结束值
+     * @param withScores 选项(是否返回分数)
+     */
+    public abstract zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES'): Promise<string[]>;
 
-     /**
-      * 移除有序集中的一个或多个成员
-      *
-      * @param key 键 
-      * @param args 成员
-      */
-      public abstract zrem(key: string,...args: any[]): Promise<number>;  
-       
-     /**
-      * 移除有序集合中指定排名(rank)区间内的所有成员
-      *
-      * @param key 键 
-      * @param start 开始区间
-      * @param stop 结尾区间
-      */
-      public abstract zremrangebyrank(key: string,start: number, stop: number): Promise<number>;
+    /**
+     * 返回有序集合中指定区间内的成员
+     * 
+     * @param key 键 
+     * @param min 位置最小的成员
+     * @param max 位置最大的成员
+     * @param limit 分页
+     * @param offset 偏移量
+     * @param count 数量
+     */
+    public abstract zrangebylex(key: string, min: string, max: string, limit?: 'LIMIT', offset?: number, count?: number): Promise<string[]>;
 
-     /**
-      * 移除有序集中分值介于区间的成员
-      *
-      * @param key 键 
-      * @param min 最小分值（包括等于）
-      * @param max 最大分值（包括等于）
-      */
-      public abstract zremrangebyscore(key: string,min: number, max: number): Promise<number>;  
-      
-     /**
-      * 返回有序集中指定区间内的成员(降序)
-      *
-      * @param key 键 
-      * @param start 开始区间（包括等于）
-      * @param stop 结束区间（包括等于）
-      * @param withScores withScores 选项(是否返回分数)
-      */
-      public abstract zrevrange(key: string,start: number, stop: number, withScores?: "WITHSCORES"): Promise<string[]>;
+    /**
+     * 返回有序集中成员的排名
+     *
+     * @param key 键 
+     * @param member 成员
+     */
+    public abstract zrank(key: string, member: string): Promise<number>;
 
-     /**
-      * 返回有序集合中成员的排名(降序)
-      *
-      * @param key 键 
-      * @param member 成员
-      */
-      public abstract zrevrank(key: string,member:string): Promise<number>;
+    /**
+     * 移除有序集中的一个或多个成员
+     *
+     * @param key 键 
+     * @param args 成员
+     */
+    public abstract zrem(key: string, ...args: any[]): Promise<number>;
 
-     /**
-      * 返回有序集中成员对应的分值
-      *
-      * @param key 键 
-      * @param member 成员
-      */
-      public abstract zscore(key: string,member:string): Promise<string>;
+    /**
+     * 移除有序集合中指定排名(rank)区间内的所有成员
+     *
+     * @param key 键 
+     * @param start 开始区间
+     * @param stop 结尾区间
+     */
+    public abstract zremrangebyrank(key: string, start: number, stop: number): Promise<number>;
 
-     /**
-      * 用于计算给定的一个或多个有序集的并集，其中给定 key 的数量必须以 numkeys 参数指定，并将该并集(结果集)储存到 destination 目标集合 
-      *
-      * @param key 键 
-      * @param args 有序集
-      */
-      public abstract zunionstore(key: string,...args: string[]): Promise<number>;
+    /**
+     * 移除有序集中分值介于区间的成员
+     *
+     * @param key 键 
+     * @param min 最小分值（包括等于）
+     * @param max 最大分值（包括等于）
+     */
+    public abstract zremrangebyscore(key: string, min: number, max: number): Promise<number>;
+
+    /**
+     * 返回有序集中指定区间内的成员(降序)
+     *
+     * @param key 键 
+     * @param start 开始区间（包括等于）
+     * @param stop 结束区间（包括等于）
+     * @param withScores withScores 选项(是否返回分数)
+     */
+    public abstract zrevrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES'): Promise<string[]>;
+
+    /**
+     * 返回有序集合中成员的排名(降序)
+     *
+     * @param key 键 
+     * @param member 成员
+     */
+    public abstract zrevrank(key: string, member: string): Promise<number>;
+
+    /**
+     * 返回有序集中成员对应的分值
+     *
+     * @param key 键 
+     * @param member 成员
+     */
+    public abstract zscore(key: string, member: string): Promise<string>;
+
+    /**
+     * 用于计算给定的一个或多个有序集的并集，其中给定 key 的数量必须以 numkeys 参数指定，并将该并集(结果集)储存到 destination 目标集合 
+     *
+     * @param key 键 
+     * @param args 有序集
+     */
+    public abstract zunionstore(key: string, ...args: string[]): Promise<number>;
 }

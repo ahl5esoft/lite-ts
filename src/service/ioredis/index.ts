@@ -160,14 +160,20 @@ export class IoredisAdapter extends RedisBase {
         return this.client.ttl(key);
     }
 
+<<<<<<< HEAD
     public async zadd(key: string,member:string[]) {
         return this.client.zadd(key,member);
+=======
+    public async zadd(key: string, member: string[]) {
+        return this.client.zadd(key, member);
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
     }
 
     public async zcard(key: string) {
         return this.client.zcard(key);
     }
 
+<<<<<<< HEAD
     public async zcount(key: string,min:number,max:number) {
         return this.client.zcount(key,min,max);
     }
@@ -182,22 +188,53 @@ export class IoredisAdapter extends RedisBase {
 
     public async zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
         return this.client.zrange(key,start,stop,withScores);
+=======
+    public async zcount(key: string, min: number, max: number) {
+        return this.client.zcount(key, min, max);
+    }
+
+    public async zincrby(key: string, increment: number, member: string) {
+        return this.client.zincrby(key, increment, member);
+    }
+
+    public async zinterstore(key: string, ...args: string[]) {
+        return this.client.zinterstore(key, ...args);
+    }
+
+    public async zrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
+        if (withScores)
+            return this.client.zrange(key, start, stop, withScores);
+        else
+            return this.client.zrange(key, start, stop);
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
     }
 
     public async zrangebylex(
         key: string,
         min: string,
         max: string,
+<<<<<<< HEAD
         limit: 'LIMIT',
         offset: number,
         count: number,) {
         return this.client.zrangebylex(key,min,max,limit,offset,count);
+=======
+        limit?: 'LIMIT',
+        offset?: number,
+        count?: number
+    ) {
+        if (limit)
+            return this.client.zrangebylex(key, min, max, limit, offset, count);
+        else
+            return this.client.zrangebylex(key, min, max);
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
     }
 
     public async zrangebyscore(
         key: string,
         min: string,
         max: string,
+<<<<<<< HEAD
         limit: 'LIMIT',
         offset: number,
         count: number,) {
@@ -236,3 +273,50 @@ export class IoredisAdapter extends RedisBase {
         return this.client.zunionstore(key,args);
     }
 }
+=======
+        limit?: 'LIMIT',
+        offset?: number,
+        count?: number
+    ) {
+        if (limit)
+            return this.client.zrangebyscore(key, min, max, limit, offset, count);
+        else
+            return this.client.zrangebyscore(key, min, max);
+    }
+
+    public async zrank(key: string, member: string) {
+        return this.client.zrank(key, member);
+    }
+
+    public async zrem(key: string, ...args: string[]) {
+        return this.client.zrem(key, args);
+    }
+
+    public async zremrangebyrank(key: string, start: number, stop: number) {
+        return this.client.zremrangebyrank(key, start, stop);
+    }
+
+    public async zremrangebyscore(key: string, min: number, max: number) {
+        return this.client.zremrangebyscore(key, min, max);
+    }
+
+    public async zrevrange(key: string, start: number, stop: number, withScores?: 'WITHSCORES') {
+        if (withScores)
+            return this.client.zrevrange(key, start, stop, withScores);
+        else
+            return this.client.zrevrange(key, start, stop);
+    }
+
+    public async zrevrank(key: string, menber: string) {
+        return this.client.zrevrank(key, menber);
+    }
+
+    public async zscore(key: string, menber: string) {
+        return this.client.zscore(key, menber);
+    }
+
+    public async zunionstore(key: string, ...args: string[]) {
+        return this.client.zunionstore(key, args);
+    }
+}
+>>>>>>> 86fdb5e6aa5d858211a2a0da28b5cd82151426d7
