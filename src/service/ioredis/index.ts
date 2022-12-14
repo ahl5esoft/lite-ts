@@ -205,14 +205,15 @@ export class IoredisAdapter extends RedisBase {
         key: string,
         min: string,
         max: string,
+        withScores?: 'WITHSCORES',
         limit?: 'LIMIT',
         offset?: number,
         count?: number
     ) {
         if (limit)
-            return this.client.zrangebyscore(key, min, max, limit, offset, count);
+            return this.client.zrangebyscore(key, min, max, withScores, limit, offset, count);
         else
-            return this.client.zrangebyscore(key, min, max);
+            return this.client.zrangebyscore(key, min, max, withScores);
     }
 
     public async zrank(key: string, member: string) {

@@ -264,11 +264,12 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
         key: string,
         min: string,
         max: string,
-        limit: 'LIMIT',
-        offset: number,
-        count: number
+        withScores?: 'WITHSCORES',
+        limit?: 'LIMIT',
+        offset?: number,
+        count?: number
     ) {
-        return await this.exec('zrangebyscore', [key, min, max, limit, offset, count], {
+        return await this.exec('zrangebyscore', [key, min, max, limit, withScores, offset, count], {
             key,
             min,
             max,

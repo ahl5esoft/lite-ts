@@ -279,6 +279,19 @@ export abstract class RedisBase {
     public abstract zrangebylex(key: string, min: string, max: string, limit?: 'LIMIT', offset?: number, count?: number): Promise<string[]>;
 
     /**
+     * 返回有序集合中指定分数内的成员
+     * 
+     * @param key 键 
+     * @param min 最低分数
+     * @param max 最高分数
+     * @param withScores 是否显示成员
+     * @param limit 分页
+     * @param offset 偏移量
+     * @param count 数量
+     */
+    public abstract zrangebyscore(key: string, min: string, max: string, withScores?: 'WITHSCORES', limit?: 'LIMIT', offset?: number, count?: number): Promise<string[]>;
+
+    /**
      * 返回有序集中成员的排名
      *
      * @param key 键 
