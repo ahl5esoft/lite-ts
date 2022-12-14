@@ -1,7 +1,6 @@
 import Ioredis from 'ioredis';
 
-import { RedisBase } from '../../contract';
-import { contract } from '../../model';
+import { IRedisGeo, IRedisZMember, IRedisZRangeByLexOption, IRedisZRangeByScoreOption, RedisBase } from '../../contract';
 
 type RedisType = Ioredis.Cluster | Ioredis.Redis;
 
@@ -67,7 +66,7 @@ export class IoredisAdapter extends RedisBase {
         return this.client.get(key);
     }
 
-    public async geoadd(key: string, ...values: contract.IRedisGeo[]) {
+    public async geoadd(key: string, ...values: IRedisGeo[]) {
         let args = values.reduce((memo: any[], r): any[] => {
             memo.push(r.longitude, r.latitude, r.member);
             return memo;
@@ -187,32 +186,30 @@ export class IoredisAdapter extends RedisBase {
             return this.client.zrange(key, start, stop);
     }
 
-    public async zrangebylex(
-        key: string,
-        min: string,
-        max: string,
-        limit?: 'LIMIT',
-        offset?: number,
-        count?: number
-    ) {
-        if (limit)
-            return this.client.zrangebylex(key, min, max, limit, offset, count);
-        else
-            return this.client.zrangebylex(key, min, max);
+    public async zrangebylex(opt: IRedisZRangeByLexOption) {
+        const args = [opt.key, opt.min, opt.max];
+        if (opt.limit)
+            args.push('LIMIT', opt.limit.offset, opt.limit.count);
+        return this.client.zrangebylex.apply(this.client, args);
     }
 
-    public async zrangebyscore(
-        key: string,
-        min: string,
-        max: string,
-        limit?: 'LIMIT',
-        offset?: number,
-        count?: number
-    ) {
-        if (limit)
-            return this.client.zrangebyscore(key, min, max, limit, offset, count);
-        else
-            return this.client.zrangebyscore(key, min, max);
+    public async zrangebyscore(opt: IRedisZRangeByScoreOption) {
+        const args = [opt.key, opt.min, opt.max];
+        if (opt.withScores)
+            args.push('WITHSCORES');
+        if (opt.limit)
+            args.push('LIMIT', opt.limit.offset, opt.limit.count);
+        const res = await this.client.zrangebyscore.apply(this.client, args) as string[];
+        return res.reduce((memo: IRedisZMember[], r, i) => {
+            if (!opt.withScores || i % 2 == 0) {
+                memo.push({
+                    member: r
+                });
+            } else {
+                memo[memo.length - 1].score = Number(r);
+            }
+            return memo;
+        }, []);
     }
 
     public async zrank(key: string, member: string) {

@@ -30,7 +30,7 @@ export class RpcUserValueService extends UserValueServiceBase {
             this.m_ChangeValues ??= [];
             this.m_ChangeValues.push(...values);
             uow.registerAfter(async () => {
-                await this.m_Rpc.callWithoutThrow<void>({
+                await this.m_Rpc.call<void>({
                     body: {
                         userID: this.userService.userID,
                         values: this.m_ChangeValues

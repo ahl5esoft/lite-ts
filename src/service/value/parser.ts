@@ -50,7 +50,7 @@ export class ValueParser implements IParser {
                 throw new Error(`无效数值消费名: ${r}`);
 
             const count = parseInt(match[2]);
-            if (isNaN(count) || count == 0)
+            if (isNaN(count))
                 throw new Error(`无效数值消费数量: ${r}`);
 
             res.push({
