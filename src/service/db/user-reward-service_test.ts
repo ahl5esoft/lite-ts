@@ -66,6 +66,16 @@ describe('src/service/db/user-reward-service.ts', () => {
             });
 
             mockRandSeedService.expectReturn(
+                r => r.use(null, 1),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.use(null, 1),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
                 r => r.use(null, 2),
                 11
             );
@@ -88,7 +98,7 @@ describe('src/service/db/user-reward-service.ts', () => {
                 source: 't2',
                 targetNo: undefined,
                 targetType: undefined,
-                valueType: 3,
+                valueType: 1,
             }]);
         });
     });
@@ -156,6 +166,16 @@ describe('src/service/db/user-reward-service.ts', () => {
             });
 
             mockRandSeedService.expectReturn(
+                r => r.use(null, 1),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.use(null, 1),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
                 r => r.use(null, 2),
                 11
             );
@@ -212,17 +232,47 @@ describe('src/service/db/user-reward-service.ts', () => {
             });
 
             mockRandSeedService.expectReturn(
-                r => r.get(null, 2, 0),
+                r => r.get(null, 1, 0),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 1),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 2, 2),
                 11
             );
 
             mockRandSeedService.expectReturn(
-                r => r.get(null, 1, 2),
+                r => r.get(null, 1, 4),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 5),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 6),
                 0
             );
 
             mockRandSeedService.expectReturn(
-                r => r.get(null, 1, 3),
+                r => r.get(null, 1, 7),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 8),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 9),
                 1
             );
 
@@ -282,17 +332,47 @@ describe('src/service/db/user-reward-service.ts', () => {
             });
 
             mockRandSeedService.expectReturn(
-                r => r.get(null, 2, 0),
+                r => r.get(null, 1, 0),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 1),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 2, 2),
                 11
             );
 
             mockRandSeedService.expectReturn(
-                r => r.get(null, 1, 2),
+                r => r.get(null, 1, 4),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 5),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 6),
                 0
             );
 
             mockRandSeedService.expectReturn(
-                r => r.get(null, 1, 3),
+                r => r.get(null, 1, 7),
+                2
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 8),
+                1
+            );
+
+            mockRandSeedService.expectReturn(
+                r => r.get(null, 1, 9),
                 1
             );
 
