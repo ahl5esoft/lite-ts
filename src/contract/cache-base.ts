@@ -11,6 +11,15 @@ export abstract class CacheBase {
         protected cacheKey: string,
     ) { }
 
+    /**
+     * 清空
+     * 
+     * @example
+     * ```typescript
+     *  const cache: CacheBase;
+     *  await cache.flush();
+     * ```
+     */
     public async flush() {
         this.m_NextCheckOn = 0;
         await this.redis.hset(
@@ -20,6 +29,15 @@ export abstract class CacheBase {
         );
     }
 
+    /**
+     * 获取
+     * 
+     * @example
+     * ```typescript
+     *  const cache: CacheBase;
+     *  const res = await cache.get<T>('key');
+     * ```
+     */
     public async get<T>(key: string) {
         const now = Date.now();
         if (this.m_NextCheckOn < now) {

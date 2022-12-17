@@ -7,13 +7,7 @@ import { UserServiceBase } from './user-service-base';
 import { ValueServiceBase } from './value-service-base';
 import { contract, global } from '../model';
 
-/**
- * 用户数值服务
- */
 export abstract class UserValueServiceBase extends ValueServiceBase<global.UserValue> {
-    /**
-     * 实体
-     */
     public get entry() {
         return new Promise<global.UserValue>(async (s, f) => {
             try {
@@ -28,9 +22,6 @@ export abstract class UserValueServiceBase extends ValueServiceBase<global.UserV
     }
 
     private m_Now: [number, number];
-    /**
-     * 获取当前时间
-     */
     public get now() {
         return new Promise<number>(async (s, f) => {
             const nowUnix = moment().unix();
@@ -38,7 +29,7 @@ export abstract class UserValueServiceBase extends ValueServiceBase<global.UserV
                 try {
                     const entry = await this.entry;
                     const temp: [number, number] = [
-                        entry?.values?.[this.m_NowValueType] ?? 0,
+                        entry?.values?.[this.nowValueType] ?? 0,
                         nowUnix
                     ];
                     if (!temp[0])
@@ -54,28 +45,14 @@ export abstract class UserValueServiceBase extends ValueServiceBase<global.UserV
         });
     }
 
-    /**
-     * 构造函数
-     * 
-     * @param userService 用户服务
-     * @param nowTime 当前时间
-     * @param m_NowValueType 当前数值类型
-     * @param enumFactory 枚举工厂
-     */
     public constructor(
         public userService: UserServiceBase,
         protected nowTime: NowTimeBase,
-        private m_NowValueType: number,
+        protected nowValueType: number,
         enumFactory: EnumFactoryBase,
     ) {
         super(enumFactory);
     }
 
-    /**
-     * 更新
-     * 
-     * @param uow 工作单元
-     * @param values 数值数组
-     */
     public abstract update(uow: IUnitOfWork, values: contract.IValue[]): Promise<void>;
 }

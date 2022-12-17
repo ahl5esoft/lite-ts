@@ -11,7 +11,7 @@ export class RpcValueService<T extends global.UserTargetValue> extends ValueServ
     public get entry() {
         return new Promise<T>(async (s, f) => {
             try {
-                const entries = await this.m_UserService.associateService.find<T>(this.m_TargetTypeData.key);
+                const entries = await this.userService.associateService.find<T>(this.targetTypeData.key);
                 s(
                     entries.length == 1 ? entries[0] : entries.find(r => r.no == this.m_Entry.no)
                 );
@@ -22,13 +22,13 @@ export class RpcValueService<T extends global.UserTargetValue> extends ValueServ
     }
 
     public get now() {
-        return this.m_UserService.valueService.now;
+        return this.userService.valueService.now;
     }
 
     public constructor(
-        private m_Rpc: RpcBase,
-        private m_UserService: UserServiceBase,
-        private m_TargetTypeData: enum_.TargetTypeData,
+        protected rpc: RpcBase,
+        protected userService: UserServiceBase,
+        protected targetTypeData: enum_.TargetTypeData,
         private m_Entry: T,
         enumFactory: EnumFactoryBase,
     ) {
@@ -36,12 +36,12 @@ export class RpcValueService<T extends global.UserTargetValue> extends ValueServ
     }
 
     public async update(_: IUnitOfWork, values: contract.IValue[]) {
-        await this.m_Rpc.call<void>({
+        await this.rpc.call<void>({
             body: {
                 ...this.m_Entry,
                 values: values
             },
-            route: `/${this.m_TargetTypeData.app}/update-values-by-user-id`
+            route: `/${this.targetTypeData.app}/update-values-by-user-id`
         });
     }
 }

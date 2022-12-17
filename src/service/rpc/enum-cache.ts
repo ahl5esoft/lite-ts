@@ -4,8 +4,8 @@ import { global } from '../../model';
 
 export class RpcEnumCache extends EnumCacheBase {
     public constructor(
-        private m_Rpc: RpcBase,
-        private m_App: string,
+        protected rpc: RpcBase,
+        protected app: string,
         redis: RedisBase,
         cacheKey: string,
         sep: string,
@@ -15,8 +15,8 @@ export class RpcEnumCache extends EnumCacheBase {
 
     public withTrace(parentSpan: any) {
         return parentSpan ? new RpcEnumCache(
-            new TracerStrategy(this.m_Rpc).withTrace(parentSpan),
-            this.m_App,
+            new TracerStrategy(this.rpc).withTrace(parentSpan),
+            this.app,
             new TracerStrategy(this.redis).withTrace(parentSpan),
             this.cacheKey,
             this.sep
@@ -24,8 +24,8 @@ export class RpcEnumCache extends EnumCacheBase {
     }
 
     protected async find() {
-        return await this.m_Rpc.call<global.Enum[]>({
-            route: `/${this.m_App}/find-all-enums`
+        return await this.rpc.call<global.Enum[]>({
+            route: `/${this.app}/find-all-enums`
         });
     }
 }

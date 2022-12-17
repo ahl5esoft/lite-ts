@@ -1,20 +1,9 @@
 import { EnumFactoryBase, IParser } from '../../contract';
 import { contract, enum_ } from '../../model';
 
-/**
- * 数值条件解析器
- */
 export class ValueConditionParser implements IParser {
-    /**
-     * 匹配规则
-     */
     public static reg = /^([^=><%-]+)(%|now-diff)*([=><]+)(-?\d+(\.?\d+)?)$/;
 
-    /**
-     * 构造函数
-     * 
-     * @param enumFactory 枚举工厂
-     */
     public constructor(
         protected enumFactory: EnumFactoryBase,
     ) { }

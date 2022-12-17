@@ -131,7 +131,7 @@ export class DbValueService<
                     );
                     if (!isSame) {
                         entry.values[r.valueType] = 0;
-                        logEntry.source += '(每周期重置)';
+                        logEntry.source += '(时间重置)';
                     }
 
                     entry.values[allValueTypeItem[r.valueType].entry.time.valueType] = nowUnix;

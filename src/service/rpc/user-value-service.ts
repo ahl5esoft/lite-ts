@@ -14,8 +14,8 @@ export class RpcUserValueService extends UserValueServiceBase {
     private m_ChangeValues: contract.IValue[] = [];
 
     public constructor(
-        private m_Rpc: RpcBase,
-        private m_TargetTypeData: enum_.TargetTypeData,
+        protected rpc: RpcBase,
+        protected targetTypeData: enum_.TargetTypeData,
         enumFactory: EnumFactoryBase,
         nowTime: NowTimeBase,
         userService: UserServiceBase,
@@ -25,12 +25,12 @@ export class RpcUserValueService extends UserValueServiceBase {
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        const route = ['', this.m_TargetTypeData.app, RpcUserValueService.updateRoute].join('/')
+        const route = ['', this.targetTypeData.app, RpcUserValueService.updateRoute].join('/')
         if (uow) {
             this.m_ChangeValues ??= [];
             this.m_ChangeValues.push(...values);
             uow.registerAfter(async () => {
-                await this.m_Rpc.call<void>({
+                await this.rpc.call<void>({
                     body: {
                         userID: this.userService.userID,
                         values: this.m_ChangeValues
@@ -39,7 +39,7 @@ export class RpcUserValueService extends UserValueServiceBase {
                 });
             }, route);
         } else {
-            await this.m_Rpc.call<void>({
+            await this.rpc.call<void>({
                 body: {
                     userID: this.userService.userID,
                     values: values

@@ -18,19 +18,19 @@ export class RpcUserService extends UserServiceBase {
     public get valueService() {
         this.m_ValueService ??= new RpcUserValueService(
             this.rpc,
-            this.m_TargetTypeData,
+            this.targetTypeData,
             this.enumFactory,
             this.nowTime,
             this,
-            this.m_NowValueType,
+            this.nowValueType,
         );
         return this.m_ValueService;
     }
 
     public constructor(
         protected nowTime: NowTimeBase,
-        private m_TargetTypeData: enum_.TargetTypeData,
-        private m_NowValueType: number,
+        protected targetTypeData: enum_.TargetTypeData,
+        protected nowValueType: number,
         associateService: IUserAssociateService,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,

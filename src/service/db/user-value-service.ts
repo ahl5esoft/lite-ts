@@ -14,14 +14,8 @@ import {
 } from '../../contract';
 import { contract, global } from '../../model';
 
-/**
- * 用户数值服务
- */
 export class DbUserValueService extends UserValueServiceBase {
     private m_ValueService: ValueServiceBase<global.UserValue>;
-    /**
-     * 数值服务
-     */
     protected get valueService() {
         this.m_ValueService ??= new DbValueService<global.UserValue, global.UserValueChange, global.UserValueLog>(
             this.m_DbFactory,
@@ -49,10 +43,6 @@ export class DbUserValueService extends UserValueServiceBase {
         return this.m_ValueService;
     }
 
-
-    /**
-     * 获取用户数值实体
-     */
     public get entry() {
         return new Promise<global.UserValue>(async (s, f) => {
             try {
@@ -66,18 +56,6 @@ export class DbUserValueService extends UserValueServiceBase {
         });
     }
 
-    /**
-     * 构造函数
-     * 
-     * @param userService 用户服务
-     * @param m_DbFactory 数据库工厂
-     * @param m_StringGenerator 字符串生成器
-     * @param m_ValueInterceptorFactory 数值拦截器工厂
-     * @param m_ParentTracerSpan 父跟踪范围
-     * @param enumFactory 枚举工厂
-     * @param nowTime 当前时间
-     * @param nowValueType 当前时间数值类型
-     */
     public constructor(
         public userService: UserServiceBase,
         private m_DbFactory: DbFactoryBase,
@@ -91,22 +69,10 @@ export class DbUserValueService extends UserValueServiceBase {
         super(userService, nowTime, nowValueType, enumFactory);
     }
 
-    /**
-     * 获取数量
-     * 
-     * @param uow 工作单元
-     * @param valueType 数值类型
-     */
     public async getCount(uow: IUnitOfWork, valueType: number) {
         return this.valueService.getCount(uow, valueType);
     }
 
-    /**
-     * 更新数值
-     * 
-     * @param uow 工作单元
-     * @param values 数值数组
-     */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         const tracerSpan = this.m_ParentTracerSpan ? opentracing.globalTracer().startSpan('userValue.update', {
             childOf: this.m_ParentTracerSpan,

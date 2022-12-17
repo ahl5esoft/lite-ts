@@ -7,22 +7,11 @@ import { TracerStrategy } from '../tracer';
 import { EnumFactoryBase, ITraceable, ValueInterceptorFactoryBase } from '../../contract';
 import { contract, enum_ } from '../../model';
 
-/**
- * null数值拦截器
- */
 const nullValueInterceptor = new NullValueInterceptor();
-/**
- * 数值拦截器工厂
- */
+
 export class ValueInterceptorFactory extends ValueInterceptorFactoryBase implements ITraceable<ValueInterceptorFactoryBase> {
-    /**
-     * 构造函数
-     * 
-     * @param m_EnumFactory 枚举工厂
-     * @param m_ParentSpan 父跟踪范围
-     */
     public constructor(
-        private m_EnumFactory: EnumFactoryBase,
+        protected enumFactory: EnumFactoryBase,
         private m_ParentSpan?: opentracing.Span
     ) {
         super();
@@ -38,7 +27,7 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
             return nullValueInterceptor;
 
         if (!valueInterceptorMetadata.valueType[value.valueType]) {
-            const allValueTypeItem = await this.m_EnumFactory.build(enum_.ValueTypeData).allItem;
+            const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
             if (allValueTypeItem[value.valueType]) {
                 for (const r of valueInterceptorMetadata.predicates) {
                     const ok = r.predicate(allValueTypeItem[value.valueType].entry);
@@ -65,7 +54,7 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
      */
     public withTrace(parentSpan: any) {
         return parentSpan ? new ValueInterceptorFactory(
-            new TracerStrategy(this.m_EnumFactory).withTrace(parentSpan),
+            new TracerStrategy(this.enumFactory).withTrace(parentSpan),
             parentSpan,
         ) : this;
     }
