@@ -54,6 +54,18 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         return false;
     }
 
+    public async enough(uow: IUnitOfWork, times: number, consumeValues: contract.IValue[]) {
+        return this.checkConditions(uow, [
+            consumeValues.map(r => {
+                return {
+                    count: Math.abs(r.count) * times,
+                    op: enum_.RelationOperator.ge,
+                    valueType: r.valueType,
+                } as contract.IValueCondition;
+            })
+        ]);
+    }
+
     public async getCount(_: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
         entry ??= {

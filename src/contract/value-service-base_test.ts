@@ -578,6 +578,58 @@ describe('src/contract/value-service-base.ts', () => {
         });
     });
 
+    describe('.enough(uow: IUnitOfWork, times: number, consumeValues: model.contract.IValue[])', () => {
+        it('ok', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const self = new Self(0, mockEnumFactory.actual);
+
+            self.entry = Promise.resolve({
+                id: '',
+                values: {
+                    2: 2
+                }
+            } as global.UserValue);
+
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
+                allItem: {}
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
+
+            const res = await self.enough(null, 2, [{
+                count: -1,
+                valueType: 2
+            }]);
+            strictEqual(res, true);
+        });
+
+        it('false', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const self = new Self(0, mockEnumFactory.actual);
+
+            self.entry = Promise.resolve({
+                id: '',
+                values: {}
+            } as global.UserValue);
+
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
+                allItem: {}
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
+
+            const res = await self.enough(null, 2, [{
+                count: -1,
+                valueType: 2
+            }]);
+            strictEqual(res, false);
+        });
+    });
+
     describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
         it('entry = null', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
