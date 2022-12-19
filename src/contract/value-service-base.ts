@@ -36,7 +36,7 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
                     case enum_.RelationOperator.ge:
                         return aCount >= bCount;
                     case enum_.RelationOperator.gt:
-                        return aCount > bCount
+                        return aCount > bCount;
                     case enum_.RelationOperator.le:
                         return aCount <= bCount;
                     case enum_.RelationOperator.lt:
@@ -74,6 +74,16 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         entry.values[valueType] ??= 0;
 
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
+        // 兼容
+        if (allValueTypeItem[valueType]?.entry['dailyTime'] && !allValueTypeItem[valueType].entry.time) {
+            allValueTypeItem[valueType].entry.time = {
+                valueType: allValueTypeItem[valueType].entry['dailyTime']
+            };
+            allValueTypeItem[allValueTypeItem[valueType].entry['dailyTime']].entry.time = {
+                momentType: 'day'
+            };
+        }
+
         if (allValueTypeItem[valueType]?.entry?.time?.valueType) {
             const now = await this.now;
             const oldNow = entry.values[allValueTypeItem[valueType].entry.time.valueType] || 0;

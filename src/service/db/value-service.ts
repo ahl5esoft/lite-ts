@@ -114,10 +114,12 @@ export class DbValueService<
 
             if (allValueTypeItem[r.valueType]) {
                 // 兼容
-                if (allValueTypeItem[r.valueType].entry['dailyTime']) {
+                if (allValueTypeItem[r.valueType].entry['dailyTime'] && !allValueTypeItem[r.valueType].entry.time) {
                     allValueTypeItem[r.valueType].entry.time = {
-                        momentType: 'day',
                         valueType: allValueTypeItem[r.valueType].entry['dailyTime']
+                    };
+                    allValueTypeItem[allValueTypeItem[r.valueType].entry['dailyTime']].entry.time = {
+                        momentType: 'day'
                     };
                 }
 

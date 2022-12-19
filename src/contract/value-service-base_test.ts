@@ -784,5 +784,43 @@ describe('src/contract/value-service-base.ts', () => {
             const res = await self.getCount(null, 1);
             strictEqual(res, 11);
         });
+
+        it('兼容dailyTime(重置)', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const self = new Self(
+                moment().unix(),
+                mockEnumFactory.actual
+            );
+
+            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
+                allItem: {
+                    1: {
+                        entry: {
+                            dailyTime: 2
+                        }
+                    },
+                    2: {
+                        entry: {
+                            isReplace: true
+                        }
+                    }
+                }
+            });
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                mockValueTypeEnum.actual
+            );
+
+            Reflect.set(self, 'entry', {
+                id: '',
+                values: {
+                    1: 11,
+                    2: moment().add(-1, 'day').unix()
+                }
+            });
+
+            const res = await self.getCount(null, 1);
+            strictEqual(res, 0);
+        });
     });
 });
