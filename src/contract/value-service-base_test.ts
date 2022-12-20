@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual } from 'assert';
+import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
 import moment from 'moment';
 
 import { EnumBase } from './enum-base';
@@ -578,55 +578,74 @@ describe('src/contract/value-service-base.ts', () => {
         });
     });
 
-    describe('.enough(uow: IUnitOfWork, times: number, consumeValues: model.contract.IValue[])', () => {
+    describe('.checkEnough(uow: IUnitOfWork, times: number, consumeValues: model.contract.IValue[])', () => {
         it('ok', async () => {
-            const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(0, mockEnumFactory.actual);
+            const self = new Self(0, null);
 
-            self.entry = Promise.resolve({
-                id: '',
-                values: {
-                    2: 2
-                }
-            } as global.UserValue);
-
-            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
-                allItem: {}
+            Reflect.set(self, 'getCount', (_: any, arg: number) => {
+                strictEqual(arg, 2);
+                return 99;
             });
-            mockEnumFactory.expectReturn(
-                r => r.build(enum_.ValueTypeData),
-                mockValueTypeEnum.actual
-            );
 
-            const res = await self.enough(null, 2, [{
-                count: -1,
-                valueType: 2
-            }]);
-            strictEqual(res, true);
+            let err: Error;
+            try {
+                await self.checkEnough(null, 2, [{
+                    count: -1,
+                    valueType: 2
+                }]);
+            } catch (ex) {
+                err = ex;
+            }
+            strictEqual(err, undefined);
         });
 
         it('false', async () => {
-            const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(0, mockEnumFactory.actual);
+            const self = new Self(0, null);
 
-            self.entry = Promise.resolve({
-                id: '',
-                values: {}
-            } as global.UserValue);
-
-            const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
-                allItem: {}
+            Reflect.set(self, 'getCount', (_: any, arg: number) => {
+                strictEqual(arg, 2);
+                return 0;
             });
-            mockEnumFactory.expectReturn(
-                r => r.build(enum_.ValueTypeData),
-                mockValueTypeEnum.actual
-            );
 
-            const res = await self.enough(null, 2, [{
-                count: -1,
-                valueType: 2
-            }]);
-            strictEqual(res, false);
+            let err: Error;
+            try {
+                await self.checkEnough(null, 2, [{
+                    count: -1,
+                    valueType: 2
+                }]);
+            } catch (ex) {
+                err = ex;
+            }
+            notStrictEqual(err, undefined);
+        });
+    });
+
+    describe('.compatibleValueType(allItem: { [value: number]: IEnumItem<enum_.ValueTypeData>; }, valueType: number)', () => {
+        it('dailyTime', async () => {
+            const self = new Self(0, null);
+            const fn = Reflect.get(self, 'compatibleValueType').bind(this);
+            const allItem = {
+                1: {
+                    entry: {
+                        dailyTime: 2
+                    }
+                },
+                2: {
+                    entry: {}
+                }
+            }
+            await fn(allItem, 1);
+            deepStrictEqual(allItem[1].entry, {
+                dailyTime: 2,
+                time: {
+                    valueType: 2
+                }
+            });
+            deepStrictEqual(allItem[2].entry, {
+                time: {
+                    momentType: 'day'
+                }
+            });
         });
     });
 

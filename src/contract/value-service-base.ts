@@ -1,10 +1,13 @@
 import moment from 'moment';
 
 import { EnumFactoryBase } from './enum-factory-base';
+import { IEnumItem } from './i-enum-item';
 import { IUnitOfWork } from './i-unit-of-work';
 import { contract, enum_, global } from '../model';
 
 export abstract class ValueServiceBase<T extends global.UserValue> {
+    public static buildNotEnoughErrorFunc: (consoumeCount: number, hasCount: number, valueType: number) => Error;
+
     public updateValues: contract.IValue[];
 
     public abstract get entry(): Promise<T>;
@@ -54,16 +57,12 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         return false;
     }
 
-    public async enough(uow: IUnitOfWork, times: number, consumeValues: contract.IValue[]) {
-        return this.checkConditions(uow, [
-            consumeValues.map(r => {
-                return {
-                    count: Math.abs(r.count) * times,
-                    op: enum_.RelationOperator.ge,
-                    valueType: r.valueType,
-                } as contract.IValueCondition;
-            })
-        ]);
+    public async checkEnough(uow: IUnitOfWork, times: number, consumeValues: contract.IValue[]) {
+        for (const r of consumeValues) {
+            const count = await this.getCount(uow, r.valueType);
+            if (count + r.count * times < 0)
+                throw ValueServiceBase.buildNotEnoughErrorFunc(r.count * times, count, r.valueType);
+        }
     }
 
     public async getCount(_: IUnitOfWork, valueType: number) {
@@ -74,20 +73,34 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         entry.values[valueType] ??= 0;
 
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
-        if (allValueTypeItem[valueType]?.entry?.time?.valueType) {
+        await this.compatibleValueType(allValueTypeItem, valueType);
+        const valueTypeEntry = allValueTypeItem[valueType]?.entry;
+        if (valueTypeEntry?.time?.valueType) {
             const now = await this.now;
-            const oldNow = entry.values[allValueTypeItem[valueType].entry.time.valueType] || 0;
+            const oldNow = entry.values[valueTypeEntry.time.valueType];
             const ok = moment.unix(now).isSame(
                 moment.unix(oldNow),
-                allValueTypeItem[allValueTypeItem[valueType].entry.time.valueType]?.entry?.time?.momentType ?? 'day'
+                allValueTypeItem[valueTypeEntry.time.valueType]?.entry?.time?.momentType ?? 'day'
             );
             if (!ok) {
                 entry.values[valueType] = 0;
-                entry.values[allValueTypeItem[valueType].entry.time.valueType] = now;
+                entry.values[valueTypeEntry.time.valueType] = now;
             }
         }
 
         return entry.values[valueType];
+    }
+
+    protected async compatibleValueType(allItem: { [value: number]: IEnumItem<enum_.ValueTypeData>; }, valueType: number) {
+        const entry = allItem[valueType]?.entry;
+        if (entry?.['dailyTime'] && !entry.time) {
+            entry.time = {
+                valueType: entry['dailyTime']
+            };
+            allItem[entry['dailyTime']].entry.time = {
+                momentType: 'day'
+            };
+        }
     }
 
     public abstract update(uow: IUnitOfWork, values: contract.IValue[]): Promise<void>;

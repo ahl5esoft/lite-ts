@@ -38,6 +38,7 @@ import {
     StringGeneratorBase,
     ThreadBase,
     UserServiceBase,
+    ValueServiceBase,
 } from '../../contract';
 import { config, enum_, global } from '../../model';
 
@@ -220,7 +221,15 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         }, {
             userID
         } as global.UserTargetValue, enumFactory);
-    }
+    };
+
+    ValueServiceBase.buildNotEnoughErrorFunc = (consumeCount, hasCount, valueType) => {
+        return new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
+            consume: Math.abs(consumeCount),
+            count: hasCount,
+            valueType: valueType,
+        });
+    };
 
     return cfg;
 }

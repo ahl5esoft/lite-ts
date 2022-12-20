@@ -1,7 +1,6 @@
 import { opentracing } from 'jaeger-client';
 import moment from 'moment';
 
-import { CustomError } from '../error';
 import {
     DbFactoryBase,
     DbRepositoryBase,
@@ -113,13 +112,7 @@ export class DbValueService<
             logEntry.valueType = r.valueType;
 
             if (allValueTypeItem[r.valueType]) {
-                // 兼容
-                if (allValueTypeItem[r.valueType].entry['dailyTime']) {
-                    allValueTypeItem[r.valueType].entry.time = {
-                        momentType: 'day',
-                        valueType: allValueTypeItem[r.valueType].entry['dailyTime']
-                    };
-                }
+                this.compatibleValueType(allValueTypeItem, r.valueType);
 
                 if (allValueTypeItem[r.valueType].entry.isReplace) {
                     entry.values[r.valueType] = r.count;
@@ -145,11 +138,7 @@ export class DbValueService<
 
             if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType]?.entry.isNegative) {
                 entry.values[r.valueType] = logEntry.oldCount;
-                throw new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
-                    consume: Math.abs(r.count),
-                    count: logEntry.oldCount,
-                    valueType: r.valueType,
-                });
+                throw ValueServiceBase.buildNotEnoughErrorFunc(r.count, logEntry.oldCount, r.valueType);
             }
 
             logEntry.count = entry.values[r.valueType];
