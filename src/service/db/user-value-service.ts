@@ -74,10 +74,11 @@ export class DbUserValueService extends UserValueServiceBase {
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
-        const tracerSpan = this.m_ParentTracerSpan ? opentracing.globalTracer().startSpan('userValue.update', {
+        const tracerSpan = opentracing.globalTracer().startSpan('userValue.update', {
             childOf: this.m_ParentTracerSpan,
-        }) : null;
-        const tasks = values.reduce((memo, r) => {
+        });
+
+        const groups = values.reduce((memo, r) => {
             r.targetType ??= 0;
             const item = memo.find(cr => {
                 return cr.targetType == r.targetType;
@@ -94,15 +95,16 @@ export class DbUserValueService extends UserValueServiceBase {
         }, [] as {
             values: contract.IValue[],
             targetType: number,
-        }[]).map(async r => {
+        }[]);
+        for (const r of groups) {
             if (r.targetType) {
-                const targetValueService = await this.userService.getTargetValueService(r.targetType);
-                return targetValueService.update(uow, r.values);
+                const valueService = await this.userService.getTargetValueService(r.targetType);
+                await valueService.update(uow, r.values);
             } else {
-                return this.valueService.update(uow, r.values);
+                await this.valueService.update(uow, r.values);
             }
-        });
-        await Promise.all(tasks);
-        tracerSpan?.finish?.();
+        }
+
+        tracerSpan.finish();
     }
 }
