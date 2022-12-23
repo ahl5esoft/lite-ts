@@ -1,6 +1,6 @@
 import { opentracing } from 'jaeger-client';
 
-import { RpcUserValueService } from './user-value-service';
+import { RpcValueService } from './value-service';
 import {
     DbFactoryBase,
     EnumFactoryBase,
@@ -9,40 +9,47 @@ import {
     RpcBase,
     ThreadBase,
     UserServiceBase,
-    UserValueServiceBase,
 } from '../../contract';
-import { enum_ } from '../../model';
+import { enum_, global } from '../../model';
 
 export class RpcUserService extends UserServiceBase {
-    private m_ValueService: UserValueServiceBase;
+    private m_ValueService: RpcValueService<global.UserValue>;
     public get valueService() {
-        this.m_ValueService ??= new RpcUserValueService(
+        this.m_ValueService ??= new RpcValueService(
             this.rpc,
             this.targetTypeData,
+            {
+                userID: this.userID,
+            },
             this.enumFactory,
-            this.nowTime,
             this,
-            this.nowValueType,
+            r => r.id == this.userID
         );
         return this.m_ValueService;
     }
 
     public constructor(
-        protected nowTime: NowTimeBase,
         protected targetTypeData: enum_.TargetTypeData,
-        protected nowValueType: number,
         associateService: IUserAssociateService,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
+        nowTime: NowTimeBase,
         rpc: RpcBase,
         thread: ThreadBase,
+        nowValueType: number,
         parentTracerSpan: opentracing.Span,
         userID: string,
     ) {
-        super(associateService, userID, dbFactory, enumFactory, rpc, thread, parentTracerSpan);
-    }
-
-    public async getTargetValueService() {
-        return null;
+        super(
+            associateService,
+            userID,
+            dbFactory,
+            enumFactory,
+            nowTime,
+            rpc,
+            thread,
+            nowValueType,
+            parentTracerSpan,
+        );
     }
 }

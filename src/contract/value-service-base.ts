@@ -3,6 +3,7 @@ import moment from 'moment';
 import { EnumFactoryBase } from './enum-factory-base';
 import { IEnumItem } from './i-enum-item';
 import { IUnitOfWork } from './i-unit-of-work';
+import { UserServiceBase } from './user-service-base';
 import { contract, enum_, global } from '../model';
 
 export abstract class ValueServiceBase<T extends global.UserValue> {
@@ -10,18 +11,28 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
 
     public updateValues: contract.IValue[];
 
-    public abstract get entry(): Promise<T>;
-    public abstract get now(): Promise<number>;
+    public get entry() {
+        return new Promise<global.UserValue>(async (s, f) => {
+            try {
+                const entries = await this.userService.associateService.find<global.UserValue>(global.UserValue.name, this.m_GetEntryPredicate);
+                s(entries[0]);
+            } catch (ex) {
+                f(ex);
+            }
+        });
+    }
 
     public constructor(
+        public userService: UserServiceBase,
         protected enumFactory: EnumFactoryBase,
+        private m_GetEntryPredicate: (r: T) => boolean,
     ) { }
 
     public async checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[][]) {
         if (!conditions?.length)
             return true;
 
-        const now = await this.now;
+        const now = await this.userService.now;
         for (const r of conditions) {
             const tasks = r.map(async cr => {
                 let aCount = await this.getCount(uow, cr.valueType);
@@ -76,7 +87,7 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
         await this.compatibleValueType(allValueTypeItem, valueType);
         const valueTypeEntry = allValueTypeItem[valueType]?.entry;
         if (valueTypeEntry?.time?.valueType) {
-            const now = await this.now;
+            const now = await this.userService.now;
             const oldNow = entry.values[valueTypeEntry.time.valueType];
             const ok = moment.unix(now).isSame(
                 moment.unix(oldNow),

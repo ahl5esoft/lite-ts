@@ -9,7 +9,7 @@ import { ConfigLoadBalance, MultiConfigLoader } from '../config';
 import { ConsoleLog } from '../console';
 import { CryptoJsAESCrypto } from '../crypto-js';
 import { DateNowTime } from '../date';
-import { DbUserRandSeedService, DbUserRewardService, DbUserService } from '../db';
+import { DbUserRandSeedService, DbUserRewardService, DbUserValueService } from '../db';
 import { EnumItem } from '../enum';
 import { CustomError } from '../error';
 import { FsFileFactory } from '../fs';
@@ -56,6 +56,38 @@ export async function initIoC(globalModel: { [name: string]: any }) {
 
     EnumCacheBase.buildItemFunc = (name, sep, entry) => {
         return new EnumItem(entry, name, sep);
+    };
+
+    DbUserValueService.buildTargetValueServiceFunc = (enumFactory: EnumFactoryBase, rpc: RpcBase, userService: UserServiceBase, targetTypeData: enum_.TargetTypeData) => {
+        return new RpcValueService(rpc, {
+            ...targetTypeData,
+            key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
+        }, {
+            userID: userService.userID
+        }, enumFactory, userService, () => true);
+    };
+
+    RpcBase.buildErrorFunc = (errCode, data) => new CustomError(errCode, data);
+
+    UserServiceBase.buildCustomGiftBagServiceFunc = (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => {
+        return new UserCustomGiftBagService(dbFactory, entry);
+    };
+    UserServiceBase.buildPortraitServiceFunc = (rpc: RpcBase, userID: string) => {
+        return new RpcUserPortraitService(rpc, userID);
+    };
+    UserServiceBase.buildRandServiceFunc = (associateService: IUserAssociateService, scene: string, userID: string, range: [number, number]) => {
+        return new DbUserRandSeedService(associateService, dbFactory, scene, userID, range);
+    };
+    UserServiceBase.buildRewardServiceFunc = (enumFactory: EnumFactoryBase, userService: UserServiceBase) => {
+        return new DbUserRewardService(enumFactory, userService);
+    };
+
+    ValueServiceBase.buildNotEnoughErrorFunc = (consumeCount, hasCount, valueType) => {
+        return new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
+            consume: Math.abs(consumeCount),
+            count: hasCount,
+            valueType: valueType,
+        });
     };
 
     const fileFactory = new FsFileFactory();
@@ -199,37 +231,6 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         StringGeneratorBase,
         new MongoStringGenerator()
     );
-
-    RpcBase.buildErrorFunc = (errCode, data) => new CustomError(errCode, data);
-
-    UserServiceBase.buildCustomGiftBagServiceFunc = (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => {
-        return new UserCustomGiftBagService(dbFactory, entry);
-    };
-    UserServiceBase.buildPortraitServiceFunc = (rpc: RpcBase, userID: string) => {
-        return new RpcUserPortraitService(rpc, userID);
-    };
-    UserServiceBase.buildRandServiceFunc = (associateService: IUserAssociateService, scene: string, userID: string, range: [number, number]) => {
-        return new DbUserRandSeedService(associateService, dbFactory, scene, userID, range);
-    };
-    UserServiceBase.buildRewardServiceFunc = (enumFactory: EnumFactoryBase, userService: UserServiceBase) => {
-        return new DbUserRewardService(enumFactory, userService);
-    };
-    DbUserService.buildTargetValueServiceFunc = (enumFactory: EnumFactoryBase, rpc: RpcBase, userService: UserServiceBase, targetTypeData: enum_.TargetTypeData, userID: string) => {
-        return new RpcValueService(rpc, userService, {
-            ...targetTypeData,
-            key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
-        }, {
-            userID
-        } as global.UserTargetValue, enumFactory);
-    };
-
-    ValueServiceBase.buildNotEnoughErrorFunc = (consumeCount, hasCount, valueType) => {
-        return new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
-            consume: Math.abs(consumeCount),
-            count: hasCount,
-            valueType: valueType,
-        });
-    };
 
     return cfg;
 }

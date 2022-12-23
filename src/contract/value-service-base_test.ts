@@ -1,38 +1,51 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
-import moment from 'moment';
 
-import { EnumBase } from './enum-base';
 import { EnumFactoryBase } from './enum-factory-base';
 import { IUnitOfWork } from './i-unit-of-work';
+import { IUserAssociateService } from './i-user-associate-service';
+import { UserServiceBase } from './user-service-base';
 import { ValueServiceBase } from './value-service-base';
 import { contract, enum_, global } from '../model';
-import { Mock } from '../service';
+import { Mock, mockAny } from '../service';
+import { EnumBase } from './enum-base';
+import moment from 'moment';
 
 class Self extends ValueServiceBase<global.UserValue> {
-    public entry: Promise<global.UserValue>;
-
-    public get now() {
-        return Promise.resolve(this.m_Now);
-    }
-
     public constructor(
-        private m_Now: number,
         enumFactory: EnumFactoryBase,
+        userService: UserServiceBase,
+        getEntryPredicate: (r: global.UserValue) => boolean,
     ) {
-        super(enumFactory);
+        super(userService, enumFactory, getEntryPredicate);
     }
 
     public async update(_: IUnitOfWork, __: contract.IValue[]) { }
-
-    protected async getEntry() {
-        return this.entry;
-    }
 }
 
 describe('src/contract/value-service-base.ts', () => {
+    describe('.entry', () => {
+        it('ok', async () => {
+            const mockAssocateService = new Mock<IUserAssociateService>();
+            const predicate = () => true;
+            const self = new Self(null, {
+                associateService: mockAssocateService.actual
+            } as any, predicate);
+
+            mockAssocateService.expectReturn(
+                r => r.find(global.UserValue.name, predicate),
+                [{}]
+            );
+
+            const res = await self.entry;
+            deepStrictEqual(res, {});
+        });
+    });
+
     describe('.checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[])', () => {
         it(`${enum_.RelationOperator.eq}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -47,7 +60,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.eq}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 1;
@@ -62,7 +77,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.eq}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 9;
@@ -77,7 +94,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.eq}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
@@ -92,7 +111,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.ge}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -107,7 +128,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.ge}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
@@ -122,7 +145,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.ge}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 9;
@@ -137,7 +162,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.ge}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
@@ -152,7 +179,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.gt}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 12;
@@ -167,7 +196,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.gt}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -182,7 +213,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.gt}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 8;
@@ -197,7 +230,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.gt}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -212,7 +247,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.le}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -227,7 +264,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.le}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 12;
@@ -242,7 +281,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.lt}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 9;
@@ -257,7 +298,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.le}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 8;
@@ -272,7 +315,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.lt}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
@@ -287,7 +332,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.lt}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -302,7 +349,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.lt}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
@@ -317,7 +366,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.nowDiff}${enum_.RelationOperator.lt}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 8;
@@ -332,7 +383,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.eq}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -347,7 +400,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.eq}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
@@ -362,7 +417,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.ge}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -377,7 +434,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.ge}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 3;
@@ -392,7 +451,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.gt}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -407,7 +468,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.gt}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 3;
@@ -422,7 +485,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.le}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 11;
@@ -437,7 +502,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.le}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 2;
@@ -452,7 +519,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.lt}(单组)`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 10;
@@ -467,7 +536,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it(`${enum_.RelationOperator.mod}${enum_.RelationOperator.lt}(单组)不通过`, async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', () => {
                 return 2;
@@ -482,7 +553,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('all(单组)', async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
                 return {
@@ -509,7 +582,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('some(单组)', async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
                 return {
@@ -536,7 +611,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('多组', async () => {
-            const self = new Self(10, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', (_: IUnitOfWork, valueType: number) => {
                 return {
@@ -580,7 +657,9 @@ describe('src/contract/value-service-base.ts', () => {
 
     describe('.checkEnough(uow: IUnitOfWork, times: number, consumeValues: model.contract.IValue[])', () => {
         it('ok', async () => {
-            const self = new Self(0, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', (_: any, arg: number) => {
                 strictEqual(arg, 2);
@@ -600,7 +679,9 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('false', async () => {
-            const self = new Self(0, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
 
             Reflect.set(self, 'getCount', (_: any, arg: number) => {
                 strictEqual(arg, 2);
@@ -622,7 +703,9 @@ describe('src/contract/value-service-base.ts', () => {
 
     describe('.compatibleValueType(allItem: { [value: number]: IEnumItem<enum_.ValueTypeData>; }, valueType: number)', () => {
         it('dailyTime', async () => {
-            const self = new Self(0, null);
+            const self = new Self(null, {
+                now: 10
+            } as any, null);
             const fn = Reflect.get(self, 'compatibleValueType').bind(this);
             const allItem = {
                 1: {
@@ -651,8 +734,16 @@ describe('src/contract/value-service-base.ts', () => {
 
     describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
         it('entry = null', async () => {
+            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(0, mockEnumFactory.actual);
+            const self = new Self(mockEnumFactory.actual, {
+                associateService: mockAssociateService.actual
+            } as any, null);
+
+            mockAssociateService.expectReturn(
+                r => r.find(global.UserValue.name, mockAny),
+                []
+            );
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {}
@@ -667,8 +758,19 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('entry.value[valueType] = null', async () => {
+            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(0, mockEnumFactory.actual);
+            const self = new Self(mockEnumFactory.actual, {
+                associateService: mockAssociateService.actual
+            } as any, null);
+
+            mockAssociateService.expectReturn(
+                r => r.find(global.UserValue.name, mockAny),
+                [{
+                    id: '',
+                    values: {}
+                }]
+            );
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {}
@@ -678,18 +780,27 @@ describe('src/contract/value-service-base.ts', () => {
                 mockValueTypeEnum.actual
             );
 
-            Reflect.set(self, 'entry', {
-                id: '',
-                values: {}
-            });
-
             const res = await self.getCount(null, 1);
             strictEqual(res, 0);
         });
 
         it('枚举存在但time无效', async () => {
+            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(0, mockEnumFactory.actual);
+            const self = new Self(mockEnumFactory.actual, {
+                associateService: mockAssociateService.actual,
+                now: 0
+            } as any, null);
+
+            mockAssociateService.expectReturn(
+                r => r.find(global.UserValue.name, mockAny),
+                [{
+                    id: '',
+                    values: {
+                        1: 11
+                    }
+                }]
+            );
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {
@@ -703,20 +814,29 @@ describe('src/contract/value-service-base.ts', () => {
                 mockValueTypeEnum.actual
             );
 
-            Reflect.set(self, 'entry', {
-                id: '',
-                values: {
-                    1: 11
-                }
-            });
-
             const res = await self.getCount(null, 1);
             strictEqual(res, 11);
         });
 
         it('time(重置)', async () => {
+            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(99, mockEnumFactory.actual);
+            const self = new Self(mockEnumFactory.actual, {
+                associateService: mockAssociateService.actual,
+                now: 99
+            } as any, null);
+
+            const entry = {
+                id: '',
+                values: {
+                    1: 11,
+                    2: moment().add(-1, 'day').unix()
+                }
+            } as global.UserValue;
+            mockAssociateService.expectReturn(
+                r => r.find(global.UserValue.name, mockAny),
+                [entry]
+            );
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 allItem: {
@@ -741,32 +861,34 @@ describe('src/contract/value-service-base.ts', () => {
                 mockValueTypeEnum.actual
             );
 
-            Reflect.set(self, 'entry', {
-                id: '',
-                values: {
-                    1: 11,
-                    2: moment().add(-1, 'day').unix()
-                }
-            });
-
             const res = await self.getCount(null, 1);
             strictEqual(res, 0);
 
-            const entry = await self.entry;
-            deepStrictEqual(entry, {
-                id: '',
-                values: {
-                    1: 0,
-                    2: 99
-                }
+            deepStrictEqual(entry.values, {
+                1: 0,
+                2: 99
             });
         });
 
         it('time(不重置)', async () => {
+            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(
-                moment().unix(),
-                mockEnumFactory.actual
+            const self = new Self(mockEnumFactory.actual, {
+                associateService: mockAssociateService.actual,
+                now: moment().unix()
+            } as any, null);
+
+            const time = moment().unix();
+            const entry = {
+                id: '',
+                values: {
+                    1: 11,
+                    2: time,
+                }
+            } as global.UserValue;
+            mockAssociateService.expectReturn(
+                r => r.find(global.UserValue.name, mockAny),
+                [entry]
             );
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
@@ -792,16 +914,13 @@ describe('src/contract/value-service-base.ts', () => {
                 mockValueTypeEnum.actual
             );
 
-            Reflect.set(self, 'entry', {
-                id: '',
-                values: {
-                    1: 11,
-                    2: moment().unix()
-                }
-            });
-
             const res = await self.getCount(null, 1);
             strictEqual(res, 11);
+
+            deepStrictEqual(entry.values, {
+                1: 11,
+                2: time
+            });
         });
     });
 });

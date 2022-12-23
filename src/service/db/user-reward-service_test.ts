@@ -2,8 +2,8 @@ import { deepStrictEqual, strictEqual } from 'assert';
 
 import { DbUserRewardService as Self } from './user-reward-service';
 import { Mock } from '../assert';
-import { EnumBase, EnumFactoryBase, IUnitOfWork, IUserRandSeedService, UserServiceBase, UserValueServiceBase } from '../../contract';
-import { contract, enum_ } from '../../model';
+import { EnumBase, EnumFactoryBase, IUnitOfWork, IUserRandSeedService, UserServiceBase, ValueServiceBase } from '../../contract';
+import { contract, enum_, global } from '../../model';
 
 describe('src/service/db/user-reward-service.ts', () => {
     describe('.findResults(uow: IUnitOfWork, rewards: IRewardData[][], scene?: string)', () => {
@@ -411,7 +411,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe('.findOpenRewards(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const mockUserValueService = new Mock<UserValueServiceBase>();
+            const mockUserValueService = new Mock<ValueServiceBase<global.UserValue>>();
             const mockUserService = new Mock<UserServiceBase>({
                 valueService: mockUserValueService.actual
             });

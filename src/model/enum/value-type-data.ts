@@ -62,6 +62,13 @@ export class ValueTypeData extends ItemData {
      */
     public openRewards?: IReward[][];
     /**
+     * 范围
+     */
+    public range?: {
+        max: number,
+        min: number;
+    };
+    /**
      * 奖励附加
      */
     public rewardAddition?: {

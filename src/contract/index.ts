@@ -49,6 +49,5 @@ export * from './unit-of-work-repository-base';
 export * from './user-activity-service-base';
 export * from './user-factory-base';
 export * from './user-service-base';
-export * from './user-value-service-base';
 export * from './value-interceptor-factory-base';
 export * from './value-service-base';

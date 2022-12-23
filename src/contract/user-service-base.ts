@@ -1,4 +1,5 @@
 import { opentracing } from 'jaeger-client';
+import moment from 'moment';
 
 import { DbFactoryBase } from './db-factory-base';
 import { EnumFactoryBase } from './enum-factory-base';
@@ -9,9 +10,9 @@ import { IUserPortraitService } from './i-user-portrait-service';
 import { IUserRandSeedService } from './i-user-rand-seed-service';
 import { IUserRewardService } from './i-user-reward-service';
 import { IUserSecurityService } from './i-user-security-service';
+import { NowTimeBase } from './now-time-base';
 import { RpcBase } from './rpc-base';
 import { ThreadBase } from './thread-base';
-import { UserValueServiceBase } from './user-value-service-base';
 import { ValueServiceBase } from './value-service-base';
 import { global } from '../model';
 
@@ -44,15 +45,37 @@ export abstract class UserServiceBase {
         return this.m_SecurityService;
     }
 
-    public abstract get valueService(): UserValueServiceBase;
+    private m_Now: [number, number];
+    public get now() {
+        return new Promise<number>(async (s, f) => {
+            const nowUnix = moment().unix();
+            if (!this.m_Now) {
+                try {
+                    const entry = await this.valueService.entry;
+                    this.m_Now ??= [
+                        entry.values?.[this.nowValueType] ?? await this.nowTime.unix(),
+                        nowUnix
+                    ];
+                } catch (ex) {
+                    return f(ex);
+                }
+            }
+
+            s(this.m_Now[0] + nowUnix - this.m_Now[1]);
+        });
+    }
+
+    public abstract get valueService(): ValueServiceBase<global.UserValue>;
 
     public constructor(
         public associateService: IUserAssociateService,
         public userID: string,
         protected dbFactory: DbFactoryBase,
         protected enumFactory: EnumFactoryBase,
+        protected nowTime: NowTimeBase,
         protected rpc: RpcBase,
         protected thread: ThreadBase,
+        protected nowValueType: number,
         protected parentTracerSpan: opentracing.Span,
     ) { }
 
@@ -88,6 +111,4 @@ export abstract class UserServiceBase {
         this.m_CustomGiftBagService.scene = scene;
         return this.m_CustomGiftBagService;
     }
-
-    public abstract getTargetValueService(targetType: number): Promise<ValueServiceBase<global.UserValue>>;
 }

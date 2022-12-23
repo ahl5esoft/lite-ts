@@ -2,13 +2,13 @@ import { strictEqual } from 'assert';
 
 import { UserConditionActivityService as Self } from './condition-activity-service';
 import { Mock } from '../assert';
-import { IUnitOfWork, UserServiceBase, UserValueServiceBase } from '../../contract';
-import { enum_ } from '../../model';
+import { IUnitOfWork, UserServiceBase, ValueServiceBase } from '../../contract';
+import { enum_, global } from '../../model';
 
 describe('src/service/user/condition-activity-service.ts', () => {
     describe('.initTime(uow: IUnitOfWork)', () => {
         it('ok', async () => {
-            const mockUserValueService = new Mock<UserValueServiceBase>();
+            const mockUserValueService = new Mock<ValueServiceBase<global.UserValue>>();
             const mockUserService = new Mock<UserServiceBase>({
                 valueService: mockUserValueService.actual
             });

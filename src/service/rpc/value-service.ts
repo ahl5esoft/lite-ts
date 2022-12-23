@@ -7,41 +7,42 @@ import {
 } from '../../contract';
 import { contract, enum_, global } from '../../model';
 
-export class RpcValueService<T extends global.UserTargetValue> extends ValueServiceBase<T>{
-    public get entry() {
-        return new Promise<T>(async (s, f) => {
-            try {
-                const entries = await this.userService.associateService.find<T>(this.targetTypeData.key);
-                s(
-                    entries.length == 1 ? entries[0] : entries.find(r => r.no == this.m_Entry.no)
-                );
-            } catch (ex) {
-                f(ex);
-            }
-        });
-    }
-
-    public get now() {
-        return this.userService.valueService.now;
-    }
+export class RpcValueService<T extends global.UserValue> extends ValueServiceBase<T>{
+    public static updateRoute = 'update-values-by-user-id';
 
     public constructor(
         protected rpc: RpcBase,
-        protected userService: UserServiceBase,
         protected targetTypeData: enum_.TargetTypeData,
-        private m_Entry: T,
+        private m_RpcBody: any,
         enumFactory: EnumFactoryBase,
+        userService: UserServiceBase,
+        getEntryPredicate: (r: T) => boolean,
     ) {
-        super(enumFactory);
+        super(userService, enumFactory, getEntryPredicate);
     }
 
-    public async update(_: IUnitOfWork, values: contract.IValue[]) {
-        await this.rpc.call<void>({
-            body: {
-                ...this.m_Entry,
-                values: values
-            },
-            route: `/${this.targetTypeData.app}/update-values-by-user-id`
-        });
+    public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        const route = ['', this.targetTypeData.app, RpcValueService.updateRoute].join('/')
+        if (uow) {
+            this.updateValues ??= [];
+            this.updateValues.push(...values);
+            uow.registerAfter(async () => {
+                await this.rpc.call<void>({
+                    body: {
+                        ...this.m_RpcBody,
+                        values: this.updateValues
+                    },
+                    route
+                });
+            }, route);
+        } else {
+            await this.rpc.call<void>({
+                body: {
+                    ...this.m_RpcBody,
+                    values
+                },
+                route
+            });
+        }
     }
 }

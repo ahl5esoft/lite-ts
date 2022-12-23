@@ -23,13 +23,13 @@ describe('src/service/db/value-service-base.ts', () => {
             const self = new Self(
                 mockDbFactory.actual,
                 null,
-                mockUserService.actual,
                 null,
                 null,
                 global.UserValueChange,
                 null,
                 null,
                 predicate,
+                mockUserService.actual,
                 null,
                 null,
             );

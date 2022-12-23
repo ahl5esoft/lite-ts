@@ -18,39 +18,31 @@ export class DbValueService<
     TChange extends global.UserValueChange,
     TLog extends global.UserValueLog
 > extends ValueServiceBase<T> {
-    public get entry() {
-        return this.m_GetEntryFunc();
-    }
-
-    public get now() {
-        return this.userService.valueService.now;
-    }
-
     public constructor(
         protected dbFactory: DbFactoryBase,
         protected stringGenerator: StringGeneratorBase,
-        protected userService: UserServiceBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected parentTracerSpan: opentracing.Span,
         protected changeModel: new () => TChange,
         private m_CreateEntryFunc: () => T,
         private m_CreateLogEntryFunc: () => TLog,
         private m_FindAndClearChangeEntriesPredicate: (r: TChange) => boolean,
-        private m_GetEntryFunc: () => Promise<T>,
+        userService: UserServiceBase,
         enumFactory: EnumFactoryBase,
+        getEntryPredicate: (r: T) => boolean,
     ) {
-        super(enumFactory);
+        super(userService, enumFactory, getEntryPredicate);
     }
 
     public async getCount(uow: IUnitOfWork, valueType: number) {
-        const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('value.getCount', {
+        const tracerSpan = opentracing.globalTracer().startSpan('value.getCount', {
             childOf: this.parentTracerSpan,
-        }) : null;
+        });
 
         const changeEntries = await this.userService.associateService.findAndClear<TChange>(this.changeModel.name, this.m_FindAndClearChangeEntriesPredicate);
         const changeDb = this.dbFactory.db(this.changeModel, uow);
         if (changeEntries.length) {
-            tracerSpan?.log?.({
+            tracerSpan.log({
                 changes: changeEntries
             });
 
@@ -60,19 +52,19 @@ export class DbValueService<
         }
 
         const res = await super.getCount(uow, valueType);
-        tracerSpan?.log?.({
+        tracerSpan.log({
             valueType,
             result: res,
-        })?.finish?.();
+        }).finish();
         return res;
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         this.updateValues = values;
 
-        const tracerSpan = this.parentTracerSpan ? opentracing.globalTracer().startSpan('value.update', {
+        const tracerSpan = opentracing.globalTracer().startSpan('value.update', {
             childOf: this.parentTracerSpan,
-        }) : null;
+        });
 
         const newEntry = this.m_CreateEntryFunc();
         const db = this.dbFactory.db(newEntry.constructor as any, uow);
@@ -87,14 +79,15 @@ export class DbValueService<
 
         let logDb: DbRepositoryBase<TLog>;
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
-        const nowUnix = await this.now;
+        const nowUnix = await this.userService.now;
         for (const r of values) {
             if (typeof r.valueType != 'number' || typeof r.count != 'number' || isNaN(r.count))
                 continue;
 
             entry.values[r.valueType] ??= 0;
 
-            if (!allValueTypeItem[r.valueType]?.entry.isReplace && r.count == 0)
+            const valueTypeEntry = allValueTypeItem[r.valueType]?.entry;
+            if (!valueTypeEntry?.isReplace && r.count == 0)
                 continue;
 
             const interceptor = await this.valueInterceptorFactory.build(r);
@@ -111,23 +104,23 @@ export class DbValueService<
             logEntry.source = r.source;
             logEntry.valueType = r.valueType;
 
-            if (allValueTypeItem[r.valueType]) {
+            if (valueTypeEntry) {
                 this.compatibleValueType(allValueTypeItem, r.valueType);
 
-                if (allValueTypeItem[r.valueType].entry.isReplace) {
+                if (valueTypeEntry.isReplace) {
                     entry.values[r.valueType] = r.count;
-                } else if (allValueTypeItem[r.valueType].entry.time?.valueType > 0) {
-                    const oldUnix = entry.values[allValueTypeItem[r.valueType].entry.time.valueType] || 0;
+                } else if (valueTypeEntry.time?.valueType > 0) {
+                    const oldUnix = entry.values[valueTypeEntry.time.valueType] || 0;
                     const isSame = moment.unix(nowUnix).isSame(
                         moment.unix(oldUnix),
-                        allValueTypeItem[allValueTypeItem[r.valueType].entry.time.valueType].entry.time.momentType
+                        allValueTypeItem[valueTypeEntry.time.valueType].entry.time.momentType
                     );
                     if (!isSame) {
                         entry.values[r.valueType] = 0;
                         logEntry.source += '(时间重置)';
                     }
 
-                    entry.values[allValueTypeItem[r.valueType].entry.time.valueType] = nowUnix;
+                    entry.values[valueTypeEntry.time.valueType] = nowUnix;
                     entry.values[r.valueType] += r.count;
                 } else {
                     entry.values[r.valueType] += r.count;
@@ -136,9 +129,17 @@ export class DbValueService<
                 entry.values[r.valueType] += r.count;
             }
 
-            if (entry.values[r.valueType] < 0 && !allValueTypeItem[r.valueType]?.entry.isNegative) {
-                entry.values[r.valueType] = logEntry.oldCount;
-                throw ValueServiceBase.buildNotEnoughErrorFunc(r.count, logEntry.oldCount, r.valueType);
+            if (valueTypeEntry) {
+                if (entry.values[r.valueType] < 0 && !valueTypeEntry.isNegative) {
+                    entry.values[r.valueType] = logEntry.oldCount;
+                    throw ValueServiceBase.buildNotEnoughErrorFunc(r.count, logEntry.oldCount, r.valueType);
+                }
+
+                if (entry.values[r.valueType] > valueTypeEntry.range?.max)
+                    entry.values[r.valueType] = valueTypeEntry.range.max;
+
+                if (entry.values[r.valueType] < valueTypeEntry.range?.min)
+                    entry.values[r.valueType] = valueTypeEntry.range.min;
             }
 
             logEntry.count = entry.values[r.valueType];
@@ -150,6 +151,6 @@ export class DbValueService<
 
         await db.save(entry);
 
-        tracerSpan?.log?.({ values })?.finish?.();
+        tracerSpan.log({ values }).finish();
     }
 }

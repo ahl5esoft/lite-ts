@@ -1,20 +1,29 @@
 import { DbUserValueService as Self } from './user-value-service';
 import { Mock } from '../assert';
-import { UserServiceBase, ValueServiceBase } from '../../contract';
-import { global } from '../../model';
+import { EnumFactoryBase, UserServiceBase, ValueServiceBase } from '../../contract';
+import { enum_, global } from '../../model';
 
 describe('src/service/user/value-service.ts', () => {
     describe('.update(uow: IUnitOfWork, values: IValueData[])', () => {
         it('ok', async () => {
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(mockUserService.actual, null, null, null, null, null, null, 0);
+            const self = new Self(null, null, mockEnumFactory.actual, null, mockUserService.actual, null, null);
 
             const mockValueService = new Mock<ValueServiceBase<global.UserValue>>();
             Reflect.set(self, 'm_ValueService', mockValueService.actual);
 
-            mockUserService.expectReturn(
-                r => r.getTargetValueService(2),
-                mockValueService.actual
+            Self.buildTargetValueServiceFunc = () => {
+                return mockValueService.actual;
+            };
+
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.TargetTypeData),
+                {
+                    allItem: {
+                        2: {},
+                    }
+                }
             );
 
             mockValueService.expected.update(null, [{
