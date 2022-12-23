@@ -8,12 +8,12 @@ import {
 import { contract, enum_, global } from '../../model';
 
 export class RpcValueService<T extends global.UserValue> extends ValueServiceBase<T>{
-    public static updateRoute = 'update-values-by-user-id';
+    public static updateRoute = 'add-user-value-changes';
 
     public constructor(
         protected rpc: RpcBase,
         protected targetTypeData: enum_.TargetTypeData,
-        private m_RpcBody: any,
+        private m_UpdateRpcBody: any,
         enumFactory: EnumFactoryBase,
         userService: UserServiceBase,
         getEntryPredicate: (r: T) => boolean,
@@ -29,7 +29,7 @@ export class RpcValueService<T extends global.UserValue> extends ValueServiceBas
             uow.registerAfter(async () => {
                 await this.rpc.call<void>({
                     body: {
-                        ...this.m_RpcBody,
+                        ...this.m_UpdateRpcBody,
                         values: this.updateValues
                     },
                     route
@@ -38,7 +38,7 @@ export class RpcValueService<T extends global.UserValue> extends ValueServiceBas
         } else {
             await this.rpc.call<void>({
                 body: {
-                    ...this.m_RpcBody,
+                    ...this.m_UpdateRpcBody,
                     values
                 },
                 route

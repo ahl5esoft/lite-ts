@@ -11,10 +11,12 @@ import {
     ThreadBase,
     UserServiceBase,
     ValueInterceptorFactoryBase,
+    ValueServiceBase,
 } from '../../contract';
+import { global } from '../../model';
 
 export class DbUserService extends UserServiceBase {
-    private m_ValueService: DbUserValueService;
+    private m_ValueService: ValueServiceBase<global.UserValue>;
     public get valueService() {
         this.m_ValueService ??= new DbUserValueService(
             this.rpc,

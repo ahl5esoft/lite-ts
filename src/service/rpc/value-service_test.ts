@@ -35,7 +35,7 @@ describe('src/service/rpc/value-service.ts', () => {
                             valueType: 11
                         }]
                     },
-                    route: '/test/update-values-by-user-id'
+                    route: `/test/${Self.updateRoute}`
                 }),
                 {}
             );

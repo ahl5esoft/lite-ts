@@ -9,11 +9,12 @@ import {
     RpcBase,
     ThreadBase,
     UserServiceBase,
+    ValueServiceBase,
 } from '../../contract';
 import { enum_, global } from '../../model';
 
 export class RpcUserService extends UserServiceBase {
-    private m_ValueService: RpcValueService<global.UserValue>;
+    private m_ValueService: ValueServiceBase<global.UserValue>;
     public get valueService() {
         this.m_ValueService ??= new RpcValueService(
             this.rpc,
