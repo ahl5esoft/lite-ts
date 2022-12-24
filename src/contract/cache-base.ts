@@ -8,7 +8,7 @@ export abstract class CacheBase implements ITraceable<CacheBase> {
     /**
      * 下次检测时间
      */
-    private m_NextCheckOn = 0;
+    public nextCheckOn = 0;
     /**
      * 当前时间
      */
@@ -16,7 +16,7 @@ export abstract class CacheBase implements ITraceable<CacheBase> {
     /**
      * 缓存
      */
-    private m_Value: { [key: string]: any };
+    public value: { [key: string]: any; };
 
     /**
      * 更新时间
@@ -38,7 +38,7 @@ export abstract class CacheBase implements ITraceable<CacheBase> {
      * 刷新
      */
     public async flush() {
-        this.m_NextCheckOn = Date.now();
+        this.nextCheckOn = Date.now();
         await this.redis.hset(
             'cache',
             this.cacheKey,
@@ -53,20 +53,20 @@ export abstract class CacheBase implements ITraceable<CacheBase> {
      */
     public async get<T>(key: string) {
         const now = Date.now();
-        if (this.m_NextCheckOn < now) {
+        if (this.nextCheckOn < now) {
             const value = await this.redis.hget('cache', this.cacheKey);
             const lastCacheOn = parseInt(value) || this.m_Now;
             if (this.updateOn != lastCacheOn) {
-                this.m_Value = await this.load();
+                this.value = await this.load();
                 this.updateOn = lastCacheOn;
             }
 
-            this.m_NextCheckOn = now + 5_000 + Math.floor(
+            this.nextCheckOn = now + 5_000 + Math.floor(
                 Math.random() * 55_000
             );
         }
 
-        return this.m_Value[key] as T;
+        return this.value[key] as T;
     }
 
     /**
@@ -79,5 +79,5 @@ export abstract class CacheBase implements ITraceable<CacheBase> {
     /**
      * 加载
      */
-    protected abstract load(): Promise<{ [key: string]: any }>;
+    protected abstract load(): Promise<{ [key: string]: any; }>;
 }

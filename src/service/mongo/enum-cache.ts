@@ -27,13 +27,20 @@ export class MongoEnumCache<T extends global.Enum> extends EnumCacheBase {
      * @param parentSpan 父范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new MongoEnumCache(
+        if (!parentSpan)
+            return this;
+
+        const cache = new MongoEnumCache(
             new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
             this.m_Model,
             new TracerStrategy(this.redis).withTrace(parentSpan),
             this.cacheKey,
             this.sep,
-        ) : this;
+        );
+        cache.updateOn = this.updateOn;
+        cache.nextCheckOn = this.nextCheckOn;
+        cache.value = this.value;
+        return cache;
     }
 
     /**
