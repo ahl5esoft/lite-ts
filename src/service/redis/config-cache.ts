@@ -29,11 +29,18 @@ export class RedisConfigCache extends CacheBase {
      * @param parentSpan 父范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new RedisConfigCache(
+        if (!parentSpan)
+            return this;
+
+        const cache = new RedisConfigCache(
             this.m_RedisKey,
             new TracerStrategy(this.redis).withTrace(parentSpan),
             this.cacheKey
-        ) : this;
+        );
+        cache.updateOn = this.updateOn;
+        cache.nextCheckOn = this.nextCheckOn;
+        cache.value = this.value;
+        return cache;
     }
 
     /**

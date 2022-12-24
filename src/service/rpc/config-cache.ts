@@ -13,12 +13,19 @@ export class RpcConfigCache extends CacheBase {
     }
 
     public withTrace(parentSpan: any): CacheBase {
-        return parentSpan ? new RpcConfigCache(
+        if (!parentSpan)
+            return this;
+
+        const cache = new RpcConfigCache(
             this.m_App,
             this.m_CacheKey,
             new TracerStrategy(this.m_Redis).withTrace(parentSpan),
             new TracerStrategy(this.m_Rpc).withTrace(parentSpan),
-        ) : this;
+        );
+        cache.updateOn = this.updateOn;
+        cache.nextCheckOn = this.nextCheckOn;
+        cache.value = this.value;
+        return cache;
     }
 
     protected async load() {

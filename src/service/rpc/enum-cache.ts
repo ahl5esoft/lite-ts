@@ -32,13 +32,20 @@ export class RpcEnumCache extends EnumCacheBase {
      * @param parentSpan 父范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new RpcEnumCache(
+        if (!parentSpan)
+            return this;
+
+        const cache = new RpcEnumCache(
             new TracerStrategy(this.m_Rpc).withTrace(parentSpan),
             this.m_App,
             new TracerStrategy(this.redis).withTrace(parentSpan),
             this.cacheKey,
             this.sep
-        ) : this;
+        );
+        cache.updateOn = this.updateOn;
+        cache.nextCheckOn = this.nextCheckOn;
+        cache.value = this.value;
+        return cache;
     }
 
     /**
