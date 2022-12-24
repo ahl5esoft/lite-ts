@@ -29,12 +29,19 @@ export class MongoConfigCache<T extends global.Config> extends CacheBase {
      * @param parentSpan 父范围
      */
     public withTrace(parentSpan: any) {
-        return parentSpan ? new MongoConfigCache(
+        if (!parentSpan)
+            return this;
+
+        const cache = new MongoConfigCache(
             new TracerStrategy(this.m_DbFactory).withTrace(parentSpan),
             this.m_Model,
             new TracerStrategy(this.redis).withTrace(parentSpan),
             this.cacheKey
-        ) : this;
+        );
+        cache.updateOn = this.updateOn;
+        cache.nextCheckOn = this.nextCheckOn;
+        cache.value = this.value;
+        return cache;
     }
 
     /**
