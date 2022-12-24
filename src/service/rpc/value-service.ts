@@ -8,7 +8,7 @@ import {
 import { contract, enum_, global } from '../../model';
 
 export class RpcValueService<T extends global.UserValue> extends ValueServiceBase<T>{
-    public static updateRoute = 'add-user-value-changes';
+    public static updateRoute = 'update-values-by-user-id';
 
     public constructor(
         protected rpc: RpcBase,
@@ -16,9 +16,9 @@ export class RpcValueService<T extends global.UserValue> extends ValueServiceBas
         private m_UpdateRpcBody: any,
         enumFactory: EnumFactoryBase,
         userService: UserServiceBase,
-        getEntryPredicate: (r: T) => boolean,
+        getEntryFunc: () => Promise<T>,
     ) {
-        super(userService, enumFactory, getEntryPredicate);
+        super(userService, enumFactory, getEntryFunc);
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {

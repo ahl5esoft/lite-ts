@@ -64,7 +64,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
             key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
         }, {
             userID: userService.userID
-        }, enumFactory, userService, () => true);
+        }, enumFactory, userService, null);
     };
 
     RpcBase.buildErrorFunc = (errCode, data) => new CustomError(errCode, data);

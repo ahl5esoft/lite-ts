@@ -12,20 +12,13 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
     public updateValues: contract.IValue[];
 
     public get entry() {
-        return new Promise<global.UserValue>(async (s, f) => {
-            try {
-                const entries = await this.userService.associateService.find<global.UserValue>(global.UserValue.name, this.m_GetEntryPredicate);
-                s(entries[0]);
-            } catch (ex) {
-                f(ex);
-            }
-        });
+        return this.m_GetEntryFunc();
     }
 
     public constructor(
         public userService: UserServiceBase,
         protected enumFactory: EnumFactoryBase,
-        private m_GetEntryPredicate: (r: T) => boolean,
+        private m_GetEntryFunc: () => Promise<T>,
     ) { }
 
     public async checkConditions(uow: IUnitOfWork, conditions: contract.IValueCondition[][]) {
@@ -78,9 +71,7 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
 
     public async getCount(_: IUnitOfWork, valueType: number) {
         let entry = await this.entry;
-        entry ??= {
-            values: {}
-        } as T;
+        entry.values ??= {};
         entry.values[valueType] ??= 0;
 
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;

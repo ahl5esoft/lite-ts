@@ -24,7 +24,10 @@ export class RpcUserService extends UserServiceBase {
             },
             this.enumFactory,
             this,
-            r => r.id == this.userID
+            async () => {
+                const entries = await this.associateService.find<global.UserValue>(global.UserValue.name, r => r.id == this.userID);
+                return entries[0];
+            }
         );
         return this.m_ValueService;
     }

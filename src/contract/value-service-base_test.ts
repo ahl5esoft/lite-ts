@@ -1,22 +1,21 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
+import moment from 'moment';
 
+import { EnumBase } from './enum-base';
 import { EnumFactoryBase } from './enum-factory-base';
 import { IUnitOfWork } from './i-unit-of-work';
-import { IUserAssociateService } from './i-user-associate-service';
 import { UserServiceBase } from './user-service-base';
 import { ValueServiceBase } from './value-service-base';
 import { contract, enum_, global } from '../model';
-import { Mock, mockAny } from '../service';
-import { EnumBase } from './enum-base';
-import moment from 'moment';
+import { Mock } from '../service';
 
 class Self extends ValueServiceBase<global.UserValue> {
     public constructor(
         enumFactory: EnumFactoryBase,
         userService: UserServiceBase,
-        getEntryPredicate: (r: global.UserValue) => boolean,
+        getEntryFunc: () => Promise<global.UserValue>,
     ) {
-        super(userService, enumFactory, getEntryPredicate);
+        super(userService, enumFactory, getEntryFunc);
     }
 
     public async update(_: IUnitOfWork, __: contract.IValue[]) { }
@@ -25,16 +24,9 @@ class Self extends ValueServiceBase<global.UserValue> {
 describe('src/contract/value-service-base.ts', () => {
     describe('.entry', () => {
         it('ok', async () => {
-            const mockAssocateService = new Mock<IUserAssociateService>();
-            const predicate = () => true;
-            const self = new Self(null, {
-                associateService: mockAssocateService.actual
-            } as any, predicate);
-
-            mockAssocateService.expectReturn(
-                r => r.find(global.UserValue.name, predicate),
-                [{}]
-            );
+            const self = new Self(null, null, async () => {
+                return {} as global.UserValue;
+            });
 
             const res = await self.entry;
             deepStrictEqual(res, {});
@@ -734,16 +726,10 @@ describe('src/contract/value-service-base.ts', () => {
 
     describe('.getCount(_: IUnitOfWork, valueType: number)', () => {
         it('entry = null', async () => {
-            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, {
-                associateService: mockAssociateService.actual
-            } as any, null);
-
-            mockAssociateService.expectReturn(
-                r => r.find(global.UserValue.name, mockAny),
-                []
-            );
+            const self = new Self(mockEnumFactory.actual, null, async () => {
+                return Promise.resolve({} as global.UserValue);
+            });
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {}
@@ -758,19 +744,13 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('entry.value[valueType] = null', async () => {
-            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, {
-                associateService: mockAssociateService.actual
-            } as any, null);
-
-            mockAssociateService.expectReturn(
-                r => r.find(global.UserValue.name, mockAny),
-                [{
+            const self = new Self(mockEnumFactory.actual, null, async () => {
+                return Promise.resolve({
                     id: '',
                     values: {}
-                }]
-            );
+                });
+            });
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {}
@@ -785,22 +765,17 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('枚举存在但time无效', async () => {
-            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const self = new Self(mockEnumFactory.actual, {
-                associateService: mockAssociateService.actual,
                 now: 0
-            } as any, null);
-
-            mockAssociateService.expectReturn(
-                r => r.find(global.UserValue.name, mockAny),
-                [{
+            } as any, async () => {
+                return Promise.resolve({
                     id: '',
                     values: {
                         1: 11
                     }
-                }]
-            );
+                });
+            });
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 items: {
@@ -819,13 +794,7 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('time(重置)', async () => {
-            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, {
-                associateService: mockAssociateService.actual,
-                now: 99
-            } as any, null);
-
             const entry = {
                 id: '',
                 values: {
@@ -833,10 +802,11 @@ describe('src/contract/value-service-base.ts', () => {
                     2: moment().add(-1, 'day').unix()
                 }
             } as global.UserValue;
-            mockAssociateService.expectReturn(
-                r => r.find(global.UserValue.name, mockAny),
-                [entry]
-            );
+            const self = new Self(mockEnumFactory.actual, {
+                now: 99
+            } as any, async () => {
+                return Promise.resolve(entry);
+            });
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 allItem: {
@@ -871,13 +841,7 @@ describe('src/contract/value-service-base.ts', () => {
         });
 
         it('time(不重置)', async () => {
-            const mockAssociateService = new Mock<IUserAssociateService>();
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual, {
-                associateService: mockAssociateService.actual,
-                now: moment().unix()
-            } as any, null);
-
             const time = moment().unix();
             const entry = {
                 id: '',
@@ -886,10 +850,11 @@ describe('src/contract/value-service-base.ts', () => {
                     2: time,
                 }
             } as global.UserValue;
-            mockAssociateService.expectReturn(
-                r => r.find(global.UserValue.name, mockAny),
-                [entry]
-            );
+            const self = new Self(mockEnumFactory.actual, {
+                now: moment().unix()
+            } as any, async () => {
+                return Promise.resolve(entry);
+            });
 
             const mockValueTypeEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 allItem: {

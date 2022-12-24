@@ -51,7 +51,10 @@ export class DbUserValueService extends DbValueService<global.UserValue, global.
             r => r.userID == userService.userID,
             userService,
             enumFactory,
-            r => r.id == userService.userID,
+            async () => {
+                const entries = await userService.associateService.find<global.UserValue>(global.UserValue.name, r => r.id == userService.userID);
+                return entries[0];
+            },
         );
     }
 

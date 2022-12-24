@@ -29,9 +29,9 @@ export class DbValueService<
         private m_FindAndClearChangeEntriesPredicate: (r: TChange) => boolean,
         userService: UserServiceBase,
         enumFactory: EnumFactoryBase,
-        getEntryPredicate: (r: T) => boolean,
+        getEntryFunc: () => Promise<T>,
     ) {
-        super(userService, enumFactory, getEntryPredicate);
+        super(userService, enumFactory, getEntryFunc);
     }
 
     public async getCount(uow: IUnitOfWork, valueType: number) {
