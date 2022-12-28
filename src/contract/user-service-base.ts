@@ -53,7 +53,7 @@ export abstract class UserServiceBase {
                 try {
                     const entry = await this.valueService.entry;
                     this.m_Now ??= [
-                        entry.values?.[this.nowValueType] ?? await this.nowTime.unix(),
+                        entry.values?.[this.nowValueType] || await this.nowTime.unix(),
                         nowUnix
                     ];
                 } catch (ex) {

@@ -27,7 +27,7 @@ class Self extends UserServiceBase {
 
 describe('src/contract/user-service-base.ts', () => {
     describe('.now', () => {
-        it('ok', async () => {
+        it('nowTime', async () => {
             const mockNowTime = new Mock<NowTimeBase>();
             const self = new Self({
                 entry: {},
@@ -40,6 +40,20 @@ describe('src/contract/user-service-base.ts', () => {
 
             const res = await self.now;
             strictEqual(res, 22);
+        });
+
+        it('value', async () => {
+            const self = new Self({
+                entry: {
+                    id: '',
+                    values: {
+                        11: 55
+                    }
+                } as global.UserValue,
+            } as any, null, null, 11, null);
+
+            const res = await self.now;
+            strictEqual(res, 55);
         });
     });
 
