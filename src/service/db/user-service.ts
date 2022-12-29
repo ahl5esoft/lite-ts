@@ -6,6 +6,7 @@ import {
     EnumFactoryBase,
     IUserAssociateService,
     NowTimeBase,
+    RedisBase,
     RpcBase,
     StringGeneratorBase,
     ThreadBase,
@@ -22,6 +23,7 @@ export class DbUserService extends UserServiceBase {
             this.rpc,
             this.dbFactory,
             this.enumFactory,
+            this.redis,
             this.stringGenerator,
             this,
             this.valueInterceptorFactory,
@@ -31,6 +33,7 @@ export class DbUserService extends UserServiceBase {
     }
 
     public constructor(
+        protected redis: RedisBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         associateService: IUserAssociateService,

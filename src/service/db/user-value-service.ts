@@ -5,6 +5,7 @@ import {
     DbFactoryBase,
     EnumFactoryBase,
     IUnitOfWork,
+    RedisBase,
     RpcBase,
     StringGeneratorBase,
     UserServiceBase,
@@ -27,6 +28,7 @@ export class DbUserValueService extends DbValueService<global.UserValue, global.
         protected rpc: RpcBase,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
+        redis: RedisBase,
         stringGenerator: StringGeneratorBase,
         userService: UserServiceBase,
         valueInterceptorFactory: ValueInterceptorFactoryBase,
@@ -34,6 +36,7 @@ export class DbUserValueService extends DbValueService<global.UserValue, global.
     ) {
         super(
             dbFactory,
+            redis,
             stringGenerator,
             valueInterceptorFactory,
             parentTracerSpan,

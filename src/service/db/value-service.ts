@@ -6,6 +6,7 @@ import {
     DbRepositoryBase,
     EnumFactoryBase,
     IUnitOfWork,
+    RedisBase,
     StringGeneratorBase,
     UserServiceBase,
     ValueInterceptorFactoryBase,
@@ -20,6 +21,7 @@ export class DbValueService<
 > extends ValueServiceBase<T> {
     public constructor(
         protected dbFactory: DbFactoryBase,
+        protected redis: RedisBase,
         protected stringGenerator: StringGeneratorBase,
         protected valueInterceptorFactory: ValueInterceptorFactoryBase,
         protected parentTracerSpan: opentracing.Span,
@@ -41,14 +43,23 @@ export class DbValueService<
 
         const changeEntries = await this.userService.associateService.findAndClear<TChange>(this.changeModel.name, this.m_FindAndClearChangeEntriesPredicate);
         const changeDb = this.dbFactory.db(this.changeModel, uow);
+        const redisKey = [this.changeModel.name, this.userService.userID].join(':');
         if (changeEntries.length) {
             tracerSpan.log({
                 changes: changeEntries
             });
 
-            for (const r of changeEntries)
+            const temp = [];
+            for (const r of changeEntries) {
                 await changeDb.remove(r);
-            await this.update(uow, changeEntries);
+
+                const ok = this.redis.hsetnx(redisKey, r.id, '');
+                if (ok)
+                    temp.push(r);
+            }
+
+            await this.update(uow, temp);
+            await this.redis.expire(redisKey, 10);
         }
 
         const res = await super.getCount(uow, valueType);
@@ -60,6 +71,9 @@ export class DbValueService<
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        if (!values?.length)
+            return;
+
         this.updateValues = values;
 
         const tracerSpan = opentracing.globalTracer().startSpan('value.update', {

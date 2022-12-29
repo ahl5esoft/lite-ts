@@ -10,7 +10,6 @@ export class EnumItem<T extends enum_.ItemData> implements IEnumItem<T> {
     public constructor(
         public entry: T,
         private m_Name: string,
-        private m_Sep: string,
     ) {
         this.m_LangKey = this.join(this.m_Name, entry.value);
     }
@@ -20,6 +19,6 @@ export class EnumItem<T extends enum_.ItemData> implements IEnumItem<T> {
     }
 
     private join(...keys: any[]) {
-        return keys.join(this.m_Sep);
+        return keys.join(':');
     }
 }

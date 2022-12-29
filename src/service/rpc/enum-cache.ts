@@ -8,9 +8,8 @@ export class RpcEnumCache extends EnumCacheBase {
         protected app: string,
         redis: RedisBase,
         cacheKey: string,
-        sep: string,
     ) {
-        super(sep, redis, cacheKey);
+        super(redis, cacheKey);
     }
 
     public withTrace(parentSpan: any) {
@@ -19,7 +18,6 @@ export class RpcEnumCache extends EnumCacheBase {
             this.app,
             new TracerStrategy(this.redis).withTrace(parentSpan),
             this.cacheKey,
-            this.sep
         ) : this;
     }
 

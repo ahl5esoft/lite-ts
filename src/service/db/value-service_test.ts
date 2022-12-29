@@ -5,23 +5,29 @@ import { Mock } from '../assert';
 import {
     DbFactoryBase,
     DbRepositoryBase,
+    EnumFactoryBase,
     IUnitOfWork,
     IUserAssociateService,
+    RedisBase,
     UserServiceBase,
 } from '../../contract';
-import { contract, global } from '../../model';
+import { contract, enum_, global } from '../../model';
 
 describe('src/service/db/value-service-base.ts', () => {
     describe('.getCount(uow: IUnitOfWork, valueType: number)', () => {
         it('ok', async () => {
             const mockDbFactory = new Mock<DbFactoryBase>();
+            const mockEnumFactory = new Mock<EnumFactoryBase>();
+            const mockRedis = new Mock<RedisBase>();
             const mockAssociateService = new Mock<IUserAssociateService>();
             const mockUserService = new Mock<UserServiceBase>({
-                associateService: mockAssociateService.actual
+                associateService: mockAssociateService.actual,
+                userID: 'uid'
             });
             const predicate = (_: global.UserValueChange) => true;
             const self = new Self(
                 mockDbFactory.actual,
+                mockRedis.actual,
                 null,
                 null,
                 null,
@@ -30,13 +36,20 @@ describe('src/service/db/value-service-base.ts', () => {
                 null,
                 predicate,
                 mockUserService.actual,
-                null,
-                null,
+                mockEnumFactory.actual,
+                async () => {
+                    return {
+                        id: '',
+                        values: {}
+                    };
+                }
             );
 
             mockAssociateService.expectReturn(
                 r => r.findAndClear<global.UserValueChange>(global.UserValueChange.name, predicate),
-                [{}]
+                [{
+                    id: 'change-id'
+                }]
             );
 
             const mockDbRepo = new Mock<DbRepositoryBase<global.UserValueChange>>();
@@ -45,15 +58,29 @@ describe('src/service/db/value-service-base.ts', () => {
                 mockDbRepo.actual
             );
 
-            mockDbRepo.expected.remove({} as global.UserValueChange);
+            mockDbRepo.expected.remove({
+                id: 'change-id'
+            } as global.UserValueChange);
+
+            mockRedis.expectReturn(
+                r => r.hsetnx('UserValueChange:uid', 'change-id', ''),
+                true
+            );
 
             Reflect.set(self, 'update', (_: IUnitOfWork, res: contract.IValue[]) => {
-                deepStrictEqual(res, [{}]);
+                deepStrictEqual(res, [{
+                    id: 'change-id'
+                }]);
             });
 
-            Reflect.set(self, 'getCount', () => {
-                return 0;
-            });
+            mockRedis.expected.expire('UserValueChange:uid', 10);
+
+            mockEnumFactory.expectReturn(
+                r => r.build(enum_.ValueTypeData),
+                {
+                    allItem: {}
+                }
+            );
 
             const res = await self.getCount(null, 1);
             strictEqual(res, 0);

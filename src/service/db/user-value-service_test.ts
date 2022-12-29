@@ -8,7 +8,7 @@ describe('src/service/user/value-service.ts', () => {
         it('ok', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(null, null, mockEnumFactory.actual, null, mockUserService.actual, null, null);
+            const self = new Self(null, null, mockEnumFactory.actual, null, null, mockUserService.actual, null, null);
 
             const mockValueService = new Mock<ValueServiceBase<global.UserTargetValue>>();
             Reflect.set(self, 'm_ValueService', mockValueService.actual);

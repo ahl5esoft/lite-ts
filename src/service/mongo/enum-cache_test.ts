@@ -13,7 +13,7 @@ describe('src/service/mongo/enum-cache.ts', () => {
             }
 
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockDbFactory.actual, global.Enum, null, '', '-');
+            const self = new Self(mockDbFactory.actual, global.Enum, null, '');
 
             const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
             mockDbFactory.expectReturn(

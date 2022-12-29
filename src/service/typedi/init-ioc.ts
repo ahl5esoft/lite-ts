@@ -54,8 +54,8 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         }
     });
 
-    EnumCacheBase.buildItemFunc = (name, sep, entry) => {
-        return new EnumItem(entry, name, sep);
+    EnumCacheBase.buildItemFunc = (name, entry) => {
+        return new EnumItem(entry, name);
     };
 
     DbUserValueService.buildTargetValueServiceFunc = (enumFactory: EnumFactoryBase, rpc: RpcBase, userService: UserServiceBase, targetTypeData: enum_.TargetTypeData) => {
@@ -208,7 +208,6 @@ export async function initIoC(globalModel: { [name: string]: any }) {
                 globalModel[cfg.enumModel] ?? global.Enum,
                 redis,
                 `${cfg.name}:${cfg.enumModel ?? global.Enum.name}`,
-                '-'
             )
         );
     }

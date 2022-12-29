@@ -8,9 +8,8 @@ export class MongoEnumCache<T extends global.Enum> extends EnumCacheBase impleme
         private m_Model: new () => T,
         redis: RedisBase,
         cacheKey: string,
-        sep: string,
     ) {
-        super(sep, redis, cacheKey);
+        super(redis, cacheKey);
     }
 
     public withTrace(parentSpan: any) {
@@ -19,7 +18,6 @@ export class MongoEnumCache<T extends global.Enum> extends EnumCacheBase impleme
             this.m_Model,
             new TracerStrategy(this.redis).withTrace(parentSpan),
             this.cacheKey,
-            this.sep,
         ) : this;
     }
 

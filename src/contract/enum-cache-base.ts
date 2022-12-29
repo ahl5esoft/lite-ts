@@ -4,10 +4,9 @@ import { RedisBase } from './redis-base';
 import { global } from '../model';
 
 export abstract class EnumCacheBase extends CacheBase {
-    public static buildItemFunc: (name: string, sep: string, itemEntry: any) => IEnumItem<any>;
+    public static buildItemFunc: (name: string, itemEntry: any) => IEnumItem<any>;
 
     public constructor(
-        protected sep: string,
         redis: RedisBase,
         cacheKey: string,
     ) {
@@ -18,7 +17,7 @@ export abstract class EnumCacheBase extends CacheBase {
         const entries = await this.find();
         return entries.reduce((memo, r) => {
             memo[r.id] = r.items.reduce((memo, cr) => {
-                memo[cr.value] = EnumCacheBase.buildItemFunc(r.id, this.sep, cr);
+                memo[cr.value] = EnumCacheBase.buildItemFunc(r.id, cr);
                 return memo;
             }, {});
             return memo;

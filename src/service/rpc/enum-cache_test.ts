@@ -13,7 +13,7 @@ describe('src/service/rpc/enum-cache.ts', () => {
             };
 
             const mockRpc = new Mock<RpcBase>();
-            const self = new Self(mockRpc.actual, 'app', null, '', '');
+            const self = new Self(mockRpc.actual, 'app', null, '');
 
             mockRpc.expectReturn(
                 r => r.call<global.Enum[]>({

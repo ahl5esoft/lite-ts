@@ -10,8 +10,8 @@ describe('src/service/mongo/enum-item.ts', () => {
                 value: 1
             };
             const enumName = 'test';
-            const res = new Self(entry, enumName, '_').langKey;
-            strictEqual(res, `${enumName}_${entry.value}`);
+            const res = new Self(entry, enumName).langKey;
+            strictEqual(res, `${enumName}:${entry.value}`);
         });
     });
 
@@ -23,8 +23,8 @@ describe('src/service/mongo/enum-item.ts', () => {
             };
             const enumName = 'test';
             const attr = 'att';
-            const res = new Self(entry, enumName, '_').getCustomLangKey(attr);
-            strictEqual(res, `${enumName}_${entry.value}_${attr}`);
+            const res = new Self(entry, enumName).getCustomLangKey(attr);
+            strictEqual(res, `${enumName}:${entry.value}:${attr}`);
         });
     });
 });

@@ -7,7 +7,7 @@ class Self extends EnumCacheBase {
     public constructor(
         private m_Entries: global.Enum[]
     ) {
-        super('-', null, null);
+        super(null, null);
     }
 
     public withTrace() {
@@ -27,11 +27,10 @@ describe('src/contract/enum-cache-base.ts', () => {
             }, {
                 value: 2
             }];
-            EnumCacheBase.buildItemFunc = (arg1: string, arg2: string, arg3: any) => {
+            EnumCacheBase.buildItemFunc = (arg1: string, arg2: any) => {
                 strictEqual(arg1, 'a');
-                strictEqual(arg2, '-');
                 deepStrictEqual(
-                    arg3,
+                    arg2,
                     arg3Expects.shift()
                 );
                 return null;

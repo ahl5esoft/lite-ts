@@ -1,6 +1,5 @@
 export * from './config';
 export * from './enum';
-export * from './user';
 export * from './user-custom-gift-bag';
 export * from './user-rand-seed';
 export * from './user-target-value';
