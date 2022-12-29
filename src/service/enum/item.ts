@@ -19,6 +19,6 @@ export class EnumItem<T extends enum_.ItemData> implements IEnumItem<T> {
     }
 
     private join(...keys: any[]) {
-        return keys.join(':');
+        return keys.join('-');
     }
 }
