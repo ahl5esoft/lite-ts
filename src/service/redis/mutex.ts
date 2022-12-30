@@ -35,10 +35,8 @@ export class RedisMutex extends MutexBase implements ITraceable<MutexBase> {
             await this.m_Thread.sleepRange(opt.sleepRange[0], opt.sleepRange[1]);
         }
 
-        if (!unlock) {
-            RedisMutex.errWaitLock ??= new Error(`${this.constructor.name}.errWaitLock: 未初始化`);
+        if (!unlock)
             throw RedisMutex.errWaitLock;
-        }
 
         return unlock;
     }

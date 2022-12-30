@@ -22,6 +22,9 @@ export class RpcValueService<T extends global.UserValue> extends ValueServiceBas
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        if (!values.length)
+            return;
+
         const route = ['', this.targetTypeData.app, RpcValueService.updateRoute].join('/')
         if (uow) {
             this.updateValues ??= [];

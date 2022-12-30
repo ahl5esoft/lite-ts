@@ -67,6 +67,8 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         }, enumFactory, userService, null);
     };
 
+    RedisMutex.errWaitLock = new CustomError(enum_.ErrorCode.waitLock);
+
     RpcBase.buildErrorFunc = (errCode, data) => new CustomError(errCode, data);
 
     UserServiceBase.buildCustomGiftBagServiceFunc = (dbFactory: DbFactoryBase, entry: global.UserCustomGiftBag) => {

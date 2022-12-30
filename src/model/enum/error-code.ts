@@ -35,6 +35,10 @@ export enum ErrorCode {
      */
     redirect,
     /**
+     * 等待锁
+     */
+    waitLock,
+    /**
      * 服务端异常
      */
     panic = 599,
