@@ -31,14 +31,16 @@ export class DbUserRewardService implements IUserRewardService {
             } else {
                 let total = 0;
                 const toBeSortedItems: {
-                    item: contract.IReward;
+                    reward: contract.IReward;
+                    index: number;
                     rand: number;
                 }[] = [];
-                for (const cr of r) {
+                for (const [index, cr] of Object.entries(r)) {
                     total += cr.weight * 1;
                     toBeSortedItems.push({
-                        item: cr,
+                        index: parseInt(index),
                         rand: await randSeedService.use(uow, 1),
+                        reward: cr,
                     });
                 }
                 const seed = await randSeedService.use(
@@ -48,14 +50,14 @@ export class DbUserRewardService implements IUserRewardService {
                 let rand = seed % total + 1;
                 reward = toBeSortedItems.sort((a, b) => {
                     return a.rand - b.rand;
-                }).map(cr => cr.item).find((cr, ci) => {
-                    rand -= cr.weight;
+                }).find(cr => {
+                    rand -= cr.reward.weight;
                     if (rand > 0)
                         return;
 
-                    res.index = ci;
+                    res.index = cr.index;
                     return true;
-                });
+                }).reward;
             }
 
             const openRewards = await this.findOpenRewards(uow, reward.valueType);
@@ -126,14 +128,16 @@ export class DbUserRewardService implements IUserRewardService {
                 } else {
                     let total = 0;
                     const toBeSortedItems: {
-                        item: contract.IReward;
+                        reward: contract.IReward;
+                        index: number;
                         rand: number;
                     }[] = [];
-                    for (const r of childRewards) {
+                    for (const [index, r] of Object.entries(childRewards)) {
                         total += r.weight * 1;
                         toBeSortedItems.push({
-                            item: r,
+                            index: parseInt(index),
                             rand: await randSeedService.get(uow, 1, offset++),
+                            reward: r,
                         });
                     }
                     const len = total.toString().length;
@@ -142,15 +146,15 @@ export class DbUserRewardService implements IUserRewardService {
                     let rand = seed % total + 1;
                     reward = toBeSortedItems.sort((a, b) => {
                         return a.rand - b.rand;
-                    }).map(r => r.item).find((r, i) => {
-                        rand -= r.weight;
+                    }).find((r, i) => {
+                        rand -= r.reward.weight;
                         if (rand > 0)
                             return;
 
                         if (res[k].index == -1)
                             res[k].index = i;
                         return rand <= 0;
-                    });
+                    }).reward;
                 }
 
                 const openRewards = await this.findOpenRewards(uow, reward.valueType);
