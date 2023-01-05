@@ -1,4 +1,3 @@
-export * from './ab-test-data';
 export * from './error-code';
 export * from './db-type';
 export * from './header';
