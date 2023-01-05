@@ -12,16 +12,11 @@ const nullValueInterceptor = new NullValueInterceptor();
 export class ValueInterceptorFactory extends ValueInterceptorFactoryBase implements ITraceable<ValueInterceptorFactoryBase> {
     public constructor(
         protected enumFactory: EnumFactoryBase,
-        private m_ParentSpan?: opentracing.Span
+        private m_ParentSpan: opentracing.Span
     ) {
         super();
     }
 
-    /**
-     * 创建数值拦截器
-     * 
-     * @param value 数值
-     */
     public async build(value: contract.IValue) {
         if (value.isSkipIntercept)
             return nullValueInterceptor;
@@ -30,28 +25,20 @@ export class ValueInterceptorFactory extends ValueInterceptorFactoryBase impleme
             const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
             if (allValueTypeItem[value.valueType]) {
                 for (const r of valueInterceptorMetadata.predicates) {
-                    const ok = r.predicate(allValueTypeItem[value.valueType].entry);
+                    const ok = await r.predicate(allValueTypeItem[value.valueType].entry);
                     if (ok)
                         valueInterceptorMetadata.valueType[value.valueType] = r.ctor;
                 }
             }
         }
 
-        if (valueInterceptorMetadata.valueType[value.valueType]) {
-            const interceptor = Container.get(valueInterceptorMetadata.valueType[value.valueType]);
-            Container.remove(valueInterceptorMetadata.valueType[value.valueType]);
+        valueInterceptorMetadata.valueType[value.valueType] ??= NullValueInterceptor;
 
-            return new TracerStrategy(interceptor).withTrace(this.m_ParentSpan);
-        }
-
-        return nullValueInterceptor;
+        const interceptor = Container.get(valueInterceptorMetadata.valueType[value.valueType]);
+        Container.remove(valueInterceptorMetadata.valueType[value.valueType]);
+        return new TracerStrategy(interceptor).withTrace(this.m_ParentSpan);
     }
 
-    /**
-     * 跟踪
-     * 
-     * @param parentSpan 父跟踪范围
-     */
     public withTrace(parentSpan: any) {
         return parentSpan ? new ValueInterceptorFactory(
             new TracerStrategy(this.enumFactory).withTrace(parentSpan),

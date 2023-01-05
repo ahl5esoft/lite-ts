@@ -32,7 +32,7 @@ describe('src/service/value/interceptor-factory.ts', () => {
     describe('.build(valueType: number)', () => {
         it('predicate', async () => {
             const mockEnumFactory = new Mock<EnumFactoryBase>();
-            const self = new Self(mockEnumFactory.actual);
+            const self = new Self(mockEnumFactory.actual, null);
 
             const mockEnum = new Mock<EnumBase<enum_.ValueTypeData>>({
                 allItem: {
@@ -56,18 +56,14 @@ describe('src/service/value/interceptor-factory.ts', () => {
         });
 
         it('valueType', async () => {
-            const self = new Self(null);
-
-            const res = await self.build({
+            const res = await new Self(null, null).build({
                 valueType: 1
             } as contract.IValue);
             strictEqual(res.constructor, ValueTypeValueInterceptor);
         });
 
         it('skip', async () => {
-            const self = new Self(null);
-
-            const res = await self.build({
+            const res = await new Self(null, null).build({
                 isSkipIntercept: true,
                 valueType: 1,
             } as contract.IValue);
