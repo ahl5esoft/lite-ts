@@ -31,6 +31,6 @@ export class MongoEnumCache<T extends global.Enum> extends EnumCacheBase impleme
     }
 
     protected async find() {
-        return await this.m_DbFactory.db(global.Enum).query().toArray();
+        return await this.m_DbFactory.db(this.m_Model).query().toArray();
     }
 }

@@ -5,6 +5,8 @@ import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, EnumCacheBase, IDbQuery } from '../../contract';
 import { enum_, global } from '../../model';
 
+class AbEnum extends global.Enum { }
+
 describe('src/service/mongo/enum-cache.ts', () => {
     describe('.load()', () => {
         it('ok', async () => {
@@ -13,15 +15,15 @@ describe('src/service/mongo/enum-cache.ts', () => {
             }
 
             const mockDbFactory = new Mock<DbFactoryBase>();
-            const self = new Self(mockDbFactory.actual, global.Enum, null, '');
+            const self = new Self(mockDbFactory.actual, AbEnum, null, '');
 
-            const mockDbRepo = new Mock<DbRepositoryBase<global.Enum>>();
+            const mockDbRepo = new Mock<DbRepositoryBase<AbEnum>>();
             mockDbFactory.expectReturn(
-                r => r.db(global.Enum),
+                r => r.db(AbEnum),
                 mockDbRepo.actual
             );
 
-            const mockDbQuery = new Mock<IDbQuery<global.Enum>>();
+            const mockDbQuery = new Mock<IDbQuery<AbEnum>>();
             mockDbRepo.expectReturn(
                 r => r.query(),
                 mockDbQuery.actual
