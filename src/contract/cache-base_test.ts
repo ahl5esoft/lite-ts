@@ -62,7 +62,7 @@ describe('src/contract/redis-cache-base.ts', () => {
             strictEqual(res, 1);
             strictEqual(loadCount, 1);
 
-            const nextCheckOn = Reflect.get(self, 'm_NextCheckOn');
+            const nextCheckOn = Reflect.get(self, 'nextCheckOn');
             notStrictEqual(nextCheckOn, 0);
         });
     });

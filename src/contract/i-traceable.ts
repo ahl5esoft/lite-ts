@@ -1,11 +1,5 @@
-/**
- * 可追踪接口
- */
+import { opentracing } from 'jaeger-client';
+
 export interface ITraceable<T> {
-    /**
-     * 包装跟踪
-     * 
-     * @param parentSpan 父跟踪范围
-     */
-    withTrace(parentSpan: any): T;
+    withTrace(parentSpan: opentracing.Span): T;
 }

@@ -1,43 +1,33 @@
 import { TracerStrategy } from '../tracer';
-import { CacheBase, RedisBase } from '../../contract';
+import { CacheBase, ITraceable, RedisBase } from '../../contract';
+import { opentracing } from 'jaeger-client';
 
-/**
- * 配置缓存
- */
-export class RedisConfigCache extends CacheBase {
-    /**
-     * 构造函数
-     * 
-     * @param m_RedisKey redis键
-     * @param redis redis
-     * @param cacheKey 缓存键
-     */
+export class RedisConfigCache extends CacheBase implements ITraceable<CacheBase> {
     public constructor(
-        private m_RedisKey: string,
+        protected redisKey: string,
         redis: RedisBase,
         cacheKey: string,
     ) {
         super(redis, cacheKey);
     }
 
-    /**
-     * 跟踪
-     * 
-     * @param parentSpan 父范围
-     */
-    public withTrace(parentSpan: any) {
-        return parentSpan ? new RedisConfigCache(
-            this.m_RedisKey,
+    public withTrace(parentSpan: opentracing.Span) {
+        if (!parentSpan)
+            return this;
+
+        const self = new RedisConfigCache(
+            this.redisKey,
             new TracerStrategy(this.redis).withTrace(parentSpan),
-            this.cacheKey
-        ) : this;
+            this.cacheKey,
+        );
+        self.nextCheckOn = this.nextCheckOn;
+        self.updateOn = this.updateOn;
+        self.value = this.value;
+        return self;
     }
 
-    /**
-     * 加载
-     */
     protected async load() {
-        const v = await this.redis.hgetall(this.m_RedisKey);
+        const v = await this.redis.hgetall(this.redisKey);
         return Object.entries(v).reduce((memo, [ck, cv]) => {
             memo[ck] = JSON.parse(cv);
             return memo;

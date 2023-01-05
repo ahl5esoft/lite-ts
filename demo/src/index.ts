@@ -22,7 +22,7 @@ import {
     const enumCache = Container.get<CacheBase>(model.enum_.IoC.enumCache);
     Container.set(
         EnumFactoryBase,
-        new service.EnumFactory(null, {
+        new service.EnumFactory(null, {}, {
             [enum_.CityData.name]: new service.CacheEnum(enumCache, enum_.CityData)
         })
     );
