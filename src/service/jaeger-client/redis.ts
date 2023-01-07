@@ -1,6 +1,6 @@
 import { opentracing } from 'jaeger-client';
 
-import { IRedisGeo, IRedisZRangeByLexOption, IRedisZRangeByScoreOption, ITraceable, RedisBase } from '../../contract';
+import { IRedisGeo, IRedisZMember, IRedisZRangeByLexOption, IRedisZRangeByScoreOption, ITraceable, RedisBase } from '../../contract';
 
 export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase> {
     private m_TracerSpan: opentracing.Span;
@@ -202,10 +202,10 @@ export class JaegerClientRedis extends RedisBase implements ITraceable<RedisBase
         return this.m_Redis.ttl(key);
     }
 
-    public async zadd(key: string, member: string[]) {
-        return await this.exec('zadd', [key, member], {
+    public async zadd(key: string, members: IRedisZMember[]) {
+        return await this.exec('zadd', [key, members], {
             key,
-            member
+            members
         });
     }
 

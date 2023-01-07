@@ -238,9 +238,9 @@ export abstract class RedisBase {
      * 添加redis有序集
      * 
      * @param key 键 
-     * @param member 成员
+     * @param members 成员
      */
-    public abstract zadd(key: string, member: any[]): Promise<any>;
+    public abstract zadd(key: string, members: IRedisZMember[]): Promise<number>;
 
     /**
      * 返回有序集的成员数量

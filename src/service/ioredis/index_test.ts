@@ -579,4 +579,28 @@ describe('src/service/ioredis/index.ts', () => {
             await client.del(key);
         });
     });
+
+    describe('.zrem(key: string, ...args: string[])', () => {
+        it.only('ok', async () => {
+            const key = 'zrem';
+            await self.zadd(key, [{
+                member: 'a',
+                score: 11,
+            }, {
+                member: 'b',
+                score: 12,
+            }, {
+                member: 'c',
+                score: 13,
+            }]);
+
+            const res = await self.zrem(key, 'a', 'b');
+            strictEqual(res, 2);
+
+            const members = await client.zrange(key, 0, -1);
+            deepStrictEqual(members, ['c']);
+
+            await client.del(key);
+        });
+    });
 });
