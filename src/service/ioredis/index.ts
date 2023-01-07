@@ -159,8 +159,17 @@ export class IoredisAdapter extends RedisBase {
         return this.client.ttl(key);
     }
 
-    public async zadd(key: string, member: string[]) {
-        return this.client.zadd(key, member);
+    public async zadd(key: string, members: IRedisZMember[]) {
+        const res = await this.client.zadd(
+            key,
+            members.reduce((memo, r) => {
+                if (typeof r.score == 'number')
+                    memo.push(r.score);
+                memo.push(r.member);
+                return memo;
+            }, [])
+        );
+        return res as number;
     }
 
     public async zcard(key: string) {
