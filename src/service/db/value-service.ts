@@ -85,7 +85,7 @@ export class DbValueService<
         let entry = await this.entry;
         if (!entry) {
             entry = newEntry;
-            entry.values = {};
+            entry.values ??= {};
             await db.add(entry);
 
             this.userService.associateService.add(newEntry.constructor.name, entry);
