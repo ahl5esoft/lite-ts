@@ -95,6 +95,7 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
         if (!bulks.length)
             return;
 
+        this.m_Bulk = {};
         const client = await this.pool.client;
         const session = client.startSession({
             defaultTransactionOptions: {
@@ -105,7 +106,6 @@ export abstract class MongoUnitOfWorkBase extends UnitOfWorkRepositoryBase {
         });
         await this.commitWithSession(session, bulks);
         await session.endSession();
-        this.m_Bulk = {};
     }
 
     /**
