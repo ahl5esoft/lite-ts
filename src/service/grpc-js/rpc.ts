@@ -30,7 +30,7 @@ export class GrpcJsRpc extends LoadBalanceRpcBase {
     public async callWithoutThrow<T>(route: string) {
         const proto = getRpcProto(this.m_ProtoFilePath);
         const routeArgs = route.split('/');
-        const url = await this.getUrl(routeArgs[1])
+        const url = await this.getUrl(routeArgs[1]);
         return new Promise<contract.IApiDyanmicResponse<T>>((s, f) => {
             new proto.RpcService(
                 url,
