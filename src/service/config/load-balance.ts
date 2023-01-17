@@ -27,9 +27,9 @@ export class ConfigLoadBalance extends LoadBalanceBase {
         if (typeof v == 'string')
             return v;
 
-        if (v?.mod?.[1] > 0)
-            return this.m_GetTimeFunc() % v.mod[1] == 0 ? v.mod[0] : v.default;
+        if (v?.percent?.[1] > 0)
+            return this.m_GetTimeFunc() % 100 < v?.percent?.[1] ? v.percent[0] : v.default;
 
-        throw new Error(`缺少config.LoadBalance[${this.m_Protocol}][${app}][${env}].mod`);
+        throw new Error(`缺少config.LoadBalance[${this.m_Protocol}][${app}][${env}].percent`);
     }
 }
