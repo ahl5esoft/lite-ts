@@ -55,7 +55,7 @@
 		"url": "https://github.com/ahl5esoft/lite-ts.git"
 	},
 	"scripts": {
-		"build": "tsc -p tsconfig.prod.json",
+		"build": "tsc -p build.tsconfig.json",
 		"doc": "typedoc src/index.ts",
 		"login": "npm config delete registry && npm config set https-proxy http://127.0.0.1:4780 && npm login",
 		"release": "npm run build && npm publish && npm config delete https-proxy && npm config set registry=https://registry.npm.taobao.org",

@@ -3,4 +3,5 @@ docs/
 proto/
 src/
 version/
+build.tsconfig.json
 tsconfig.json
