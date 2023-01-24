@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { PushLogBase } from './log-base';
-import { Mock } from '../assert';
 import { PushBase } from '../../contract';
 
 class Self extends PushLogBase {

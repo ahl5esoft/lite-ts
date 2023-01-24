@@ -1,7 +1,7 @@
 import { strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { ExpressApiSession as Self } from './api-session';
-import { Mock } from '../assert';
 import { CryptoBase } from '../../contract';
 import { enum_ } from '../../model';
 

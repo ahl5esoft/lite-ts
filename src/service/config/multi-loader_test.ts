@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { MultiConfigLoader as Self } from './multi-loader';
-import { Mock } from '../assert';
 import { ConfigLoaderBase } from '../../contract';
 
 class ConfigTest { }

@@ -1,7 +1,7 @@
 import { notStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { createApiFactory } from './factory';
-import { Mock } from '../assert';
 import { IDirectory } from '../../contract';
 
 describe('src/service/api/factory.ts', () => {

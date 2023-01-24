@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock, mockAny } from 'lite-ts-mock';
 
 import { ValueRewardParser as Self } from './reward-parser';
-import { Mock, mockAny } from '../assert';
 import { EnumBase, EnumFactoryBase, IEnumItem } from '../../contract';
 import { enum_ } from '../../model';
 

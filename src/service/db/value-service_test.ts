@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { DbValueService as Self } from './value-service';
-import { Mock } from '../assert';
 import {
     DbFactoryBase,
     DbRepositoryBase,

@@ -1,4 +1,5 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { DbFactoryBase } from './db-factory-base';
 import { DbRepositoryBase } from './db-repository-base';
@@ -7,7 +8,6 @@ import { NowTimeBase } from './now-time-base';
 import { UserServiceBase } from './user-service-base';
 import { ValueServiceBase } from './value-service-base';
 import { global } from '../model';
-import { Mock } from '../service';
 
 class Self extends UserServiceBase {
     public constructor(

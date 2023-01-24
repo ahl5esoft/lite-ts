@@ -1,4 +1,5 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 import moment from 'moment';
 
 import { EnumBase } from './enum-base';
@@ -7,7 +8,6 @@ import { IUnitOfWork } from './i-unit-of-work';
 import { UserServiceBase } from './user-service-base';
 import { ValueServiceBase } from './value-service-base';
 import { contract, enum_, global } from '../model';
-import { Mock } from '../service';
 
 class Self extends ValueServiceBase<global.UserValue> {
     public constructor(

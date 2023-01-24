@@ -1,7 +1,7 @@
 import { strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { JaegerClientDbRepository as Self } from './db-repository';
-import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase } from '../../contract';
 
 class TestDbRepository { }

@@ -1,5 +1,6 @@
+import { Mock } from 'lite-ts-mock';
+
 import { PushSms as Self } from './sms';
-import { Mock } from '../assert';
 import { PushBase } from '../../contract';
 
 describe('src/service/push/sms.ts', () => {

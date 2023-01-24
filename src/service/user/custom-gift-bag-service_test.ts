@@ -1,5 +1,6 @@
+import { Mock } from 'lite-ts-mock';
+
 import { UserCustomGiftBagService as Self } from './custom-gift-bag-service';
-import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase } from '../../contract';
 import { global } from '../../model';
 

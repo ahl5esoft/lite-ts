@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { EnumFileParser as Self } from './file-parser';
-import { Mock } from '../assert';
 import { FileFactoryBase, IFile } from '../../contract';
 
 describe('src/service/enum/parser.ts', () => {

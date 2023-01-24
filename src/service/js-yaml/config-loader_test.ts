@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { JsYamlConfigLoader as Self } from './config-loader';
-import { Mock } from '../assert';
 import { IFile } from '../../contract';
 
 class Test { }

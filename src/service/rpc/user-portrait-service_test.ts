@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { RpcUserPortraitService as Self } from './user-portrait-service';
-import { Mock } from '../assert';
 import { RpcBase } from '../../contract';
 import { global } from '../../model';
 

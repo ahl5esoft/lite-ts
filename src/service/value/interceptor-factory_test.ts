@@ -1,10 +1,10 @@
 import { strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { ValueIntercept } from './interceptor-decorator';
 import { ValueInterceptorFactory as Self } from './interceptor-factory';
 import { valueInterceptorMetadata } from './interceptor-metadata';
 import { NullValueInterceptor } from './null-interceptor';
-import { Mock } from '../assert';
 import { EnumBase, EnumFactoryBase, IValueInterceptor } from '../../contract';
 import { contract, enum_ } from '../../model';
 

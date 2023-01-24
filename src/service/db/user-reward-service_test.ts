@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { DbUserRewardService as Self } from './user-reward-service';
-import { Mock } from '../assert';
 import { EnumBase, EnumFactoryBase, IUnitOfWork, IUserRandSeedService, UserServiceBase, ValueServiceBase } from '../../contract';
 import { contract, enum_, global } from '../../model';
 

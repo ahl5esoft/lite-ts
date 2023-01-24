@@ -1,9 +1,9 @@
 import { strictEqual } from 'assert';
 import express from 'express';
+import { Mock, mockAny } from 'lite-ts-mock';
 import supertest from 'supertest';
 
 import { expressPostOption as self } from './post-option';
-import { Mock, mockAny } from '../assert';
 import { bodyParserJsonExpressOption } from '../body-parser';
 import { CryptoBase, IApi, ILog, LogFactoryBase } from '../../contract';
 

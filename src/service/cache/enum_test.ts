@@ -1,8 +1,8 @@
 import { deepStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { CacheEnum as Self } from './enum';
 import { valueTypeOpenRewardsReduce } from '../value-type';
-import { Mock } from '../assert';
 import { CacheBase } from '../../contract';
 import { enum_ } from '../../model';
 

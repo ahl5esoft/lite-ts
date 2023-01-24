@@ -1,7 +1,7 @@
 import { strictEqual } from 'assert';
+import { Mock, mockAny } from 'lite-ts-mock';
 
 import { RpcValueService as Self } from './value-service';
-import { Mock, mockAny } from '../assert';
 import { CustomError } from '../error';
 import { IUserAssociateService, RpcBase, UserServiceBase } from '../../contract';
 import { enum_, global } from '../../model';

@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { RpcEnumCache as Self } from './enum-cache';
-import { Mock } from '../assert';
 import { EnumCacheBase, RpcBase } from '../../contract';
 import { global } from '../../model';
 

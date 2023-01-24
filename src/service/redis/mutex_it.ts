@@ -1,7 +1,7 @@
 import { ok, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { RedisMutex as Self } from './mutex';
-import { Mock } from '../assert';
 import { IoredisAdapter } from '../ioredis';
 import { ThreadBase } from '../../contract';
 

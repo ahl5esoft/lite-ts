@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { RedisConfigCache as Self } from './config-cache';
-import { Mock } from '../assert';
 import { RedisBase } from '../../contract';
 
 describe('src/service/redis/config-cache.ts', () => {

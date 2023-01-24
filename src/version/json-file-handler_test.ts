@@ -1,6 +1,7 @@
+import { Mock } from 'lite-ts-mock';
+
 import { JsonFileHandler } from './json-file-handler';
 import { IFile } from '../contract';
-import { Mock } from '../service';
 
 describe('src/version/json-file-handler.ts', () => {
     describe('.handle()', () => {

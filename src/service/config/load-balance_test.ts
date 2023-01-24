@@ -1,7 +1,7 @@
 import { strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { ConfigLoadBalance as Self } from './load-balance';
-import { Mock } from '../assert';
 import { ConfigLoaderBase } from '../../contract';
 import { config } from '../../model';
 
@@ -26,7 +26,7 @@ describe('src/model/config/load-balance.ts', () => {
             strictEqual(res, 'url');
         });
 
-        it('mod(false)', async () => {
+        it('percent(false)', async () => {
             const mockConfigLoader = new Mock<ConfigLoaderBase>();
             const self = new Self(mockConfigLoader.actual, 'http');
 
@@ -37,7 +37,7 @@ describe('src/model/config/load-balance.ts', () => {
                         app: {
                             '': {
                                 default: 'd-url',
-                                mod: ['m-url', 5],
+                                percent: ['m-url', 5],
                             }
                         }
                     }
@@ -45,7 +45,7 @@ describe('src/model/config/load-balance.ts', () => {
             );
 
             Reflect.set(self, 'm_GetTimeFunc', () => {
-                return 1;
+                return 6;
             });
 
             const res = await self.getUrl('app', undefined);
@@ -63,7 +63,7 @@ describe('src/model/config/load-balance.ts', () => {
                         app: {
                             '': {
                                 default: 'd-url',
-                                mod: ['m-url', 5],
+                                percent: ['m-url', 5],
                             }
                         }
                     }
@@ -71,7 +71,7 @@ describe('src/model/config/load-balance.ts', () => {
             );
 
             Reflect.set(self, 'm_GetTimeFunc', () => {
-                return 10;
+                return 1;
             });
 
             const res = await self.getUrl('app', undefined);

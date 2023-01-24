@@ -1,10 +1,10 @@
 import { strictEqual } from 'assert';
 import { opentracing } from 'jaeger-client';
+import { Mock } from 'lite-ts-mock';
 
 import { JaegerClientDbFactory as Self } from './db-factory';
 import { JaegerClientDbRepository } from './db-repository';
 import { JaegerClientUnitOfWork } from './unit-of-work';
-import { Mock } from '../assert';
 import { DbFactoryBase, IUnitOfWork } from '../../contract';
 
 describe('src/service/jaeger/db-factory.ts', () => {

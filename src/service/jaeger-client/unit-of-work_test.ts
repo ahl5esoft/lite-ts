@@ -1,7 +1,7 @@
 import { opentracing } from 'jaeger-client';
+import { Mock } from 'lite-ts-mock';
 
 import { JaegerClientUnitOfWork as Self } from './unit-of-work';
-import { Mock } from '../assert';
 import { UnitOfWorkRepositoryBase } from '../../contract';
 
 class TestUnitOfWorkModel { }

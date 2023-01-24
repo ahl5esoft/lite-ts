@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { CacheConfigLoader as Self } from './config-loader';
-import { Mock } from '../assert';
 import { CacheBase } from '../../contract';
 import { config } from '../../model';
 

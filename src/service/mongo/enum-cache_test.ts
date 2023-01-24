@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { MongoEnumCache as Self } from './enum-cache';
-import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, EnumCacheBase, IDbQuery } from '../../contract';
 import { enum_, global } from '../../model';
 

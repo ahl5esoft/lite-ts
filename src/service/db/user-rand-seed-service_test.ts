@@ -1,7 +1,7 @@
 import { ok, strictEqual } from 'assert';
+import { Mock, mockAny } from 'lite-ts-mock';
 
 import { DbUserRandSeedService as Self } from './user-rank-seed-service';
-import { Mock, mockAny } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, IUnitOfWork, IUserAssociateService } from '../../contract';
 import { global } from '../../model';
 

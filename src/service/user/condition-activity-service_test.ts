@@ -1,7 +1,7 @@
 import { strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { UserConditionActivityService as Self } from './condition-activity-service';
-import { Mock } from '../assert';
 import { IUnitOfWork, UserServiceBase, ValueServiceBase } from '../../contract';
 import { enum_, global } from '../../model';
 

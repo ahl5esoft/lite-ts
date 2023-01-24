@@ -1,6 +1,7 @@
+import { Mock } from 'lite-ts-mock';
+
 import { ReadmeHandler } from './readme-handler';
 import { IFile } from '../contract';
-import { Mock } from '../service/assert';
 
 describe('src/version/readme-handler.ts', () => {
     describe('.handle()', () => {

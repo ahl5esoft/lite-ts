@@ -1,5 +1,6 @@
+import { Mock } from 'lite-ts-mock';
+
 import { DbUserValueService as Self } from './user-value-service';
-import { Mock } from '../assert';
 import { EnumFactoryBase, UserServiceBase, ValueServiceBase } from '../../contract';
 import { enum_, global } from '../../model';
 

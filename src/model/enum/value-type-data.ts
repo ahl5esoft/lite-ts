@@ -15,14 +15,7 @@ export class ValueTypeData extends ItemData {
      *      value: 1,
      *  }];
      * 
-     *  const valueService: ITargetValueService;
-     *  valueService.data = {
-     *      id: '目标ID',
-     *      values: [{
-     *          1: 10
-     *      }]
-     *  };
-     * 
+     *  const valueService: ValueServiceBase<T>;
      *  wait valueService.update(工作单元, [{
      *      count: -100,
      *      valueType: 1
@@ -40,15 +33,7 @@ export class ValueTypeData extends ItemData {
      *      isReplace: true
      *  }];
      * 
-     *  const valueService: ITargetValueService;
-     *  valueService.data = {
-     *      id: '目标ID',
-     *      values: [{
-     *          1: 1,
-     *          2: 11
-     *      }]
-     *  };
-     * 
+     *  const valueService: ValueServiceBase<T>;
      *  await valueService.update(工作单元, [{
      *      count: 1,
      *      valueType: 22
@@ -80,7 +65,41 @@ export class ValueTypeData extends ItemData {
          * 数值类型
          */
         valueType: number;
-    }
+    };
+    /**
+     * 同步
+     * 
+     * @example
+     * ```typescript
+     *  const valueTypeDatas: enum_.ValueTypeData[] = [{
+     *      text: '登录次数',
+     *      sync: {
+     *          valueTypes: [2, 3]
+     *      },
+     *      value: 1,
+     *  }, {
+     *      text: '今日登录次数',
+     *      value: 2,
+     *  }, {
+     *      text: '本月登录次数',
+     *      value: 3,
+     *  }];
+     * 
+     *  const valueService: ValueServiceBase<T>;
+     *  await valueService.update(工作单元, [{
+     *      count: 1,
+     *      valueType: 1
+     *  }]);
+     *  const res = await valueService.getCount(工作单元, 1);
+     *  // res = 1
+     *  const res = await valueService.getCount(工作单元, 2);
+     *  // res = 1
+     *  const res = await valueService.getCount(工作单元, 3);
+     *  // res = 1
+     */
+    public sync?: {
+        valueTypes: number[];
+    };
     /**
      * 时间数值类型, 值有效的情况下, 目标数值更新时会根据该值对应的目标数值是否与当前时间同一时期,如果不同时期则目标数值会重置为0
      * 
@@ -100,15 +119,7 @@ export class ValueTypeData extends ItemData {
      *      }
      *  }];
      * 
-     *  const valueService: ITargetValueService;
-     *  valueService.data = {
-     *      id: '目标ID',
-     *      values: [{
-     *          1: 5,
-     *          2: 上次更新登录次数的时间戳
-     *      }]
-     *  };
-     * 
+     *  const valueService: ValueServiceBase<T>;
      *  await valueService.update(工作单元, [{
      *      count: 1,
      *      valueType: 1

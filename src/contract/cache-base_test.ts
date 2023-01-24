@@ -1,8 +1,8 @@
 import { notStrictEqual, strictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { CacheBase } from './cache-base';
 import { RedisBase } from './redis-base';
-import { Mock } from '../service';
 
 class Self extends CacheBase {
     public constructor(

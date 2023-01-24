@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
+import { Mock } from 'lite-ts-mock';
 
 import { MongoConfigCache as Self } from './config-cache';
-import { Mock } from '../assert';
 import { DbFactoryBase, DbRepositoryBase, IDbQuery } from '../../contract';
 import { global } from '../../model';
 
