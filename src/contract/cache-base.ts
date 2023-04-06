@@ -2,7 +2,7 @@ import { RedisBase } from './redis-base';
 
 export abstract class CacheBase {
     protected nextCheckOn = 0;
-    protected value: { [key: string]: any };
+    protected value: { [key: string]: any; };
 
     public updateOn = 0;
 
@@ -44,8 +44,8 @@ export abstract class CacheBase {
             const value = await this.redis.hget('cache', this.cacheKey);
             const lastCacheOn = parseInt(value) || now;
             if (this.updateOn != lastCacheOn) {
-                this.updateOn = lastCacheOn;
                 this.value = await this.load();
+                this.updateOn = lastCacheOn;
             }
 
             this.nextCheckOn = now + 5_000 + Math.floor(
@@ -56,5 +56,5 @@ export abstract class CacheBase {
         return this.value[key] as T;
     }
 
-    protected abstract load(): Promise<{ [key: string]: any }>;
+    protected abstract load(): Promise<{ [key: string]: any; }>;
 }
