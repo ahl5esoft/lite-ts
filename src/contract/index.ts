@@ -33,7 +33,6 @@ export * from './i-user-rand-seed-service';
 export * from './i-user-reward-service';
 export * from './i-user-security-service';
 export * from './i-value-interceptor';
-export * from './i-value-type-service';
 export * from './load-balance-base';
 export * from './log-factory-base';
 export * from './mutex-base';
