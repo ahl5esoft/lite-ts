@@ -13,6 +13,10 @@ import { contract, enum_, global } from '../../model';
  */
 export class RpcValueService<T extends global.UserTargetValue> extends TargetValueServiceBase<T>{
     /**
+     * 变更
+     */
+    private m_ChangeValues: contract.IValue[] = [];
+    /**
      * 实体
      */
     public get entry() {
@@ -52,14 +56,25 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
     /**
      * 更新
      * 
-     * @param _ 工作单元(忽略)
+     * @param uow 工作单元
      * @param values 数值数组
      */
-    public async update(_: IUnitOfWork, values: contract.IValue[]) {
-        await this.m_Rpc.setBody({
-            ...this.m_Entry,
-            values: values
-        }).call<void>(`/${this.m_TargetTypeData.app}/update-values-by-user-id`);
+    public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        const route = `/${this.m_TargetTypeData.app}/update-values-by-user-id`;
+        if (uow) {
+            this.m_ChangeValues.push(...values);
+            uow.registerAfter(async () => {
+                await this.m_Rpc.setBody({
+                    userID: this.m_Entry.userID,
+                    values: this.m_ChangeValues
+                }).call<void>(route);
+            }, route);
+        } else {
+            await this.m_Rpc.setBody({
+                ...this.m_Entry,
+                values: values
+            }).call<void>(route);
+        }
     }
 
     /**
