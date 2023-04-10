@@ -65,7 +65,7 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
             this.m_ChangeValues.push(...values);
             uow.registerAfter(async () => {
                 await this.m_Rpc.setBody({
-                    userID: this.m_Entry.userID,
+                    ...this.m_Entry,
                     values: this.m_ChangeValues
                 }).call<void>(route);
             }, route);
