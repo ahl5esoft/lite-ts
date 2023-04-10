@@ -60,19 +60,20 @@ export class RpcValueService<T extends global.UserTargetValue> extends TargetVal
      * @param values 数值数组
      */
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
+        const route = `/${this.m_TargetTypeData.app}/update-values-by-user-id`;
         if (uow) {
             this.m_ChangeValues.push(...values);
             uow.registerAfter(async () => {
                 await this.m_Rpc.setBody({
                     userID: this.m_Entry.userID,
                     values: this.m_ChangeValues
-                }).call<void>(`/${this.m_TargetTypeData.app}/update-values-by-user-id`);
-            }, `/${this.m_TargetTypeData.app}/update-values-by-user-id`);
+                }).call<void>(route);
+            }, route);
         } else {
             await this.m_Rpc.setBody({
                 ...this.m_Entry,
                 values: values
-            }).call<void>(`/${this.m_TargetTypeData.app}/update-values-by-user-id`);
+            }).call<void>(route);
         }
     }
 
