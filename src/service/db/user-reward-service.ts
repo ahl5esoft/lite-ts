@@ -1,10 +1,11 @@
-import { EnumFactoryBase, IUnitOfWork, IUserRewardService, UserServiceBase } from '../../contract';
+import { EnumFactoryBase, IUnitOfWork, IUserRewardService, MathBase, UserServiceBase } from '../../contract';
 import { contract, enum_ } from '../../model';
 
 export class DbUserRewardService implements IUserRewardService {
     public constructor(
         private m_EnummFactory: EnumFactoryBase,
-        private m_UserService: UserServiceBase,
+        private m_Math: MathBase,
+        private m_UserService: UserServiceBase
     ) { }
 
     public async findResults(uow: IUnitOfWork, rewards: contract.IReward[][], source: string, scene = '') {
@@ -62,7 +63,7 @@ export class DbUserRewardService implements IUserRewardService {
 
             const openRewards = await this.findOpenRewards(uow, reward.valueType);
             if (openRewards) {
-                for (let i = 0; i < reward.count; i++) {
+                for (let i = 0; this.m_Math.lt(i, reward.count); i++) {
                     const resRewards = await this.findResults(uow, openRewards, source, scene);
                     for (const item of resRewards) {
                         res.value[item.valueType] ??= {
@@ -72,7 +73,7 @@ export class DbUserRewardService implements IUserRewardService {
                             targetType: item.targetType,
                             valueType: item.valueType,
                         };
-                        res.value[item.valueType].count += item.count;
+                        res.value[item.valueType].count = this.m_Math.add(res.value[item.valueType].count, item.count);
                     }
                 }
             } else {
@@ -83,7 +84,7 @@ export class DbUserRewardService implements IUserRewardService {
                     targetType: reward.targetType,
                     valueType: reward.valueType,
                 };
-                res.value[reward.valueType].count += reward.count;
+                res.value[reward.valueType].count = this.m_Math.add(res.value[reward.valueType].count, reward.count);
             }
         }
 
@@ -107,7 +108,7 @@ export class DbUserRewardService implements IUserRewardService {
             [key: string]: {
                 index: number,
                 value: { [valueType: number]: contract.IValue; },
-            }
+            };
         } = {};
         for (const [k, v] of Object.entries(rewardsGroup)) {
             res[k] = {
@@ -159,14 +160,14 @@ export class DbUserRewardService implements IUserRewardService {
 
                 const openRewards = await this.findOpenRewards(uow, reward.valueType);
                 if (openRewards) {
-                    for (let i = 0; i < reward.count; i++)
+                    for (let i = 0; this.m_Math.lt(i, reward.count); i++)
                         rewardsQueue.splice(openRewards.length * i, 0, ...openRewards);
                 } else {
                     res[k].value[reward.valueType] ??= {
                         count: 0,
                         valueType: reward.valueType,
                     };
-                    res[k].value[reward.valueType].count += reward.count;
+                    res[k].value[reward.valueType].count = this.m_Math.add(res[k].value[reward.valueType].count, reward.count);
                 }
             }
         }
@@ -196,7 +197,7 @@ export class DbUserRewardService implements IUserRewardService {
                 for (const cr of r) {
                     let weightAddition = 0;
                     if (rewardAddition[valueType][cr.valueType])
-                        weightAddition = await this.m_UserService.valueService.getCount(uow, rewardAddition[valueType][cr.valueType]);
+                        weightAddition = Number(await this.m_UserService.valueService.getCount(uow, rewardAddition[valueType][cr.valueType]));
                     children.push({
                         ...cr,
                         weight: cr.weight + weightAddition

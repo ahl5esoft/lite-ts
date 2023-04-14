@@ -14,12 +14,20 @@ describe('src/service/rpc/value-service.ts', () => {
                 associateService: mockAssociateService.actual
             });
             const mockRpc = new Mock<RpcBase>();
-            const self = new Self(mockRpc.actual, {
-                app: 'test',
-                value: 1
-            } as enum_.TargetTypeData, {
-                no: 2
-            } as global.UserTargetValue, null, mockUserService.actual, null);
+            const self = new Self(
+                mockRpc.actual,
+                {
+                    app: 'test',
+                    value: 1
+                } as enum_.TargetTypeData,
+                {
+                    no: 2
+                } as global.UserTargetValue,
+                null,
+                null,
+                mockUserService.actual,
+                null
+            );
 
             mockAssociateService.expectReturn(
                 r => r.find(`${global.UserTargetValue.name}-1`, mockAny),

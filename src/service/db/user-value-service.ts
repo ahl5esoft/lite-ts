@@ -5,6 +5,7 @@ import {
     DbFactoryBase,
     EnumFactoryBase,
     IUnitOfWork,
+    MathBase,
     RedisBase,
     RpcBase,
     StringGeneratorBase,
@@ -22,12 +23,13 @@ export class DbUserValueService extends DbValueService<global.UserValue, global.
         targetTypeData: enum_.TargetTypeData,
     ) => ValueServiceBase<global.UserTargetValue>;
 
-    private m_TargetTypeValueService: { [targetType: number]: ValueServiceBase<global.UserTargetValue> } = {};
+    private m_TargetTypeValueService: { [targetType: number]: ValueServiceBase<global.UserTargetValue>; } = {};
 
     public constructor(
         protected rpc: RpcBase,
         dbFactory: DbFactoryBase,
         enumFactory: EnumFactoryBase,
+        math: MathBase,
         redis: RedisBase,
         stringGenerator: StringGeneratorBase,
         userService: UserServiceBase,
@@ -52,6 +54,7 @@ export class DbUserValueService extends DbValueService<global.UserValue, global.
                 return entry;
             },
             r => r.userID == userService.userID,
+            math,
             userService,
             enumFactory,
             async () => {

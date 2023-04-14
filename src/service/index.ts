@@ -1,5 +1,6 @@
 export * from './api';
 export * from './bcryptjs';
+export * from './big-integer';
 export * from './class-transformer';
 export * from './crypto-js';
 export * from './bent';

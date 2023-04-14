@@ -1,5 +1,7 @@
+import { Integer } from '../../contract';
+
 export interface IValue {
-    count: number;
+    count: Integer;
     valueType: number;
     isSkipIntercept?: boolean;
     source?: string;

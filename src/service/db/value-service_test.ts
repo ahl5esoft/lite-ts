@@ -25,6 +25,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 userID: 'uid'
             });
             const predicate = (_: global.UserValueChange) => true;
+
             const self = new Self(
                 mockDbFactory.actual,
                 mockRedis.actual,
@@ -35,6 +36,7 @@ describe('src/service/db/value-service-base.ts', () => {
                 null,
                 null,
                 predicate,
+                null,
                 mockUserService.actual,
                 mockEnumFactory.actual,
                 async () => {

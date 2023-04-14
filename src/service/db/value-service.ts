@@ -6,6 +6,7 @@ import {
     DbRepositoryBase,
     EnumFactoryBase,
     IUnitOfWork,
+    MathBase,
     RedisBase,
     StringGeneratorBase,
     UserServiceBase,
@@ -29,11 +30,12 @@ export class DbValueService<
         private m_CreateEntryFunc: () => T,
         private m_CreateLogEntryFunc: () => TLog,
         private m_FindAndClearChangeEntriesPredicate: (r: TChange) => boolean,
+        math: MathBase,
         userService: UserServiceBase,
         enumFactory: EnumFactoryBase,
         getEntryFunc: () => Promise<T>,
     ) {
-        super(userService, enumFactory, getEntryFunc);
+        super(userService, enumFactory, math, getEntryFunc);
     }
 
     public async getCount(uow: IUnitOfWork, valueType: number) {
@@ -126,7 +128,7 @@ export class DbValueService<
                 } else if (valueTypeEntry.time?.valueType > 0) {
                     const oldUnix = entry.values[valueTypeEntry.time.valueType] || 0;
                     const isSame = moment.unix(nowUnix).isSame(
-                        moment.unix(oldUnix),
+                        moment.unix(Number(oldUnix)),
                         allValueTypeItem[valueTypeEntry.time.valueType].entry.time.momentType
                     );
                     if (!isSame) {
@@ -135,24 +137,24 @@ export class DbValueService<
                     }
 
                     entry.values[valueTypeEntry.time.valueType] = nowUnix;
-                    entry.values[r.valueType] += r.count;
+                    entry.values[r.valueType] = this.math.add(entry.values[r.valueType], r.count);
                 } else {
-                    entry.values[r.valueType] += r.count;
+                    entry.values[r.valueType] = this.math.add(entry.values[r.valueType], r.count);
                 }
             } else {
-                entry.values[r.valueType] += r.count;
+                entry.values[r.valueType] = this.math.add(entry.values[r.valueType], r.count);
             }
 
             if (valueTypeEntry) {
-                if (entry.values[r.valueType] < 0 && !valueTypeEntry.isNegative) {
+                if (this.math.lt(entry.values[r.valueType], 0) && !valueTypeEntry.isNegative) {
                     entry.values[r.valueType] = logEntry.oldCount;
                     throw ValueServiceBase.buildNotEnoughErrorFunc(r.count, logEntry.oldCount, r.valueType);
                 }
 
-                if (entry.values[r.valueType] > valueTypeEntry.range?.max)
+                if (this.math.gt(entry.values[r.valueType], valueTypeEntry.range?.max))
                     entry.values[r.valueType] = valueTypeEntry.range.max;
 
-                if (entry.values[r.valueType] < valueTypeEntry.range?.min)
+                if (this.math.lt(entry.values[r.valueType], valueTypeEntry.range?.min))
                     entry.values[r.valueType] = valueTypeEntry.range.min;
             }
 

@@ -4,6 +4,7 @@ import { join } from 'path';
 import Container from 'typedi';
 
 import { BentLoadBalanceRpc } from '../bent';
+import { BigIntegerMath } from '../big-integer';
 import { CacheConfigLoader } from '../cache';
 import { ConfigLoadBalance, MultiConfigLoader } from '../config';
 import { ConsoleLog } from '../console';
@@ -31,6 +32,7 @@ import {
     FileFactoryBase,
     IUserAssociateService,
     LogFactoryBase,
+    MathBase,
     MutexBase,
     NowTimeBase,
     RedisBase,
@@ -47,7 +49,7 @@ import { config, enum_, global } from '../../model';
  * 
  * @param globalModel 全局模型
  */
-export async function initIoC(globalModel: { [name: string]: any }) {
+export async function initIoC(globalModel: { [name: string]: any; }) {
     moment.updateLocale('en', {
         week: {
             dow: 1,
@@ -58,13 +60,24 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         return new EnumItem(entry, name);
     };
 
+    const math = new BigIntegerMath();
+    Container.set(MathBase, math);
+
     DbUserValueService.buildTargetValueServiceFunc = (enumFactory: EnumFactoryBase, rpc: RpcBase, userService: UserServiceBase, targetTypeData: enum_.TargetTypeData) => {
-        return new RpcValueService(rpc, {
-            ...targetTypeData,
-            key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
-        }, {
-            userID: userService.userID
-        }, enumFactory, userService, null);
+        return new RpcValueService(
+            rpc,
+            {
+                ...targetTypeData,
+                key: [global.UserTargetValue.name, targetTypeData.value].join('-'),
+            },
+            {
+                userID: userService.userID
+            },
+            enumFactory,
+            math,
+            userService,
+            null
+        );
     };
 
     RedisMutex.errWaitLock = new CustomError(enum_.ErrorCode.waitLock);
@@ -81,12 +94,12 @@ export async function initIoC(globalModel: { [name: string]: any }) {
         return new DbUserRandSeedService(associateService, dbFactory, scene, userID, range);
     };
     UserServiceBase.buildRewardServiceFunc = (enumFactory: EnumFactoryBase, userService: UserServiceBase) => {
-        return new DbUserRewardService(enumFactory, userService);
+        return new DbUserRewardService(enumFactory, math, userService);
     };
 
     ValueServiceBase.buildNotEnoughErrorFunc = (consumeCount, hasCount, valueType) => {
         return new CustomError(enum_.ErrorCode.valueTypeNotEnough, {
-            consume: Math.abs(consumeCount),
+            consume: math.abs(consumeCount),
             count: hasCount,
             valueType: valueType,
         });
@@ -118,7 +131,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
     const pkg = await fileFactory.buildFile(
         process.cwd(),
         'package.json'
-    ).read<{ version: string }>();
+    ).read<{ version: string; }>();
     cfg.version = pkg.version;
 
     if (cfg.auth?.secretKey) {
@@ -224,7 +237,7 @@ export async function initIoC(globalModel: { [name: string]: any }) {
 
     Container.set(LogFactoryBase, {
         build() {
-            return cfg.log4js ? new Log4jsLog() : new ConsoleLog()
+            return cfg.log4js ? new Log4jsLog() : new ConsoleLog();
         },
     } as LogFactoryBase);
 

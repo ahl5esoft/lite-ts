@@ -25,7 +25,7 @@ export abstract class UserServiceBase {
     public static buildSecurityServiceFunc: (rpc: RpcBase, userID: string) => IUserSecurityService;
 
     private m_CustomGiftBagService: IUserCustomGiftBagService;
-    private m_RandSeedService: { [scene: string]: IUserRandSeedService } = {};
+    private m_RandSeedService: { [scene: string]: IUserRandSeedService; } = {};
 
     private m_PortraitService: IUserPortraitService;
     public get portraitService() {
@@ -53,7 +53,7 @@ export abstract class UserServiceBase {
                 try {
                     const entry = await this.valueService.entry;
                     this.m_Now ??= [
-                        entry.values?.[this.nowValueType] || await this.nowTime.unix(),
+                        Number(entry.values?.[this.nowValueType]) || await this.nowTime.unix(),
                         nowUnix
                     ];
                 } catch (ex) {
@@ -95,7 +95,7 @@ export abstract class UserServiceBase {
             });
             if (entries.length) {
                 for (let i = 1; i < entries.length; i++) {
-                    await db.remove(entries[i])
+                    await db.remove(entries[i]);
                 }
             } else {
                 entries.push({

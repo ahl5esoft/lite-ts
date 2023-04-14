@@ -1,10 +1,11 @@
 import { IsNumber, IsOptional, IsPositive, Length } from 'class-validator';
 
 import { IValue } from '../contract';
+import { Integer } from '../../contract';
 
 export class Value implements IValue {
     @IsNumber()
-    public count: number;
+    public count: Integer;
 
     @IsPositive()
     public valueType: number;

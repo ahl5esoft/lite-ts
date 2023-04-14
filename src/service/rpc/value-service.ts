@@ -1,6 +1,7 @@
 import {
     EnumFactoryBase,
     IUnitOfWork,
+    MathBase,
     RpcBase,
     UserServiceBase,
     ValueServiceBase
@@ -15,17 +16,18 @@ export class RpcValueService<T extends global.UserValue> extends ValueServiceBas
         protected targetTypeData: enum_.TargetTypeData,
         private m_UpdateRpcBody: any,
         enumFactory: EnumFactoryBase,
+        math: MathBase,
         userService: UserServiceBase,
         getEntryFunc: () => Promise<T>,
     ) {
-        super(userService, enumFactory, getEntryFunc);
+        super(userService, enumFactory, math, getEntryFunc);
     }
 
     public async update(uow: IUnitOfWork, values: contract.IValue[]) {
         if (!values.length)
             return;
 
-        const route = ['', this.targetTypeData.app, RpcValueService.updateRoute].join('/')
+        const route = ['', this.targetTypeData.app, RpcValueService.updateRoute].join('/');
         if (uow) {
             this.updateValues ??= [];
             this.updateValues.push(...values);
