@@ -27,8 +27,8 @@ export class UserConditionActivityService<T extends contract.IConditionActivity>
             return;
 
         const beginOn = await this.userService.valueService.getCount(uow, this.activity.contrastValueType);
-        this.closeOn = beginOn + this.activity.closeConditions[0][0].count;
-        this.hideOn = beginOn + this.activity.hideConditions[0][0].count;
-        this.openOn = beginOn + this.activity.openConditions[0][0].count;
+        this.closeOn = Number(beginOn) + Number(this.activity.closeConditions[0][0].count);
+        this.hideOn = Number(beginOn) + Number(this.activity.hideConditions[0][0].count);
+        this.openOn = Number(beginOn) + Number(this.activity.openConditions[0][0].count);
     }
 }

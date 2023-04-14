@@ -2,6 +2,7 @@ import { deepStrictEqual, strictEqual } from 'assert';
 import { Mock } from 'lite-ts-mock';
 
 import { DbUserRewardService as Self } from './user-reward-service';
+import { BigIntegerMath } from '../big-integer';
 import { EnumBase, EnumFactoryBase, IUnitOfWork, IUserRandSeedService, UserServiceBase, ValueServiceBase } from '../../contract';
 import { contract, enum_, global } from '../../model';
 
@@ -9,7 +10,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe('.findResults(uow: IUnitOfWork, rewards: IRewardData[][], scene?: string)', () => {
         it('固定', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(null, mockUserService.actual);
+            const self = new Self(null, new BigIntegerMath(), mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -53,7 +54,7 @@ describe('src/service/db/user-reward-service.ts', () => {
 
         it('权重', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(null, mockUserService.actual);
+            const self = new Self(null, new BigIntegerMath(), mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -106,7 +107,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe('.findResultsWithIndex(uow: IUnitOfWork, rewards: IRewardData[][], scene?: string)', () => {
         it('固定', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(null, mockUserService.actual);
+            const self = new Self(null, new BigIntegerMath(), mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -153,7 +154,7 @@ describe('src/service/db/user-reward-service.ts', () => {
 
         it('权重', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(null, mockUserService.actual);
+            const self = new Self(null, new BigIntegerMath(), mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -209,7 +210,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe(`.preview(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '')`, () => {
         it('ok', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(null, mockUserService.actual);
+            const self = new Self(null, new BigIntegerMath(), mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -309,7 +310,7 @@ describe('src/service/db/user-reward-service.ts', () => {
     describe(`.previewWithIndex(uow: IUnitOfWork, rewardsGroup: { [key: string]: contract.IReward[][] }, scene = '')`, () => {
         it('ok', async () => {
             const mockUserService = new Mock<UserServiceBase>();
-            const self = new Self(null, mockUserService.actual);
+            const self = new Self(null, new BigIntegerMath(), mockUserService.actual);
 
             const mockRandSeedService = new Mock<IUserRandSeedService>();
             mockUserService.expectReturn(
@@ -415,7 +416,7 @@ describe('src/service/db/user-reward-service.ts', () => {
             const mockUserService = new Mock<UserServiceBase>({
                 valueService: mockUserValueService.actual
             });
-            const self = new Self(mockEnumFactory.actual, mockUserService.actual);
+            const self = new Self(mockEnumFactory.actual, new BigIntegerMath(), mockUserService.actual);
 
             const mockEnum = new Mock<EnumBase<enum_.ValueTypeData>>();
             mockEnumFactory.expectReturn(

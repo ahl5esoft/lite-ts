@@ -5,6 +5,7 @@ import {
     DbFactoryBase,
     EnumFactoryBase,
     IUserAssociateService,
+    MathBase,
     NowTimeBase,
     RpcBase,
     ThreadBase,
@@ -23,6 +24,7 @@ export class RpcUserService extends UserServiceBase {
                 userID: this.userID,
             },
             this.enumFactory,
+            this.m_Math,
             this,
             async () => {
                 const entries = await this.associateService.find<global.UserValue>(global.UserValue.name, r => r.id == this.userID);
@@ -33,6 +35,7 @@ export class RpcUserService extends UserServiceBase {
     }
 
     public constructor(
+        private m_Math: MathBase,
         protected targetTypeData: enum_.TargetTypeData,
         associateService: IUserAssociateService,
         dbFactory: DbFactoryBase,

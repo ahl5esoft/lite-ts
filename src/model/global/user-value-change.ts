@@ -1,4 +1,5 @@
 import { IValue } from '../contract';
+import { Integer } from '../../contract';
 
 /**
  * 用户数值变更模型
@@ -7,7 +8,8 @@ export class UserValueChange implements IValue {
     /**
      * 数量
      */
-    public count: number;
+    public count: Integer;
+
     public id: string;
     /**
      * 来源

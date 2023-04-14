@@ -1,3 +1,5 @@
+import { Integer } from '../../contract';
+
 /**
  * 用户数值变更日志
  */
@@ -5,12 +7,12 @@ export class UserValueLog {
     /**
      * 当前数量
      */
-    public count: number;
+    public count: Integer;
     public id: string;
     /**
      * 旧数量
      */
-    public oldCount: number;
+    public oldCount: Integer;
     /**
      * 来源
      */

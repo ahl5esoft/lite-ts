@@ -3,11 +3,13 @@ import moment from 'moment';
 import { EnumFactoryBase } from './enum-factory-base';
 import { IEnumItem } from './i-enum-item';
 import { IUnitOfWork } from './i-unit-of-work';
+import { Integer } from './integer';
+import { MathBase } from './math-base';
 import { UserServiceBase } from './user-service-base';
 import { contract, enum_, global } from '../model';
 
 export abstract class ValueServiceBase<T extends global.UserValue> {
-    public static buildNotEnoughErrorFunc: (consoumeCount: number, hasCount: number, valueType: number) => Error;
+    public static buildNotEnoughErrorFunc: (consoumeCount: Integer, hasCount: Integer, valueType: number) => Error;
 
     public updateValues: contract.IValue[];
 
@@ -18,6 +20,7 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
     public constructor(
         public userService: UserServiceBase,
         protected enumFactory: EnumFactoryBase,
+        protected math: MathBase,
         private m_GetEntryFunc: () => Promise<T>,
     ) { }
 
@@ -32,24 +35,24 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
                 let bCount = cr.count;
                 let op: string = cr.op;
                 if (cr.op.includes(enum_.RelationOperator.nowDiff)) {
-                    aCount = now - aCount;
+                    aCount = this.math.subtract(now, aCount);
                     op = cr.op.replace(enum_.RelationOperator.nowDiff, '');
                 } else if (cr.op.includes(enum_.RelationOperator.mod)) {
-                    aCount = aCount % Math.floor(cr.count / 100);
+                    aCount = this.math.mod(aCount, this.math.divide(cr.count, 100));
                     op = cr.op.replace(enum_.RelationOperator.mod, '');
-                    bCount = bCount % 100;
+                    bCount = this.math.mod(bCount, 100);
                 }
                 switch (op) {
                     case enum_.RelationOperator.ge:
-                        return aCount >= bCount;
+                        return this.math.gte(aCount, bCount);
                     case enum_.RelationOperator.gt:
-                        return aCount > bCount
+                        return this.math.gt(aCount, bCount);
                     case enum_.RelationOperator.le:
-                        return aCount <= bCount;
+                        return this.math.lte(aCount, bCount);
                     case enum_.RelationOperator.lt:
-                        return aCount < bCount;
+                        return this.math.lt(aCount, bCount);
                     default:
-                        return aCount == bCount;
+                        return this.math.eq(aCount, bCount);
                 }
             });
             const res = await Promise.all(tasks);
@@ -64,8 +67,9 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
     public async checkEnough(uow: IUnitOfWork, times: number, consumeValues: contract.IValue[]) {
         for (const r of consumeValues) {
             const count = await this.getCount(uow, r.valueType);
-            if (count + r.count * times < 0)
-                throw ValueServiceBase.buildNotEnoughErrorFunc(r.count * times, count, r.valueType);
+
+            if (this.math.lt(this.math.add(count, this.math.multiply(r.count, times)), 0))
+                throw ValueServiceBase.buildNotEnoughErrorFunc(this.math.multiply(r.count, times), count, r.valueType);
         }
     }
 
@@ -81,7 +85,7 @@ export abstract class ValueServiceBase<T extends global.UserValue> {
             const now = await this.userService.now;
             const oldNow = entry.values[valueTypeEntry.time.valueType];
             const ok = moment.unix(now).isSame(
-                moment.unix(oldNow),
+                moment.unix(Number(oldNow)),
                 allValueTypeItem[valueTypeEntry.time.valueType]?.entry?.time?.momentType ?? 'day'
             );
             if (!ok) {

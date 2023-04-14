@@ -8,6 +8,7 @@ import { IUnitOfWork } from './i-unit-of-work';
 import { UserServiceBase } from './user-service-base';
 import { ValueServiceBase } from './value-service-base';
 import { contract, enum_, global } from '../model';
+import { BigIntegerMath } from '../service';
 
 class Self extends ValueServiceBase<global.UserValue> {
     public constructor(
@@ -15,7 +16,7 @@ class Self extends ValueServiceBase<global.UserValue> {
         userService: UserServiceBase,
         getEntryFunc: () => Promise<global.UserValue>,
     ) {
-        super(userService, enumFactory, getEntryFunc);
+        super(userService, enumFactory, new BigIntegerMath(), getEntryFunc);
     }
 
     public async update(_: IUnitOfWork, __: contract.IValue[]) { }
@@ -708,7 +709,7 @@ describe('src/contract/value-service-base.ts', () => {
                 2: {
                     entry: {}
                 }
-            }
+            };
             await fn(allItem, 1);
             deepStrictEqual(allItem[1].entry, {
                 dailyTime: 2,
