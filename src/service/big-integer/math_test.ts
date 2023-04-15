@@ -122,4 +122,16 @@ describe('src/service/big-integer/math.ts', () => {
             strictEqual(bigintAbs, '1002001');
         });
     });
+
+    describe('.subtract(a: Integer, b: Integer)', () => {
+        it('ok', async () => {
+            const self = new Self();
+
+            const numAbs = self.subtract(22201, 100);
+            strictEqual(numAbs, 22101);
+
+            const bigintAbs = self.subtract('1001', 1001);
+            strictEqual(bigintAbs, '0');
+        });
+    });
 });
