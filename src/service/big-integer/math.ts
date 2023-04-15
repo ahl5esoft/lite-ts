@@ -88,6 +88,6 @@ export class BigIntegerMath extends MathBase {
         if (typeof a == 'number' && typeof b == 'number')
             return a - b;
 
-        return (BigInt(a) / BigInt(b)).toString();
+        return (BigInt(a) - BigInt(b)).toString();
     }
 }
