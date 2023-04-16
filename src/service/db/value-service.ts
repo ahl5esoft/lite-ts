@@ -97,7 +97,7 @@ export class DbValueService<
         const allValueTypeItem = await this.enumFactory.build(enum_.ValueTypeData).allItem;
         const nowUnix = await this.userService.now;
         for (const r of values) {
-            if (typeof r.valueType != 'number' || typeof r.count != 'number' || isNaN(r.count))
+            if (typeof r.valueType != 'number' || isNaN(r.count as any))
                 continue;
 
             entry.values[r.valueType] ??= 0;
