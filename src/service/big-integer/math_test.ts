@@ -13,6 +13,13 @@ describe('src/service/big-integer/math.ts', () => {
             const bigintAbs = self.abs('-100000000000000000000000');
             strictEqual(bigintAbs, '100000000000000000000000');
         });
+
+        it('小数', async () => {
+            const self = new Self();
+
+            const numAbs = self.abs('-10.12');
+            strictEqual(numAbs, '10');
+        });
     });
 
     describe('.add(a: Integer, b: Integer)', () => {
@@ -32,7 +39,7 @@ describe('src/service/big-integer/math.ts', () => {
             const self = new Self();
 
             const numAbs = self.divide(22201, 100);
-            strictEqual(numAbs, 222);
+            strictEqual(numAbs, 222.01);
 
             const bigintAbs = self.divide('100000000000000000000000', 1000);
             strictEqual(bigintAbs, '100000000000000000000');
@@ -120,6 +127,18 @@ describe('src/service/big-integer/math.ts', () => {
 
             const bigintAbs = self.multiply('1001', 1001);
             strictEqual(bigintAbs, '1002001');
+        });
+    });
+
+    describe('.pow(a: Integer, b: number)', () => {
+        it('ok', async () => {
+            const self = new Self();
+
+            const numAbs = self.pow(100, 3);
+            strictEqual(numAbs, 1000000);
+
+            const bigintAbs = self.pow('10000', 4);
+            strictEqual(bigintAbs, '10000000000000000');
         });
     });
 
