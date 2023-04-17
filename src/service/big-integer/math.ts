@@ -114,14 +114,12 @@ export class BigIntegerMath extends MathBase {
 
             const [_, num, __, exponent] = match;
             const index = num.indexOf('.');
-            if (index >= 0) {
+            if (index >= 0)
                 numStr = num.replace('.', '').padEnd(Number(exponent) + index, '0');
-            } else {
+            else
                 numStr = num.padEnd(Number(exponent) + num.length, '0');
-            }
         }
 
-        const index = numStr.indexOf('.');
-        return BigInt(index >= 0 ? numStr.substring(0, index) : numStr);
+        return BigInt(numStr);
     }
 }
