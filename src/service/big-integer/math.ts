@@ -1,6 +1,9 @@
 import { MathBase, Integer } from '../../contract';
 
 export class BigIntegerMath extends MathBase {
+
+    public static reg = /(\d(\.\d+)?)e\+(\d+)/;
+
     public abs(a: Integer) {
         if (typeof a == 'number')
             return Math.abs(a);
@@ -103,8 +106,20 @@ export class BigIntegerMath extends MathBase {
     }
 
     private toBigInt(a: Integer) {
-        const numStr = a.toString();
-        const index = numStr.indexOf('.');
-        return BigInt(index >= 0 ? numStr.substring(0, index) : numStr);
+        let numStr = a.toString();
+        if (numStr.includes('e+')) {
+            const match = numStr.match(BigIntegerMath.reg);
+            if (!match)
+                throw new Error(`错误的数字格式: ${a}`);
+
+            const [_, num, __, exponent] = match;
+            const index = num.indexOf('.');
+            if (index >= 0)
+                numStr = num.replace('.', '').padEnd(Number(exponent) + index, '0');
+            else
+                numStr = num.padEnd(Number(exponent) + num.length, '0');
+        }
+
+        return BigInt(numStr);
     }
 }

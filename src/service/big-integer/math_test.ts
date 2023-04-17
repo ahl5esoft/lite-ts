@@ -7,18 +7,18 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.abs(-10);
-            strictEqual(numAbs, 10);
+            const numRes = self.abs(-10);
+            strictEqual(numRes, 10);
 
-            const bigintAbs = self.abs('-100000000000000000000000');
-            strictEqual(bigintAbs, '100000000000000000000000');
+            const bigintRes = self.abs('-100000000000000000000000');
+            strictEqual(bigintRes, '100000000000000000000000');
         });
 
         it('小数', async () => {
             const self = new Self();
 
-            const numAbs = self.abs('-10.12');
-            strictEqual(numAbs, '10');
+            const numRes = self.abs('-10.12');
+            strictEqual(numRes, '10');
         });
     });
 
@@ -26,11 +26,18 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.add(-10, 100);
-            strictEqual(numAbs, 90);
+            const numRes = self.add(-10, 100);
+            strictEqual(numRes, 90);
 
-            const bigintAbs = self.add('100000000000000000000000', 1000);
-            strictEqual(bigintAbs, '100000000000000000001000');
+            const bigintRes = self.add('100000000000000000000000', 1000);
+            strictEqual(bigintRes, '100000000000000000001000');
+        });
+
+        it('科学计数法', async () => {
+            const self = new Self();
+
+            const res = self.add('100', 1.1e+20);
+            strictEqual(res, '110000000000000000100');
         });
     });
 
@@ -38,11 +45,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.divide(22201, 100);
-            strictEqual(numAbs, 222.01);
+            const numRes = self.divide(22201, 100);
+            strictEqual(numRes, 222.01);
 
-            const bigintAbs = self.divide('100000000000000000000000', 1000);
-            strictEqual(bigintAbs, '100000000000000000000');
+            const bigintRes = self.divide('100000000000000000000000', 1000);
+            strictEqual(bigintRes, '100000000000000000000');
         });
     });
 
@@ -50,11 +57,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.eq(22201, 100);
-            strictEqual(numAbs, false);
+            const numRes = self.eq(22201, 100);
+            strictEqual(numRes, false);
 
-            const bigintAbs = self.eq('1001', 1001);
-            strictEqual(bigintAbs, true);
+            const bigintRes = self.eq('1001', 1001);
+            strictEqual(bigintRes, true);
         });
     });
 
@@ -62,11 +69,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.gte(22201, 100);
-            strictEqual(numAbs, true);
+            const numRes = self.gte(22201, 100);
+            strictEqual(numRes, true);
 
-            const bigintAbs = self.gte('1001', 1001);
-            strictEqual(bigintAbs, true);
+            const bigintRes = self.gte('1001', 1001);
+            strictEqual(bigintRes, true);
         });
     });
 
@@ -74,11 +81,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.gt(22201, 100);
-            strictEqual(numAbs, true);
+            const numRes = self.gt(22201, 100);
+            strictEqual(numRes, true);
 
-            const bigintAbs = self.gt('1001', 1001);
-            strictEqual(bigintAbs, false);
+            const bigintRes = self.gt('1001', 1001);
+            strictEqual(bigintRes, false);
         });
     });
 
@@ -86,11 +93,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.lt(22201, 100);
-            strictEqual(numAbs, false);
+            const numRes = self.lt(22201, 100);
+            strictEqual(numRes, false);
 
-            const bigintAbs = self.lt('1001', 1001);
-            strictEqual(bigintAbs, false);
+            const bigintRes = self.lt('1001', 1001);
+            strictEqual(bigintRes, false);
         });
     });
 
@@ -98,11 +105,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.lte(22201, 100);
-            strictEqual(numAbs, false);
+            const numRes = self.lte(22201, 100);
+            strictEqual(numRes, false);
 
-            const bigintAbs = self.lte('1001', 1001);
-            strictEqual(bigintAbs, true);
+            const bigintRes = self.lte('1001', 1001);
+            strictEqual(bigintRes, true);
         });
     });
 
@@ -110,11 +117,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.mod(22201, 100);
-            strictEqual(numAbs, 1);
+            const numRes = self.mod(22201, 100);
+            strictEqual(numRes, 1);
 
-            const bigintAbs = self.mod('1001', 1001);
-            strictEqual(bigintAbs, '0');
+            const bigintRes = self.mod('1001', 1001);
+            strictEqual(bigintRes, '0');
         });
     });
 
@@ -122,11 +129,18 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.multiply(22201, 100);
-            strictEqual(numAbs, 2220100);
+            const numRes = self.multiply(22201, 100);
+            strictEqual(numRes, 2220100);
 
-            const bigintAbs = self.multiply('1001', 1001);
-            strictEqual(bigintAbs, '1002001');
+            const bigintRes = self.multiply('1001', 1001);
+            strictEqual(bigintRes, '1002001');
+        });
+
+        it('科学计数法', async () => {
+            const self = new Self();
+
+            const res = self.multiply(155, Math.pow(1.0053, 10000));
+            strictEqual(res, 1.4033217213822456e+25);
         });
     });
 
@@ -134,11 +148,11 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.pow(100, 3);
-            strictEqual(numAbs, 1000000);
+            const numRes = self.pow(100, 3);
+            strictEqual(numRes, 1000000);
 
-            const bigintAbs = self.pow('10000', 4);
-            strictEqual(bigintAbs, '10000000000000000');
+            const bigintRes = self.pow('10000', 4);
+            strictEqual(bigintRes, '10000000000000000');
         });
     });
 
@@ -146,11 +160,21 @@ describe('src/service/big-integer/math.ts', () => {
         it('ok', async () => {
             const self = new Self();
 
-            const numAbs = self.subtract(22201, 100);
-            strictEqual(numAbs, 22101);
+            const numRes = self.subtract(22201, 100);
+            strictEqual(numRes, 22101);
 
-            const bigintAbs = self.subtract('1001', 1001);
-            strictEqual(bigintAbs, '0');
+            const bigintRes = self.subtract('1001', 1001);
+            strictEqual(bigintRes, '0');
+        });
+
+        it('科学计数法', async () => {
+            const self = new Self();
+
+            const numRes1 = self.subtract('1e+10', 1e+9);
+            strictEqual(numRes1, '9000000000');
+
+            const numRes2 = self.subtract('100000000000000000000000000', 1.4033217213822456e+25);
+            strictEqual(numRes2, '85966782786177544000000000');
         });
     });
 });
