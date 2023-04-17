@@ -73,6 +73,13 @@ export abstract class MathBase {
     public abstract multiply(a: Integer, b: Integer): Integer;
 
     /**
+     * a ^ b
+     * @param a 
+     * @param b 
+     */
+    public abstract pow(a: Integer, b: number): Integer;
+
+    /**
      * a - b
      * @param a 
      * @param b 
